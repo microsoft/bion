@@ -7,7 +7,6 @@ namespace Bion
     public unsafe class BionReader : IDisposable
     {
         private Stream _stream;
-        private long _totalLengthBytes;
 
         // String and Property Name tokens, in order, are Len5b, Len2b, Len1b, Look1b, Look2b.
         private static sbyte[] LengthLookup = new sbyte[] { 5, 2, 1, -1, -2 };
@@ -16,7 +15,6 @@ namespace Bion
         {
             _stream = new BufferedStream(stream);
             _buffer = new byte[1024];
-            _totalLengthBytes = stream.Length - stream.Position;
         }
 
         public long BytesRead { get; private set; }
@@ -26,11 +24,13 @@ namespace Bion
 
         private BionMarker _currentMarker;
         private int _currentLength;
+        private int _currentDepth;
         private byte[] _buffer;
 
         public bool Read()
         {
-            if (BytesRead >= _totalLengthBytes) return false;
+            // Check for end (after reading one thing at the root depth)
+            if (_currentDepth == 0 && BytesRead > 0) return false;
 
             // Read the current token marker
             _currentMarker = (BionMarker)_stream.ReadByte();
@@ -41,6 +41,9 @@ namespace Bion
             {
                 // Container. Token is all marker bits. LoL and Length zero.
                 TokenType = (BionToken)_currentMarker;
+
+                // Increment or Decrement depth
+                _currentDepth += (_currentMarker >= BionMarker.StartArray ? 1 : -1);
             }
             else if(_currentMarker >= BionMarker.String)
             {
@@ -80,6 +83,7 @@ namespace Bion
             // Read value
             if(_currentLength > 0)
             {
+                Allocator.EnsureBufferLength(ref _buffer, _currentLength);
                 _stream.Read(_buffer, 0, _currentLength);
                 BytesRead += _currentLength;
             }

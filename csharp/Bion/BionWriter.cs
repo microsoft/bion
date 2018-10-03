@@ -92,22 +92,22 @@ namespace Bion
 
         public void WriteValue(string value)
         {
-            WriteStringValue(BionMarker.String, value, 0, value?.Length ?? 0);
+            WriteStringValue(BionToken.String, value, 0, value?.Length ?? 0);
         }
 
         public void WriteValue(string value, int index, int count)
         {
-            WriteStringValue(BionMarker.String, value, index, count);
+            WriteStringValue(BionToken.String, value, index, count);
         }
 
         public void WritePropertyName(string name)
         {
-            WriteStringValue(BionMarker.PropertyName, name, 0, name?.Length ?? 0);
+            WriteStringValue(BionToken.PropertyName, name, 0, name?.Length ?? 0);
         }
 
         public void WritePropertyName(string name, int index, int count)
         {
-            WriteStringValue(BionMarker.PropertyName, name, index, count);
+            WriteStringValue(BionToken.PropertyName, name, index, count);
         }
 
         private void WriteInteger(BionMarker marker, ulong value)
@@ -125,7 +125,40 @@ namespace Bion
             BytesWritten += length;
         }
 
-        private void WriteStringValue(BionMarker markerType, string value, int index, int count)
+        private void WriteStringLength(BionToken marker, int stringLength)
+        {
+            int lengthOfLength;
+            int markerAdjustment;
+
+            if (stringLength <= MaxOneByteLength)
+            {
+                lengthOfLength = 1;
+                markerAdjustment = -2;
+            }
+            else if (stringLength <= MaxTwoByteLength)
+            {
+                lengthOfLength = 2;
+                markerAdjustment = -1;
+            }
+            else
+            {
+                lengthOfLength = 5;
+                markerAdjustment = 0;
+            }
+
+            for(int index = 1; index <= lengthOfLength; ++index)
+            {
+                _buffer[index] = (byte)(stringLength & 0x7F);
+                stringLength = stringLength >> 7;
+            }
+
+            _buffer[0] = (byte)((int)marker + markerAdjustment);
+
+            _stream.Write(_buffer, 0, lengthOfLength + 1);
+            BytesWritten += lengthOfLength + 1;
+        }
+
+        private void WriteStringValue(BionToken markerType, string value, int index, int count)
         {
             if (value == null)
             {
@@ -133,52 +166,17 @@ namespace Bion
                 return;
             }
 
-            // Figure out string length
             int length = Encoding.UTF8.GetByteCount(value, index, count);
+            
+            // Write marker and length
+            WriteStringLength(markerType, length);
 
-            // Ensure buffer large enough for marker, length, and value
-            EnsureBufferLength(length + 6);
+            // Encode and write value
+            Allocator.EnsureBufferLength(ref _buffer, length);
+            Encoding.UTF8.GetBytes(value, index, count, _buffer, 0);
 
-            // Figure out convert marker and length to encoded value
-            byte lengthBeforeValue = ConvertStringLength(markerType, length);
-
-            // Encode value
-            Encoding.UTF8.GetBytes(value, index, count, _buffer, lengthBeforeValue);
-
-            // Write marker, length, and value
-            _stream.Write(_buffer, 0, lengthBeforeValue + length);
-            BytesWritten += lengthBeforeValue + length;
-        }
-
-        private byte ConvertStringLength(BionMarker markerType, int length)
-        {
-            if (length <= MaxOneByteLength)
-            {
-                // Write as one byte (enum: Marker + 1)
-                _buffer[0] = (byte)(markerType + 1);
-                _buffer[1] = (byte)(length & 0x7F);
-                return 2;
-            }
-            else if (length <= MaxTwoByteLength)
-            {
-                // Write as two bytes (enum: Marker + 2)
-                _buffer[0] = (byte)(markerType + 2);
-                _buffer[1] = (byte)(length & 0x7F);
-                _buffer[2] = (byte)((length >> 7) & 0x7F);
-                return 3;
-            }
-            else
-            {
-                // Write as five bytes (enum: Marker + 3)
-                _buffer[0] = (byte)(markerType + 3);
-                for (int index = 0; index < 5; ++index)
-                {
-                    _buffer[index + 1] = (byte)(length & 0x7F);
-                    length = length >> 7;
-                    index++;
-                }
-                return 6;
-            }
+            _stream.Write(_buffer, 0, length);
+            BytesWritten += length;
         }
 
         private void WriteStartContainer(BionMarker container)
@@ -210,16 +208,6 @@ namespace Bion
         {
             _stream.WriteByte(value);
             BytesWritten++;
-        }
-
-        private void EnsureBufferLength(int length)
-        {
-            if (_buffer.Length >= length) return;
-
-            int newLength = _buffer.Length + _buffer.Length / 4;
-            if (length > newLength) newLength = length;
-
-            _buffer = new byte[newLength];
         }
 
         public void Dispose()

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 
 namespace Bion.Test
@@ -6,6 +7,33 @@ namespace Bion.Test
     [TestClass]
     public class BionRoundTripBasics
     {
+        [TestMethod]
+        public void Literals()
+        {
+            RoundTrip((bool?)null);
+            RoundTrip(true);
+            RoundTrip(false);
+        }
+
+        [TestMethod]
+        public void Strings()
+        {
+            RoundTrip("");
+            RoundTrip("Simple");
+            RoundTrip("Normally\t\r\nRequires\"Escaping\"");
+
+            RoundTrip("\u00BC");                // Two Byte  [¼]
+            RoundTrip("\u16A0");                // Three Byte  [ᚠ]
+            RoundTrip("\U00010908");            // Four Byte  [𐤈] (should look like circle with X inscribed)
+
+            RoundTrip("\u1F3AF");               // 'Direct Hit' (dart board bullseye)
+            RoundTrip("\u1F937");               // Person Shrugging
+            RoundTrip("\u263A\uFE0F");          // Smiley Face
+            RoundTrip("\u2714\uFE0F");          // Check Mark")
+
+            RoundTrip(new string('S', ushort.MaxValue));
+        }
+
         [TestMethod]
         public void Integers()
         {
@@ -32,34 +60,140 @@ namespace Bion.Test
             RoundTrip(long.MinValue);
         }
 
-        private static void RoundTrip(long value)
+        [TestMethod]
+        public void Doubles()
         {
-            byte[] buffer = new byte[20];
+            RoundTrip(0.0);
+            RoundTrip(0.3333);
+            RoundTrip(0.5);
+            RoundTrip(1.0);
 
-            using (MemoryStream stream = new MemoryStream(buffer))
+            RoundTrip(-0.5);
+            RoundTrip(-1.0);
+            
+            RoundTrip((double)int.MaxValue);
+
+            RoundTrip(float.MinValue);
+            RoundTrip(float.MaxValue);
+            RoundTrip(double.MinValue);
+            RoundTrip(double.MaxValue);
+        }
+
+        private static void RoundTrip(Action<BionWriter> write, Action<BionReader> readAndVerify)
+        {
+            using (MemoryStream stream = new MemoryStream())
             {
+                // Write desired value(s) without closing stream
                 using (BionWriter writer = new BionWriter(stream))
                 {
                     writer.CloseStream = false;
-                    writer.WriteValue(value);
+                    write(writer);
                 }
 
+                // Track position and seek back
                 long length = stream.Position;
                 stream.Seek(0, SeekOrigin.Begin);
 
+                // Read, verify, validate position and no more content
                 using (BionReader reader = new BionReader(stream))
                 {
                     reader.CloseStream = false;
+                    readAndVerify(reader);
 
+                    Assert.AreEqual(length, reader.BytesRead);
+                    Assert.IsFalse(reader.Read());
+                }
+            }
+        }
+
+        private static void RoundTrip(bool? value)
+        {
+            RoundTrip(
+                (writer) =>
+                {
+                    writer.WriteValue(value);
+                },
+                (reader) =>
+                {
+                    Assert.IsTrue(reader.Read());
+
+                    if (value == null)
+                    {
+                        Assert.AreEqual(BionToken.Null, reader.TokenType);
+                    }
+                    else if (value == true)
+                    {
+                        Assert.AreEqual(BionToken.True, reader.TokenType);
+                        Assert.AreEqual(true, reader.CurrentBool());
+                    }
+                    else
+                    {
+                        Assert.AreEqual(BionToken.False, reader.TokenType);
+                        Assert.AreEqual(false, reader.CurrentBool());
+                    }
+                }
+            );
+        }
+
+        private static void RoundTrip(long value)
+        {
+            RoundTrip(
+                (writer) =>
+                {
+                    writer.WriteValue(value);
+                },
+                (reader) =>
+                {
                     Assert.IsTrue(reader.Read());
                     Assert.AreEqual(BionToken.Integer, reader.TokenType);
 
                     long valueRead = reader.CurrentInteger();
                     Assert.AreEqual(value, valueRead);
-
-                    Assert.AreEqual(length, reader.BytesRead);
                 }
-            }
+            );
+        }
+
+        private static void RoundTrip(double value)
+        {
+            RoundTrip(
+                (writer) =>
+                {
+                    writer.WriteValue(value);
+                },
+                (reader) =>
+                {
+                    Assert.IsTrue(reader.Read());
+                    Assert.AreEqual(BionToken.Float, reader.TokenType);
+
+                    double valueRead = reader.CurrentFloat();
+                    Assert.AreEqual(value, valueRead);
+                }
+            );
+        }
+
+        private static void RoundTrip(string value)
+        {
+            RoundTrip(
+                (writer) =>
+                {
+                    // Write twice as both string containers
+                    //writer.WritePropertyName(value);
+                    writer.WriteValue(value);
+                },
+                (reader) =>
+                {
+                    // Read and validate in both forms
+                    //Assert.IsTrue(reader.Read());
+                    //Assert.AreEqual(BionToken.PropertyName, reader.TokenType);
+                    //string readAsPropertyName = reader.CurrentString();
+                    //Assert.AreEqual(value, readAsPropertyName);
+
+                    Assert.IsTrue(reader.Read());
+                    Assert.AreEqual(BionToken.String, reader.TokenType);
+                    string readAsString = reader.CurrentString();
+                    Assert.AreEqual(value, readAsString);
+                }
+            );
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Bion
+﻿namespace Bion
 {
     public enum BionToken : byte
     {
@@ -11,9 +7,9 @@ namespace Bion
         EndObject = 0xFD,
         EndArray = 0xFC,
 
-        String = 0xFB,
+        String = 0xFB,              // Encoding must equal longest (5b) String
 
-        PropertyName = 0xF7,
+        PropertyName = 0xF7,        // Encoding must equal longest (5b) PropertyName
 
         Null = 0xF2,
         True = 0xF1,
@@ -40,8 +36,9 @@ namespace Bion
         PropertyNameLength5b = 0xF7,
         PropertyNameLength2b = 0xF6,
         PropertyNameLength1b = 0xF5,
-        PropertyNameLookup2b = 0xF4,
-        PropertyName = 0xF4,
+        PropertyNameLookup1b = 0xF4,
+        PropertyNameLookup2b = 0xF3,
+        PropertyName = 0xF3,
 
         Null = 0xF2,
         True = 0xF1,
