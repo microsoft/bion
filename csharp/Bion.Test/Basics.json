@@ -1,0 +1,15 @@
+{
+  "IsNull": null,
+  "IsTrue": true,
+  "IsFalse": false,
+  "Zero": 0,
+  "TinyInteger": 15,
+  "NegativeInteger": -1,
+  "SmallFloat": 0.5,
+  "EmptyString": "",
+  "ShortString": "hello",
+  "BoolArray": [ true, false, false, false, true, true, true, false ],
+  "NestedObject": {
+    "NestedString": "InnerValue"
+  }
+}
