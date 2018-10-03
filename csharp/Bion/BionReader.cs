@@ -143,6 +143,7 @@ namespace Bion
 
         public string CurrentString()
         {
+            if (TokenType == BionToken.Null) return null;
             if (TokenType != BionToken.PropertyName && TokenType != BionToken.String) throw new InvalidCastException($"@{BytesRead}: TokenType {TokenType} isn't a string type.");
             return Encoding.UTF8.GetString(_buffer, 0, _currentLength);
         }

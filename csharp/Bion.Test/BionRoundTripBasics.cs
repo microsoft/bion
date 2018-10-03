@@ -18,6 +18,7 @@ namespace Bion.Test
         [TestMethod]
         public void Strings()
         {
+            RoundTrip((string)null);
             RoundTrip("");
             RoundTrip("Simple");
             RoundTrip("Normally\t\r\nRequires\"Escaping\"");
@@ -177,21 +178,29 @@ namespace Bion.Test
                 (writer) =>
                 {
                     // Write twice as both string containers
-                    //writer.WritePropertyName(value);
+                    writer.WriteStartObject();
+                    writer.WritePropertyName(value);
                     writer.WriteValue(value);
+                    writer.WriteEndObject();
                 },
                 (reader) =>
                 {
+                    // StartObject
+                    Assert.IsTrue(reader.Read());
+
                     // Read and validate in both forms
-                    //Assert.IsTrue(reader.Read());
-                    //Assert.AreEqual(BionToken.PropertyName, reader.TokenType);
-                    //string readAsPropertyName = reader.CurrentString();
-                    //Assert.AreEqual(value, readAsPropertyName);
+                    Assert.IsTrue(reader.Read());
+                    Assert.AreEqual((value != null ? BionToken.PropertyName : BionToken.Null), reader.TokenType);
+                    string readAsPropertyName = reader.CurrentString();
+                    Assert.AreEqual(value, readAsPropertyName);
 
                     Assert.IsTrue(reader.Read());
-                    Assert.AreEqual(BionToken.String, reader.TokenType);
+                    Assert.AreEqual((value != null ? BionToken.String : BionToken.Null), reader.TokenType);
                     string readAsString = reader.CurrentString();
                     Assert.AreEqual(value, readAsString);
+
+                    // EndObject
+                    Assert.IsTrue(reader.Read());
                 }
             );
         }
