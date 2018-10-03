@@ -17,13 +17,12 @@ namespace Bion.Console
             ToBion(fromPath, bionPath);
             ToJson(bionPath, jsonPath);
             Compare(fromPath, bionPath);
-            ReadSpeed(bionPath);
 
-            //ReadSpeed(fromPath, false);
-            //for (int i = 0; i < 5; ++i)
-            //{
-            //    ReadSpeed(toBionPath, false);
-            //}
+            ReadSpeed(jsonPath);
+            for (int i = 0; i < 5; ++i)
+            {
+                ReadSpeed(bionPath);
+            }
 
             //JsonStatistics stats = new JsonStatistics(args[0]);
             //System.Console.WriteLine(stats);

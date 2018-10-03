@@ -13,6 +13,7 @@ namespace Bion
 
         public BionReader(Stream stream)
         {
+            CloseStream = true;
             _stream = new BufferedStream(stream);
             _buffer = new byte[1024];
         }

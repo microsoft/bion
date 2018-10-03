@@ -21,6 +21,7 @@ namespace Bion
 
         public BionWriter(Stream stream)
         {
+            CloseStream = true;
             _stream = new BufferedStream(stream);
             _containers = new Stack<long>();
             _buffer = new byte[1024];
