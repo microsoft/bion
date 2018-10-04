@@ -14,28 +14,27 @@ namespace Bion
         public long BytesWritten { get; private set; }
         public bool CloseStream { get; set; }
 
-        private Stream _lookupStream;
+        private Stream _stream;
+        private Stack<long> _containers;
+        private byte[] _buffer;
+
         private LookupDictionary _lookupDictionary;
 
-        private Stream _stream;
-        
-        private Stack<long> _containers;
-
-        private byte[] _buffer;
+        private string _lastPropertyName;
+        private long _lastPropertyPosition;
 
         public BionWriter(Stream stream) : this(stream, null)
         { }
 
-        public BionWriter(Stream stream, Stream lookupStream)
+        public BionWriter(Stream stream, LookupDictionary lookupDictionary)
         {
             CloseStream = true;
-
-            _lookupStream = lookupStream;
-            if (_lookupStream != null) _lookupDictionary = new LookupDictionary();
 
             _stream = new BufferedStream(stream);
             _containers = new Stack<long>();
             _buffer = new byte[1024];
+
+            _lookupDictionary = lookupDictionary;
         }
 
         public void WriteStartObject()
@@ -82,7 +81,7 @@ namespace Bion
 
         public void WriteValue(long value)
         {
-            if(value < 0)
+            if (value < 0)
             {
                 WriteVariableInteger(BionMarker.NegativeInteger, (ulong)(-value));
             }
@@ -130,6 +129,9 @@ namespace Bion
         public void WritePropertyName(string name)
         {
             WriteStringValue(BionToken.PropertyName, name);
+
+            _lastPropertyName = name;
+            _lastPropertyPosition = BytesWritten;
         }
 
         private void WriteStringLength(BionToken marker, int stringLength)
@@ -168,21 +170,28 @@ namespace Bion
                 return;
             }
 
-            if(markerType == BionToken.PropertyName && _lookupDictionary != null)
+            if (_lookupDictionary != null)
             {
-                if(_lookupDictionary.TryLookup(value, out short index))
+                if (markerType == BionToken.PropertyName)
                 {
-                    ConvertFixedInteger((ulong)index, 2);
-                    _buffer[0] = (byte)BionMarker.PropertyNameLookup2b;
-                    _stream.Write(_buffer, 0, 3);
-                    BytesWritten += 3;
-
-                    return;
+                    if (_lookupDictionary.TryLookup(value, out short index))
+                    {
+                        WriteLookupIndex(BionMarker.PropertyNameLookup1b, index);
+                        return;
+                    }
+                }
+                else if(_lastPropertyPosition == BytesWritten)
+                {
+                    if(_lookupDictionary.TryLookup(_lastPropertyName, value, out short index))
+                    {
+                        WriteLookupIndex(BionMarker.StringLookup1b, index);
+                        return;
+                    }
                 }
             }
 
             int length = Encoding.UTF8.GetByteCount(value);
-            
+
             // Write marker and length
             WriteStringLength(markerType, length);
 
@@ -192,6 +201,16 @@ namespace Bion
 
             _stream.Write(_buffer, 0, length);
             BytesWritten += length;
+        }
+
+        private void WriteLookupIndex(BionMarker oneByteLookupMarker, short index)
+        {
+            byte length = ConvertVariableInteger((ushort)index);
+            if (length == 2) oneByteLookupMarker -= 1;
+            _buffer[0] = (byte)oneByteLookupMarker;
+
+            _stream.Write(_buffer, 0, length + 1);
+            BytesWritten += length + 1;
         }
 
         private void WriteVariableInteger(BionMarker marker, ulong value)
@@ -236,11 +255,13 @@ namespace Bion
         private byte ConvertVariableInteger(ulong value)
         {
             byte length = 1;
-            for(; value > 0; ++length)
+            do
             {
                 _buffer[length] = (byte)(value & 0x7F);
                 value = value >> 7;
-            }
+                length++;
+            } while (value > 0);
+
             return --length;
         }
 
@@ -277,26 +298,17 @@ namespace Bion
 
         public void Dispose()
         {
-            if(_stream != null)
+            if (_stream != null)
             {
                 _stream.Flush();
-
-                if (CloseStream)
-                {
-                    _stream.Close();
-                    _stream.Dispose();
-                }
-
-                if(_lookupDictionary != null)
-                {
-                    _lookupDictionary.Write(_lookupStream);
-                    _lookupDictionary = null;
-
-                    _lookupStream.Dispose();
-                    _lookupStream = null;
-                }
-
+                if (CloseStream) _stream.Dispose();
                 _stream = null;
+            }
+
+            if (_lookupDictionary != null)
+            {
+                _lookupDictionary.Dispose();
+                _lookupDictionary = null;
             }
         }
     }

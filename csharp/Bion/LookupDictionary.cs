@@ -25,7 +25,7 @@ namespace Bion
         }
     }
 
-    public class LookupDictionary
+    public class LookupDictionary : IDisposable
     {
         public const int PropertyNameLengthLimit = 32;
         public const int PropertyNameCountLimit = 16384;
@@ -35,30 +35,63 @@ namespace Bion
 
         private List<LookupEntry> _lookupArray;
         private Dictionary<string, LookupEntry> _lookupDictionary;
+        private Stream _writeToStream;
 
         public bool IsReadOnly { get; private set; }
 
         /// <summary>
         ///  Build a writeable LookupDictionary for the current document.
         /// </summary>
-        public LookupDictionary()
+        public LookupDictionary() : this(false, null)
+        { }
+
+        private LookupDictionary(bool isReadOnly, Stream writeToStream)
         {
             _lookupArray = new List<LookupEntry>();
             _lookupDictionary = new Dictionary<string, LookupEntry>();
-            IsReadOnly = false;
+            _writeToStream = writeToStream;
+            IsReadOnly = isReadOnly;
         }
 
         /// <summary>
         ///  Load a read only LookupDictionary from an existing stream.
         /// </summary>
-        /// <param name="stream"></param>
-        public LookupDictionary(Stream stream) : this()
+        /// <param name="stream">Stream to read from</param>
+        public static LookupDictionary OpenRead(Stream stream)
         {
+            LookupDictionary result = new LookupDictionary(true, null);
             using (BionReader reader = new BionReader(stream))
             {
-                Read(reader);
-                IsReadOnly = true;
+                result.Read(reader);
             }
+            return result;
+        }
+
+        /// <summary>
+        ///  Load a read only LookupDictionary from an existing file.
+        /// </summary>
+        /// <param name="filePath">File Path to read from</param>
+        public static LookupDictionary OpenRead(string filePath)
+        {
+            return LookupDictionary.OpenRead(new FileStream(filePath, FileMode.Open));
+        }
+
+        /// <summary>
+        ///  Create a writeable LookupDictionary to be written to the target stream.
+        /// </summary>
+        /// <param name="stream">Stream to write to</param>
+        public static LookupDictionary OpenWrite(Stream stream)
+        {
+            return new LookupDictionary(false, stream);
+        }
+
+        /// <summary>
+        ///  Create a writeable LookupDictionary to be written to the target file.
+        /// </summary>
+        /// <param name="filePath">File Path to write to</param>
+        public static LookupDictionary OpenWrite(string filePath)
+        {
+            return LookupDictionary.OpenWrite(new FileStream(filePath, FileMode.Create));
         }
 
         /// <summary>
@@ -127,15 +160,20 @@ namespace Bion
 
         public string PropertyName(short index)
         {
-            if (index < 0 || index >= _lookupArray.Count) throw new ArgumentOutOfRangeException("index");
+            if (index < 0 || index >= _lookupArray.Count)
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
             return _lookupArray[index].PropertyName;
         }
 
-        public string Value(string propertyName, short index)
+        public string Value(short propertyIndex, short valueIndex)
         {
-            if (!_lookupDictionary.TryGetValue(propertyName, out LookupEntry entry)) throw new ArgumentOutOfRangeException("propertyName");
-            if (index < 0 || index >= entry.ValueCount) throw new ArgumentOutOfRangeException("index");
-            return entry.Values[index];
+            if (propertyIndex < 0 || propertyIndex >= _lookupArray.Count) throw new ArgumentOutOfRangeException("propertyName");
+
+            LookupEntry entry = _lookupArray[propertyIndex];
+            if (valueIndex < 0 || valueIndex >= entry.ValueCount) throw new ArgumentOutOfRangeException("index");
+            return entry.Values[valueIndex];
         }
 
         public void Write(BionWriter writer)
@@ -164,7 +202,7 @@ namespace Bion
         public void Write(Stream stream)
         {
             // Write, making sure not to have yet another nested LookupDictionary
-            using (BionWriter writer = new BionWriter(stream, lookupStream: null))
+            using (BionWriter writer = new BionWriter(stream, lookupDictionary: null))
             {
                 Write(writer);
             }
@@ -200,12 +238,13 @@ namespace Bion
             }
         }
 
-        public void Read(Stream stream)
+        public void Dispose()
         {
-            // Read, making sure not to have yet another nested LookupDictionary
-            using (BionReader reader = new BionReader(stream, lookupStream: null))
+            if(_writeToStream != null)
             {
-                Read(reader);
+                Write(_writeToStream);
+                _writeToStream.Dispose();
+                _writeToStream = null;
             }
         }
     }

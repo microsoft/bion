@@ -15,6 +15,7 @@ namespace Bion
         private int _currentLength;
         private int _currentDepth;
 
+        private short _lastPropertyLookupIndex;
         private string _currentDecodedString;
 
         // String and Property Name tokens, in order, are Len5b, Len2b, Len1b, Look1b, Look2b.
@@ -23,13 +24,13 @@ namespace Bion
         public BionReader(Stream stream) : this(stream, null)
         { }
 
-        public BionReader(Stream stream, Stream lookupStream)
+        public BionReader(Stream stream, LookupDictionary lookupDictionary)
         {
             CloseStream = true;
             _stream = new BufferedStream(stream);
             _buffer = new byte[1024];
 
-            if(lookupStream != null) _lookupDictionary = new LookupDictionary(lookupStream);
+            _lookupDictionary = lookupDictionary;
         }
 
         public long BytesRead { get; private set; }
@@ -175,9 +176,19 @@ namespace Bion
                 BytesRead += lengthOfLength;
 
                 short lookupIndex = (short)DecodeUnsignedInteger(lengthOfLength);
-                if (_lookupDictionary == null) throw new BionSyntaxException($"@{BytesRead}: Found Property Name lookup for index {lookupIndex}, but no LookupDictionary was passed to the reader.");
+                if (_lookupDictionary == null) throw new BionSyntaxException($"@{BytesRead}: Found {TokenType} lookup for index {lookupIndex}, but no LookupDictionary was passed to the reader.");
 
-                _currentDecodedString = _lookupDictionary.PropertyName(lookupIndex);
+                if (TokenType == BionToken.PropertyName)
+                {
+                    _currentDecodedString = _lookupDictionary.PropertyName(lookupIndex);
+                    _lastPropertyLookupIndex = lookupIndex;
+                }
+                else
+                {
+                    // A string value lookup can only appear right after a property name which is also indexed; look up the index from last time.
+                    _currentDecodedString = _lookupDictionary.Value(_lastPropertyLookupIndex, lookupIndex);
+                }
+
                 return 0;
             }
             else
@@ -214,12 +225,14 @@ namespace Bion
         {
             if (_stream != null)
             {
-                if (CloseStream)
-                {
-                    _stream.Dispose();
-                }
-
+                if (CloseStream) _stream.Dispose();
                 _stream = null;
+            }
+
+            if(_lookupDictionary != null)
+            {
+                _lookupDictionary.Dispose();
+                _lookupDictionary = null;
             }
         }
     }

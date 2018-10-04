@@ -47,7 +47,7 @@ namespace Bion.Test
             string bionLookupFilePath = "Basics.WithLookup.Lookup.bion";
 
             using (JsonTextReader reader = new JsonTextReader(new StreamReader(jsonFilePath)))
-            using (BionWriter writer = new BionWriter(new FileStream(bionFilePath, FileMode.Create), new FileStream(bionLookupFilePath, FileMode.Create)))
+            using (BionWriter writer = new BionWriter(new FileStream(bionFilePath, FileMode.Create), LookupDictionary.OpenWrite(bionLookupFilePath)))
             {
                 JsonBionConverter.JsonToBion(reader, writer);
             }
@@ -56,7 +56,7 @@ namespace Bion.Test
             JsonBionConverter.BionToJson(bionLookupFilePath, Path.ChangeExtension(bionLookupFilePath, ".json"));
 
             using (JsonTextReader jsonReader = new JsonTextReader(new StreamReader(jsonFilePath)))
-            using (BionReader bionReader = new BionReader(new FileStream(bionFilePath, FileMode.Open), new FileStream(bionLookupFilePath, FileMode.Open)))
+            using (BionReader bionReader = new BionReader(new FileStream(bionFilePath, FileMode.Open), LookupDictionary.OpenRead(bionLookupFilePath)))
             {
                 JsonBionComparer.Compare(jsonReader, bionReader);
             }

@@ -10,6 +10,7 @@
   "ShortString": "hello",
   "BoolArray": [ true, false, false, false, true, true, true, false ],
   "NestedObject": {
-    "ShortString": "InnerValue"
+    "ShortString": "InnerValue",
+    "StringArray":  [ "", "One", "Two" ]
   }
 }
