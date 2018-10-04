@@ -6,41 +6,41 @@ namespace Bion.Json
 {
     public class JsonBionComparer
     {
-        public static bool Compare(string jsonPath, string BionPath)
+        public static bool Compare(string jsonPath, string bionPath)
         {
             using (JsonTextReader jsonReader = new JsonTextReader(new StreamReader(jsonPath)))
-            using (BionReader BionReader = new BionReader(new FileStream(BionPath, FileMode.Open)))
+            using (BionReader BionReader = new BionReader(new FileStream(bionPath, FileMode.Open)))
             {
                 return Compare(jsonReader, BionReader);
             }
         }
 
-        public static bool Compare(JsonTextReader jsonReader, BionReader BionReader)
+        public static bool Compare(JsonTextReader jsonReader, BionReader bionReader)
         {
             while (true)
             {
                 bool moreJson = jsonReader.Read();
-                bool moreBion = BionReader.Read();
-                AssertEqual(jsonReader, BionReader, moreJson, moreBion, $".Read() return value");
+                bool moreBion = bionReader.Read();
+                AssertEqual(jsonReader, bionReader, moreJson, moreBion, $".Read() return value");
                 if (moreJson == false) break;
 
-                JsonToken BionToken = Convert(BionReader.TokenType);
-                AssertEqual(jsonReader, BionReader, jsonReader.TokenType, BionToken, "Token Type");
+                JsonToken BionToken = Convert(bionReader.TokenType);
+                AssertEqual(jsonReader, bionReader, jsonReader.TokenType, BionToken, "Token Type");
 
                 switch (BionToken)
                 {
                     case JsonToken.PropertyName:
                     case JsonToken.String:
-                        AssertEqual(jsonReader, BionReader, (string)jsonReader.Value, BionReader.CurrentString(), "text value");
+                        AssertEqual(jsonReader, bionReader, (string)jsonReader.Value, bionReader.CurrentString(), "text value");
                         break;
                     case JsonToken.Integer:
-                        AssertEqual(jsonReader, BionReader, (long)jsonReader.Value, BionReader.CurrentInteger(), "integer value");
+                        AssertEqual(jsonReader, bionReader, (long)jsonReader.Value, bionReader.CurrentInteger(), "integer value");
                         break;
                     case JsonToken.Float:
-                        AssertEqual(jsonReader, BionReader, (double)jsonReader.Value, BionReader.CurrentFloat(), "float value");
+                        AssertEqual(jsonReader, bionReader, (double)jsonReader.Value, bionReader.CurrentFloat(), "float value");
                         break;
                     case JsonToken.Boolean:
-                        AssertEqual(jsonReader, BionReader, (bool)jsonReader.Value, BionReader.CurrentBool(), "bool value");
+                        AssertEqual(jsonReader, bionReader, (bool)jsonReader.Value, bionReader.CurrentBool(), "bool value");
                         break;
                 }
             }

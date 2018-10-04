@@ -6,10 +6,10 @@ namespace Bion.Json
 {
     public class JsonBionConverter
     {
-        public static void JsonToBion(string jsonPath, string BionPath)
+        public static void JsonToBion(string jsonPath, string bionPath)
         {
             using (JsonTextReader reader = new JsonTextReader(new StreamReader(jsonPath)))
-            using (BionWriter writer = new BionWriter(new FileStream(BionPath, FileMode.Create)))
+            using (BionWriter writer = new BionWriter(new FileStream(bionPath, FileMode.Create)))
             {
                 JsonToBion(reader, writer);
             }
@@ -59,9 +59,9 @@ namespace Bion.Json
             }
         }
 
-        public static void BionToJson(string BionPath, string jsonPath)
+        public static void BionToJson(string bionPath, string jsonPath)
         {
-            using (BionReader reader = new BionReader(new FileStream(BionPath, FileMode.Open)))
+            using (BionReader reader = new BionReader(new FileStream(bionPath, FileMode.Open)))
             using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(jsonPath)))
             {
                 writer.Formatting = Formatting.Indented;
