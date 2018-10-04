@@ -61,7 +61,7 @@ namespace Bion.Console
                         //}
 
                         //object value = null;
-                        //switch(reader.TokenType)
+                        //switch (reader.TokenType)
                         //{
                         //    case TokenType.PropertyName:
                         //    case TokenType.String:
@@ -103,7 +103,7 @@ namespace Bion.Console
         private static void Compare(string jsonPath, string BionPath)
         {
             Stopwatch w = Stopwatch.StartNew();
-            JsonBionConverter.Compare(jsonPath, BionPath);
+            JsonBionComparer.Compare(jsonPath, BionPath);
             w.Stop();
             System.Console.WriteLine($"Done. Compared {new FileInfo(jsonPath).Length / BytesPerMB:n1}MB JSON to {new FileInfo(BionPath).Length / BytesPerMB:n1}MB Bion in {w.ElapsedMilliseconds:n0}ms.");
         }
