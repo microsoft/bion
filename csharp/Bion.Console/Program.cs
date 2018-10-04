@@ -11,18 +11,32 @@ namespace Bion.Console
         private static void Main(string[] args)
         {
             string fromPath = args[0];
-            string bionPath = Path.ChangeExtension(fromPath, ".bion");
             string jsonPath = Path.ChangeExtension(fromPath, ".json");
+            string bionPath = Path.ChangeExtension(fromPath, ".bion");
+            string bionLookupPath = Path.ChangeExtension(fromPath, ".lookup.bion");
 
-            ToBion(fromPath, bionPath);
-            ToJson(bionPath, jsonPath);
-            Compare(fromPath, bionPath);
-
-            ReadSpeed(jsonPath);
-            for (int i = 0; i < 5; ++i)
+            Stopwatch w = Stopwatch.StartNew();
+            using (JsonTextReader reader = new JsonTextReader(new StreamReader(fromPath)))
+            using (BionLookup lookup = BionLookup.OpenWrite(bionLookupPath))
+            using (BionWriter writer = new BionWriter(new FileStream(bionPath, FileMode.Create), lookup))
             {
-                ReadSpeed(bionPath);
+                JsonBionConverter.JsonToBion(reader, writer);
             }
+
+            w.Stop();
+            System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(bionPath).Length / BytesPerMB:n2}MB BION in {w.ElapsedMilliseconds:n0}ms.");
+
+            JsonBionConverter.BionToJson(bionLookupPath, Path.ChangeExtension(bionLookupPath, ".json"));
+
+            //ToBion(fromPath, bionPath);
+            //ToJson(bionPath, jsonPath);
+            //Compare(fromPath, bionPath);
+
+            //ReadSpeed(jsonPath);
+            //for (int i = 0; i < 5; ++i)
+            //{
+            //    ReadSpeed(bionPath);
+            //}
 
             //JsonStatistics stats = new JsonStatistics(args[0]);
             //System.Console.WriteLine(stats);
@@ -33,7 +47,7 @@ namespace Bion.Console
             Stopwatch w = Stopwatch.StartNew();
             JsonBionConverter.JsonToBion(fromPath, toPath);
             w.Stop();
-            System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n1}MB JSON to {new FileInfo(toPath).Length / BytesPerMB:n1}MB Bion in {w.ElapsedMilliseconds:n0}ms.");
+            System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(toPath).Length / BytesPerMB:n2}MB BION in {w.ElapsedMilliseconds:n0}ms.");
         }
 
         private static void ToJson(string fromPath, string toPath)
@@ -41,7 +55,7 @@ namespace Bion.Console
             Stopwatch w = Stopwatch.StartNew();
             JsonBionConverter.BionToJson(fromPath, toPath);
             w.Stop();
-            System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n1}MB Bion to {new FileInfo(toPath).Length / BytesPerMB:n1}MB JSON in {w.ElapsedMilliseconds:n0}ms.");
+            System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB BION to {new FileInfo(toPath).Length / BytesPerMB:n2}MB JSON in {w.ElapsedMilliseconds:n0}ms.");
         }
 
         private static void ReadSpeed(string filePath)
@@ -97,7 +111,7 @@ namespace Bion.Console
             }
 
             w.Stop();
-            System.Console.WriteLine($"Done. Read {filePath} ({new FileInfo(filePath).Length / BytesPerMB:n1}MB; {tokenCount:n0} tokens) in {w.ElapsedMilliseconds:n0}ms.");
+            System.Console.WriteLine($"Done. Read {filePath} ({new FileInfo(filePath).Length / BytesPerMB:n2}MB; {tokenCount:n0} tokens) in {w.ElapsedMilliseconds:n0}ms.");
         }
 
         private static void Compare(string jsonPath, string BionPath)
@@ -105,7 +119,7 @@ namespace Bion.Console
             Stopwatch w = Stopwatch.StartNew();
             JsonBionComparer.Compare(jsonPath, BionPath);
             w.Stop();
-            System.Console.WriteLine($"Done. Compared {new FileInfo(jsonPath).Length / BytesPerMB:n1}MB JSON to {new FileInfo(BionPath).Length / BytesPerMB:n1}MB Bion in {w.ElapsedMilliseconds:n0}ms.");
+            System.Console.WriteLine($"Done. Compared {new FileInfo(jsonPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(BionPath).Length / BytesPerMB:n2}MB BION in {w.ElapsedMilliseconds:n0}ms.");
         }
 
         private static void RemoveWhitespace(string fromPath, string toPath)
@@ -120,9 +134,9 @@ namespace Bion.Console
             }
 
             w.Stop();
-            System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n1}MB JSON to {new FileInfo(toPath).Length / BytesPerMB:n1}MB JSON [no whitespace] in {w.ElapsedMilliseconds:n0}ms.");
+            System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(toPath).Length / BytesPerMB:n2}MB JSON [no whitespace] in {w.ElapsedMilliseconds:n0}ms.");
         }
 
-        private const int BytesPerMB = 1024 * 1024;
+        private const float BytesPerMB = 1024 * 1024;
     }
 }

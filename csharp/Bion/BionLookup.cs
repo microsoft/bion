@@ -30,7 +30,7 @@ namespace Bion
         public const int PropertyNameLengthLimit = 32;
         public const int PropertyNameCountLimit = 16384;
 
-        public const int ValueLengthLimit = 64;
+        public const int ValueLengthLimit = 128;
         public const int ValueCountLimit = 64;
 
         private List<LookupEntry> _lookupArray;
