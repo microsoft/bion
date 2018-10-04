@@ -73,7 +73,7 @@ namespace Bion
         {
             if(value < 0)
             {
-                WriteInteger(BionMarker.NegativeInteger, (ulong)(-value));
+                WriteVariableInteger(BionMarker.NegativeInteger, (ulong)(-value));
             }
             else if (value <= MaxInlineInteger)
             {
@@ -81,14 +81,34 @@ namespace Bion
             }
             else
             {
-                WriteInteger(BionMarker.Integer, (ulong)value);
+                WriteVariableInteger(BionMarker.Integer, (ulong)value);
             }
+        }
+
+        public unsafe void WriteValue(float value)
+        {
+            // Coerce .NET to reinterpret the bytes as a uint and write that
+            uint valueBytes = *(uint*)&value;
+            WriteFixedInteger(BionMarker.Float, valueBytes, 5);
         }
 
         public unsafe void WriteValue(double value)
         {
+            // See if the value can be represented with a float instead of a double
+            if (value >= float.MinValue && value <= float.MaxValue)
+            {
+                float asFloat = (float)value;
+                if ((double)asFloat == value)
+                {
+                    // If the float form converted back identically, store in five bytes
+                    WriteValue(asFloat);
+                    return;
+                }
+            }
+
             // Coerce .NET to reinterpret the bytes as a ulong and write that
-            WriteInteger(BionMarker.Float, *(ulong*)&value);
+            ulong valueBytes = *(ulong*)&value;
+            WriteFixedInteger(BionMarker.Float, valueBytes, 10);
         }
 
         public void WriteValue(string value)
@@ -109,21 +129,6 @@ namespace Bion
         public void WritePropertyName(string name, int index, int count)
         {
             WriteStringValue(BionToken.PropertyName, name, index, count);
-        }
-
-        private void WriteInteger(BionMarker marker, ulong value)
-        {
-            byte length = 1;
-            while (value > 0)
-            {
-                _buffer[length++] = (byte)(value & 0x7F);
-                value = value >> 7;
-            }
-
-            _buffer[0] = (byte)(marker + length - 1);
-
-            _stream.Write(_buffer, 0, length);
-            BytesWritten += length;
         }
 
         private void WriteStringLength(BionToken marker, int stringLength)
@@ -147,12 +152,7 @@ namespace Bion
                 markerAdjustment = 0;
             }
 
-            for(int index = 1; index <= lengthOfLength; ++index)
-            {
-                _buffer[index] = (byte)(stringLength & 0x7F);
-                stringLength = stringLength >> 7;
-            }
-
+            ConvertFixedInteger((ulong)stringLength, lengthOfLength);
             _buffer[0] = (byte)((int)marker + markerAdjustment);
 
             _stream.Write(_buffer, 0, lengthOfLength + 1);
@@ -178,6 +178,56 @@ namespace Bion
 
             _stream.Write(_buffer, 0, length);
             BytesWritten += length;
+        }
+
+        private void WriteVariableInteger(BionMarker marker, ulong value)
+        {
+            byte length = ConvertVariableInteger(value);
+            _buffer[0] = (byte)(marker + length);
+
+            _stream.Write(_buffer, 0, length + 1);
+            BytesWritten += length + 1;
+        }
+
+        private void WriteFixedInteger(BionMarker marker, ulong value, byte length)
+        {
+            ConvertFixedInteger(value, length);
+            _buffer[0] = (byte)(marker + length);
+
+            _stream.Write(_buffer, 0, length + 1);
+            BytesWritten += length + 1;
+        }
+
+        /// <summary>
+        ///  Convert a non-negative integer to a fixed number of bytes
+        ///  starting in buffer index one.
+        /// </summary>
+        /// <param name="value">Value to convert</param>
+        /// <param name="length">Number of bytes to write to</param>
+        private void ConvertFixedInteger(ulong value, int length)
+        {
+            for (int i = 1; i <= length; ++i)
+            {
+                _buffer[i] = (byte)(value & 0x7F);
+                value = value >> 7;
+            }
+        }
+
+        /// <summary>
+        ///  Convert a non-negative integer to a variable number of bytes
+        ///  starting in buffer index one. Return the number of bytes needed.
+        /// </summary>
+        /// <param name="value">Value to convert</param>
+        /// <returns>Byte length of converted value</returns>
+        private byte ConvertVariableInteger(ulong value)
+        {
+            byte length = 1;
+            for(; value > 0; ++length)
+            {
+                _buffer[length] = (byte)(value & 0x7F);
+                value = value >> 7;
+            }
+            return --length;
         }
 
         private void WriteStartContainer(BionMarker container)

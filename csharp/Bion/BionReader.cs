@@ -139,7 +139,17 @@ namespace Bion
 
             // Decode as an integer and coerce .NET into reinterpreting the bytes
             ulong value = DecodeUnsignedInteger(_currentLength);
-            return *(double*)&value;
+
+            if (_currentLength <= 5)
+            {
+                uint asInt = (uint)value;
+                return (double)*(float*)&asInt;
+            }
+            else
+            {
+                
+                return *(double*)&value;
+            }
         }
 
         public string CurrentString()
