@@ -5,7 +5,7 @@ using System.IO;
 namespace Bion.Test
 {
     [TestClass]
-    public class BionRoundTripBasics
+    public class BionTokenRoundTripTests
     {
         [TestMethod]
         public void Literals()
