@@ -18,7 +18,7 @@ namespace Bion
         private Stack<long> _containers;
         private byte[] _buffer;
 
-        private LookupDictionary _lookupDictionary;
+        private BionLookup _lookupDictionary;
 
         private string _lastPropertyName;
         private long _lastPropertyPosition;
@@ -26,7 +26,7 @@ namespace Bion
         public BionWriter(Stream stream) : this(stream, null)
         { }
 
-        public BionWriter(Stream stream, LookupDictionary lookupDictionary)
+        public BionWriter(Stream stream, BionLookup lookupDictionary)
         {
             CloseStream = true;
 

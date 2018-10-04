@@ -25,7 +25,7 @@ namespace Bion
         }
     }
 
-    public class LookupDictionary : IDisposable
+    public class BionLookup : IDisposable
     {
         public const int PropertyNameLengthLimit = 32;
         public const int PropertyNameCountLimit = 16384;
@@ -42,10 +42,10 @@ namespace Bion
         /// <summary>
         ///  Build a writeable LookupDictionary for the current document.
         /// </summary>
-        public LookupDictionary() : this(false, null)
+        public BionLookup() : this(false, null)
         { }
 
-        private LookupDictionary(bool isReadOnly, Stream writeToStream)
+        private BionLookup(bool isReadOnly, Stream writeToStream)
         {
             _lookupArray = new List<LookupEntry>();
             _lookupDictionary = new Dictionary<string, LookupEntry>();
@@ -57,9 +57,9 @@ namespace Bion
         ///  Load a read only LookupDictionary from an existing stream.
         /// </summary>
         /// <param name="stream">Stream to read from</param>
-        public static LookupDictionary OpenRead(Stream stream)
+        public static BionLookup OpenRead(Stream stream)
         {
-            LookupDictionary result = new LookupDictionary(true, null);
+            BionLookup result = new BionLookup(true, null);
             using (BionReader reader = new BionReader(stream))
             {
                 result.Read(reader);
@@ -71,27 +71,27 @@ namespace Bion
         ///  Load a read only LookupDictionary from an existing file.
         /// </summary>
         /// <param name="filePath">File Path to read from</param>
-        public static LookupDictionary OpenRead(string filePath)
+        public static BionLookup OpenRead(string filePath)
         {
-            return LookupDictionary.OpenRead(new FileStream(filePath, FileMode.Open));
+            return BionLookup.OpenRead(new FileStream(filePath, FileMode.Open));
         }
 
         /// <summary>
         ///  Create a writeable LookupDictionary to be written to the target stream.
         /// </summary>
         /// <param name="stream">Stream to write to</param>
-        public static LookupDictionary OpenWrite(Stream stream)
+        public static BionLookup OpenWrite(Stream stream)
         {
-            return new LookupDictionary(false, stream);
+            return new BionLookup(false, stream);
         }
 
         /// <summary>
         ///  Create a writeable LookupDictionary to be written to the target file.
         /// </summary>
         /// <param name="filePath">File Path to write to</param>
-        public static LookupDictionary OpenWrite(string filePath)
+        public static BionLookup OpenWrite(string filePath)
         {
-            return LookupDictionary.OpenWrite(new FileStream(filePath, FileMode.Create));
+            return BionLookup.OpenWrite(new FileStream(filePath, FileMode.Create));
         }
 
         /// <summary>

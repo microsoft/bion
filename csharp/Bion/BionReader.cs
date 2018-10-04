@@ -9,7 +9,7 @@ namespace Bion
         private Stream _stream;
         private byte[] _buffer;
 
-        private LookupDictionary _lookupDictionary;
+        private BionLookup _lookupDictionary;
 
         private BionMarker _currentMarker;
         private int _currentLength;
@@ -24,7 +24,7 @@ namespace Bion
         public BionReader(Stream stream) : this(stream, null)
         { }
 
-        public BionReader(Stream stream, LookupDictionary lookupDictionary)
+        public BionReader(Stream stream, BionLookup lookupDictionary)
         {
             CloseStream = true;
             _stream = new BufferedStream(stream);

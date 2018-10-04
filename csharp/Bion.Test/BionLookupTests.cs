@@ -6,12 +6,12 @@ using System.IO;
 namespace Bion.Test
 {
     [TestClass]
-    public class LookupDictionaryTests
+    public class BionLookupTests
     {
         [TestMethod]
-        public void LookupDictionary_Basics()
+        public void BionLookup_Basics()
         {
-            LookupDictionary d = new LookupDictionary();
+            BionLookup d = new BionLookup();
             short index;
 
             // Adding item
@@ -40,14 +40,14 @@ namespace Bion.Test
         }
 
         [TestMethod]
-        public void LookupDictionary_ThroughReaderWriter()
+        public void BionLookup_ThroughReaderWriter()
         {
             string jsonFilePath = @"CompareTests\Basics.json";
             string bionFilePath = "Basics.WithLookup.bion";
             string bionLookupFilePath = "Basics.WithLookup.Lookup.bion";
 
             using (JsonTextReader reader = new JsonTextReader(new StreamReader(jsonFilePath)))
-            using (BionWriter writer = new BionWriter(new FileStream(bionFilePath, FileMode.Create), LookupDictionary.OpenWrite(bionLookupFilePath)))
+            using (BionWriter writer = new BionWriter(new FileStream(bionFilePath, FileMode.Create), BionLookup.OpenWrite(bionLookupFilePath)))
             {
                 JsonBionConverter.JsonToBion(reader, writer);
             }
@@ -56,7 +56,7 @@ namespace Bion.Test
             JsonBionConverter.BionToJson(bionLookupFilePath, Path.ChangeExtension(bionLookupFilePath, ".json"));
 
             using (JsonTextReader jsonReader = new JsonTextReader(new StreamReader(jsonFilePath)))
-            using (BionReader bionReader = new BionReader(new FileStream(bionFilePath, FileMode.Open), LookupDictionary.OpenRead(bionLookupFilePath)))
+            using (BionReader bionReader = new BionReader(new FileStream(bionFilePath, FileMode.Open), BionLookup.OpenRead(bionLookupFilePath)))
             {
                 JsonBionComparer.Compare(jsonReader, bionReader);
             }
