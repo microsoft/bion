@@ -7,7 +7,7 @@ namespace Bion
     public unsafe class BionReader : IDisposable
     {
         private Stream _stream;
-        private byte[] _buffer;
+        private Memory<byte> _buffer;
 
         private BionLookup _lookupDictionary;
 
@@ -27,9 +27,7 @@ namespace Bion
         public BionReader(Stream stream, BionLookup lookupDictionary)
         {
             CloseStream = true;
-            _stream = new BufferedStream(stream);
-            _buffer = new byte[1024];
-
+            _stream = stream;
             _lookupDictionary = lookupDictionary;
         }
 
@@ -47,7 +45,7 @@ namespace Bion
             }
 
             // Read the current token marker
-            _currentMarker = (BionMarker)_stream.ReadByte();
+            _currentMarker = (BionMarker)ReadByte();
             _currentLength = 0;
             _currentDecodedString = null;
             BytesRead++;
@@ -96,12 +94,8 @@ namespace Bion
             }
 
             // Read value
-            if(_currentLength > 0)
-            {
-                Allocator.EnsureBufferLength(ref _buffer, _currentLength);
-                _stream.Read(_buffer, 0, _currentLength);
-                BytesRead += _currentLength;
-            }
+            _buffer = Read(_currentLength);
+            BytesRead += _currentLength;
 
             return true;
         }
@@ -170,7 +164,7 @@ namespace Bion
 
             if (_currentDecodedString == null)
             {
-                _currentDecodedString = Encoding.UTF8.GetString(_buffer, 0, _currentLength);
+                _currentDecodedString = Encoding.UTF8.GetString(_buffer.Span);
             }
 
             return _currentDecodedString;
@@ -183,7 +177,7 @@ namespace Bion
             if (lengthOfLength < 0)
             {
                 lengthOfLength = (sbyte)-lengthOfLength;
-                _stream.Read(_buffer, 0, lengthOfLength);
+                _buffer = Read(lengthOfLength);
                 BytesRead += lengthOfLength;
 
                 short lookupIndex = (short)DecodeUnsignedInteger(lengthOfLength);
@@ -204,7 +198,7 @@ namespace Bion
             }
             else
             {
-                _stream.Read(_buffer, 0, lengthOfLength);
+                _buffer = Read(lengthOfLength);
                 BytesRead += lengthOfLength;
                 return (int)DecodeUnsignedInteger(lengthOfLength);
             }
@@ -217,7 +211,7 @@ namespace Bion
             for (int i = length - 1; i >= 0; --i)
             {
                 value = value << 7;
-                value += (ulong)(_buffer[i] & 0x7F);
+                value += (ulong)(_buffer.Span[i] & 0x7F);
             }
 
             return value;
@@ -246,5 +240,54 @@ namespace Bion
                 _lookupDictionary = null;
             }
         }
+
+        #region Inlined Buffered Stream
+        private byte ReadByte()
+        {
+            if (_innerIndex >= _innerLength) ReadNext(1);
+            return _innerBuffer[_innerIndex++];
+        }
+
+        private Memory<byte> Read(int length)
+        {
+            if (length == 0) return Memory<byte>.Empty;
+            if (_innerLength - _innerIndex < length) length = ReadNext(length);
+            Memory<byte> result = new Memory<byte>(_innerBuffer, _innerIndex, length);
+            _innerIndex += length;
+            return result;
+        }
+
+        byte[] _innerBuffer = new byte[16384];
+        int _innerIndex;
+        int _innerLength;
+
+        private int ReadNext(int size)
+        {
+            byte[] readInto = _innerBuffer;
+
+            // Resize if needed
+            if (size > _innerBuffer.Length)
+            {
+                readInto = new byte[Math.Max(_innerBuffer.Length * 5 / 4, size)];
+            }
+
+            // Copy unused bytes
+            int lengthLeft = _innerLength - _innerIndex;
+            if (lengthLeft > 0)
+            {
+                Buffer.BlockCopy(_innerBuffer, _innerIndex, readInto, 0, lengthLeft);
+            }
+
+            // Fill remaining buffer
+            _innerLength = lengthLeft + _stream.Read(readInto, lengthLeft, readInto.Length - lengthLeft);
+
+            // Reset variables
+            _innerBuffer = readInto;
+            _innerIndex = 0;
+
+            // Return the safe size to read, if less than size
+            return Math.Min(size, _innerLength);
+        }
+        #endregion
     }
 }

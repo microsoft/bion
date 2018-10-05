@@ -32,7 +32,7 @@ namespace Bion.Console
             //ToJson(bionPath, jsonPath);
             //Compare(fromPath, bionPath);
 
-            //ReadSpeed(jsonPath);
+            ReadSpeed(jsonPath);
             for (int i = 0; i < 5; ++i)
             {
                 ReadSpeed(bionPath);
