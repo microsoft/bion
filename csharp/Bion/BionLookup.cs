@@ -4,27 +4,11 @@ using System.IO;
 
 namespace Bion
 {
-    internal class LookupEntry
-    {
-        public string PropertyName;
-        public short Index;
-        public List<string> Values;
-        public short ValueCount => (short)(Values?.Count ?? 0);
-
-        public LookupEntry(string propertyName, short index)
-        {
-            this.PropertyName = propertyName;
-            this.Index = index;
-            this.Values = null;
-        }
-
-        public void AddValue(string value)
-        {
-            if (Values == null) Values = new List<string>();
-            Values.Add(value);
-        }
-    }
-
+    /// <summary>
+    ///  BionLookup implements the Lookup Dictionary part of BION,
+    ///  which is a set of Property Names and per-Property Name values
+    ///  which can be referred to be indices.
+    /// </summary>
     public class BionLookup : IDisposable
     {
         public const int PropertyNameLengthLimit = 32;
@@ -41,8 +25,10 @@ namespace Bion
 
         /// <summary>
         ///  Build a writeable LookupDictionary for the current document.
+        ///  Instances constructed this way must be serialized by the caller
+        ///  after they have been populated.
         /// </summary>
-        public BionLookup() : this(false, null)
+        private BionLookup() : this(false, null)
         { }
 
         private BionLookup(bool isReadOnly, Stream writeToStream)
@@ -158,6 +144,11 @@ namespace Bion
             return true;
         }
 
+        /// <summary>
+        ///  Get the Property Name for the given lookup index.
+        /// </summary>
+        /// <param name="index">Index of Property Name</param>
+        /// <returns>Property Name for index</returns>
         public string PropertyName(short index)
         {
             if (index < 0 || index >= _lookupArray.Count)
@@ -167,6 +158,12 @@ namespace Bion
             return _lookupArray[index].PropertyName;
         }
 
+        /// <summary>
+        ///  Get the Value for the given Property Name and Value indices.
+        /// </summary>
+        /// <param name="propertyIndex">Index of Property Name</param>
+        /// <param name="valueIndex">Index of Value</param>
+        /// <returns>Value for index combination</returns>
         public string Value(short propertyIndex, short valueIndex)
         {
             if (propertyIndex < 0 || propertyIndex >= _lookupArray.Count) throw new ArgumentOutOfRangeException("propertyName");
@@ -176,6 +173,10 @@ namespace Bion
             return entry.Values[valueIndex];
         }
 
+        /// <summary>
+        ///  Serialize this Lookup via a BionWriter
+        /// </summary>
+        /// <param name="writer">BionWriter to write to</param>
         public void Write(BionWriter writer)
         {
             writer.WriteStartObject();
@@ -199,6 +200,10 @@ namespace Bion
             writer.WriteEndObject();
         }
 
+        /// <summary>
+        ///  Serialize this Lookup to the provided Stream
+        /// </summary>
+        /// <param name="stream">Stream to write to</param>
         public void Write(Stream stream)
         {
             // Write, making sure not to have yet another nested LookupDictionary
@@ -208,10 +213,13 @@ namespace Bion
             }
         }
 
+        /// <summary>
+        ///  Deserialize this Lookup from a BionReader
+        /// </summary>
+        /// <param name="reader">BionReader to read from</param>
         public void Read(BionReader reader)
         {
-            reader.Read();
-            reader.Expect(BionToken.StartObject);
+            reader.Read(BionToken.StartObject);
 
             short countRead = 0;
             while(reader.Read())
@@ -221,8 +229,7 @@ namespace Bion
                 reader.Expect(BionToken.PropertyName);
                 LookupEntry entry = new LookupEntry(reader.CurrentString(), countRead);
 
-                reader.Read();
-                reader.Expect(BionToken.StartArray);
+                reader.Read(BionToken.StartArray);
 
                 reader.Read();
                 while(reader.TokenType != BionToken.EndArray)
@@ -245,6 +252,27 @@ namespace Bion
                 Write(_writeToStream);
                 _writeToStream.Dispose();
                 _writeToStream = null;
+            }
+        }
+
+        private class LookupEntry
+        {
+            public string PropertyName;
+            public short Index;
+            public List<string> Values;
+            public short ValueCount => (short)(Values?.Count ?? 0);
+
+            public LookupEntry(string propertyName, short index)
+            {
+                this.PropertyName = propertyName;
+                this.Index = index;
+                this.Values = null;
+            }
+
+            public void AddValue(string value)
+            {
+                if (Values == null) Values = new List<string>();
+                Values.Add(value);
             }
         }
     }

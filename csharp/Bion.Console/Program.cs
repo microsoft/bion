@@ -15,28 +15,28 @@ namespace Bion.Console
             string bionPath = Path.ChangeExtension(fromPath, ".bion");
             string bionLookupPath = Path.ChangeExtension(fromPath, ".lookup.bion");
 
-            Stopwatch w = Stopwatch.StartNew();
-            using (JsonTextReader reader = new JsonTextReader(new StreamReader(fromPath)))
-            using (BionLookup lookup = BionLookup.OpenWrite(bionLookupPath))
-            using (BionWriter writer = new BionWriter(new FileStream(bionPath, FileMode.Create), lookup))
-            {
-                JsonBionConverter.JsonToBion(reader, writer);
-            }
+            //Stopwatch w = Stopwatch.StartNew();
+            //using (JsonTextReader reader = new JsonTextReader(new StreamReader(fromPath)))
+            //using (BionLookup lookup = BionLookup.OpenWrite(bionLookupPath))
+            //using (BionWriter writer = new BionWriter(new FileStream(bionPath, FileMode.Create), lookup))
+            //{
+            //    JsonBionConverter.JsonToBion(reader, writer);
+            //}
 
-            w.Stop();
-            System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(bionPath).Length / BytesPerMB:n2}MB BION in {w.ElapsedMilliseconds:n0}ms.");
+            //w.Stop();
+            //System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(bionPath).Length / BytesPerMB:n2}MB BION in {w.ElapsedMilliseconds:n0}ms.");
 
-            JsonBionConverter.BionToJson(bionLookupPath, Path.ChangeExtension(bionLookupPath, ".json"));
+            //JsonBionConverter.BionToJson(bionLookupPath, Path.ChangeExtension(bionLookupPath, ".json"));
 
             //ToBion(fromPath, bionPath);
             //ToJson(bionPath, jsonPath);
             //Compare(fromPath, bionPath);
 
             //ReadSpeed(jsonPath);
-            //for (int i = 0; i < 5; ++i)
-            //{
-            //    ReadSpeed(bionPath);
-            //}
+            for (int i = 0; i < 5; ++i)
+            {
+                ReadSpeed(bionPath);
+            }
 
             //JsonStatistics stats = new JsonStatistics(args[0]);
             //System.Console.WriteLine(stats);

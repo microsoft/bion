@@ -11,32 +11,34 @@ namespace Bion.Test
         [TestMethod]
         public void BionLookup_Basics()
         {
-            BionLookup d = new BionLookup();
-            short index;
+            using (BionLookup d = BionLookup.OpenWrite(new MemoryStream()))
+            {
+                short index;
 
-            // Adding item
-            Assert.IsTrue(d.TryLookup("Name", out index));
-            Assert.AreEqual(0, index);
+                // Adding item
+                Assert.IsTrue(d.TryLookup("Name", out index));
+                Assert.AreEqual(0, index);
 
-            // Existing item
-            Assert.IsTrue(d.TryLookup("Name", out index));
-            Assert.AreEqual(0, index);
+                // Existing item
+                Assert.IsTrue(d.TryLookup("Name", out index));
+                Assert.AreEqual(0, index);
 
-            // Value too long
-            Assert.IsFalse(d.TryLookup("1234567890_1234567890_1234567890_", out index));
-            Assert.AreEqual(-1, index);
+                // Value too long
+                Assert.IsFalse(d.TryLookup("1234567890_1234567890_1234567890_", out index));
+                Assert.AreEqual(-1, index);
 
-            // Add
-            Assert.IsTrue(d.TryLookup("IsEnabled", out index));
-            Assert.AreEqual(1, index);
+                // Add
+                Assert.IsTrue(d.TryLookup("IsEnabled", out index));
+                Assert.AreEqual(1, index);
 
-            // Existing item
-            Assert.IsTrue(d.TryLookup("Name", out index));
-            Assert.AreEqual(0, index);
+                // Existing item
+                Assert.IsTrue(d.TryLookup("Name", out index));
+                Assert.AreEqual(0, index);
 
-            // Lookup
-            Assert.AreEqual("Name", d.PropertyName(0));
-            Assert.AreEqual("IsEnabled", d.PropertyName(1));
+                // Lookup
+                Assert.AreEqual("Name", d.PropertyName(0));
+                Assert.AreEqual("IsEnabled", d.PropertyName(1));
+            }
         }
 
         [TestMethod]

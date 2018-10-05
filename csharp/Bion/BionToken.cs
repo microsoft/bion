@@ -18,6 +18,8 @@
         Float = 0xE0,
 
         Integer = 0xB0,
+
+        None = 0x00,                // End of File or Read not called yet.
     }
 
     internal enum BionMarker : byte

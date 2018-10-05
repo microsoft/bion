@@ -40,7 +40,11 @@ namespace Bion
         public bool Read()
         {
             // Check for end (after reading one thing at the root depth)
-            if (_currentDepth == 0 && BytesRead > 0) return false;
+            if (_currentDepth == 0 && BytesRead > 0)
+            {
+                TokenType = BionToken.None;
+                return false;
+            }
 
             // Read the current token marker
             _currentMarker = (BionMarker)_stream.ReadByte();
@@ -100,6 +104,13 @@ namespace Bion
             }
 
             return true;
+        }
+
+        public bool Read(BionToken expected)
+        {
+            bool result = Read();
+            Expect(expected);
+            return result;
         }
 
         public void Expect(BionToken expected)
