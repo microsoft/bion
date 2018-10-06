@@ -32,11 +32,16 @@ namespace Bion.Console
             //ToJson(bionPath, jsonPath);
             //Compare(fromPath, bionPath);
 
-            ReadSpeed(jsonPath);
-            for (int i = 0; i < 5; ++i)
+            //ReadSpeed(jsonPath);
+            for (int i = 0; i < 10; ++i)
             {
                 ReadSpeed(bionPath);
             }
+
+            //for (int i = 0; i < 10; ++i)
+            //{
+            //    StreamReadSpeed(bionPath);
+            //}
 
             //JsonStatistics stats = new JsonStatistics(args[0]);
             //System.Console.WriteLine(stats);
@@ -56,6 +61,23 @@ namespace Bion.Console
             JsonBionConverter.BionToJson(fromPath, toPath);
             w.Stop();
             System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB BION to {new FileInfo(toPath).Length / BytesPerMB:n2}MB JSON in {w.ElapsedMilliseconds:n0}ms.");
+        }
+
+        private static void StreamReadSpeed(string filePath)
+        {
+            Stopwatch w = Stopwatch.StartNew();
+            byte[] buffer = new byte[16384];
+            using (Stream stream = File.OpenRead(filePath))
+            {
+                while (true)
+                {
+                    int length = stream.Read(buffer);
+                    if (length < buffer.Length) break;
+                }
+            }
+
+            w.Stop();
+            System.Console.WriteLine($"Done. Read {filePath} (bytes only) ({new FileInfo(filePath).Length / BytesPerMB:n2}MB) in {w.ElapsedMilliseconds:n0}ms.");
         }
 
         private static void ReadSpeed(string filePath)

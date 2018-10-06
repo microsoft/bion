@@ -94,8 +94,15 @@ namespace Bion
             }
 
             // Read value
-            _buffer = Read(_currentLength);
-            BytesRead += _currentLength;
+            if (_currentLength > 0)
+            {
+                _buffer = Read(_currentLength);
+                BytesRead += _currentLength;
+            }
+            else
+            {
+                _buffer = Memory<byte>.Empty;
+            }
 
             return true;
         }
@@ -250,7 +257,6 @@ namespace Bion
 
         private Memory<byte> Read(int length)
         {
-            if (length == 0) return Memory<byte>.Empty;
             if (_innerLength - _innerIndex < length) length = ReadNext(length);
             Memory<byte> result = new Memory<byte>(_innerBuffer, _innerIndex, length);
             _innerIndex += length;
