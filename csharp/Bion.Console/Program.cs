@@ -65,14 +65,49 @@ namespace Bion.Console
 
         private static void StreamReadSpeed(string filePath)
         {
+            int _currentDepth = 0;
+
+            sbyte[] map = new sbyte[256];
+            for(int i = 0; i < 256; ++i)
+            {
+                map[i] = 0;
+            }
+
+            map[255] = 1;
+            map[254] = 1;
+            map[253] = -1;
+            map[252] = -1;
+
             Stopwatch w = Stopwatch.StartNew();
-            byte[] buffer = new byte[16384];
+            byte[] buffer = new byte[512 * 1024];
             using (Stream stream = File.OpenRead(filePath))
             {
                 while (true)
                 {
                     int length = stream.Read(buffer);
                     if (length < buffer.Length) break;
+
+                    for (int i = 0; i < length; ++i)
+                    {
+                        byte marker = buffer[i];
+
+                        _currentDepth += map[marker];
+
+                        //if (marker >= 0xFC)
+                        //{
+                        //    switch (marker)
+                        //    {
+                        //        case 0xFF:
+                        //        case 0xFE:
+                        //            _currentDepth++;
+                        //            break;
+                        //        case 0xFD:
+                        //        case 0xFC:
+                        //            _currentDepth--;
+                        //            break;
+                        //    }
+                        //}
+                    }
                 }
             }
 
@@ -89,31 +124,34 @@ namespace Bion.Console
             {
                 using (BionReader reader = new BionReader(new BufferedStream(new FileStream(filePath, FileMode.Open))))
                 {
+                    //reader.Skip();
+
                     while (reader.Read())
                     {
-                        //if(reader.TokenType == TokenType.PropertyName && reader.CurrentString() == "results")
-                        //{
-                        //    reader.Skip();
-                        //}
+                    //    //if(reader.TokenType == TokenType.PropertyName && reader.CurrentString() == "results")
+                    //    //{
+                    //    //    reader.Skip();
+                    //    //}
 
-                        //object value = null;
-                        //switch (reader.TokenType)
-                        //{
-                        //    case TokenType.PropertyName:
-                        //    case TokenType.String:
-                        //        value = reader.CurrentString();
-                        //        break;
-                        //    case TokenType.InlineInteger:
-                        //    case TokenType.Integer:
-                        //        value = reader.CurrentLong();
-                        //        break;
-                        //    case TokenType.Float:
-                        //        value = reader.CurrentFloat();
-                        //        break;
-                        //}
+                    //    //object value = null;
+                    //    //switch (reader.TokenType)
+                    //    //{
+                    //    //    case BionToken.PropertyName:
+                    //    //    case BionToken.String:
+                    //    //        value = reader.CurrentString();
+                    //    //        break;
+                    //    //    case BionToken.Integer:
+                    //    //        value = reader.CurrentInteger();
+                    //    //        break;
+                    //    //    case BionToken.Float:
+                    //    //        value = reader.CurrentFloat();
+                    //    //        break;
+                    //    //}
 
                         tokenCount++;
                     }
+                    //tokenCount = reader.BytesRead;
+
                 }
             }
             else

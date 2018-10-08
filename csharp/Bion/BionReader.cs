@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Bion
@@ -18,8 +19,21 @@ namespace Bion
         private short _lastPropertyLookupIndex;
         private string _currentDecodedString;
 
+        private Encoding _textEncoding = Encoding.UTF8;
+
         // String and Property Name tokens, in order, are Len5b, Len2b, Len1b, Look1b, Look2b.
         private static sbyte[] LengthLookup = new sbyte[] { 5, 2, 1, -1, -2 };
+
+        private static sbyte[] DepthLookup = Enumerable.Repeat((sbyte)0, 256).ToArray();
+
+        static BionReader()
+        {
+            // Set DepthLookup for items with depth
+            DepthLookup[(byte)BionMarker.StartObject] = 1;
+            DepthLookup[(byte)BionMarker.StartArray] = 1;
+            DepthLookup[(byte)BionMarker.EndObject] = -1;
+            DepthLookup[(byte)BionMarker.EndArray] = -1;
+        }
 
         public BionReader(Stream stream) : this(stream, null)
         { }
@@ -119,6 +133,38 @@ namespace Bion
             if (this.TokenType != expected) throw new BionSyntaxException(this, expected);
         }
 
+        public void Skip()
+        {
+            // Record depth
+            int depth = _currentDepth;
+
+            // Read one token
+            Read();
+
+            // If it wasn't a container, we're done
+            if (depth == _currentDepth) return;
+
+            // Otherwise, find the matching end container
+            while (true)
+            {
+                Span<byte> buffer = Read(1024).Span;
+                for (int i = 0; i < buffer.Length; ++i)
+                {
+                    _currentDepth += DepthLookup[buffer[i]];
+
+                    if (depth == _currentDepth)
+                    {
+                        // Once found, return remaining bytes to the buffer
+                        Return(buffer.Length - i + 1);
+                        BytesRead += i;
+                        return;
+                    }
+                }
+
+                BytesRead += buffer.Length;
+            }
+        }
+
         public bool CurrentBool()
         {
             if (TokenType == BionToken.True) return true;
@@ -171,7 +217,7 @@ namespace Bion
 
             if (_currentDecodedString == null)
             {
-                _currentDecodedString = Encoding.UTF8.GetString(_buffer.Span);
+                _currentDecodedString = _textEncoding.GetString(_buffer.Span);
             }
 
             return _currentDecodedString;
@@ -257,13 +303,13 @@ namespace Bion
 
         private Memory<byte> Read(int length)
         {
-            if (_innerLength - _innerIndex < length) length = ReadNext(length);
+            if (_innerIndex + length > _innerLength) length = ReadNext(length);
             Memory<byte> result = new Memory<byte>(_innerBuffer, _innerIndex, length);
             _innerIndex += length;
             return result;
         }
 
-        byte[] _innerBuffer = new byte[16384];
+        byte[] _innerBuffer = new byte[64 * 1024];
         int _innerIndex;
         int _innerLength;
 
@@ -293,6 +339,13 @@ namespace Bion
 
             // Return the safe size to read, if less than size
             return Math.Min(size, _innerLength);
+        }
+
+        private void Return(int length)
+        {
+            // Put 'length' bytes back into the buffer
+            if (_innerIndex < length) throw new InvalidOperationException("Can't rewind data before current buffer.");
+            _innerIndex -= length;
         }
         #endregion
     }
