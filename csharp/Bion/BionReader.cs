@@ -21,10 +21,10 @@ namespace Bion
 
         private Encoding _textEncoding = Encoding.UTF8;
 
-        // String and Property Name tokens, in order, are Len5b, Len2b, Len1b, Look1b, Look2b.
-        private static sbyte[] LengthLookup = new sbyte[] { 5, 2, 1, -1, -2 };
-
+        // Lookups: Marker to Depth, Length, TokenType
         private static sbyte[] DepthLookup = Enumerable.Repeat((sbyte)0, 256).ToArray();
+        private static sbyte[] LengthLookup = Enumerable.Repeat((sbyte)0, 256).ToArray();
+        private static BionToken[] TokenLookup = Enumerable.Repeat(BionToken.None, 256).ToArray();
 
         static BionReader()
         {
@@ -33,6 +33,35 @@ namespace Bion
             DepthLookup[(byte)BionMarker.StartArray] = 1;
             DepthLookup[(byte)BionMarker.EndObject] = -1;
             DepthLookup[(byte)BionMarker.EndArray] = -1;
+
+            // Set LengtLookup for "length of length" or length of value
+            LengthLookup[(byte)BionMarker.StringLength5b] = 5;
+            LengthLookup[(byte)BionMarker.StringLength2b] = 2;
+            LengthLookup[(byte)BionMarker.StringLength1b] = 1;
+            LengthLookup[(byte)BionMarker.StringLookup1b] = -1;
+
+            LengthLookup[(byte)BionMarker.PropertyNameLength5b] = 5;
+            LengthLookup[(byte)BionMarker.PropertyNameLength2b] = 2;
+            LengthLookup[(byte)BionMarker.PropertyNameLength1b] = 1;
+            LengthLookup[(byte)BionMarker.PropertyNameLookup1b] = -1;
+            LengthLookup[(byte)BionMarker.PropertyNameLookup2b] = -2;
+
+            // Float/NegativeInt/Int
+            for(int i = 0xB0; i < 0xE0; ++i)
+            {
+                LengthLookup[i] = (sbyte)(i & 15);
+            }
+
+            // Set TokenLookup
+            for (int i = 0xF0; i <= 0xFF; ++i)
+            {
+                TokenLookup[i] = (BionToken)i;
+            }
+
+            Array.Fill(TokenLookup, BionToken.Float, 0xB0, 0xC0 - 0xB0);
+            Array.Fill(TokenLookup, BionToken.Integer, 0xC0, 0xF0 - 0xC0);
+            Array.Fill(TokenLookup, BionToken.PropertyName, 0xF3, 5);
+            Array.Fill(TokenLookup, BionToken.String, 0xF8, 4);
         }
 
         public BionReader(Stream stream) : this(stream, null)
@@ -58,63 +87,39 @@ namespace Bion
                 return false;
             }
 
-            // Read the current token marker
-            _currentMarker = (BionMarker)ReadByte();
-            _currentLength = 0;
-            _currentDecodedString = null;
+            // Read the marker
+            byte marker = ReadByte();
             BytesRead++;
 
-            if(_currentMarker >= BionMarker.EndArray)
-            {
-                // Container. Token is all marker bits. LoL and Length zero.
-                TokenType = (BionToken)_currentMarker;
+            // Identify the token type and length
+            _currentMarker = (BionMarker)marker;
+            _currentLength = LengthLookup[marker];
+            TokenType = TokenLookup[marker];
 
-                // Increment or Decrement depth
-                _currentDepth += (_currentMarker >= BionMarker.StartArray ? 1 : -1);
-            }
-            else if(_currentMarker >= BionMarker.String)
+            if (_currentLength < 0)
             {
-                // String
-                TokenType = BionToken.String;
-                _currentLength = ReadStringLength();
+                // Negative lengths are lookup strings; look up the value
+                LookupString();
             }
-            else if(_currentMarker >= BionMarker.PropertyName)
+            else if (_currentLength > 0)
             {
-                // Property Name
-                TokenType = BionToken.PropertyName;
-                _currentLength = ReadStringLength();
-            }
-            else if(_currentMarker >= BionMarker.False)
-            {
-                // Literal
-                TokenType = (BionToken)_currentMarker;
-            }
-            else if(_currentMarker >= BionMarker.InlineInteger)
-            {
-                // Inline Int
-                TokenType = BionToken.Integer;
-            }
-            else if(_currentMarker >= BionMarker.Float)
-            {
-                // Integer | NegativeInteger | Float
-                TokenType = (_currentMarker >= BionMarker.NegativeInteger ? BionToken.Integer : BionToken.Float);
-
-                // Length is last four bits
-                _currentLength = (int)_currentMarker & 0x0F;
-            }
-            else
-            {
-                throw new BionSyntaxException($"@{BytesRead:n0}: Byte 0x{_currentMarker:X} is not a valid BION marker.");
-            }
-
-            // Read value
-            if (_currentLength > 0)
-            {
+                // Read value (non-string) or length (string)
                 _buffer = Read(_currentLength);
                 BytesRead += _currentLength;
+
+                // Read value (string)
+                if (marker >= 0xF0)
+                {
+                    _currentDecodedString = null;
+                    _currentLength = (int)DecodeUnsignedInteger(_currentLength);
+                    _buffer = Read(_currentLength);
+                    BytesRead += _currentLength;
+                }
             }
             else
             {
+                // Adjust depth (length 0 tokens only)
+                _currentDepth += DepthLookup[marker];
                 _buffer = Memory<byte>.Empty;
             }
 
@@ -223,37 +228,24 @@ namespace Bion
             return _currentDecodedString;
         }
 
-        private int ReadStringLength()
+        private void LookupString()
         {
-            sbyte lengthOfLength = LengthLookup[(byte)TokenType - (byte)_currentMarker];
+            _currentLength = -_currentLength;
+            _buffer = Read(_currentLength);
+            BytesRead += _currentLength;
 
-            if (lengthOfLength < 0)
+            short lookupIndex = (short)DecodeUnsignedInteger(_currentLength);
+            if (_lookupDictionary == null) throw new BionSyntaxException($"@{BytesRead}: Found {TokenType} lookup for index {lookupIndex}, but no LookupDictionary was passed to the reader.");
+
+            if (_currentMarker == BionMarker.StringLookup1b)
             {
-                lengthOfLength = (sbyte)-lengthOfLength;
-                _buffer = Read(lengthOfLength);
-                BytesRead += lengthOfLength;
-
-                short lookupIndex = (short)DecodeUnsignedInteger(lengthOfLength);
-                if (_lookupDictionary == null) throw new BionSyntaxException($"@{BytesRead}: Found {TokenType} lookup for index {lookupIndex}, but no LookupDictionary was passed to the reader.");
-
-                if (TokenType == BionToken.PropertyName)
-                {
-                    _currentDecodedString = _lookupDictionary.PropertyName(lookupIndex);
-                    _lastPropertyLookupIndex = lookupIndex;
-                }
-                else
-                {
-                    // A string value lookup can only appear right after a property name which is also indexed; look up the index from last time.
-                    _currentDecodedString = _lookupDictionary.Value(_lastPropertyLookupIndex, lookupIndex);
-                }
-
-                return 0;
+                // A string value lookup can only appear right after a property name which is also indexed; look up the index from last time.
+                _currentDecodedString = _lookupDictionary.Value(_lastPropertyLookupIndex, lookupIndex);
             }
             else
             {
-                _buffer = Read(lengthOfLength);
-                BytesRead += lengthOfLength;
-                return (int)DecodeUnsignedInteger(lengthOfLength);
+                _currentDecodedString = _lookupDictionary.PropertyName(lookupIndex);
+                _lastPropertyLookupIndex = lookupIndex;
             }
         }
 
@@ -261,10 +253,11 @@ namespace Bion
         {
             ulong value = 0;
 
+            Span<byte> span = _buffer.Span;
             for (int i = length - 1; i >= 0; --i)
             {
                 value = value << 7;
-                value += (ulong)(_buffer.Span[i] & 0x7F);
+                value += (ulong)(span[i] & 0x7F);
             }
 
             return value;
@@ -295,6 +288,10 @@ namespace Bion
         }
 
         #region Inlined Buffered Stream
+        byte[] _innerBuffer = new byte[64 * 1024];
+        int _innerIndex;
+        int _innerLength;
+
         private byte ReadByte()
         {
             if (_innerIndex >= _innerLength) ReadNext(1);
@@ -308,10 +305,6 @@ namespace Bion
             _innerIndex += length;
             return result;
         }
-
-        byte[] _innerBuffer = new byte[64 * 1024];
-        int _innerIndex;
-        int _innerLength;
 
         private int ReadNext(int size)
         {

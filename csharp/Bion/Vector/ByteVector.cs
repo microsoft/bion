@@ -17,7 +17,6 @@ namespace Bion.Vector
             {
                 return CountGreaterThanCs(content, cutoff);
             }
-
         }
 
         private static int CountGreaterThanCs(Span<byte> content, byte cutoff)
