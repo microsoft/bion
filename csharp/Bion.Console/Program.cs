@@ -29,12 +29,12 @@ namespace Bion.Console
             //System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(bionPath).Length / BytesPerMB:n2}MB BION in {w.ElapsedMilliseconds:n0}ms.");
 
 
-            using (JsonTextReader jsonReader = new JsonTextReader(new StreamReader(fromPath)))
-            using (BionLookup lookup = BionLookup.OpenRead(bionLookupPath))
-            using (BionReader bionReader = new BionReader(new FileStream(bionPath, FileMode.Open), lookup))
-            {
-                JsonBionComparer.Compare(jsonReader, bionReader);
-            }
+            //using (JsonTextReader jsonReader = new JsonTextReader(new StreamReader(fromPath)))
+            //using (BionLookup lookup = BionLookup.OpenRead(bionLookupPath))
+            //using (BionReader bionReader = new BionReader(new FileStream(bionPath, FileMode.Open), lookup))
+            //{
+            //    JsonBionComparer.Compare(jsonReader, bionReader);
+            //}
 
             //JsonBionConverter.BionToJson(bionLookupPath, Path.ChangeExtension(bionLookupPath, ".json"));
 
@@ -43,10 +43,10 @@ namespace Bion.Console
             //Compare(fromPath, bionPath);
 
             //ReadSpeed(jsonPath);
-            //for (int i = 0; i < 10; ++i)
-            //{
-            //    ReadSpeed(bionPath);
-            //}
+            for (int i = 0; i < 10; ++i)
+            {
+                StreamReadSpeed(bionPath);
+            }
 
             //for (int i = 0; i < 10; ++i)
             //{
@@ -117,54 +117,26 @@ namespace Bion.Console
         {
             int _currentDepth = 0;
 
-            sbyte[] map = Enumerable.Repeat((sbyte)0, 256).ToArray();
-            map[(byte)BionToken.StartObject] = 1;
-            map[(byte)BionToken.StartArray] = 1;
-            map[(byte)BionToken.EndObject] = -1;
-            map[(byte)BionToken.EndArray] = -1;
+            // Build a map of depth change for byte
+            sbyte[] depthChangeLookup = Enumerable.Repeat((sbyte)0, 256).ToArray();
+            Array.Fill<sbyte>(depthChangeLookup, 1, 0xFE, 2);
+            Array.Fill<sbyte>(depthChangeLookup, -1, 0xFC, 2);
 
             Stopwatch w = Stopwatch.StartNew();
             byte[] buffer = new byte[512 * 1024];
             using (Stream stream = File.OpenRead(filePath))
             {
-                int length = stream.Read(buffer);
-
-                long fileLength = new FileInfo(filePath).Length;
-                long lengthDone = 0;
-                while (lengthDone < fileLength)
+                int length = 0;
+                do
                 {
-                    //int length = stream.Read(buffer);
-                    //_currentDepth += ContainerCount(new Span<byte>(buffer, 0, length));
-                    //currentDepth += ByteVector.CountGreaterThan(new Span<byte>(buffer, 0, length), 0xFD);
-
+                    length = stream.Read(buffer);
                     for (int i = 0; i < length; ++i)
                     {
                         byte marker = buffer[i];
-
-                        _currentDepth += map[marker];
-
-                        //if (marker >= 0xFE)
-                        //{
-                        //    _currentDepth++;
-                        //}
-
-                        //if (marker >= 0xFC)
-                        //{
-                        //    switch (marker)
-                        //    {
-                        //        case 0xFF:
-                        //        case 0xFE:
-                        //            _currentDepth++;
-                        //            break;
-                        //        case 0xFD:
-                        //        case 0xFC:
-                        //            _currentDepth--;
-                        //            break;
-                        //    }
-                        //}
+                        _currentDepth += depthChangeLookup[marker];
                     }
-                    lengthDone += length;
-                }
+
+                } while (length == buffer.Length);
             }
 
             w.Stop();
@@ -181,37 +153,10 @@ namespace Bion.Console
                 using (BionReader reader = new BionReader(new FileStream(filePath, FileMode.Open)))
                 {
                     //reader.Skip();
-
                     while (reader.Read())
                     {
                         tokenCount++;
-                        //if (reader.TokenType == BionToken.StartArray || reader.TokenType == BionToken.StartObject) tokenCount++;
-                        //if (reader.TokenType == BionToken.EndArray || reader.TokenType == BionToken.EndObject) tokenCount--;
                     }
-                    //    //if(reader.TokenType == TokenType.PropertyName && reader.CurrentString() == "results")
-                    //    //{
-                    //    //    reader.Skip();
-                    //    //}
-
-                    //    //object value = null;
-                    //    //switch (reader.TokenType)
-                    //    //{
-                    //    //    case BionToken.PropertyName:
-                    //    //    case BionToken.String:
-                    //    //        value = reader.CurrentString();
-                    //    //        break;
-                    //    //    case BionToken.Integer:
-                    //    //        value = reader.CurrentInteger();
-                    //    //        break;
-                    //    //    case BionToken.Float:
-                    //    //        value = reader.CurrentFloat();
-                    //    //        break;
-                    //    //}
-
-                    //    tokenCount++;
-                    //}
-                    //tokenCount = reader.BytesRead;
-
                 }
             }
             else
@@ -220,11 +165,6 @@ namespace Bion.Console
                 {
                     while (reader.Read())
                     {
-                        //if (reader.TokenType == JsonToken.PropertyName && (string)reader.Value == "results")
-                        //{
-                        //    reader.Skip();
-                        //}
-
                         tokenCount++;
                     }
                 }
