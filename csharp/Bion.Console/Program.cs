@@ -1,8 +1,10 @@
 ﻿using Bion.Json;
+using Bion.Vector;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace Bion.Console
 {
@@ -33,15 +35,15 @@ namespace Bion.Console
             //Compare(fromPath, bionPath);
 
             //ReadSpeed(jsonPath);
-            for (int i = 0; i < 10; ++i)
-            {
-                ReadSpeed(bionPath);
-            }
-
             //for (int i = 0; i < 10; ++i)
             //{
-            //    StreamReadSpeed(bionPath);
+            //    ReadSpeed(bionPath);
             //}
+
+            for (int i = 0; i < 10; ++i)
+            {
+                VectorTest(bionPath, false);
+            }
 
             //JsonStatistics stats = new JsonStatistics(args[0]);
             //System.Console.WriteLine(stats);
@@ -63,16 +65,51 @@ namespace Bion.Console
             System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB BION to {new FileInfo(toPath).Length / BytesPerMB:n2}MB JSON in {w.ElapsedMilliseconds:n0}ms.");
         }
 
+        private static void VectorTest(string filePath, bool readAll)
+        {
+            Stopwatch w = Stopwatch.StartNew();
+
+            int containerCount = 0;
+
+            long fileLength = new FileInfo(filePath).Length;
+            byte[] buffer = new byte[64 * 1024];
+            using (Stream stream = File.OpenRead(filePath))
+            {
+                long lengthDone = 0;
+                int bufferLength = stream.Read(buffer);
+
+                while (lengthDone < fileLength)
+                {
+                    //containerCount += ContainerCount(new Span<byte>(buffer, 0, bufferLength));
+                    containerCount += ByteVector.CountGreaterThan(new Span<byte>(buffer, 0, bufferLength), 0xFD);
+
+                    lengthDone += bufferLength;
+                    if (readAll) bufferLength = stream.Read(buffer);
+                }
+            }
+
+            w.Stop();
+            System.Console.WriteLine($"Done. VectorTest found {containerCount:n0} containers in {filePath} ({fileLength / BytesPerMB:n2}MB) in {w.ElapsedMilliseconds:n0}ms.");
+        }
+
+        private static int ContainerCount(Span<byte> buffer)
+        {
+            int containerCount = 0;
+
+            for (int i = 0; i < buffer.Length; ++i)
+            {
+                // Count 0xFE and 0xFF
+                if (buffer[i] > 0xFD) containerCount++;
+            }
+
+            return containerCount;
+        }
+
         private static void StreamReadSpeed(string filePath)
         {
             int _currentDepth = 0;
 
-            sbyte[] map = new sbyte[256];
-            for(int i = 0; i < 256; ++i)
-            {
-                map[i] = 0;
-            }
-
+            sbyte[] map = Enumerable.Repeat((sbyte)0, 256).ToArray();
             map[255] = 1;
             map[254] = 1;
             map[253] = -1;
@@ -82,37 +119,46 @@ namespace Bion.Console
             byte[] buffer = new byte[512 * 1024];
             using (Stream stream = File.OpenRead(filePath))
             {
-                while (true)
+                int length = stream.Read(buffer);
+
+                long fileLength = new FileInfo(filePath).Length;
+                long lengthDone = 0;
+                while (lengthDone < fileLength)
                 {
-                    int length = stream.Read(buffer);
+                    //int length = stream.Read(buffer);
+                    //_currentDepth += ContainerCount(new Span<byte>(buffer, 0, length));
+                    _currentDepth += ByteVector.CountGreaterThan(new Span<byte>(buffer, 0, length), 0xFD);
+                    lengthDone += length;
+
+
+                    //for (int i = 0; i < length; ++i)
+                    //{
+                    //    byte marker = buffer[i];
+
+                    //    _currentDepth += map[marker];
+
+                    //    //if (marker >= 0xFC)
+                    //    //{
+                    //    //    switch (marker)
+                    //    //    {
+                    //    //        case 0xFF:
+                    //    //        case 0xFE:
+                    //    //            _currentDepth++;
+                    //    //            break;
+                    //    //        case 0xFD:
+                    //    //        case 0xFC:
+                    //    //            _currentDepth--;
+                    //    //            break;
+                    //    //    }
+                    //    //}
+                    //}
+
                     if (length < buffer.Length) break;
-
-                    for (int i = 0; i < length; ++i)
-                    {
-                        byte marker = buffer[i];
-
-                        _currentDepth += map[marker];
-
-                        //if (marker >= 0xFC)
-                        //{
-                        //    switch (marker)
-                        //    {
-                        //        case 0xFF:
-                        //        case 0xFE:
-                        //            _currentDepth++;
-                        //            break;
-                        //        case 0xFD:
-                        //        case 0xFC:
-                        //            _currentDepth--;
-                        //            break;
-                        //    }
-                        //}
-                    }
                 }
             }
 
             w.Stop();
-            System.Console.WriteLine($"Done. Read {filePath} (bytes only) ({new FileInfo(filePath).Length / BytesPerMB:n2}MB) in {w.ElapsedMilliseconds:n0}ms.");
+            System.Console.WriteLine($"Done. Read {filePath} (bytes only) ({new FileInfo(filePath).Length / BytesPerMB:n2}MB) [{_currentDepth:n0}] in {w.ElapsedMilliseconds:n0}ms.");
         }
 
         private static void ReadSpeed(string filePath)
@@ -128,6 +174,8 @@ namespace Bion.Console
 
                     while (reader.Read())
                     {
+                        if (reader.TokenType == BionToken.StartArray || reader.TokenType == BionToken.StartObject) tokenCount++;
+                    }
                     //    //if(reader.TokenType == TokenType.PropertyName && reader.CurrentString() == "results")
                     //    //{
                     //    //    reader.Skip();
@@ -148,8 +196,8 @@ namespace Bion.Console
                     //    //        break;
                     //    //}
 
-                        tokenCount++;
-                    }
+                    //    tokenCount++;
+                    //}
                     //tokenCount = reader.BytesRead;
 
                 }
