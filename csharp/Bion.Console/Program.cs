@@ -90,11 +90,23 @@ namespace Bion.Console
 
             System.Console.WriteLine($"Compressing {fromPath}...");
             Stopwatch w = Stopwatch.StartNew();
-            using (BionWriter writer = new BionWriter(File.OpenWrite(toPath)))
             using (WordCompressor compressor = WordCompressor.OpenWrite(dictionaryPath))
             {
-                string allText = File.ReadAllText(fromPath);
-                compressor.Compress(allText, writer);
+                using (BionWriter writer = new BionWriter(File.OpenWrite(toPath)))
+                {
+                    string allText = File.ReadAllText(fromPath);
+                    compressor.Compress(allText, writer);
+                }
+
+                string tempPath = Path.ChangeExtension(toPath, ".opt.bion");
+                using (BionReader reader = new BionReader(File.OpenRead(toPath)))
+                using (BionWriter writer = new BionWriter(File.OpenWrite(tempPath)))
+                {
+                    compressor.Optimize(reader, writer);
+                }
+
+                File.Delete(toPath);
+                File.Move(tempPath, toPath);
             }
             w.Stop();
             System.Console.WriteLine($"Done. Compressed from {new FileInfo(fromPath).Length / BytesPerMB:n2}MB to {(new FileInfo(toPath).Length + new FileInfo(dictionaryPath).Length) / BytesPerMB:n2}MB in {w.ElapsedMilliseconds:n0}ms.");

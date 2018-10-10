@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Bion.Text
@@ -65,6 +66,35 @@ namespace Bion.Text
 
                 isWord = !isWord;
                 index += length;
+            }
+
+            writer.WriteEndArray();
+        }
+
+        public void Optimize(BionReader reader, BionWriter writer)
+        {
+            int[] wordRemapping = Words.Optimize();
+            int[] nonWordRemapping = NonWords.Optimize();
+
+            reader.Read(BionToken.StartArray);
+            writer.WriteStartArray();
+
+            reader.Read();
+            bool isWord = reader.CurrentBool();
+            writer.WriteValue(isWord);
+
+            while (true)
+            {
+                reader.Read();
+                if (reader.TokenType == BionToken.EndArray) { break; }
+
+                long index = reader.CurrentInteger();
+                int[] map = (isWord ? wordRemapping : nonWordRemapping);
+
+                long remapped = map[index];
+                writer.WriteValue(remapped);
+
+                isWord = !isWord;
             }
 
             writer.WriteEndArray();
@@ -170,6 +200,29 @@ namespace Bion.Text
             Index[word] = index;
 
             return index;
+        }
+
+        public int[] Optimize()
+        {
+            int[] remapping = new int[Words.Count];
+
+            // Sort words in descending frequency order
+            Words.Sort((left, right) => right.Count.CompareTo(left.Count));
+
+            // Look up the old index for each word to map to the new index
+            for(int i = 0; i < Words.Count; ++i)
+            {
+                remapping[Index[Words[i].Value]] = i;
+            }
+
+            // Rebuild the index on the new order
+            Index.Clear();
+            for (int i = 0; i < Words.Count; ++i)
+            {
+                Index[Words[i].Value] = i;
+            }
+
+            return remapping;
         }
 
         public void Write(BionWriter writer)
