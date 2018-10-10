@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bion.Vector;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -150,20 +151,17 @@ namespace Bion
             if (depth == _currentDepth) return;
 
             // Otherwise, find the matching end container
+            int innerDepth = 1;
             while (true)
             {
-                Span<byte> buffer = Read(1024).Span;
-                for (int i = 0; i < buffer.Length; ++i)
-                {
-                    _currentDepth += DepthLookup[buffer[i]];
+                Span<byte> buffer = Read(64 * 1024).Span;
+                int endIndex = ByteVector.Skip(buffer, ref innerDepth);
 
-                    if (depth == _currentDepth)
-                    {
-                        // Once found, return remaining bytes to the buffer
-                        Return(buffer.Length - i + 1);
-                        BytesRead += i;
-                        return;
-                    }
+                if (endIndex < buffer.Length)
+                {
+                    Return(buffer.Length - endIndex + 1);
+                    BytesRead += endIndex;
+                    return;
                 }
 
                 BytesRead += buffer.Length;

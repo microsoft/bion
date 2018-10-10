@@ -45,7 +45,7 @@ namespace Bion.Console
             //ReadSpeed(jsonPath);
             for (int i = 0; i < 10; ++i)
             {
-                StreamReadSpeed(bionPath);
+                ReadSpeed(bionPath);
             }
 
             //for (int i = 0; i < 10; ++i)
@@ -152,11 +152,13 @@ namespace Bion.Console
             {
                 using (BionReader reader = new BionReader(new FileStream(filePath, FileMode.Open)))
                 {
-                    //reader.Skip();
-                    while (reader.Read())
-                    {
-                        tokenCount++;
-                    }
+                    reader.Skip();
+                    tokenCount = reader.BytesRead;
+
+                    //while (reader.Read())
+                    //{
+                    //    tokenCount++;
+                    //}
                 }
             }
             else
@@ -195,6 +197,80 @@ namespace Bion.Console
 
             w.Stop();
             System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(toPath).Length / BytesPerMB:n2}MB JSON [no whitespace] in {w.ElapsedMilliseconds:n0}ms.");
+        }
+
+        private static void ConvertFilesToArray(string fromPath, string toPath)
+        {
+            using (JsonTextReader reader = new JsonTextReader(new StreamReader(fromPath)))
+            using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(toPath)))
+            {
+                writer.Formatting = Formatting.Indented;
+
+                while (reader.Read())
+                {
+                    if(reader.TokenType == JsonToken.PropertyName && ((string)reader.Value) == "files")
+                    {
+                        writer.WritePropertyName((string)reader.Value);
+
+                        // StartObject
+                        reader.Read();
+                        writer.WriteStartArray();
+
+                        while(true)
+                        {
+                            // Name
+                            reader.Read();
+                            if (reader.TokenType == JsonToken.EndObject) break;
+
+                            // Value
+                            reader.Read();
+                            writer.WriteToken(reader);
+                        }
+
+                        writer.WriteEndArray();
+                    }
+                    else
+                    {
+                        switch (reader.TokenType)
+                        {
+                            case JsonToken.StartObject:
+                                writer.WriteStartObject();
+                                break;
+                            case JsonToken.StartArray:
+                                writer.WriteStartArray();
+                                break;
+                            case JsonToken.EndObject:
+                                writer.WriteEndObject();
+                                break;
+                            case JsonToken.EndArray:
+                                writer.WriteEndArray();
+                                break;
+                            case JsonToken.PropertyName:
+                                writer.WritePropertyName((string)reader.Value);
+                                break;
+                            case JsonToken.String:
+                                string value = (string)reader.Value;
+                                writer.WriteValue(value);
+                                break;
+                            case JsonToken.Integer:
+                                writer.WriteValue((long)reader.Value);
+                                break;
+                            case JsonToken.Boolean:
+                                writer.WriteValue((bool)reader.Value);
+                                break;
+                            case JsonToken.Null:
+                                writer.WriteNull();
+                                break;
+                            case JsonToken.Float:
+                                writer.WriteValue((double)reader.Value);
+                                break;
+                            case JsonToken.Date:
+                                writer.WriteValue((DateTime)reader.Value);
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         private const float BytesPerMB = 1024 * 1024;
