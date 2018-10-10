@@ -1,4 +1,5 @@
 ﻿using Bion.Json;
+using Bion.Text;
 using Bion.Vector;
 using Newtonsoft.Json;
 using System;
@@ -17,6 +18,7 @@ namespace Bion.Console
             string bionPath = Path.ChangeExtension(fromPath, ".bion");
             string bionLookupPath = Path.ChangeExtension(fromPath, ".lookup.bion");
 
+            CompressTest(fromPath, bionPath);
             //Stopwatch w = Stopwatch.StartNew();
             //using (JsonTextReader reader = new JsonTextReader(new StreamReader(fromPath)))
             //using (BionLookup lookup = BionLookup.OpenWrite(bionLookupPath))
@@ -42,11 +44,11 @@ namespace Bion.Console
             //ToJson(bionPath, jsonPath);
             //Compare(fromPath, bionPath);
 
-            ReadSpeed(jsonPath);
-            for (int i = 0; i < 10; ++i)
-            {
-                ReadSpeed(bionPath);
-            }
+            //ReadSpeed(jsonPath);
+            //for (int i = 0; i < 10; ++i)
+            //{
+            //    ReadSpeed(bionPath);
+            //}
 
             //for (int i = 0; i < 10; ++i)
             //{
@@ -71,6 +73,42 @@ namespace Bion.Console
             JsonBionConverter.BionToJson(fromPath, toPath);
             w.Stop();
             System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB BION to {new FileInfo(toPath).Length / BytesPerMB:n2}MB JSON in {w.ElapsedMilliseconds:n0}ms.");
+        }
+
+        private static void CompressTest(string fromPath, string toPath)
+        {
+            string dictionaryPath = Path.ChangeExtension(toPath, ".Dictionary.bion");
+            string comparePath = Path.ChangeExtension(fromPath, "out.json");
+
+            string nowsPath = Path.ChangeExtension(fromPath, ".nows.json");
+            if (!File.Exists(nowsPath))
+            {
+                RemoveWhitespace(fromPath, nowsPath);
+            }
+
+            fromPath = nowsPath;
+
+            System.Console.WriteLine($"Compressing {fromPath}...");
+            Stopwatch w = Stopwatch.StartNew();
+            using (BionWriter writer = new BionWriter(File.OpenWrite(toPath)))
+            using (WordCompressor compressor = WordCompressor.OpenWrite(dictionaryPath))
+            {
+                string allText = File.ReadAllText(fromPath);
+                compressor.Compress(allText, writer);
+            }
+            w.Stop();
+            System.Console.WriteLine($"Done. Compressed from {new FileInfo(fromPath).Length / BytesPerMB:n2}MB to {(new FileInfo(toPath).Length + new FileInfo(dictionaryPath).Length) / BytesPerMB:n2}MB in {w.ElapsedMilliseconds:n0}ms.");
+
+            System.Console.WriteLine($"Decompressing {fromPath}...");
+            w = Stopwatch.StartNew();
+            using (BionReader reader = new BionReader(File.OpenRead(toPath)))
+            using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
+            {
+                string allText = compressor.Decompress(reader);
+                File.WriteAllText(comparePath, allText);
+            }
+            w.Stop();
+            System.Console.WriteLine($"Done. Decompressed from {new FileInfo(toPath).Length / BytesPerMB:n2}MB to {new FileInfo(comparePath).Length / BytesPerMB:n2}MB in {w.ElapsedMilliseconds:n0}ms.");
         }
 
         private static void VectorTest(string filePath, bool readAll)
