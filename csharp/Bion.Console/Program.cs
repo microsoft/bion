@@ -42,7 +42,7 @@ namespace Bion.Console
             //ToJson(bionPath, jsonPath);
             //Compare(fromPath, bionPath);
 
-            //ReadSpeed(jsonPath);
+            ReadSpeed(jsonPath);
             for (int i = 0; i < 10; ++i)
             {
                 ReadSpeed(bionPath);
@@ -165,10 +165,13 @@ namespace Bion.Console
             {
                 using (JsonTextReader reader = new JsonTextReader(new StreamReader(filePath)))
                 {
-                    while (reader.Read())
-                    {
-                        tokenCount++;
-                    }
+                    reader.Read();
+                    reader.Skip();
+                    
+                    //while (reader.Read())
+                    //{
+                    //    tokenCount++;
+                    //}
                 }
             }
 

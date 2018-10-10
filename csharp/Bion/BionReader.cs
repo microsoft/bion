@@ -154,7 +154,7 @@ namespace Bion
             int innerDepth = 1;
             while (true)
             {
-                Span<byte> buffer = Read(64 * 1024).Span;
+                Span<byte> buffer = Read(128 * 1024).Span;
                 int endIndex = ByteVector.Skip(buffer, ref innerDepth);
 
                 if (endIndex < buffer.Length)

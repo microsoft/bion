@@ -103,12 +103,15 @@ namespace Bion.Vector
             Vector256<sbyte> toSignedV = SetAllTo(128);
 
             // Look for StartObject, StartArray, EndObject, EndArray
-            Vector256<sbyte> cutoffV = SetAllTo(0xFB);
-            cutoffV = Avx2.Subtract(cutoffV, toSignedV);
+            Vector256<sbyte> startOrEndCutoffV = SetAllTo(0xFB);
+            startOrEndCutoffV = Avx2.Subtract(startOrEndCutoffV, toSignedV);
+
+            Vector256<sbyte> startCutoffV = SetAllTo(0xFD);
+            startCutoffV = Avx2.Subtract(startCutoffV, toSignedV);
 
             fixed (byte* contentPtr = &content[0])
             {
-                int fullBlockLength = content.Length - 31;
+                int fullBlockLength = content.Length & ~31;
 
                 int i;
                 for (i = 0; i < fullBlockLength; i += 32)
@@ -117,27 +120,29 @@ namespace Bion.Vector
                     Vector256<sbyte> contentV = Unsafe.ReadUnaligned<Vector256<sbyte>>(&contentPtr[i]);
                     Vector256<sbyte> contentSV = Avx2.Subtract(contentV, toSignedV);
 
-                    // Find bytes greater than the cutoff
-                    Vector256<sbyte> result = Avx2.CompareGreaterThan(contentSV, cutoffV);
+                    // Find start containers only, convert to bit vector
+                    Vector256<sbyte> startV = Avx2.CompareGreaterThan(contentSV, startCutoffV);
+                    uint startBits = unchecked((uint)Avx2.MoveMask(startV));
 
-                    // Convert the byte mask of matches to a bit mask
-                    uint bits = unchecked((uint)Avx2.MoveMask(result));
+                    // Find all start or end containers, convert to bit vector
+                    Vector256<sbyte> startOrEndV = Avx2.CompareGreaterThan(contentSV, startOrEndCutoffV);
+                    uint startOrEndBits = unchecked((uint)Avx2.MoveMask(startOrEndV));
+                    uint endBits = (startOrEndBits & ~startBits);
 
-                    // Find the index of the first container
-                    int index = TrailingZeroCount(bits);
+                    // Count start and ends found
+                    int startCount = Popcnt.PopCount(startBits);
+                    int endCount = Popcnt.PopCount(endBits);
 
-                    // If container found, ...
-                    if (index < 32)
+                    if(depth - endCount <= 0)
                     {
-                        // Calculate new depth
-                        byte container = content[i + index];
-                        depth += (container & 0x2) - 1;
-
-                        // If zero, return where
-                        if (depth == 0) return (i + index);
-
-                        // Otherwise, set to continue scanning right after match (index + 1)
-                        i += (index + 1) - 32;
+                        // If there are enough end containers here to reach the root, we have to check the order
+                        int index = SkipCs(content.Slice(i, 32), ref depth);
+                        if (index < 32) return i + index;
+                    }
+                    else
+                    {
+                        // Otherwise, it's safe to continue looking for the end
+                        depth = depth - endCount + startCount;
                     }
                 }
 
@@ -156,23 +161,6 @@ namespace Bion.Vector
 
             // Load into a Vector256 and return
             return Unsafe.Read<Vector256<sbyte>>(_loader);
-        }
-
-        private const uint DeBruijnSequence = 0x077CB531U;
-        private static readonly int[] DeBruijnTrailingZeroCount =
-        {
-            0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
-            31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
-        };
-
-        private static int TrailingZeroCount(uint bits)
-        {
-            // Should be this, but it's not in the JIT as of .NET Core 2.1
-            //return unchecked((int)Bmi1.TrailingZeroCount(bits));
-
-            // http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup
-            if (bits == 0) return 32;
-            return DeBruijnTrailingZeroCount[(unchecked((uint)((int)bits & -(int)bits)) * DeBruijnSequence) >> 27];
         }
     }
 }
