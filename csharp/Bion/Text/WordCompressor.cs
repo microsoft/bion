@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace Bion.Text
 {
     public class WordCompressor : IDisposable
     {
-        private WordIndex Words;
-        private WordIndex NonWords;
-
+        private WordIndex _words;
         private Stream _writeToStream;
 
         private WordCompressor()
         {
-            this.Words = new WordIndex();
-            this.NonWords = new WordIndex();
+            this._words = new WordIndex();
         }
 
         public static WordCompressor OpenWrite(string filePath)
@@ -27,7 +23,6 @@ namespace Bion.Text
         public static WordCompressor OpenRead(string filePath)
         {
             WordCompressor compressor = new WordCompressor();
-
             using (BionReader reader = new BionReader(File.OpenRead(filePath)))
             {
                 compressor.Read(reader);
@@ -36,107 +31,67 @@ namespace Bion.Text
             return compressor;
         }
 
-        public void Compress(string text, BionWriter writer)
+        public void Compress(ReadOnlyMemory<byte> text, NumberWriter writer)
         {
-            if (String.IsNullOrEmpty(text))
-            {
-                writer.WriteStartArray();
-                writer.WriteValue(true);
-                writer.WriteEndArray();
-                return;
-            }
-
-            writer.WriteStartArray();
+            if (text.IsEmpty) return;
             
+            ReadOnlySpan<byte> textSpan = text.Span;
+
             int index = 0;
             int length;
-            bool isWord = Char.IsLetterOrDigit(text[0]);
-            writer.WriteValue(isWord);
-
-            while(index < text.Length)
+            bool isWord = WordSplitter.IsLetterOrDigit(textSpan[0]);
+            while (index < text.Length)
             {
                 length = 1;
-                while (index + length < text.Length && Char.IsLetterOrDigit(text[index + length]) == isWord) length++;
+                while (index + length < text.Length && WordSplitter.IsLetterOrDigit(textSpan[index + length]) == isWord) length++;
 
-                string word = text.Substring(index, length);
-                WordIndex set = (isWord ? Words : NonWords);
+                String8 word = new String8(text.Slice(index, length));
 
-                int wordIndex = set.FindOrAdd(word);
-                writer.WriteValue(wordIndex);
+                int wordIndex = _words.FindOrAdd(word);
+                writer.WriteValue((ulong)wordIndex);
 
                 isWord = !isWord;
                 index += length;
             }
-
-            writer.WriteEndArray();
         }
 
-        public void Optimize(BionReader reader, BionWriter writer)
+        public void Optimize(NumberReader reader, NumberWriter writer)
         {
-            int[] wordRemapping = Words.Optimize();
-            int[] nonWordRemapping = NonWords.Optimize();
+            int[] map = _words.Optimize();
 
-            reader.Read(BionToken.StartArray);
-            writer.WriteStartArray();
-
-            reader.Read();
-            bool isWord = reader.CurrentBool();
-            writer.WriteValue(isWord);
-
-            while (true)
+            while (!reader.EndOfStream)
             {
-                reader.Read();
-                if (reader.TokenType == BionToken.EndArray) { break; }
-
-                long index = reader.CurrentInteger();
-                int[] map = (isWord ? wordRemapping : nonWordRemapping);
-
-                long remapped = map[index];
-                writer.WriteValue(remapped);
-
-                isWord = !isWord;
+                int index = (int)reader.ReadNumber();
+                int remapped = map[index];
+                writer.WriteValue((ulong)remapped);
             }
-
-            writer.WriteEndArray();
         }
 
-        public string Decompress(BionReader reader)
+        public int Decompress(NumberReader reader, Span<byte> buffer)
         {
-            StringBuilder result = new StringBuilder();
+            int lengthWritten = 0;
 
-            reader.Read(BionToken.StartArray);
-
-            reader.Read();
-            bool isWord = reader.CurrentBool();
-
-            while (true)
+            while (!reader.EndOfStream)
             {
-                reader.Read();
-                if (reader.TokenType == BionToken.EndArray) { break; }
+                int wordIndex = (int)reader.ReadNumber();
+                String8 word = _words[wordIndex];
 
-                long index = reader.CurrentInteger();
-                WordIndex set = (isWord ? Words : NonWords);
+                if(lengthWritten + word.Value.Length > buffer.Length)
+                {
+                    reader.UndoRead((ulong)wordIndex);
+                    break;
+                }
 
-                result.Append(set[index]);
-                isWord = !isWord;
+                word.Value.Span.CopyTo(buffer.Slice(lengthWritten));
+                lengthWritten += word.Value.Length;
             }
 
-            return result.ToString();
+            return lengthWritten;
         }
 
         private void Read(BionReader reader)
         {
-            reader.Read(BionToken.StartObject);
-
-            reader.Read(BionToken.PropertyName);
-            if (reader.CurrentString() != "words") { throw new BionSyntaxException(reader, "words"); }
-            Words.Read(reader);
-
-            reader.Read(BionToken.PropertyName);
-            if (reader.CurrentString() != "nonWords") { throw new BionSyntaxException(reader, "nonWords"); }
-            NonWords.Read(reader);
-
-            reader.Read(BionToken.EndObject);
+            _words.Read(reader);
         }
 
         public void Write(Stream stream)
@@ -149,15 +104,7 @@ namespace Bion.Text
 
         private void Write(BionWriter writer)
         {
-            writer.WriteStartObject();
-
-            writer.WritePropertyName("words");
-            Words.Write(writer);
-
-            writer.WritePropertyName("nonWords");
-            NonWords.Write(writer);
-
-            writer.WriteEndObject();
+            _words.Write(writer);
         }
 
         public void Dispose()
@@ -168,22 +115,41 @@ namespace Bion.Text
                 _writeToStream = null;
             }
         }
+
+        private class WordSplitter
+        {
+            private static bool[] _letterOrDigitLookup;
+
+            static WordSplitter()
+            {
+                _letterOrDigitLookup = new bool[256];
+                Array.Fill(_letterOrDigitLookup, true, 0x30, 10);     // 0-9
+                Array.Fill(_letterOrDigitLookup, true, 0x41, 26);     // A-Z
+                Array.Fill(_letterOrDigitLookup, true, 0x61, 26);     // a-z
+                Array.Fill(_letterOrDigitLookup, true, 0x80, 128);    // Multibyte
+            }
+
+            public static bool IsLetterOrDigit(byte b)
+            {
+                return _letterOrDigitLookup[b];
+            }
+        }
     }
 
     public class WordIndex
     {
         private List<WordEntry> Words;
-        private Dictionary<string, int> Index;
+        private Dictionary<String8, int> Index;
 
         public WordIndex()
         {
             this.Words = new List<WordEntry>();
-            this.Index = new Dictionary<string, int>();
+            this.Index = new Dictionary<String8, int>();
         }
 
-        public string this[long index] => Words[(int)index].Value;
+        public String8 this[long index] => Words[(int)index].Value;
 
-        public int FindOrAdd(string word)
+        public int FindOrAdd(String8 word)
         {
             int index;
             if(Index.TryGetValue(word, out index))
@@ -196,7 +162,7 @@ namespace Bion.Text
             }
 
             index = Words.Count;
-            Words.Add(new WordEntry(word, 1));
+            Words.Add(new WordEntry(String8.Copy(word), 1));
             Index[word] = index;
 
             return index;
@@ -230,7 +196,7 @@ namespace Bion.Text
             writer.WriteStartArray();
             foreach (WordEntry entry in Words)
             {
-                writer.WriteValue(entry.Value);
+                writer.WriteValue(entry.Value.Value.Span);
             }
             writer.WriteEndArray();
         }
@@ -247,7 +213,7 @@ namespace Bion.Text
                 reader.Read();
                 if (reader.TokenType == BionToken.EndArray) { break; }
 
-                string value = reader.CurrentString();
+                String8 value = String8.Copy(new String8(reader.CurrentBytes()));
                 Index[value] = Words.Count;
                 Words.Add(new WordEntry(value));
             }
@@ -256,10 +222,10 @@ namespace Bion.Text
 
     public struct WordEntry
     {
-        public string Value;
+        public String8 Value;
         public int Count;
 
-        public WordEntry(string value, int count = 0)
+        public WordEntry(String8 value, int count = 0)
         {
             this.Value = value;
             this.Count = count;

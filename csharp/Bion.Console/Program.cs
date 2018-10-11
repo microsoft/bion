@@ -77,6 +77,8 @@ namespace Bion.Console
 
         private static void CompressTest(string fromPath, string toPath)
         {
+            byte[] buffer = new byte[64 * 1024];
+
             string dictionaryPath = Path.ChangeExtension(toPath, ".Dictionary.bion");
             string comparePath = Path.ChangeExtension(fromPath, "out.json");
 
@@ -92,32 +94,46 @@ namespace Bion.Console
             Stopwatch w = Stopwatch.StartNew();
             using (WordCompressor compressor = WordCompressor.OpenWrite(dictionaryPath))
             {
-                using (BionWriter writer = new BionWriter(File.OpenWrite(toPath)))
+                using (FileStream reader = File.OpenRead(fromPath))
+                using (NumberWriter writer = new NumberWriter(File.OpenWrite(toPath)))
                 {
-                    string allText = File.ReadAllText(fromPath);
-                    compressor.Compress(allText, writer);
+                    while (true)
+                    {
+                        int length = reader.Read(buffer);
+                        compressor.Compress(buffer.AsMemory(0, length), writer);
+                        if (length < buffer.Length) break;
+                    }
                 }
 
-                string tempPath = Path.ChangeExtension(toPath, ".opt.bion");
-                using (BionReader reader = new BionReader(File.OpenRead(toPath)))
-                using (BionWriter writer = new BionWriter(File.OpenWrite(tempPath)))
-                {
-                    compressor.Optimize(reader, writer);
-                }
+                //string tempPath = Path.ChangeExtension(toPath, ".opt.bion");
+                //using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
+                //using (NumberWriter writer = new NumberWriter(File.OpenWrite(tempPath)))
+                //{
+                //    compressor.Optimize(reader, writer);
+                //}
 
-                File.Delete(toPath);
-                File.Move(tempPath, toPath);
+                //File.Delete(toPath);
+                //File.Move(tempPath, toPath);                
             }
+            JsonBionConverter.BionToJson(dictionaryPath, Path.ChangeExtension(dictionaryPath, ".json"));
             w.Stop();
             System.Console.WriteLine($"Done. Compressed from {new FileInfo(fromPath).Length / BytesPerMB:n2}MB to {(new FileInfo(toPath).Length + new FileInfo(dictionaryPath).Length) / BytesPerMB:n2}MB in {w.ElapsedMilliseconds:n0}ms.");
 
             System.Console.WriteLine($"Decompressing {fromPath}...");
             w = Stopwatch.StartNew();
-            using (BionReader reader = new BionReader(File.OpenRead(toPath)))
-            using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
+            for (int i = 0; i < 10; ++i)
             {
-                string allText = compressor.Decompress(reader);
-                File.WriteAllText(comparePath, allText);
+                using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
+                using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
+                using (FileStream writer = File.OpenWrite(comparePath))
+                {
+                    while(true)
+                    {
+                        int length = compressor.Decompress(reader, buffer);
+                        writer.Write(buffer.AsSpan(0, length));
+                        if (length < buffer.Length) break;
+                    }
+                }
             }
             w.Stop();
             System.Console.WriteLine($"Done. Decompressed from {new FileInfo(toPath).Length / BytesPerMB:n2}MB to {new FileInfo(comparePath).Length / BytesPerMB:n2}MB in {w.ElapsedMilliseconds:n0}ms.");
