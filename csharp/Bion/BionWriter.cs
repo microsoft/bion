@@ -126,6 +126,16 @@ namespace Bion
             WriteStringValue(BionToken.String, value);
         }
 
+        public void WriteValue(ReadOnlySpan<byte> utf8Text)
+        {
+            // Write marker and length
+            WriteStringLength(BionToken.String, utf8Text.Length);
+
+            // Write value
+            _stream.Write(utf8Text);
+            BytesWritten += utf8Text.Length;
+        }
+
         public void WritePropertyName(string name)
         {
             WriteStringValue(BionToken.PropertyName, name);

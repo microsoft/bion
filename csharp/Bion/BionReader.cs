@@ -226,6 +226,11 @@ namespace Bion
             return _currentDecodedString;
         }
 
+        public ReadOnlyMemory<byte> CurrentBytes()
+        {
+            return _buffer;
+        }
+
         private void LookupString()
         {
             _currentLength = -_currentLength;
