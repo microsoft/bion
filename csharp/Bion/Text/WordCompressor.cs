@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Bion.Text
 {
@@ -31,28 +30,34 @@ namespace Bion.Text
             return compressor;
         }
 
-        public void Compress(ReadOnlyMemory<byte> text, NumberWriter writer)
+        public int Compress(ReadOnlyMemory<byte> text, NumberWriter writer)
         {
-            if (text.IsEmpty) return;
+            if (text.IsEmpty) return 0;
             
             ReadOnlySpan<byte> textSpan = text.Span;
 
             int index = 0;
-            int length;
+            int length = 0;
             bool isWord = WordSplitter.IsLetterOrDigit(textSpan[0]);
             while (index < text.Length)
             {
+                // Find length of current word
                 length = 1;
                 while (index + length < text.Length && WordSplitter.IsLetterOrDigit(textSpan[index + length]) == isWord) length++;
-
                 String8 word = new String8(text.Slice(index, length));
 
+                // If it's the last word, stop
+                if (index > 0 && index + length == text.Length) { break; }
+                
                 int wordIndex = _words.FindOrAdd(word);
                 writer.WriteValue((ulong)wordIndex);
+                if (writer.BytesWritten > 12484276) System.Diagnostics.Debugger.Break();
 
                 isWord = !isWord;
                 index += length;
             }
+
+            return index;
         }
 
         public void Optimize(NumberReader reader, NumberWriter writer)
@@ -62,6 +67,7 @@ namespace Bion.Text
             while (!reader.EndOfStream)
             {
                 int index = (int)reader.ReadNumber();
+                if (index > map.Length) System.Diagnostics.Debugger.Break();
                 int remapped = map[index];
                 writer.WriteValue((ulong)remapped);
             }
@@ -78,7 +84,7 @@ namespace Bion.Text
 
                 if(lengthWritten + word.Value.Length > buffer.Length)
                 {
-                    reader.UndoRead((ulong)wordIndex);
+                    reader.UndoRead();
                     break;
                 }
 

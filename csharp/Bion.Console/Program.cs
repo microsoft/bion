@@ -77,7 +77,7 @@ namespace Bion.Console
 
         private static void CompressTest(string fromPath, string toPath)
         {
-            byte[] buffer = new byte[64 * 1024];
+            Memory<byte> buffer = new byte[64 * 1024];
 
             string dictionaryPath = Path.ChangeExtension(toPath, ".Dictionary.bion");
             string comparePath = Path.ChangeExtension(fromPath, "out.json");
@@ -95,19 +95,25 @@ namespace Bion.Console
             using (WordCompressor compressor = WordCompressor.OpenWrite(dictionaryPath))
             {
                 using (FileStream reader = File.OpenRead(fromPath))
-                using (NumberWriter writer = new NumberWriter(File.OpenWrite(toPath)))
+                using (NumberWriter writer = new NumberWriter(File.Create(toPath)))
                 {
+                    int length = 0;
+                    int lengthLeft = 0;
+
+                    // TODO: Too complex and easy to mess up. How do I make this *simple*?
                     while (true)
                     {
-                        int length = reader.Read(buffer);
-                        compressor.Compress(buffer.AsMemory(0, length), writer);
-                        if (length < buffer.Length) break;
+                        length = lengthLeft + reader.Read(buffer.Slice(lengthLeft).Span);
+                        lengthLeft = length - compressor.Compress(buffer.Slice(0, length), writer);
+                        if (lengthLeft > 0) { buffer.Slice(length - lengthLeft).CopyTo(buffer); }
+
+                        if (length < buffer.Length && lengthLeft == 0) break;
                     }
                 }
 
                 string tempPath = Path.ChangeExtension(toPath, ".opt.bion");
                 using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
-                using (NumberWriter writer = new NumberWriter(File.OpenWrite(tempPath)))
+                using (NumberWriter writer = new NumberWriter(File.Create(tempPath)))
                 {
                     compressor.Optimize(reader, writer);
                 }
@@ -124,18 +130,40 @@ namespace Bion.Console
             {
                 using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
                 using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
-                using (FileStream writer = File.OpenWrite(comparePath))
+                using (FileStream writer = File.Create(comparePath))
                 {
                     while(true)
                     {
-                        int length = compressor.Decompress(reader, buffer);
-                        writer.Write(buffer.AsSpan(0, length));
-                        if (length < buffer.Length) break;
+                        int length = compressor.Decompress(reader, buffer.Span);
+                        if (length == 0) break;
+
+                        writer.Write(buffer.Slice(0, length).Span);
                     }
                 }
             }
             w.Stop();
             System.Console.WriteLine($"Done. Decompressed from {new FileInfo(toPath).Length / BytesPerMB:n2}MB to {new FileInfo(comparePath).Length / BytesPerMB:n2}MB in {w.ElapsedMilliseconds:n0}ms.");
+
+            // TODO: Clean up and make a function with clear output.
+            long position = 0;
+            Memory<byte> buffer2 = new byte[buffer.Length];
+            using (FileStream expectedReader = File.OpenRead(fromPath))
+            using (FileStream actualReader = File.OpenRead(comparePath))
+            {
+                int length = expectedReader.Read(buffer.Span);
+                int length2 = actualReader.Read(buffer2.Span.Slice(0, length));
+                if (length2 != length) Debugger.Break();
+
+                for(int i = 0; i < length; ++i)
+                {
+                    if(buffer.Span[i] != buffer2.Span[i])
+                    {
+                        Debugger.Break();
+                    }
+                }
+
+                position += length;
+            }
         }
 
         private static void VectorTest(string filePath, bool readAll)

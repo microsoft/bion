@@ -8,6 +8,7 @@ namespace Bion.Text
         private Stream _stream;
         private byte[] _buffer;
         private int _index;
+        public long BytesWritten { get; private set; }
 
         public NumberWriter(Stream stream)
         {
@@ -19,6 +20,7 @@ namespace Bion.Text
         {
             if (_index + 10 >= _buffer.Length) { Flush(); }
 
+            int indexBefore = _index;
             while(value > 0x7F)
             {
                 _buffer[_index++] = (byte)(value & 0x7F);
@@ -26,6 +28,7 @@ namespace Bion.Text
             }
 
             _buffer[_index++] = (byte)(value | 0x80);
+            BytesWritten += _index - indexBefore;
         }
 
         private void Flush()
@@ -52,8 +55,10 @@ namespace Bion.Text
     {
         private Stream _stream;
         private byte[] _buffer;
+        private int _lastIndex;
         private int _index;
         private int _length;
+        public long BytesRead { get; private set; }
 
         public NumberReader(Stream stream)
         {
@@ -71,6 +76,7 @@ namespace Bion.Text
         {
             if (_index + 10 >= _length) { Read(); }
 
+            _lastIndex = _index;
             ulong value = 0;
             int shift = 0;
 
@@ -82,19 +88,14 @@ namespace Bion.Text
                 if (next >= 0x80) break;
             }
 
+            BytesRead += _index - _lastIndex;
             return value;
         }
 
-        public void UndoRead(ulong value)
+        public void UndoRead()
         {
-            int length = 1;
-            while (value > 0x7F)
-            {
-                length++;
-                value = value >> 7;
-            }
-
-            _index -= length;
+            BytesRead -= _index - _lastIndex;
+            _index = _lastIndex;
         }
 
         private void Read()
