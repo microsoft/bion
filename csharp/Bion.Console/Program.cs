@@ -105,23 +105,22 @@ namespace Bion.Console
                     }
                 }
 
-                //string tempPath = Path.ChangeExtension(toPath, ".opt.bion");
-                //using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
-                //using (NumberWriter writer = new NumberWriter(File.OpenWrite(tempPath)))
-                //{
-                //    compressor.Optimize(reader, writer);
-                //}
+                string tempPath = Path.ChangeExtension(toPath, ".opt.bion");
+                using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
+                using (NumberWriter writer = new NumberWriter(File.OpenWrite(tempPath)))
+                {
+                    compressor.Optimize(reader, writer);
+                }
 
-                //File.Delete(toPath);
-                //File.Move(tempPath, toPath);                
+                toPath = tempPath;
             }
             JsonBionConverter.BionToJson(dictionaryPath, Path.ChangeExtension(dictionaryPath, ".json"));
             w.Stop();
-            System.Console.WriteLine($"Done. Compressed from {new FileInfo(fromPath).Length / BytesPerMB:n2}MB to {(new FileInfo(toPath).Length + new FileInfo(dictionaryPath).Length) / BytesPerMB:n2}MB in {w.ElapsedMilliseconds:n0}ms.");
+            System.Console.WriteLine($"Done. Compressed from {new FileInfo(fromPath).Length / BytesPerMB:n2}MB to {new FileInfo(toPath).Length / BytesPerMB:n2}MB + {new FileInfo(dictionaryPath).Length / BytesPerMB:n2}MB Index in {w.ElapsedMilliseconds:n0}ms.");
 
             System.Console.WriteLine($"Decompressing {fromPath}...");
             w = Stopwatch.StartNew();
-            for (int i = 0; i < 10; ++i)
+            //for (int i = 0; i < 10; ++i)
             {
                 using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
                 using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))

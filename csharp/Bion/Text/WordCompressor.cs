@@ -162,8 +162,10 @@ namespace Bion.Text
             }
 
             index = Words.Count;
-            Words.Add(new WordEntry(String8.Copy(word), 1));
-            Index[word] = index;
+            String8 wordCopy = String8.Copy(word);
+
+            Words.Add(new WordEntry(wordCopy, 1));
+            Index[wordCopy] = index;
 
             return index;
         }

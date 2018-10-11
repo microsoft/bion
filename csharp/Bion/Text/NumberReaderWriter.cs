@@ -30,7 +30,7 @@ namespace Bion.Text
 
         private void Flush()
         {
-            if(_index > 0)
+            if (_index > 0)
             {
                 _stream.Write(_buffer, 0, _index);
                 _index = 0;
@@ -59,6 +59,10 @@ namespace Bion.Text
         {
             _stream = stream;
             _buffer = new byte[16 * 1024];
+
+            // Indicate nothing read yet by making index > length.
+            _index = _buffer.Length;
+            _length = _buffer.Length;
         }
 
         public bool EndOfStream => _length < _buffer.Length && _index == _length;
@@ -68,15 +72,15 @@ namespace Bion.Text
             if (_index + 10 >= _length) { Read(); }
 
             ulong value = 0;
-            byte next = 0;
             int shift = 0;
 
-            do
+            while(true)
             {
-                next = _buffer[_index++];
+                byte next = _buffer[_index++];
                 value += (ulong)(next & 0x7F) << shift;
                 shift += 7;
-            } while (next < 0x80);
+                if (next >= 0x80) break;
+            }
 
             return value;
         }
@@ -96,11 +100,11 @@ namespace Bion.Text
         private void Read()
         {
             // If we didn't get a full block, we're out of stream
-            if (_length != 0 && _length < _buffer.Length) { return; }
+            if (_length < _buffer.Length) { return; }
 
             // Shift any unread suffix
             int bytesLeft = _length - _index;
-            if(bytesLeft > 0) { Buffer.BlockCopy(_buffer, _index, _buffer, 0, bytesLeft); }
+            if (bytesLeft > 0) { Buffer.BlockCopy(_buffer, _index, _buffer, 0, bytesLeft); }
 
             // Refill the block and set the new length and index
             _length = bytesLeft + _stream.Read(_buffer, bytesLeft, _buffer.Length - bytesLeft);
