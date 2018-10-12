@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bion.Extensions;
+using System;
 using System.IO;
 
 namespace Bion.Text
@@ -31,7 +32,7 @@ namespace Bion.Text
             BytesWritten += _index - indexBefore;
         }
 
-        private void Flush()
+        public void Flush()
         {
             if (_index > 0)
             {
@@ -54,38 +55,37 @@ namespace Bion.Text
     public class NumberReader : IDisposable
     {
         private Stream _stream;
+        private bool _endOfStream;
         private byte[] _buffer;
         private int _lastIndex;
         private int _index;
         private int _length;
-        public long BytesRead { get; private set; }
-
+        
         public NumberReader(Stream stream)
         {
             _stream = stream;
             _buffer = new byte[16 * 1024];
-
-            // Indicate nothing read yet by making index > length.
-            _index = _buffer.Length;
-            _length = _buffer.Length;
         }
 
-        public bool EndOfStream => _length < _buffer.Length && _index == _length;
+        public long BytesRead { get; private set; }
+        public bool EndOfStream => _endOfStream && _index == _length;
 
         public ulong ReadNumber()
         {
-            if (_index + 10 >= _length) { Read(); }
+            if (_index + 10 >= _length)
+            {
+                _stream.Refill(ref _index, ref _length, ref _endOfStream, ref _buffer);
+            }
 
             _lastIndex = _index;
             ulong value = 0;
-            int shift = 0;
+            int current = 0, shift = 0;
 
-            while(true)
+            while(current < 0x80)
             {
-                byte next = _buffer[_index++];
-                value += (ulong)(next & 0x7F) << shift;
+                current = _buffer[_index++];
+                value += (ulong)(current & 0x7F) << shift;
                 shift += 7;
-                if (next >= 0x80) break;
             }
 
             BytesRead += _index - _lastIndex;
@@ -96,20 +96,6 @@ namespace Bion.Text
         {
             BytesRead -= _index - _lastIndex;
             _index = _lastIndex;
-        }
-
-        private void Read()
-        {
-            // If we didn't get a full block, we're out of stream
-            if (_length < _buffer.Length) { return; }
-
-            // Shift any unread suffix
-            int bytesLeft = _length - _index;
-            if (bytesLeft > 0) { Buffer.BlockCopy(_buffer, _index, _buffer, 0, bytesLeft); }
-
-            // Refill the block and set the new length and index
-            _length = bytesLeft + _stream.Read(_buffer, bytesLeft, _buffer.Length - bytesLeft);
-            _index = 0;
         }
 
         public void Dispose()

@@ -144,7 +144,7 @@ namespace Bion.Console
 
         private static void CompressTest(string fromPath, string toPath)
         {
-            Memory<byte> buffer = new byte[64 * 1024];
+            byte[] buffer = new byte[64 * 1024];
             ReadOnlyMemory<byte> left;
             bool readerDone;
 
@@ -171,7 +171,7 @@ namespace Bion.Console
                         readerDone = false;
                         while (!readerDone)
                         {
-                            left = reader.Refill(left, out readerDone, ref buffer);
+                            left = reader.Refill(left, ref readerDone, ref buffer);
                             left = compressor.Compress(left, readerDone, writer);
                         }
                     }

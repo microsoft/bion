@@ -7,18 +7,21 @@ namespace Bion.Extensions
     {
         /// <summary>
         ///  Refill makes it easy to implement a Reader/Writer pattern with Memory&lt;byte&gt;.
-        ///  Refill grows the buffer, if needed, copies unused bytes, and fills the buffer.
+        ///   - Copy any unread bytes to beginning of buffer.
+        ///   - Grow buffer if needed (if nothing could be consumed before).
+        ///   - Refill buffer from source stream.
+        ///   - Return new length and whether stream is at end.
         /// </summary>
         /// <remarks>
         ///  Usage
         ///  =====
-        ///  Memory&lt;byte&gt; buffer = new byte[64 * 1024];
+        ///  byte[] buffer = new byte[64 * 1024];
         ///  Memory&lt;byte&gt; left = Memory&lt;byte&gt;.Empty;
         ///  bool readerDone = false;
         ///  
         ///  while (!readerDone)
         ///  {
-        ///      left = stream.Refill(left, out readerDone, ref buffer);
+        ///      left = stream.Refill(left, ref readerDone, ref buffer);
         ///      left = Consume(left, readerDone);
         ///  }
         ///  
@@ -41,22 +44,47 @@ namespace Bion.Extensions
         /// <param name="readerDone">True if reader has no remaining bytes after this call</param>
         /// <param name="buffer">Buffer to read into and grow if needed</param>
         /// <returns>Memory&lt;byte&gt; with bytes from 'left' and remaining bytes which could be read</returns>
-        public static Memory<byte> Refill(this Stream source, ReadOnlyMemory<byte> left, out bool readerDone, ref Memory<byte> buffer)
+        public static Memory<byte> Refill(this Stream source, ReadOnlyMemory<byte> left, ref bool readerDone, ref byte[] buffer)
         {
             // If nothing could be consumed, expand the buffer
-            if (left.Length == buffer.Length) { buffer = new byte[buffer.Length * 2]; }
+            if (left.Length == buffer.Length && !readerDone) { buffer = new byte[buffer.Length * 2]; }
 
             // Copy the unused content to the beginning of the buffer
             left.CopyTo(buffer);
+            int newFilledLength = left.Length;
 
             // Fill the remainder of the buffer
-            int newFilledLength = left.Length + source.Read(buffer.Slice(left.Length).Span);
-
-            // The reader is done if the buffer wasn't filled
-            readerDone = newFilledLength < buffer.Length;
+            if (!readerDone)
+            {
+                newFilledLength += source.Read(buffer.AsSpan(left.Length));
+                readerDone = newFilledLength < buffer.Length;
+            }
 
             // Return the portion filled
-            return buffer.Slice(0, newFilledLength);
+            return buffer.AsMemory(0, newFilledLength);
+        }
+
+        /// <summary>
+        ///  Refill for direct byte[] style use.
+        ///   - Copy any unread bytes to beginning of buffer.
+        ///   - Grow buffer if needed (if nothing could be consumed before).
+        ///   - Refill buffer from source stream.
+        ///   - Return new length and whether stream is at end.
+        /// </summary>
+        /// <param name="source">Stream to read from</param>
+        /// <param name="index">Index of unread suffix of buffer</param>
+        /// <param name="lastLength">Length previously read</param>
+        /// <param name="readerDone">True if reader has no remaining bytes after this call</param>
+        /// <param name="buffer">Buffer to read into and grow if needed</param>
+        public static void Refill(this Stream source, ref int index, ref int length, ref bool readerDone, ref byte[] buffer)
+        {
+            // Refill with Memory overload
+            Memory<byte> left = buffer.AsMemory(index, length - index);
+            Memory<byte> refill = source.Refill(left, ref readerDone, ref buffer);
+
+            // Update index and length for new read
+            index = 0;
+            length = refill.Length;
         }
     }
 }
