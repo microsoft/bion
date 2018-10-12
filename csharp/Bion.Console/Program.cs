@@ -1,4 +1,6 @@
-﻿using Bion.Json;
+﻿using Bion.Core;
+using Bion.Extensions;
+using Bion.Json;
 using Bion.Text;
 using Bion.Vector;
 using Newtonsoft.Json;
@@ -61,23 +63,90 @@ namespace Bion.Console
 
         private static void ToBion(string fromPath, string toPath)
         {
-            Stopwatch w = Stopwatch.StartNew();
-            JsonBionConverter.JsonToBion(fromPath, toPath);
-            w.Stop();
-            System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(toPath).Length / BytesPerMB:n2}MB BION in {w.ElapsedMilliseconds:n0}ms.");
+            using (new ConsoleWatch($"Converting {fromPath} to {toPath}...",
+                () => $"Done. {LengthMB(fromPath)} JSON to {LengthMB(toPath)} BION"))
+            {
+                JsonBionConverter.JsonToBion(fromPath, toPath);
+            }
         }
 
         private static void ToJson(string fromPath, string toPath)
         {
-            Stopwatch w = Stopwatch.StartNew();
-            JsonBionConverter.BionToJson(fromPath, toPath);
-            w.Stop();
-            System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB BION to {new FileInfo(toPath).Length / BytesPerMB:n2}MB JSON in {w.ElapsedMilliseconds:n0}ms.");
+            using (new ConsoleWatch($"Converting {fromPath} to {toPath}...",
+                () => $"Done. {LengthMB(fromPath)} BION to {LengthMB(toPath)} JSON"))
+            {
+                JsonBionConverter.BionToJson(fromPath, toPath);
+            }
+        }
+
+        private static void Compare(string jsonPath, string bionPath)
+        {
+            using (new ConsoleWatch($"Comparing {jsonPath} to {bionPath}..."))
+            {
+                JsonBionComparer.Compare(jsonPath, bionPath);
+            }
+        }
+
+        private static bool CompareBytes(string expectedPath, string actualPath)
+        {
+            using (new ConsoleWatch($"Comparing {expectedPath} to {actualPath}..."))
+            {
+                Span<byte> expected = new byte[64 * 1024];
+                Span<byte> actual = new byte[64 * 1024];
+
+                long position = 0;
+                using (FileStream expectedReader = File.OpenRead(expectedPath))
+                using (FileStream actualReader = File.OpenRead(actualPath))
+                {
+                    while (true)
+                    {
+                        int expectedLength = expectedReader.Read(expected);
+                        int actualLength = actualReader.Read(actual);
+                        if (expectedLength != actualLength)
+                        {
+                            System.Console.WriteLine($"@{position:n0}, expect returned {expectedLength:n0} bytes\r\nactual returned {actualLength:n0}bytes.");
+                            return false;
+                        }
+
+                        for (int i = 0; i < expectedLength; ++i)
+                        {
+                            if (expected[i] != actual[i])
+                            {
+                                System.Console.WriteLine($"@{position + i:n0};\r\nexpect: {expected[i]},\r\nactual: {actual[i]}.");
+                                return false;
+                            }
+                        }
+
+                        position += expectedLength;
+                        if (expectedLength < expected.Length) break;
+                    }
+
+                    System.Console.WriteLine("Files Identical.");
+                }
+            }
+
+            return true;
+        }
+
+        private static void RemoveWhitespace(string fromPath, string toPath)
+        {
+            using (new ConsoleWatch($"Writing {fromPath} without whitespace to {toPath}...",
+                () => $"Done; {LengthMB(fromPath)} => {LengthMB(toPath)}"))
+            {
+                using (JsonTextReader reader = new JsonTextReader(new StreamReader(fromPath)))
+                using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(toPath)))
+                {
+                    writer.Formatting = Formatting.None;
+                    writer.WriteToken(reader);
+                }
+            }
         }
 
         private static void CompressTest(string fromPath, string toPath)
         {
             Memory<byte> buffer = new byte[64 * 1024];
+            ReadOnlyMemory<byte> left;
+            bool readerDone;
 
             string dictionaryPath = Path.ChangeExtension(toPath, ".Dictionary.bion");
             string comparePath = Path.ChangeExtension(fromPath, "out.json");
@@ -90,107 +159,81 @@ namespace Bion.Console
 
             fromPath = nowsPath;
 
-            System.Console.WriteLine($"Compressing {fromPath}...");
-            Stopwatch w = Stopwatch.StartNew();
-            using (WordCompressor compressor = WordCompressor.OpenWrite(dictionaryPath))
+            using (new ConsoleWatch($"Compressing {fromPath}...",
+                () => $"Done. {LengthMB(fromPath)} to {LengthMB(toPath)} + {LengthMB(dictionaryPath)} index"))
             {
-                using (FileStream reader = File.OpenRead(fromPath))
-                using (NumberWriter writer = new NumberWriter(File.Create(toPath)))
+                using (WordCompressor compressor = WordCompressor.OpenWrite(dictionaryPath))
                 {
-                    int length = 0;
-                    int lengthLeft = 0;
-
-                    // TODO: Too complex and easy to mess up. How do I make this *simple*?
-                    while (true)
+                    using (FileStream reader = File.OpenRead(fromPath))
+                    using (NumberWriter writer = new NumberWriter(File.Create(toPath)))
                     {
-                        length = lengthLeft + reader.Read(buffer.Slice(lengthLeft).Span);
-                        lengthLeft = length - compressor.Compress(buffer.Slice(0, length), writer);
-                        if (lengthLeft > 0) { buffer.Slice(length - lengthLeft).CopyTo(buffer); }
-
-                        if (length < buffer.Length && lengthLeft == 0) break;
+                        left = ReadOnlyMemory<byte>.Empty;
+                        readerDone = false;
+                        while (!readerDone)
+                        {
+                            left = reader.Refill(left, out readerDone, ref buffer);
+                            left = compressor.Compress(left, readerDone, writer);
+                        }
                     }
-                }
 
-                string tempPath = Path.ChangeExtension(toPath, ".opt.bion");
-                using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
-                using (NumberWriter writer = new NumberWriter(File.Create(tempPath)))
-                {
-                    compressor.Optimize(reader, writer);
-                }
-
-                toPath = tempPath;
-            }
-            JsonBionConverter.BionToJson(dictionaryPath, Path.ChangeExtension(dictionaryPath, ".json"));
-            w.Stop();
-            System.Console.WriteLine($"Done. Compressed from {new FileInfo(fromPath).Length / BytesPerMB:n2}MB to {new FileInfo(toPath).Length / BytesPerMB:n2}MB + {new FileInfo(dictionaryPath).Length / BytesPerMB:n2}MB Index in {w.ElapsedMilliseconds:n0}ms.");
-
-            System.Console.WriteLine($"Decompressing {fromPath}...");
-            w = Stopwatch.StartNew();
-            //for (int i = 0; i < 10; ++i)
-            {
-                using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
-                using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
-                using (FileStream writer = File.Create(comparePath))
-                {
-                    while(true)
+                    string tempPath = Path.ChangeExtension(toPath, ".opt.bion");
+                    using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
+                    using (NumberWriter writer = new NumberWriter(File.Create(tempPath)))
                     {
-                        int length = compressor.Decompress(reader, buffer.Span);
-                        if (length == 0) break;
+                        compressor.Optimize(reader, writer);
+                    }
 
-                        writer.Write(buffer.Slice(0, length).Span);
+                    toPath = tempPath;
+                }
+            }
+
+            int iterations = 1;
+            using (new ConsoleWatch($"Decompressing {fromPath} {iterations:n0}x..."))
+            {
+                for (int i = 0; i < iterations; ++i)
+                {
+                    using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
+                    using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
+                    using (FileStream writer = File.Create(comparePath))
+                    {
+                        readerDone = false;
+                        while (!readerDone)
+                        {
+                            left = compressor.Decompress(reader, buffer, out readerDone);
+                            if (!readerDone && left.Length == 0) { buffer = new byte[buffer.Length * 2]; }
+                            writer.Write(left.Span);
+                        }
                     }
                 }
             }
-            w.Stop();
-            System.Console.WriteLine($"Done. Decompressed from {new FileInfo(toPath).Length / BytesPerMB:n2}MB to {new FileInfo(comparePath).Length / BytesPerMB:n2}MB in {w.ElapsedMilliseconds:n0}ms.");
 
-            // TODO: Clean up and make a function with clear output.
-            long position = 0;
-            Memory<byte> buffer2 = new byte[buffer.Length];
-            using (FileStream expectedReader = File.OpenRead(fromPath))
-            using (FileStream actualReader = File.OpenRead(comparePath))
-            {
-                int length = expectedReader.Read(buffer.Span);
-                int length2 = actualReader.Read(buffer2.Span.Slice(0, length));
-                if (length2 != length) Debugger.Break();
-
-                for(int i = 0; i < length; ++i)
-                {
-                    if(buffer.Span[i] != buffer2.Span[i])
-                    {
-                        Debugger.Break();
-                    }
-                }
-
-                position += length;
-            }
+            // Verify files identical
+            CompareBytes(fromPath, comparePath);
         }
 
         private static void VectorTest(string filePath, bool readAll)
         {
-            Stopwatch w = Stopwatch.StartNew();
-
             int containerCount = 0;
-
-            long fileLength = new FileInfo(filePath).Length;
-            byte[] buffer = new byte[64 * 1024];
-            using (Stream stream = File.OpenRead(filePath))
+            using (new ConsoleWatch($"Counting containers in {filePath}...",
+                () => $"Done, {containerCount:n0} containers in {LengthMB(filePath)}"))
             {
-                long lengthDone = 0;
-                int bufferLength = stream.Read(buffer);
-
-                while (lengthDone < fileLength)
+                long fileLength = new FileInfo(filePath).Length;
+                byte[] buffer = new byte[64 * 1024];
+                using (Stream stream = File.OpenRead(filePath))
                 {
-                    //containerCount += ContainerCount(new Span<byte>(buffer, 0, bufferLength));
-                    containerCount += ByteVector.CountGreaterThan(new Span<byte>(buffer, 0, bufferLength), 0xFD);
+                    long lengthDone = 0;
+                    int bufferLength = stream.Read(buffer);
 
-                    lengthDone += bufferLength;
-                    if (readAll) bufferLength = stream.Read(buffer);
+                    while (lengthDone < fileLength)
+                    {
+                        //containerCount += ContainerCount(new Span<byte>(buffer, 0, bufferLength));
+                        containerCount += ByteVector.CountGreaterThan(new Span<byte>(buffer, 0, bufferLength), 0xFD);
+
+                        lengthDone += bufferLength;
+                        if (readAll) bufferLength = stream.Read(buffer);
+                    }
                 }
             }
-
-            w.Stop();
-            System.Console.WriteLine($"Done. VectorTest found {containerCount:n0} containers in {filePath} ({fileLength / BytesPerMB:n2}MB) in {w.ElapsedMilliseconds:n0}ms.");
         }
 
         private static int ContainerCount(Span<byte> buffer)
@@ -215,84 +258,61 @@ namespace Bion.Console
             Array.Fill<sbyte>(depthChangeLookup, 1, 0xFE, 2);
             Array.Fill<sbyte>(depthChangeLookup, -1, 0xFC, 2);
 
-            Stopwatch w = Stopwatch.StartNew();
-            byte[] buffer = new byte[512 * 1024];
-            using (Stream stream = File.OpenRead(filePath))
+            using (new ConsoleWatch($"Stream Read {filePath} ({LengthMB(filePath)}) with depth tracking...",
+                () => $"Done; {_currentDepth:n0} depth at end"))
             {
-                int length = 0;
-                do
+                byte[] buffer = new byte[512 * 1024];
+                using (Stream stream = File.OpenRead(filePath))
                 {
-                    length = stream.Read(buffer);
-                    for (int i = 0; i < length; ++i)
+                    int length = 0;
+                    do
                     {
-                        byte marker = buffer[i];
-                        _currentDepth += depthChangeLookup[marker];
-                    }
+                        length = stream.Read(buffer);
+                        for (int i = 0; i < length; ++i)
+                        {
+                            byte marker = buffer[i];
+                            _currentDepth += depthChangeLookup[marker];
+                        }
 
-                } while (length == buffer.Length);
+                    } while (length == buffer.Length);
+                }
             }
-
-            w.Stop();
-            System.Console.WriteLine($"Done. Read {filePath} (bytes only) ({new FileInfo(filePath).Length / BytesPerMB:n2}MB) [{_currentDepth:n0}] in {w.ElapsedMilliseconds:n0}ms.");
         }
 
         private static void ReadSpeed(string filePath)
         {
-            Stopwatch w = Stopwatch.StartNew();
             long tokenCount = 0;
 
-            if (filePath.EndsWith(".bion", StringComparison.OrdinalIgnoreCase))
+            using (new ConsoleWatch($"Reading {filePath} ({LengthMB(filePath)})...",
+                () => $"Done ({tokenCount:n0})"))
             {
-                using (BionReader reader = new BionReader(new FileStream(filePath, FileMode.Open)))
+                if (filePath.EndsWith(".bion", StringComparison.OrdinalIgnoreCase))
                 {
-                    reader.Skip();
-                    tokenCount = reader.BytesRead;
+                    using (BionReader reader = new BionReader(new FileStream(filePath, FileMode.Open)))
+                    {
+                        reader.Skip();
+                        tokenCount = reader.BytesRead;
 
-                    //while (reader.Read())
-                    //{
-                    //    tokenCount++;
-                    //}
+                        //while (reader.Read())
+                        //{
+                        //    tokenCount++;
+                        //}
+                    }
+                }
+                else
+                {
+                    using (JsonTextReader reader = new JsonTextReader(new StreamReader(filePath)))
+                    {
+                        reader.Read();
+                        reader.Skip();
+
+                        //while (reader.Read())
+                        //{
+                        //    tokenCount++;
+                        //}
+                    }
                 }
             }
-            else
-            {
-                using (JsonTextReader reader = new JsonTextReader(new StreamReader(filePath)))
-                {
-                    reader.Read();
-                    reader.Skip();
-                    
-                    //while (reader.Read())
-                    //{
-                    //    tokenCount++;
-                    //}
-                }
-            }
-
-            w.Stop();
-            System.Console.WriteLine($"Done. Read {filePath} ({new FileInfo(filePath).Length / BytesPerMB:n2}MB; {tokenCount:n0} tokens) in {w.ElapsedMilliseconds:n0}ms.");
-        }
-
-        private static void Compare(string jsonPath, string BionPath)
-        {
-            Stopwatch w = Stopwatch.StartNew();
-            JsonBionComparer.Compare(jsonPath, BionPath);
-            w.Stop();
-            System.Console.WriteLine($"Done. Compared {new FileInfo(jsonPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(BionPath).Length / BytesPerMB:n2}MB BION in {w.ElapsedMilliseconds:n0}ms.");
-        }
-
-        private static void RemoveWhitespace(string fromPath, string toPath)
-        {
-            Stopwatch w = Stopwatch.StartNew();
-
-            using (JsonTextReader reader = new JsonTextReader(new StreamReader(fromPath)))
-            using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(toPath)))
-            {
-                writer.Formatting = Formatting.None;
-                writer.WriteToken(reader);
-            }
-
-            w.Stop();
-            System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(toPath).Length / BytesPerMB:n2}MB JSON [no whitespace] in {w.ElapsedMilliseconds:n0}ms.");
         }
 
         private static void ConvertFilesToArray(string fromPath, string toPath)
@@ -367,6 +387,11 @@ namespace Bion.Console
                     }
                 }
             }
+        }
+
+        private static string LengthMB(string filePath)
+        {
+            return $"{new FileInfo(filePath).Length / BytesPerMB:n2}MB";
         }
 
         private const float BytesPerMB = 1024 * 1024;

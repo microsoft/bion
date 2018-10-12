@@ -30,9 +30,9 @@ namespace Bion.Text
             return compressor;
         }
 
-        public int Compress(ReadOnlyMemory<byte> text, NumberWriter writer)
+        public ReadOnlyMemory<byte> Compress(ReadOnlyMemory<byte> text, bool isComplete, NumberWriter writer)
         {
-            if (text.IsEmpty) return 0;
+            if (text.IsEmpty) return ReadOnlyMemory<byte>.Empty;
             
             ReadOnlySpan<byte> textSpan = text.Span;
 
@@ -44,20 +44,20 @@ namespace Bion.Text
                 // Find length of current word
                 length = 1;
                 while (index + length < text.Length && WordSplitter.IsLetterOrDigit(textSpan[index + length]) == isWord) length++;
-                String8 word = new String8(text.Slice(index, length));
+                String8 word = String8.Reference(text.Slice(index, length));
 
-                // If it's the last word, stop
-                if (index > 0 && index + length == text.Length) { break; }
+                // If this is the last word but not the end of input, don't consume it
+                if (!isComplete && index + length == text.Length) { break; }
                 
                 int wordIndex = _words.FindOrAdd(word);
                 writer.WriteValue((ulong)wordIndex);
-                if (writer.BytesWritten > 12484276) System.Diagnostics.Debugger.Break();
 
                 isWord = !isWord;
                 index += length;
             }
 
-            return index;
+            // Return the leftover input, if any
+            return text.Slice(index);
         }
 
         public void Optimize(NumberReader reader, NumberWriter writer)
@@ -67,14 +67,14 @@ namespace Bion.Text
             while (!reader.EndOfStream)
             {
                 int index = (int)reader.ReadNumber();
-                if (index > map.Length) System.Diagnostics.Debugger.Break();
                 int remapped = map[index];
                 writer.WriteValue((ulong)remapped);
             }
         }
 
-        public int Decompress(NumberReader reader, Span<byte> buffer)
+        public Memory<byte> Decompress(NumberReader reader, Memory<byte> buffer, out bool readerDone)
         {
+            Span<byte> span = buffer.Span;
             int lengthWritten = 0;
 
             while (!reader.EndOfStream)
@@ -82,17 +82,18 @@ namespace Bion.Text
                 int wordIndex = (int)reader.ReadNumber();
                 String8 word = _words[wordIndex];
 
-                if(lengthWritten + word.Value.Length > buffer.Length)
+                if(lengthWritten + word.Length > buffer.Length)
                 {
                     reader.UndoRead();
                     break;
                 }
 
-                word.Value.Span.CopyTo(buffer.Slice(lengthWritten));
+                word.CopyTo(span.Slice(lengthWritten));
                 lengthWritten += word.Value.Length;
             }
 
-            return lengthWritten;
+            readerDone = reader.EndOfStream;
+            return buffer.Slice(0, lengthWritten);
         }
 
         private void Read(BionReader reader)
@@ -221,7 +222,7 @@ namespace Bion.Text
                 reader.Read();
                 if (reader.TokenType == BionToken.EndArray) { break; }
 
-                String8 value = String8.Copy(new String8(reader.CurrentBytes()));
+                String8 value = String8.Copy(reader.CurrentBytes());
                 Index[value] = Words.Count;
                 Words.Add(new WordEntry(value));
             }
