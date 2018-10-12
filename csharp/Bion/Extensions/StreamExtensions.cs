@@ -41,7 +41,7 @@ namespace Bion.Extensions
         /// </remarks>
         /// <param name="source">Stream to read from</param>
         /// <param name="left">Bytes from previous read which weren't consumed</param>
-        /// <param name="readerDone">True if reader has no remaining bytes after this call</param>
+        /// <param name="readerDone">Whether stream is at end</param>
         /// <param name="buffer">Buffer to read into and grow if needed</param>
         /// <returns>Memory&lt;byte&gt; with bytes from 'left' and remaining bytes which could be read</returns>
         public static Memory<byte> Refill(this Stream source, ReadOnlyMemory<byte> left, ref bool readerDone, ref byte[] buffer)
@@ -72,9 +72,9 @@ namespace Bion.Extensions
         ///   - Return new length and whether stream is at end.
         /// </summary>
         /// <param name="source">Stream to read from</param>
-        /// <param name="index">Index of unread suffix of buffer</param>
-        /// <param name="lastLength">Length previously read</param>
-        /// <param name="readerDone">True if reader has no remaining bytes after this call</param>
+        /// <param name="index">Index of first unconsumed byte, or 0.</param>
+        /// <param name="lastLength">Length of previous Refill, or 0.</param>
+        /// <param name="readerDone">Whether stream is at end</param>
         /// <param name="buffer">Buffer to read into and grow if needed</param>
         public static void Refill(this Stream source, ref int index, ref int length, ref bool readerDone, ref byte[] buffer)
         {
