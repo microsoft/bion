@@ -1,4 +1,5 @@
-﻿using Bion.Vector;
+﻿using Bion.Extensions;
+using Bion.Vector;
 using System;
 using System.IO;
 using System.Linq;
@@ -9,13 +10,12 @@ namespace Bion
     public unsafe class BionReader : IDisposable
     {
         private Stream _stream;
-        private Memory<byte> _buffer;
-
         private BionLookup _lookupDictionary;
 
         private BionMarker _currentMarker;
         private int _currentLength;
         private int _currentDepth;
+        private Memory<byte> _currentValue;
 
         private short _lastPropertyLookupIndex;
         private string _currentDecodedString;
@@ -105,7 +105,7 @@ namespace Bion
             else if (_currentLength > 0)
             {
                 // Read value (non-string) or length (string)
-                _buffer = Read(_currentLength);
+                _currentValue = Read(_currentLength);
                 BytesRead += _currentLength;
 
                 // Read value (string)
@@ -113,7 +113,7 @@ namespace Bion
                 {
                     _currentDecodedString = null;
                     _currentLength = (int)DecodeUnsignedInteger(_currentLength);
-                    _buffer = Read(_currentLength);
+                    _currentValue = Read(_currentLength);
                     BytesRead += _currentLength;
                 }
             }
@@ -121,7 +121,7 @@ namespace Bion
             {
                 // Adjust depth (length 0 tokens only)
                 _currentDepth += DepthLookup[marker];
-                _buffer = Memory<byte>.Empty;
+                _currentValue = Memory<byte>.Empty;
             }
 
             return true;
@@ -220,7 +220,7 @@ namespace Bion
 
             if (_currentDecodedString == null)
             {
-                _currentDecodedString = _textEncoding.GetString(_buffer.Span);
+                _currentDecodedString = _textEncoding.GetString(_currentValue.Span);
             }
 
             return _currentDecodedString;
@@ -228,13 +228,13 @@ namespace Bion
 
         public ReadOnlyMemory<byte> CurrentBytes()
         {
-            return _buffer;
+            return _currentValue;
         }
 
         private void LookupString()
         {
             _currentLength = -_currentLength;
-            _buffer = Read(_currentLength);
+            _currentValue = Read(_currentLength);
             BytesRead += _currentLength;
 
             short lookupIndex = (short)DecodeUnsignedInteger(_currentLength);
@@ -256,7 +256,7 @@ namespace Bion
         {
             ulong value = 0;
 
-            Span<byte> span = _buffer.Span;
+            Span<byte> span = _currentValue.Span;
             for (int i = length - 1; i >= 0; --i)
             {
                 value = value << 7;
@@ -294,6 +294,7 @@ namespace Bion
         byte[] _innerBuffer = new byte[64 * 1024];
         int _innerIndex;
         int _innerLength;
+        bool _endOfStream;
 
         private byte ReadByte()
         {
@@ -311,27 +312,7 @@ namespace Bion
 
         private int ReadNext(int size)
         {
-            byte[] readInto = _innerBuffer;
-
-            // Resize if needed
-            if (size > _innerBuffer.Length)
-            {
-                readInto = new byte[Math.Max(_innerBuffer.Length * 5 / 4, size)];
-            }
-
-            // Copy unused bytes
-            int lengthLeft = _innerLength - _innerIndex;
-            if (lengthLeft > 0)
-            {
-                Buffer.BlockCopy(_innerBuffer, _innerIndex, readInto, 0, lengthLeft);
-            }
-
-            // Fill remaining buffer
-            _innerLength = lengthLeft + _stream.Read(readInto, lengthLeft, readInto.Length - lengthLeft);
-
-            // Reset variables
-            _innerBuffer = readInto;
-            _innerIndex = 0;
+            _stream.Refill(ref _innerIndex, ref _innerLength, ref _endOfStream, ref _innerBuffer);
 
             // Return the safe size to read, if less than size
             return Math.Min(size, _innerLength);
