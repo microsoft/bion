@@ -165,7 +165,7 @@ namespace Bion.Console
                 using (WordCompressor compressor = WordCompressor.OpenWrite(dictionaryPath))
                 {
                     using (FileStream reader = File.OpenRead(fromPath))
-                    using (NumberWriter writer = new NumberWriter(File.Create(toPath)))
+                    using (VariableNumberWriter writer = new VariableNumberWriter(File.Create(toPath)))
                     {
                         left = ReadOnlyMemory<byte>.Empty;
                         readerDone = false;
@@ -177,8 +177,8 @@ namespace Bion.Console
                     }
 
                     string tempPath = Path.ChangeExtension(toPath, ".opt.bion");
-                    using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
-                    using (NumberWriter writer = new NumberWriter(File.Create(tempPath)))
+                    using (VariableNumberReader reader = new VariableNumberReader(File.OpenRead(toPath)))
+                    using (VariableNumberWriter writer = new VariableNumberWriter(File.Create(tempPath)))
                     {
                         compressor.Optimize(reader, writer);
                     }
@@ -187,12 +187,14 @@ namespace Bion.Console
                 }
             }
 
+            JsonBionConverter.BionToJson(dictionaryPath, Path.ChangeExtension(dictionaryPath, ".json"));
+
             int iterations = 1;
             using (new ConsoleWatch($"Decompressing {fromPath} {iterations:n0}x..."))
             {
                 for (int i = 0; i < iterations; ++i)
                 {
-                    using (NumberReader reader = new NumberReader(File.OpenRead(toPath)))
+                    using (VariableNumberReader reader = new VariableNumberReader(File.OpenRead(toPath)))
                     using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
                     using (FileStream writer = File.Create(comparePath))
                     {

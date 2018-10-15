@@ -4,14 +4,18 @@ using System.IO;
 
 namespace Bion.Text
 {
-    public class NumberWriter : IDisposable
+    public class VariableNumberWriter : IDisposable
     {
+        internal const byte BitsPerByte = 6;
+        internal const byte FirstByteMarker = 1 << BitsPerByte;
+        internal const byte PerByteCutoff = (1 << BitsPerByte) - 1;
+
         private Stream _stream;
         private byte[] _buffer;
         private int _index;
         public long BytesWritten { get; private set; }
 
-        public NumberWriter(Stream stream)
+        public VariableNumberWriter(Stream stream)
         {
             _stream = stream;
             _buffer = new byte[16 * 1024];
@@ -22,13 +26,13 @@ namespace Bion.Text
             if (_index + 10 >= _buffer.Length) { Flush(); }
 
             int indexBefore = _index;
-            while(value > 0x7F)
+            while(value > PerByteCutoff)
             {
-                _buffer[_index++] = (byte)(value & 0x7F);
-                value = value >> 7;
+                _buffer[_index++] = (byte)(value & PerByteCutoff);
+                value = value >> BitsPerByte;
             }
 
-            _buffer[_index++] = (byte)(value | 0x80);
+            _buffer[_index++] = (byte)(value | FirstByteMarker);
             BytesWritten += _index - indexBefore;
         }
 
@@ -52,7 +56,7 @@ namespace Bion.Text
         }
     }
 
-    public class NumberReader : IDisposable
+    public class VariableNumberReader : IDisposable
     {
         private Stream _stream;
         private bool _endOfStream;
@@ -61,7 +65,7 @@ namespace Bion.Text
         private int _index;
         private int _length;
         
-        public NumberReader(Stream stream)
+        public VariableNumberReader(Stream stream)
         {
             _stream = stream;
             _buffer = new byte[16 * 1024];
@@ -81,11 +85,11 @@ namespace Bion.Text
             ulong value = 0;
             int current = 0, shift = 0;
 
-            while(current < 0x80)
+            while(current <= VariableNumberWriter.PerByteCutoff)
             {
                 current = _buffer[_index++];
-                value += (ulong)(current & 0x7F) << shift;
-                shift += 7;
+                value += (ulong)(current & VariableNumberWriter.PerByteCutoff) << shift;
+                shift += VariableNumberWriter.BitsPerByte;
             }
 
             BytesRead += _index - _lastIndex;

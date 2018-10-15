@@ -30,7 +30,7 @@ namespace Bion.Text
             return compressor;
         }
 
-        public ReadOnlyMemory<byte> Compress(ReadOnlyMemory<byte> text, bool isComplete, NumberWriter writer)
+        public ReadOnlyMemory<byte> Compress(ReadOnlyMemory<byte> text, bool isComplete, VariableNumberWriter writer)
         {
             if (text.IsEmpty) return ReadOnlyMemory<byte>.Empty;
             
@@ -60,7 +60,7 @@ namespace Bion.Text
             return text.Slice(index);
         }
 
-        public void Optimize(NumberReader reader, NumberWriter writer)
+        public void Optimize(VariableNumberReader reader, VariableNumberWriter writer)
         {
             int[] map = _words.Optimize();
 
@@ -72,7 +72,7 @@ namespace Bion.Text
             }
         }
 
-        public Memory<byte> Decompress(NumberReader reader, Memory<byte> buffer, out bool readerDone)
+        public Memory<byte> Decompress(VariableNumberReader reader, Memory<byte> buffer, out bool readerDone)
         {
             Span<byte> span = buffer.Span;
             int lengthWritten = 0;
@@ -206,6 +206,7 @@ namespace Bion.Text
             foreach (WordEntry entry in Words)
             {
                 writer.WriteValue(entry.Value.Value.Span);
+                writer.WriteValue(entry.Count);
             }
             writer.WriteEndArray();
         }
@@ -222,9 +223,13 @@ namespace Bion.Text
                 reader.Read();
                 if (reader.TokenType == BionToken.EndArray) { break; }
 
+                reader.Expect(BionToken.String);
                 String8 value = String8.Copy(reader.CurrentBytes());
+
+                reader.Read(BionToken.Integer);
+                int count = (int)reader.CurrentInteger();
                 Index[value] = Words.Count;
-                Words.Add(new WordEntry(value));
+                Words.Add(new WordEntry(value, count));
             }
         }
     }

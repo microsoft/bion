@@ -128,12 +128,7 @@ namespace Bion
 
         public void WriteValue(ReadOnlySpan<byte> utf8Text)
         {
-            // Write marker and length
-            WriteStringLength(BionToken.String, utf8Text.Length);
-
-            // Write value
-            _stream.Write(utf8Text);
-            BytesWritten += utf8Text.Length;
+            WriteStringValue(BionToken.String, utf8Text);
         }
 
         public void WritePropertyName(string name)
@@ -142,6 +137,11 @@ namespace Bion
 
             _lastPropertyName = name;
             _lastPropertyPosition = BytesWritten;
+        }
+
+        public void WritePropertyName(ReadOnlySpan<byte> utf8Text)
+        {
+            WriteStringValue(BionToken.PropertyName, utf8Text);
         }
 
         private void WriteStringLength(BionToken marker, int stringLength)
@@ -170,6 +170,16 @@ namespace Bion
 
             _stream.Write(_buffer, 0, lengthOfLength + 1);
             BytesWritten += lengthOfLength + 1;
+        }
+
+        private void WriteStringValue(BionToken markerType, ReadOnlySpan<byte> value)
+        {
+            // Write marker and length
+            WriteStringLength(markerType, value.Length);
+
+            // Write value
+            _stream.Write(value);
+            BytesWritten += value.Length;
         }
 
         private void WriteStringValue(BionToken markerType, string value)

@@ -13,7 +13,7 @@ namespace Bion.Test.Text
             string fileName = "Sample.bin";
             long bytes;
 
-            using (NumberWriter writer = new NumberWriter(File.Create(fileName)))
+            using (VariableNumberWriter writer = new VariableNumberWriter(File.Create(fileName)))
             {
                 for(int i = 1000; i < 1050; ++i)
                 {
@@ -23,7 +23,7 @@ namespace Bion.Test.Text
                 bytes = writer.BytesWritten;
             }
 
-            using (NumberReader reader = new NumberReader(File.OpenRead(fileName)))
+            using (VariableNumberReader reader = new VariableNumberReader(File.OpenRead(fileName)))
             {
                 Assert.IsFalse(reader.EndOfStream);
 
