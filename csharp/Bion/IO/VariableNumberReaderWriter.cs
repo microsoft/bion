@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace Bion.Text
+namespace Bion.IO
 {
     public class VariableNumberWriter : IDisposable
     {

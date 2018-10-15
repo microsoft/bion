@@ -1,11 +1,11 @@
-﻿using Bion.Text;
+﻿using Bion.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 
 namespace Bion.Test.Text
 {
     [TestClass]
-    public class NumberReaderWriterTests
+    public class VariableNumberReaderWriterTests
     {
         [TestMethod]
         public void RoundTrip()
@@ -15,7 +15,7 @@ namespace Bion.Test.Text
 
             using (VariableNumberWriter writer = new VariableNumberWriter(File.Create(fileName)))
             {
-                for(int i = 1000; i < 1050; ++i)
+                for(int i = 1000; i < 100000; ++i)
                 {
                     writer.WriteValue((uint)i);
                 }
@@ -27,7 +27,7 @@ namespace Bion.Test.Text
             {
                 Assert.IsFalse(reader.EndOfStream);
 
-                for(int i = 1000; i < 1050; ++i)
+                for(int i = 1000; i < 100000; ++i)
                 {
                     int value = (int)reader.ReadNumber();
                     Assert.AreEqual(i, value);
