@@ -1,12 +1,10 @@
 ﻿using Bion.Core;
-using Bion.Extensions;
 using Bion.IO;
 using Bion.Json;
 using Bion.Text;
 using Bion.Vector;
 using Newtonsoft.Json;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -23,12 +21,12 @@ namespace Bion.Console
 
             //CompressTest(fromPath, bionPath);
             ConvertAndBackTest(fromPath, jsonPath, bionPath);
-            
+
             //ReadSpeed(jsonPath);
-            //for (int i = 0; i < 10; ++i)
-            //{
-            //    ReadSpeed(bionPath);
-            //}
+            for (int i = 0; i < 10; ++i)
+            {
+                ReadSpeed(bionPath);
+            }
 
             //for (int i = 0; i < 10; ++i)
             //{
@@ -264,13 +262,13 @@ namespace Bion.Console
                 {
                     using (BionReader reader = new BionReader(new FileStream(filePath, FileMode.Open)))
                     {
-                        reader.Skip();
-                        tokenCount = reader.BytesRead;
+                        //reader.Skip();
+                        //tokenCount = reader.BytesRead;
 
-                        //while (reader.Read())
-                        //{
-                        //    tokenCount++;
-                        //}
+                        while (reader.Read())
+                        {
+                            tokenCount++;
+                        }
                     }
                 }
                 else
@@ -298,7 +296,7 @@ namespace Bion.Console
 
                 while (reader.Read())
                 {
-                    if(reader.TokenType == JsonToken.PropertyName && ((string)reader.Value) == "files")
+                    if (reader.TokenType == JsonToken.PropertyName && ((string)reader.Value) == "files")
                     {
                         writer.WritePropertyName((string)reader.Value);
 
@@ -306,7 +304,7 @@ namespace Bion.Console
                         reader.Read();
                         writer.WriteStartArray();
 
-                        while(true)
+                        while (true)
                         {
                             // Name
                             reader.Read();

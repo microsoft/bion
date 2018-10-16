@@ -199,7 +199,7 @@ namespace Bion.Text
                 if (reader.TokenType == BionToken.EndArray) { break; }
 
                 reader.Expect(BionToken.String);
-                String8 value = String8.Copy(reader.CurrentBytes());
+                String8 value = String8.Copy(reader.CurrentString8());
 
                 reader.Read(BionToken.Integer);
                 int count = (int)reader.CurrentInteger();

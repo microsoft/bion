@@ -41,7 +41,7 @@ namespace Bion.IO
         /// </summary>
         /// <param name="stream">Stream to read</param>
         /// <param name="size">Initial buffer size</param>
-        public BufferedReader(Stream stream, int size = 16 * 1024) : this(stream, new byte[size])
+        public BufferedReader(Stream stream, int size = 64 * 1024) : this(stream, new byte[size])
         { }
 
         /// <summary>

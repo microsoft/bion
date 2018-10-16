@@ -96,9 +96,8 @@ namespace Bion.Test
                 stream.Seek(0, SeekOrigin.Begin);
 
                 // Read, verify, validate position and no more content
-                using (BionReader reader = new BionReader(stream))
+                using (BionReader reader = new BionReader(new BufferedReader(stream) { CloseStream = false }))
                 {
-                    reader.CloseStream = false;
                     readAndVerify(reader);
 
                     Assert.AreEqual(length, reader.BytesRead);
