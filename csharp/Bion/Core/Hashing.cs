@@ -8,14 +8,14 @@ namespace Bion.Core
         private const int r = 47;
 
         // Murmur2 64-bit for Span<T>; see https://github.com/aappleby/smhasher. MIT License.
-        public static unsafe ulong Murmur2(ReadOnlySpan<byte> span, ulong seed)
+        public static unsafe ulong Murmur2(byte[] array, int index, int length, ulong seed)
         {
-            ulong h = seed ^ unchecked(((ulong)span.Length * m));
+            ulong h = seed ^ unchecked(((ulong)length * m));
 
-            int blockLength = span.Length / 8;
+            int blockLength = length / 8;
             if (blockLength > 0)
             {
-                fixed (byte* spanPtr = &span[0])
+                fixed (byte* spanPtr = &array[index])
                 {
                     ulong* blockPtr = (ulong*)spanPtr;
                     for (int i = 0; i < blockLength; ++i)
@@ -32,11 +32,11 @@ namespace Bion.Core
                 }
             }
 
-            if ((span.Length & 0x7) != 0)
+            if ((length & 0x7) != 0)
             {
-                for (int i = 8 * blockLength, shift = 0; i < span.Length; ++i, shift += 8)
+                for (int i = 8 * blockLength, shift = 0; i < length; ++i, shift += 8)
                 {
-                    h ^= (ulong)span[i] << shift;
+                    h ^= (ulong)array[index + i] << shift;
                 }
 
                 h *= m;

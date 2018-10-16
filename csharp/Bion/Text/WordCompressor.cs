@@ -42,7 +42,7 @@ namespace Bion.Text
             {
                 // Read the next word
                 length = WordSplitter.NextWordLength(reader, isWord);
-                String8 word = String8.Reference(reader.Buffer.AsMemory(reader.Index, length));
+                String8 word = String8.Reference(reader.Buffer, reader.Index, length);
 
                 // Set state to read next word
                 reader.Index += length;
@@ -86,7 +86,7 @@ namespace Bion.Text
                 String8 word = _words[wordIndex];
 
                 writer.EnsureSpace(word.Length);
-                word.Value.CopyTo(writer.Buffer.AsMemory(writer.Index));
+                word.CopyTo(writer.Buffer, writer.Index);
                 writer.Index += word.Length;
             }
         }
@@ -181,7 +181,7 @@ namespace Bion.Text
             writer.WriteStartArray();
             foreach (WordEntry entry in Words)
             {
-                writer.WriteValue(entry.Value.Value.Span);
+                writer.WriteValue(entry.Value.Span);
                 writer.WriteValue(entry.Count);
             }
             writer.WriteEndArray();

@@ -20,14 +20,13 @@ namespace Bion.Test.Core
             }
             hashes.Clear();
 
-
             // Verify hashing bytes is unique
             Random r = new Random(5);
             byte[] bytes = new byte[60];
             for(int i = 0; i < 100000; ++i)
             {
                 r.NextBytes(bytes);
-                Assert.IsTrue(hashes.Add(Hashing.Murmur2(bytes, 0)));
+                Assert.IsTrue(hashes.Add(Hashing.Murmur2(bytes, 0, bytes.Length, 0)));
             }
         }
     }
