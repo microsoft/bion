@@ -1,5 +1,4 @@
-﻿using Bion.Extensions;
-using System;
+﻿using System;
 using System.IO;
 
 namespace Bion.IO
@@ -79,9 +78,29 @@ namespace Bion.IO
             int bytesLeft = (Length - Index);
             if (bytesLeft >= length) { return true; }
 
-            _stream.Refill(ref Index, ref Length, ref _streamDone, ref Buffer, length);
-            _bytesRead += (Length - Index) - bytesLeft;
-            return (Length - Index) > length;
+            byte[] toFill = Buffer;
+            
+            // If the buffer is too small, increase it
+            if (length > Buffer.Length)
+            {
+                toFill = new byte[Math.Max(length, Buffer.Length * 2)];
+            }
+
+            // Copy any leftover bytes
+            System.Buffer.BlockCopy(Buffer, Index, toFill, 0, bytesLeft);
+            Buffer = toFill;
+            Length = bytesLeft;
+            Index = 0;
+
+            // Fill the remainder of the buffer
+            if (!_streamDone)
+            {
+                Length += _stream.Read(toFill, bytesLeft, toFill.Length - bytesLeft);
+                _streamDone = Length < toFill.Length;
+            }
+
+            _bytesRead += Length - bytesLeft;
+            return Length >= length;
         }
 
         public void Dispose()
