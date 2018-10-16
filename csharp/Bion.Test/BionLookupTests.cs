@@ -41,27 +41,27 @@ namespace Bion.Test
             }
         }
 
-        [TestMethod]
-        public void BionLookup_ThroughReaderWriter()
-        {
-            string jsonFilePath = @"CompareTests\Basics.json";
-            string bionFilePath = "Basics.WithLookup.bion";
-            string bionLookupFilePath = "Basics.WithLookup.Lookup.bion";
+        //[TestMethod]
+        //public void BionLookup_ThroughReaderWriter()
+        //{
+        //    string jsonFilePath = @"CompareTests\Basics.json";
+        //    string bionFilePath = "Basics.WithLookup.bion";
+        //    string bionLookupFilePath = "Basics.WithLookup.Lookup.bion";
 
-            using (JsonTextReader reader = new JsonTextReader(new StreamReader(jsonFilePath)))
-            using (BionWriter writer = new BionWriter(new FileStream(bionFilePath, FileMode.Create), BionLookup.OpenWrite(bionLookupFilePath)))
-            {
-                JsonBionConverter.JsonToBion(reader, writer);
-            }
+        //    using (JsonTextReader reader = new JsonTextReader(new StreamReader(jsonFilePath)))
+        //    using (BionWriter writer = new BionWriter(new FileStream(bionFilePath, FileMode.Create), BionLookup.OpenWrite(bionLookupFilePath)))
+        //    {
+        //        JsonBionConverter.JsonToBion(reader, writer);
+        //    }
 
-            // Debuggability: Convert lookup to JSON
-            JsonBionConverter.BionToJson(bionLookupFilePath, Path.ChangeExtension(bionLookupFilePath, ".json"));
+        //    // Debuggability: Convert lookup to JSON
+        //    JsonBionConverter.BionToJson(bionLookupFilePath, Path.ChangeExtension(bionLookupFilePath, ".json"));
 
-            using (JsonTextReader jsonReader = new JsonTextReader(new StreamReader(jsonFilePath)))
-            using (BionReader bionReader = new BionReader(new FileStream(bionFilePath, FileMode.Open), BionLookup.OpenRead(bionLookupFilePath)))
-            {
-                JsonBionComparer.Compare(jsonReader, bionReader);
-            }
-        }
+        //    using (JsonTextReader jsonReader = new JsonTextReader(new StreamReader(jsonFilePath)))
+        //    using (BionReader bionReader = new BionReader(new FileStream(bionFilePath, FileMode.Open), BionLookup.OpenRead(bionLookupFilePath)))
+        //    {
+        //        JsonBionComparer.Compare(jsonReader, bionReader);
+        //    }
+        //}
     }
 }

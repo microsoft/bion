@@ -9,14 +9,14 @@ namespace Bion.Test.Text
     public class NumberConverterTests
     {
         [TestMethod]
-        public void RoundTrip_SevenBit()
+        public void RoundTrip_SevenBitTerminated()
         {
             BufferedRoundTrip("SevenBit.bin",
                 (writer) =>
                 {
                     for (int i = 0; i < 100000; ++i)
                     {
-                        NumberConverter.WriteSevenBit((uint)i, writer);
+                        NumberConverter.WriteSevenBitTerminated(writer, (uint)i);
                     }
                 },
                 (reader) =>
@@ -24,7 +24,7 @@ namespace Bion.Test.Text
                     int expected = 0;
                     while (!reader.EndOfStream)
                     {
-                        int value = (int)NumberConverter.ReadSevenBit(reader);
+                        int value = (int)NumberConverter.ReadSevenBitTerminated(reader);
                         Assert.AreEqual(expected, value);
                         expected++;
                     }
@@ -35,14 +35,14 @@ namespace Bion.Test.Text
         }
 
         [TestMethod]
-        public void RoundTrip_SixBit()
+        public void RoundTrip_SixBitTerminated()
         {
             BufferedRoundTrip("SixBit.bin",
                 (writer) =>
                 {
                     for (int i = 0; i < 100000; ++i)
                     {
-                        NumberConverter.WriteSixBit((uint)i, writer);
+                        NumberConverter.WriteSixBit(writer, (uint)i);
                     }
                 },
                 (reader) =>
@@ -51,6 +51,33 @@ namespace Bion.Test.Text
                     while (!reader.EndOfStream)
                     {
                         int value = (int)NumberConverter.ReadSixBit(reader);
+                        Assert.AreEqual(expected, value);
+                        expected++;
+                    }
+
+                    Assert.AreEqual(100000, expected);
+                }
+            );
+        }
+
+        [TestMethod]
+        public void RoundTrip_SevenBitFixed()
+        {
+            int fixedLength = 5;
+            BufferedRoundTrip("SevenBitFixed.bin",
+                (writer) =>
+                {
+                    for (int i = 0; i < 100000; ++i)
+                    {
+                        NumberConverter.WriteSevenBitFixed(writer, (uint)i, fixedLength);
+                    }
+                },
+                (reader) =>
+                {
+                    int expected = 0;
+                    while (!reader.EndOfStream)
+                    {
+                        int value = (int)NumberConverter.ReadSevenBitFixed(reader, fixedLength);
                         Assert.AreEqual(expected, value);
                         expected++;
                     }

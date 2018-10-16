@@ -1,5 +1,4 @@
-﻿using Bion.Core;
-using Bion.IO;
+﻿using Bion.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -52,7 +51,7 @@ namespace Bion.Text
                 {
                     // If this is word is definitely complete, write it
                     uint wordIndex = _words.FindOrAdd(word);
-                    NumberConverter.WriteSevenBit(wordIndex, writer);
+                    NumberConverter.WriteSevenBitTerminated(writer, wordIndex);
                 }
                 else if(!reader.EndOfStream)
                 {
@@ -72,9 +71,9 @@ namespace Bion.Text
 
             while (!reader.EndOfStream)
             {
-                ulong index = NumberConverter.ReadSevenBit(reader);
+                ulong index = NumberConverter.ReadSevenBitTerminated(reader);
                 uint remapped = map[index];
-                NumberConverter.WriteSevenBit(remapped, writer);
+                NumberConverter.WriteSevenBitTerminated(writer, remapped);
             }
         }
 
@@ -82,7 +81,7 @@ namespace Bion.Text
         {
             while (!reader.EndOfStream)
             {
-                ulong wordIndex = NumberConverter.ReadSevenBit(reader);
+                ulong wordIndex = NumberConverter.ReadSevenBitTerminated(reader);
                 String8 word = _words[wordIndex];
 
                 writer.EnsureSpace(word.Length);
@@ -98,7 +97,7 @@ namespace Bion.Text
 
         public void Write(Stream stream)
         {
-            using (BionWriter writer = new BionWriter(stream, lookupDictionary: null))
+            using (BionWriter writer = new BionWriter(stream))
             {
                 Write(writer);
             }

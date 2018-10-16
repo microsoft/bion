@@ -21,32 +21,9 @@ namespace Bion.Console
             string bionPath = Path.ChangeExtension(fromPath, ".bion");
             string bionLookupPath = Path.ChangeExtension(fromPath, ".lookup.bion");
 
-            CompressTest(fromPath, bionPath);
-            //Stopwatch w = Stopwatch.StartNew();
-            //using (JsonTextReader reader = new JsonTextReader(new StreamReader(fromPath)))
-            //using (BionLookup lookup = BionLookup.OpenWrite(bionLookupPath))
-            //using (BionWriter writer = new BionWriter(new FileStream(bionPath, FileMode.Create), lookup))
-            //{
-            //    JsonBionConverter.JsonToBion(reader, writer);
-            //}
-
-            //w.Stop();
-            //System.Console.WriteLine($"Done. Converted {new FileInfo(fromPath).Length / BytesPerMB:n2}MB JSON to {new FileInfo(bionPath).Length / BytesPerMB:n2}MB BION in {w.ElapsedMilliseconds:n0}ms.");
-
-
-            //using (JsonTextReader jsonReader = new JsonTextReader(new StreamReader(fromPath)))
-            //using (BionLookup lookup = BionLookup.OpenRead(bionLookupPath))
-            //using (BionReader bionReader = new BionReader(new FileStream(bionPath, FileMode.Open), lookup))
-            //{
-            //    JsonBionComparer.Compare(jsonReader, bionReader);
-            //}
-
-            //JsonBionConverter.BionToJson(bionLookupPath, Path.ChangeExtension(bionLookupPath, ".json"));
-
-            //ToBion(fromPath, bionPath);
-            //ToJson(bionPath, jsonPath);
-            //Compare(fromPath, bionPath);
-
+            //CompressTest(fromPath, bionPath);
+            ConvertAndBackTest(fromPath, jsonPath, bionPath);
+            
             //ReadSpeed(jsonPath);
             //for (int i = 0; i < 10; ++i)
             //{
@@ -199,6 +176,13 @@ namespace Bion.Console
 
             // Verify files identical
             CompareBytes(fromPath, comparePath);
+        }
+
+        private static void ConvertAndBackTest(string fromPath, string jsonPath, string bionPath)
+        {
+            ToBion(fromPath, bionPath);
+            ToJson(bionPath, jsonPath);
+            Compare(fromPath, bionPath);
         }
 
         private static void VectorTest(string filePath, bool readAll)

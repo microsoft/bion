@@ -207,7 +207,7 @@ namespace Bion
         public void Write(Stream stream)
         {
             // Write, making sure not to have yet another nested LookupDictionary
-            using (BionWriter writer = new BionWriter(stream, lookupDictionary: null))
+            using (BionWriter writer = new BionWriter(stream))
             {
                 Write(writer);
             }

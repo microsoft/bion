@@ -44,10 +44,17 @@ namespace Bion.Extensions
         /// <param name="readerDone">Whether stream is at end</param>
         /// <param name="buffer">Buffer to read into and grow if needed</param>
         /// <returns>Memory&lt;byte&gt; with bytes from 'left' and remaining bytes which could be read</returns>
-        public static Memory<byte> Refill(this Stream source, ReadOnlyMemory<byte> left, ref bool readerDone, ref byte[] buffer)
+        public static Memory<byte> Refill(this Stream source, ReadOnlyMemory<byte> left, ref bool readerDone, ref byte[] buffer, int requiredLength)
         {
             // If nothing could be consumed, expand the buffer
-            if (left.Length == buffer.Length && !readerDone) { buffer = new byte[buffer.Length * 2]; }
+            if(requiredLength > buffer.Length)
+            {
+                buffer = new byte[requiredLength];
+            }
+            else if(left.Length == buffer.Length && !readerDone)
+            {
+                buffer = new byte[buffer.Length * 2];
+            }
 
             // Copy the unused content to the beginning of the buffer
             left.CopyTo(buffer);
@@ -76,11 +83,11 @@ namespace Bion.Extensions
         /// <param name="lastLength">Length of previous Refill, or 0.</param>
         /// <param name="readerDone">Whether stream is at end</param>
         /// <param name="buffer">Buffer to read into and grow if needed</param>
-        public static void Refill(this Stream source, ref int index, ref int length, ref bool readerDone, ref byte[] buffer)
+        public static void Refill(this Stream source, ref int index, ref int length, ref bool readerDone, ref byte[] buffer, int requiredLength)
         {
             // Refill with Memory overload
             Memory<byte> left = buffer.AsMemory(index, length - index);
-            Memory<byte> refill = source.Refill(left, ref readerDone, ref buffer);
+            Memory<byte> refill = source.Refill(left, ref readerDone, ref buffer, requiredLength);
 
             // Update index and length for new read
             index = 0;

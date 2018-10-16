@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bion.IO;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -7,34 +8,22 @@ namespace Bion
 {
     public unsafe class BionWriter : IDisposable
     {
-        private const int MaxOneByteLength = 127;   // 7 bits
-        private const int MaxTwoByteLength = 16383; // 14 bits
-        private const int MaxInlineInteger = 15;    // 4 bits
+        public const int MaxInlineInteger = 15;
+        public const int MaxOneByteLength = 127;
+        public const int MaxTwoByteLength = 16383;
 
-        public long BytesWritten { get; private set; }
-        public bool CloseStream { get; set; }
-
-        private Stream _stream;
+        private BufferedWriter _writer;
         private Stack<long> _containers;
-        private byte[] _buffer;
 
-        private BionLookup _lookupDictionary;
+        public long BytesWritten => _writer.BytesWritten;
 
-        private string _lastPropertyName;
-        private long _lastPropertyPosition;
-
-        public BionWriter(Stream stream) : this(stream, null)
+        public BionWriter(Stream stream) : this(new BufferedWriter(stream))
         { }
 
-        public BionWriter(Stream stream, BionLookup lookupDictionary)
+        public BionWriter(BufferedWriter writer)
         {
-            CloseStream = true;
-
-            _stream = new BufferedStream(stream);
+            _writer = writer;
             _containers = new Stack<long>();
-            _buffer = new byte[1024];
-
-            _lookupDictionary = lookupDictionary;
         }
 
         public void WriteStartObject()
@@ -134,9 +123,6 @@ namespace Bion
         public void WritePropertyName(string name)
         {
             WriteStringValue(BionToken.PropertyName, name);
-
-            _lastPropertyName = name;
-            _lastPropertyPosition = BytesWritten;
         }
 
         public void WritePropertyName(ReadOnlySpan<byte> utf8Text)
@@ -165,11 +151,10 @@ namespace Bion
                 markerAdjustment = 0;
             }
 
-            ConvertFixedInteger((ulong)stringLength, lengthOfLength);
-            _buffer[0] = (byte)((int)marker + markerAdjustment);
-
-            _stream.Write(_buffer, 0, lengthOfLength + 1);
-            BytesWritten += lengthOfLength + 1;
+            _writer.EnsureSpace(lengthOfLength + 1);
+            int index = _writer.Index++;
+            NumberConverter.WriteSevenBitFixed(_writer, (ulong)stringLength, lengthOfLength);
+            _writer.Buffer[index] = (byte)((int)marker + markerAdjustment);
         }
 
         private void WriteStringValue(BionToken markerType, ReadOnlySpan<byte> value)
@@ -178,8 +163,9 @@ namespace Bion
             WriteStringLength(markerType, value.Length);
 
             // Write value
-            _stream.Write(value);
-            BytesWritten += value.Length;
+            _writer.EnsureSpace(value.Length);
+            value.CopyTo(_writer.Buffer.AsSpan(_writer.Index));
+            _writer.Index += value.Length;
         }
 
         private void WriteStringValue(BionToken markerType, string value)
@@ -190,114 +176,48 @@ namespace Bion
                 return;
             }
 
-            if (_lookupDictionary != null)
-            {
-                if (markerType == BionToken.PropertyName)
-                {
-                    if (_lookupDictionary.TryLookup(value, out short index))
-                    {
-                        WriteLookupIndex(BionMarker.PropertyNameLookup1b, index);
-                        return;
-                    }
-                }
-                else if(_lastPropertyPosition == BytesWritten)
-                {
-                    if(_lookupDictionary.TryLookup(_lastPropertyName, value, out short index))
-                    {
-                        WriteLookupIndex(BionMarker.StringLookup1b, index);
-                        return;
-                    }
-                }
-            }
-
             int length = Encoding.UTF8.GetByteCount(value);
 
             // Write marker and length
             WriteStringLength(markerType, length);
 
-            // Encode and write value
-            Allocator.EnsureBufferLength(ref _buffer, length);
-            Encoding.UTF8.GetBytes(value, _buffer);
-
-            _stream.Write(_buffer, 0, length);
-            BytesWritten += length;
-        }
-
-        private void WriteLookupIndex(BionMarker oneByteLookupMarker, short index)
-        {
-            byte length = ConvertVariableInteger((ushort)index);
-            if (length == 2) oneByteLookupMarker -= 1;
-            _buffer[0] = (byte)oneByteLookupMarker;
-
-            _stream.Write(_buffer, 0, length + 1);
-            BytesWritten += length + 1;
+            // Encode and writer value
+            _writer.EnsureSpace(length);
+            Encoding.UTF8.GetBytes(value, 0, value.Length, _writer.Buffer, _writer.Index);
+            _writer.Index += length;
         }
 
         private void WriteVariableInteger(BionMarker marker, ulong value)
         {
-            byte length = ConvertVariableInteger(value);
-            _buffer[0] = (byte)(marker + length);
+            _writer.EnsureSpace(11);
+            int index = _writer.Index++;
 
-            _stream.Write(_buffer, 0, length + 1);
-            BytesWritten += length + 1;
+            byte length = NumberConverter.WriteSevenBitExplicit(_writer, value);
+            _writer.Buffer[index] = (byte)(marker + length);
         }
 
         private void WriteFixedInteger(BionMarker marker, ulong value, byte length)
         {
-            ConvertFixedInteger(value, length);
-            _buffer[0] = (byte)(marker + length);
+            _writer.EnsureSpace(length + 1);
+            int index = _writer.Index++;
 
-            _stream.Write(_buffer, 0, length + 1);
-            BytesWritten += length + 1;
-        }
-
-        /// <summary>
-        ///  Convert a non-negative integer to a fixed number of bytes
-        ///  starting in buffer index one.
-        /// </summary>
-        /// <param name="value">Value to convert</param>
-        /// <param name="length">Number of bytes to write to</param>
-        private void ConvertFixedInteger(ulong value, int length)
-        {
-            for (int i = 1; i <= length; ++i)
-            {
-                _buffer[i] = (byte)(value & 0x7F);
-                value = value >> 7;
-            }
-        }
-
-        /// <summary>
-        ///  Convert a non-negative integer to a variable number of bytes
-        ///  starting in buffer index one. Return the number of bytes needed.
-        /// </summary>
-        /// <param name="value">Value to convert</param>
-        /// <returns>Byte length of converted value</returns>
-        private byte ConvertVariableInteger(ulong value)
-        {
-            byte length = 1;
-            do
-            {
-                _buffer[length] = (byte)(value & 0x7F);
-                value = value >> 7;
-                length++;
-            } while (value > 0);
-
-            return --length;
+            NumberConverter.WriteSevenBitFixed(_writer, value, length);
+            _writer.Buffer[index] = (byte)(marker + length);
         }
 
         private void WriteStartContainer(BionMarker container)
         {
             Write(container);
-            _containers.Push(BytesWritten);
+            _containers.Push(_writer.BytesWritten);
         }
 
         private void WriteEndContainer(BionMarker container)
         {
             Write(container);
 
-            long end = BytesWritten;
+            long end = _writer.BytesWritten;
             long start = _containers.Pop();
-            long length = BytesWritten - start - 4;
+            long length = _writer.BytesWritten - start - 4;
         }
 
         private void Write(BionMarker marker)
@@ -312,23 +232,16 @@ namespace Bion
 
         private void Write(byte value)
         {
-            _stream.WriteByte(value);
-            BytesWritten++;
+            _writer.EnsureSpace(1);
+            _writer.Buffer[_writer.Index++] = value;
         }
 
         public void Dispose()
         {
-            if (_stream != null)
+            if (_writer != null)
             {
-                _stream.Flush();
-                if (CloseStream) _stream.Dispose();
-                _stream = null;
-            }
-
-            if (_lookupDictionary != null)
-            {
-                _lookupDictionary.Dispose();
-                _lookupDictionary = null;
+                _writer.Dispose();
+                _writer = null;
             }
         }
     }

@@ -312,7 +312,7 @@ namespace Bion
 
         private int ReadNext(int size)
         {
-            _stream.Refill(ref _innerIndex, ref _innerLength, ref _endOfStream, ref _innerBuffer);
+            _stream.Refill(ref _innerIndex, ref _innerLength, ref _endOfStream, ref _innerBuffer, size);
 
             // Return the safe size to read, if less than size
             return Math.Min(size, _innerLength);

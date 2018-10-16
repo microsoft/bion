@@ -77,14 +77,11 @@ namespace Bion.IO
         public bool EnsureSpace(int length)
         {
             int bytesLeft = (Length - Index);
-            if (bytesLeft < length)
-            {
-                _stream.Refill(ref Index, ref Length, ref _streamDone, ref Buffer);
-                _bytesRead += (Length - Index) - bytesLeft;
-                return (Length - Index) > length;
-            }
+            if (bytesLeft >= length) { return true; }
 
-            return true;
+            _stream.Refill(ref Index, ref Length, ref _streamDone, ref Buffer, length);
+            _bytesRead += (Length - Index) - bytesLeft;
+            return (Length - Index) > length;
         }
 
         public void Dispose()
