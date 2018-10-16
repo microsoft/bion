@@ -183,74 +183,6 @@ namespace Bion.Console
             Compare(fromPath, bionPath);
         }
 
-        private static void VectorTest(string filePath, bool readAll)
-        {
-            int containerCount = 0;
-            using (new ConsoleWatch($"Counting containers in {filePath}...",
-                () => $"Done, {containerCount:n0} containers in {LengthMB(filePath)}"))
-            {
-                long fileLength = new FileInfo(filePath).Length;
-                byte[] buffer = new byte[64 * 1024];
-                using (Stream stream = File.OpenRead(filePath))
-                {
-                    long lengthDone = 0;
-                    int bufferLength = stream.Read(buffer);
-
-                    while (lengthDone < fileLength)
-                    {
-                        //containerCount += ContainerCount(new Span<byte>(buffer, 0, bufferLength));
-                        containerCount += ByteVector.CountGreaterThan(new Span<byte>(buffer, 0, bufferLength), 0xFD);
-
-                        lengthDone += bufferLength;
-                        if (readAll) bufferLength = stream.Read(buffer);
-                    }
-                }
-            }
-        }
-
-        private static int ContainerCount(Span<byte> buffer)
-        {
-            int containerCount = 0;
-
-            for (int i = 0; i < buffer.Length; ++i)
-            {
-                // Count 0xFE and 0xFF
-                if (buffer[i] > 0xFD) containerCount++;
-            }
-
-            return containerCount;
-        }
-
-        private static void StreamReadSpeed(string filePath)
-        {
-            int _currentDepth = 0;
-
-            // Build a map of depth change for byte
-            sbyte[] depthChangeLookup = Enumerable.Repeat((sbyte)0, 256).ToArray();
-            Array.Fill<sbyte>(depthChangeLookup, 1, 0xFE, 2);
-            Array.Fill<sbyte>(depthChangeLookup, -1, 0xFC, 2);
-
-            using (new ConsoleWatch($"Stream Read {filePath} ({LengthMB(filePath)}) with depth tracking...",
-                () => $"Done; {_currentDepth:n0} depth at end"))
-            {
-                byte[] buffer = new byte[512 * 1024];
-                using (Stream stream = File.OpenRead(filePath))
-                {
-                    int length = 0;
-                    do
-                    {
-                        length = stream.Read(buffer);
-                        for (int i = 0; i < length; ++i)
-                        {
-                            byte marker = buffer[i];
-                            _currentDepth += depthChangeLookup[marker];
-                        }
-
-                    } while (length == buffer.Length);
-                }
-            }
-        }
-
         private static void ReadSpeed(string filePath)
         {
             long tokenCount = 0;
@@ -262,9 +194,6 @@ namespace Bion.Console
                 {
                     using (BionReader reader = new BionReader(new FileStream(filePath, FileMode.Open)))
                     {
-                        //reader.Skip();
-                        //tokenCount = reader.BytesRead;
-
                         while (reader.Read())
                         {
                             tokenCount++;
@@ -275,13 +204,36 @@ namespace Bion.Console
                 {
                     using (JsonTextReader reader = new JsonTextReader(new StreamReader(filePath)))
                     {
+                        while (reader.Read())
+                        {
+                            tokenCount++;
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void SkipSpeed(string filePath)
+        {
+            long tokenCount = 0;
+
+            using (new ConsoleWatch($"Reading {filePath} ({LengthMB(filePath)})...",
+                () => $"Done ({tokenCount:n0})"))
+            {
+                if (filePath.EndsWith(".bion", StringComparison.OrdinalIgnoreCase))
+                {
+                    using (BionReader reader = new BionReader(new FileStream(filePath, FileMode.Open)))
+                    {
+                        reader.Skip();
+                        tokenCount = reader.BytesRead;
+                    }
+                }
+                else
+                {
+                    using (JsonTextReader reader = new JsonTextReader(new StreamReader(filePath)))
+                    {
                         reader.Read();
                         reader.Skip();
-
-                        //while (reader.Read())
-                        //{
-                        //    tokenCount++;
-                        //}
                     }
                 }
             }

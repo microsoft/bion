@@ -144,10 +144,9 @@ namespace Bion
             while (!_reader.EndOfStream)
             {
                 _reader.EnsureSpace(128 * 1024);
-                Span<byte> buffer = _reader.Buffer.AsSpan(_reader.Index, _reader.Length - _reader.Index);
-                int endIndex = ByteVector.Skip(buffer, ref innerDepth);
+                int endIndex = ByteVector.Skip(_reader.Buffer, _reader.Index, _reader.Length, ref innerDepth);
 
-                if (endIndex < buffer.Length)
+                if (endIndex < _reader.Length)
                 {
                     _reader.Index = endIndex + 1;
                     return;
