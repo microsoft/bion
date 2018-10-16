@@ -166,7 +166,7 @@ namespace Bion.Console
                 using (WordCompressor compressor = WordCompressor.OpenWrite(dictionaryPath))
                 {
                     using (FileStream reader = File.OpenRead(fromPath))
-                    using (VariableNumberWriter writer = new VariableNumberWriter(File.Create(toPath)))
+                    using (BufferedWriter writer = new BufferedWriter(File.Create(toPath)))
                     {
                         left = ReadOnlyMemory<byte>.Empty;
                         readerDone = false;
@@ -178,8 +178,8 @@ namespace Bion.Console
                     }
 
                     string tempPath = Path.ChangeExtension(toPath, ".opt.bion");
-                    using (VariableNumberReader reader = new VariableNumberReader(File.OpenRead(toPath)))
-                    using (VariableNumberWriter writer = new VariableNumberWriter(File.Create(tempPath)))
+                    using (BufferedReader reader = new BufferedReader(File.OpenRead(toPath)))
+                    using (BufferedWriter writer = new BufferedWriter(File.Create(tempPath)))
                     {
                         compressor.Optimize(reader, writer);
                     }
@@ -195,7 +195,7 @@ namespace Bion.Console
             {
                 for (int i = 0; i < iterations; ++i)
                 {
-                    using (VariableNumberReader reader = new VariableNumberReader(File.OpenRead(toPath)))
+                    using (BufferedReader reader = new BufferedReader(File.OpenRead(toPath)))
                     using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
                     using (FileStream writer = File.Create(comparePath))
                     {

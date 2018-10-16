@@ -1,4 +1,5 @@
-﻿using Bion.IO;
+﻿using Bion.Core;
+using Bion.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,7 +32,7 @@ namespace Bion.Text
             return compressor;
         }
 
-        public ReadOnlyMemory<byte> Compress(ReadOnlyMemory<byte> text, bool isComplete, VariableNumberWriter writer)
+        public ReadOnlyMemory<byte> Compress(ReadOnlyMemory<byte> text, bool isComplete, BufferedWriter writer)
         {
             if (text.IsEmpty) return ReadOnlyMemory<byte>.Empty;
             
@@ -43,15 +44,14 @@ namespace Bion.Text
             while (index < text.Length)
             {
                 // Find length of current word
-                length = 1;
-                while (index + length < text.Length && WordSplitter.IsLetterOrDigit(textSpan[index + length]) == isWord) length++;
+                length = WordSplitter.WordLength(textSpan, index, isWord);
                 String8 word = String8.Reference(text.Slice(index, length));
 
                 // If this is the last word but not the end of input, don't consume it
                 if (!isComplete && index + length == text.Length) { break; }
                 
-                int wordIndex = _words.FindOrAdd(word);
-                writer.WriteValue((ulong)wordIndex);
+                uint wordIndex = _words.FindOrAdd(word);
+                NumberConverter.WriteSevenBit(wordIndex, writer);
 
                 isWord = !isWord;
                 index += length;
@@ -61,31 +61,32 @@ namespace Bion.Text
             return text.Slice(index);
         }
 
-        public void Optimize(VariableNumberReader reader, VariableNumberWriter writer)
+        public void Optimize(BufferedReader reader, BufferedWriter writer)
         {
-            int[] map = _words.Optimize();
+            uint[] map = _words.Optimize();
 
             while (!reader.EndOfStream)
             {
-                int index = (int)reader.ReadNumber();
-                int remapped = map[index];
-                writer.WriteValue((ulong)remapped);
+                ulong index = NumberConverter.ReadSevenBit(reader);
+                uint remapped = map[index];
+                NumberConverter.WriteSevenBit(remapped, writer);
             }
         }
 
-        public Memory<byte> Decompress(VariableNumberReader reader, Memory<byte> buffer, out bool readerDone)
+        public Memory<byte> Decompress(BufferedReader reader, Memory<byte> buffer, out bool readerDone)
         {
             Span<byte> span = buffer.Span;
             int lengthWritten = 0;
 
             while (!reader.EndOfStream)
             {
-                int wordIndex = (int)reader.ReadNumber();
+                int lastBufferIndex = reader.Index;
+                ulong wordIndex = NumberConverter.ReadSevenBit(reader);
                 String8 word = _words[wordIndex];
 
                 if(lengthWritten + word.Length > buffer.Length)
                 {
-                    reader.UndoRead();
+                    reader.Index = lastBufferIndex;
                     break;
                 }
 
@@ -123,25 +124,6 @@ namespace Bion.Text
                 _writeToStream = null;
             }
         }
-
-        private class WordSplitter
-        {
-            private static bool[] _letterOrDigitLookup;
-
-            static WordSplitter()
-            {
-                _letterOrDigitLookup = new bool[256];
-                Array.Fill(_letterOrDigitLookup, true, 0x30, 10);     // 0-9
-                Array.Fill(_letterOrDigitLookup, true, 0x41, 26);     // A-Z
-                Array.Fill(_letterOrDigitLookup, true, 0x61, 26);     // a-z
-                Array.Fill(_letterOrDigitLookup, true, 0x80, 128);    // Multibyte
-            }
-
-            public static bool IsLetterOrDigit(byte b)
-            {
-                return _letterOrDigitLookup[b];
-            }
-        }
     }
 
     public class WordIndex
@@ -155,9 +137,9 @@ namespace Bion.Text
             this.Index = new Dictionary<String8, int>();
         }
 
-        public String8 this[long index] => Words[(int)index].Value;
+        public String8 this[ulong index] => Words[(int)index].Value;
 
-        public int FindOrAdd(String8 word)
+        public uint FindOrAdd(String8 word)
         {
             int index;
             if(Index.TryGetValue(word, out index))
@@ -166,7 +148,7 @@ namespace Bion.Text
                 entry.Count++;
                 Words[index] = entry;
 
-                return index;
+                return (uint)index;
             }
 
             index = Words.Count;
@@ -175,12 +157,12 @@ namespace Bion.Text
             Words.Add(new WordEntry(wordCopy, 1));
             Index[wordCopy] = index;
 
-            return index;
+            return (uint)index;
         }
 
-        public int[] Optimize()
+        public uint[] Optimize()
         {
-            int[] remapping = new int[Words.Count];
+            uint[] remapping = new uint[Words.Count];
 
             // Sort words in descending frequency order
             Words.Sort((left, right) => right.Count.CompareTo(left.Count));
@@ -188,7 +170,7 @@ namespace Bion.Text
             // Look up the old index for each word to map to the new index
             for(int i = 0; i < Words.Count; ++i)
             {
-                remapping[Index[Words[i].Value]] = i;
+                remapping[Index[Words[i].Value]] = (uint)i;
             }
 
             // Rebuild the index on the new order
