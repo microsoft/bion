@@ -39,10 +39,20 @@ namespace Bion.IO
         /// </summary>
         /// <param name="stream">Stream to write to</param>
         /// <param name="size">Initial buffer size</param>
-        public BufferedWriter(Stream stream, int size = 1024)
+        public BufferedWriter(Stream stream, int size = 1024) : this(stream, new byte[size])
+        { }
+
+        /// <summary>
+        ///  Construct a BufferedWriter on the desired stream with the
+        ///  provided buffer.
+        /// </summary>
+        /// <param name="stream">Stream to write to</param>
+        /// <param name="buffer">Initial buffer</param>
+        public BufferedWriter(Stream stream, byte[] buffer)
         {
             _stream = stream;
-            Buffer = new byte[size];
+            Buffer = buffer;
+            CloseStream = true;
         }
 
         /// <summary>

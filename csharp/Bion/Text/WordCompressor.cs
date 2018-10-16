@@ -32,33 +32,38 @@ namespace Bion.Text
             return compressor;
         }
 
-        public ReadOnlyMemory<byte> Compress(ReadOnlyMemory<byte> text, bool isComplete, BufferedWriter writer)
+        public void Compress(BufferedReader reader, BufferedWriter writer)
         {
-            if (text.IsEmpty) return ReadOnlyMemory<byte>.Empty;
-            
-            ReadOnlySpan<byte> textSpan = text.Span;
+            if (reader.EndOfStream) { return; }
 
-            int index = 0;
+            bool isWord = WordSplitter.IsLetterOrDigit(reader.Buffer[reader.Index]);
             int length = 0;
-            bool isWord = WordSplitter.IsLetterOrDigit(textSpan[0]);
-            while (index < text.Length)
+            while (!reader.EndOfStream)
             {
-                // Find length of current word
-                length = WordSplitter.WordLength(textSpan, index, isWord);
-                String8 word = String8.Reference(text.Slice(index, length));
+                // Read the next word
+                length = WordSplitter.NextWordLength(reader, isWord);
+                String8 word = String8.Reference(reader.Buffer.AsMemory(reader.Index, length));
 
-                // If this is the last word but not the end of input, don't consume it
-                if (!isComplete && index + length == text.Length) { break; }
-                
-                uint wordIndex = _words.FindOrAdd(word);
-                NumberConverter.WriteSevenBit(wordIndex, writer);
-
+                // Set state to read next word
+                reader.Index += length;
                 isWord = !isWord;
-                index += length;
-            }
 
-            // Return the leftover input, if any
-            return text.Slice(index);
+                if (reader.Index < reader.Length || reader.EndOfStream)
+                {
+                    // If this is word is definitely complete, write it
+                    uint wordIndex = _words.FindOrAdd(word);
+                    NumberConverter.WriteSevenBit(wordIndex, writer);
+                }
+                else if(!reader.EndOfStream)
+                {
+                    // Reset state to re-read this word
+                    reader.Index -= length;
+                    isWord = !isWord;
+
+                    // If end of buffer but not stream, request more
+                    reader.EnsureSpace(length * 2);
+                }
+            }
         }
 
         public void Optimize(BufferedReader reader, BufferedWriter writer)
@@ -73,29 +78,17 @@ namespace Bion.Text
             }
         }
 
-        public Memory<byte> Decompress(BufferedReader reader, Memory<byte> buffer, out bool readerDone)
+        public void Decompress(BufferedReader reader, BufferedWriter writer)
         {
-            Span<byte> span = buffer.Span;
-            int lengthWritten = 0;
-
             while (!reader.EndOfStream)
             {
-                int lastBufferIndex = reader.Index;
                 ulong wordIndex = NumberConverter.ReadSevenBit(reader);
                 String8 word = _words[wordIndex];
 
-                if(lengthWritten + word.Length > buffer.Length)
-                {
-                    reader.Index = lastBufferIndex;
-                    break;
-                }
-
-                word.CopyTo(span.Slice(lengthWritten));
-                lengthWritten += word.Value.Length;
+                writer.EnsureSpace(word.Length);
+                word.Value.CopyTo(writer.Buffer.AsMemory(writer.Index));
+                writer.Index += word.Length;
             }
-
-            readerDone = reader.EndOfStream;
-            return buffer.Slice(0, lengthWritten);
         }
 
         private void Read(BionReader reader)

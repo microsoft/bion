@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bion.IO;
+using System;
 
 namespace Bion.Text
 {
@@ -20,10 +21,10 @@ namespace Bion.Text
             return _letterOrDigitLookup[b];
         }
 
-        public static int WordLength(ReadOnlySpan<byte> text, int index, bool isWord)
+        public static int NextWordLength(BufferedReader reader, bool isWord)
         {
             int length = 1;
-            while (index + length < text.Length && WordSplitter.IsLetterOrDigit(text[index + length]) == isWord) length++;
+            while (reader.Index + length < reader.Length && WordSplitter.IsLetterOrDigit(reader.Buffer[reader.Index + length]) == isWord) length++;
             return length;
         }
     }

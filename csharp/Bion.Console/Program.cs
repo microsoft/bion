@@ -145,9 +145,8 @@ namespace Bion.Console
 
         private static void CompressTest(string fromPath, string toPath)
         {
-            byte[] buffer = new byte[64 * 1024];
-            ReadOnlyMemory<byte> left;
-            bool readerDone;
+            byte[] readBuffer = new byte[64 * 1024];
+            byte[] writeBuffer = new byte[64 * 1024];
 
             string dictionaryPath = Path.ChangeExtension(toPath, ".Dictionary.bion");
             string comparePath = Path.ChangeExtension(fromPath, "out.json");
@@ -165,21 +164,15 @@ namespace Bion.Console
             {
                 using (WordCompressor compressor = WordCompressor.OpenWrite(dictionaryPath))
                 {
-                    using (FileStream reader = File.OpenRead(fromPath))
-                    using (BufferedWriter writer = new BufferedWriter(File.Create(toPath)))
+                    using (BufferedReader reader = new BufferedReader(File.OpenRead(fromPath), readBuffer))
+                    using (BufferedWriter writer = new BufferedWriter(File.Create(toPath), writeBuffer))
                     {
-                        left = ReadOnlyMemory<byte>.Empty;
-                        readerDone = false;
-                        while (!readerDone)
-                        {
-                            left = reader.Refill(left, ref readerDone, ref buffer);
-                            left = compressor.Compress(left, readerDone, writer);
-                        }
+                        compressor.Compress(reader, writer);
                     }
 
                     string tempPath = Path.ChangeExtension(toPath, ".opt.bion");
-                    using (BufferedReader reader = new BufferedReader(File.OpenRead(toPath)))
-                    using (BufferedWriter writer = new BufferedWriter(File.Create(tempPath)))
+                    using (BufferedReader reader = new BufferedReader(File.OpenRead(toPath), readBuffer))
+                    using (BufferedWriter writer = new BufferedWriter(File.Create(tempPath), writeBuffer))
                     {
                         compressor.Optimize(reader, writer);
                     }
@@ -195,17 +188,11 @@ namespace Bion.Console
             {
                 for (int i = 0; i < iterations; ++i)
                 {
-                    using (BufferedReader reader = new BufferedReader(File.OpenRead(toPath)))
+                    using (BufferedReader reader = new BufferedReader(File.OpenRead(toPath), readBuffer))
+                    using (BufferedWriter writer = new BufferedWriter(File.Create(comparePath), writeBuffer))
                     using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
-                    using (FileStream writer = File.Create(comparePath))
                     {
-                        readerDone = false;
-                        while (!readerDone)
-                        {
-                            left = compressor.Decompress(reader, buffer, out readerDone);
-                            if (!readerDone && left.Length == 0) { buffer = new byte[buffer.Length * 2]; }
-                            writer.Write(left.Span);
-                        }
+                        compressor.Decompress(reader, writer);
                     }
                 }
             }

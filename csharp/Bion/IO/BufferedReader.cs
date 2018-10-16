@@ -41,10 +41,21 @@ namespace Bion.IO
         /// </summary>
         /// <param name="stream">Stream to read</param>
         /// <param name="size">Initial buffer size</param>
-        public BufferedReader(Stream stream, int size = 16 * 1024)
+        public BufferedReader(Stream stream, int size = 16 * 1024) : this(stream, new byte[size])
+        { }
+
+        /// <summary>
+        ///  Construct a BufferedReader on the desired stream with the
+        ///  provided buffer.
+        /// </summary>
+        /// <param name="stream">Stream to read</param>
+        /// <param name="buffer">Initial buffer to use</param>
+        public BufferedReader(Stream stream, byte[] buffer)
         {
             _stream = stream;
-            Buffer = new byte[size];
+            Buffer = buffer;
+            CloseStream = true;
+            EnsureSpace(1);
         }
 
         /// <summary>
