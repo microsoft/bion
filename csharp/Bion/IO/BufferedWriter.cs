@@ -56,6 +56,17 @@ namespace Bion.IO
         }
 
         /// <summary>
+        ///  Return a BufferedWriter which will write to an in-memory byte[] only.
+        ///  It will use the passed array, but may have to resize it.
+        ///  writer.Buffer[0, writer.Index] will contain the result.
+        /// </summary>
+        /// <returns>BufferedWriter keeping result in memory</returns>
+        public static BufferedWriter ToArray(byte[] buffer)
+        {
+            return new BufferedWriter(null, buffer) { CloseStream = false };
+        }
+
+        /// <summary>
         ///  Ensure at least the specified length is available in the buffer to write.
         ///  This will flush and grow the buffer if required.
         /// </summary>
@@ -66,7 +77,7 @@ namespace Bion.IO
             {
                 Flush();
 
-                if (Buffer.Length < length)
+                if (Buffer.Length - Index < length)
                 {
                     int newLength = Buffer.Length * 2;
                     if (length > newLength) newLength = length;

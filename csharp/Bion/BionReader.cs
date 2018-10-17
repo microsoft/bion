@@ -237,21 +237,21 @@ namespace Bion
 
         private int LengthIncludingTerminator()
         {
-            int lengthRead = 0;
-            int lengthToRead = 16 * 1024;
+            int readSize = 16 * 1024;
+            int lengthScanned = 0;
 
             int endIndex = -1;
             while (endIndex == -1)
             {
                 // Read a block of bytes
-                _reader.EnsureSpace(lengthToRead);
-                _currentCompressedStringStart = _reader.Index;
+                _reader.EnsureSpace(readSize);
 
                 // Look for the EndValue marker (only *after* previously read bytes)
-                endIndex = ByteVector.IndexOf((byte)BionMarker.EndValue, _reader.Buffer, _reader.Index + lengthRead, _reader.Length);
+                endIndex = ByteVector.IndexOf((byte)BionMarker.EndValue, _reader.Buffer, _reader.Index + lengthScanned, _reader.Length);
 
                 // Read more next time (without advancing index)
-                lengthRead += lengthToRead;
+                lengthScanned = _reader.Length - _reader.Index;
+                readSize *= 2;
             }
 
             // Return the number of characters to the terminator
@@ -262,10 +262,10 @@ namespace Bion
         {
             if (_decompressBuffer == null) { _decompressBuffer = new byte[1024]; }
             using (BufferedReader reader = BufferedReader.FromArray(_reader.Buffer, _currentCompressedStringStart, _reader.Index - _currentCompressedStringStart - 1))
-            using (BufferedWriter writer = new BufferedWriter(null, _decompressBuffer))
+            using (BufferedWriter writer = BufferedWriter.ToArray(_decompressBuffer))
             {
                 // Decompress the content
-                _compressor.Decompress(reader, writer);
+                _compressor.Expand(reader, writer);
 
                 // Capture the (possibly resized) buffer
                 _decompressBuffer = writer.Buffer;

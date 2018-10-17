@@ -121,11 +121,11 @@ namespace Bion.IO
         ///  This will grow the buffer and read more data if required.
         /// </summary>
         /// <param name="length">Length in bytes required in buffer</param>
-        /// <returns>True if length is now available, False if stream ends in fewer bytes than requested.</returns>
-        public bool EnsureSpace(int length)
+        /// <returns>Length available, which may be more or less than desired length.</returns>
+        public int EnsureSpace(int length)
         {
             int bytesLeft = (Length - Index);
-            if (bytesLeft >= length) { return true; }
+            if (bytesLeft >= length) { return bytesLeft; }
 
             byte[] toFill = Buffer;
 
@@ -148,7 +148,7 @@ namespace Bion.IO
             }
 
             _bytesRead += Length - bytesLeft;
-            return Length >= length;
+            return (Length - Index);
         }
 
         protected virtual int Read(byte[] buffer, int index, int length, out bool streamDone)

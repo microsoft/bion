@@ -9,9 +9,11 @@ namespace Bion.Test.Text
         [TestMethod]
         public void String8_Basics()
         {
-            String8 one = new String8("one");
-            String8 two = new String8("two");
-            String8 one2 = new String8("one");
+            byte[] b1 = null, b2 = null, b3 = null;
+
+            String8 one = String8.Copy("one", ref b1);
+            String8 two = String8.Copy("two", ref b2);
+            String8 one2 = String8.Copy("one", ref b3);
 
             Assert.IsFalse(one.Equals(two));
             Assert.AreNotEqual(one.GetHashCode(), two.GetHashCode());

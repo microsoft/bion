@@ -15,20 +15,57 @@ namespace Bion.Text
             this._words = new WordIndex();
         }
 
-        public static WordCompressor OpenWrite(string filePath)
+        public static WordCompressor OpenWrite(string dictionaryPath)
         {
-            return new WordCompressor() { _writeToStream = File.OpenWrite(filePath) };
+            return new WordCompressor() { _writeToStream = File.OpenWrite(dictionaryPath) };
         }
 
-        public static WordCompressor OpenRead(string filePath)
+        public static WordCompressor OpenRead(string dictionaryPath)
         {
             WordCompressor compressor = new WordCompressor();
-            using (BionReader reader = new BionReader(File.OpenRead(filePath)))
+            using (BionReader reader = new BionReader(File.OpenRead(dictionaryPath)))
             {
                 compressor.Read(reader);
             }
 
             return compressor;
+        }
+
+        public static void Compress(string fromPath, string toPath, string toDictionaryPath, bool optimize = true)
+        {
+            using (WordCompressor compressor = WordCompressor.OpenWrite(toDictionaryPath))
+            {
+                string firstWritePath = toPath;
+                if(optimize) { firstWritePath = Path.ChangeExtension(toPath, ".tmp"); }
+
+                // First Pass
+                using (BufferedReader reader = new BufferedReader(File.OpenRead(fromPath)))
+                using (BufferedWriter writer = new BufferedWriter(File.Create(firstWritePath)))
+                {
+                    compressor.Compress(reader, writer);
+                }
+
+                // Optimize Pass
+                if (optimize)
+                {
+                    uint[] map = compressor.OptimizeIndex();
+                    using (BufferedReader reader = new BufferedReader(File.OpenRead(firstWritePath)))
+                    using (BufferedWriter writer = new BufferedWriter(File.Create(toPath)))
+                    {
+                        compressor.RewriteOptimized(map, reader, writer);
+                    }
+                }
+            }
+        }
+
+        public static void Expand(string fromPath, string toPath, string fromDictionaryPath)
+        {
+            using (WordCompressor compressor = WordCompressor.OpenRead(fromDictionaryPath))
+            using (BufferedReader reader = new BufferedReader(File.OpenRead(fromPath)))
+            using (BufferedWriter writer = new BufferedWriter(File.Create(toPath)))
+            {
+                compressor.Expand(reader, writer);
+            }
         }
 
         public void Compress(BufferedReader reader, BufferedWriter writer)
@@ -80,7 +117,7 @@ namespace Bion.Text
             }
         }
 
-        public void Decompress(BufferedReader reader, BufferedWriter writer)
+        public void Expand(BufferedReader reader, BufferedWriter writer)
         {
             while (!reader.EndOfStream)
             {
@@ -88,6 +125,8 @@ namespace Bion.Text
                 String8 word = _words[wordIndex];
 
                 writer.EnsureSpace(word.Length);
+                if (writer.Buffer.Length - writer.Index < word.Length) System.Diagnostics.Debugger.Break();
+
                 word.CopyTo(writer.Buffer, writer.Index);
                 writer.Index += word.Length;
             }

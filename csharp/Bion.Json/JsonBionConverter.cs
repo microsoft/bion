@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Bion.Text;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 
@@ -6,10 +7,11 @@ namespace Bion.Json
 {
     public class JsonBionConverter
     {
-        public static void JsonToBion(string jsonPath, string bionPath)
+        public static void JsonToBion(string jsonPath, string bionPath, string toDictionaryPath = null)
         {
+            using (WordCompressor compressor = (toDictionaryPath == null ? null : WordCompressor.OpenWrite(toDictionaryPath)))
             using (JsonTextReader reader = new JsonTextReader(new StreamReader(jsonPath)))
-            using (BionWriter writer = new BionWriter(new FileStream(bionPath, FileMode.Create)))
+            using (BionWriter writer = new BionWriter(File.Create(bionPath), compressor))
             {
                 JsonToBion(reader, writer);
             }
@@ -59,9 +61,10 @@ namespace Bion.Json
             }
         }
 
-        public static void BionToJson(string bionPath, string jsonPath)
+        public static void BionToJson(string bionPath, string jsonPath, string fromDictionaryPath = null)
         {
-            using (BionReader reader = new BionReader(new FileStream(bionPath, FileMode.Open)))
+            using (WordCompressor compressor = (fromDictionaryPath == null ? null : WordCompressor.OpenRead(fromDictionaryPath)))
+            using (BionReader reader = new BionReader(File.OpenRead(bionPath), compressor))
             using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(jsonPath)))
             {
                 writer.Formatting = Formatting.Indented;

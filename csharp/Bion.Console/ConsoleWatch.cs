@@ -17,7 +17,7 @@ namespace Bion.Core
 
         public void Dispose()
         {
-            System.Console.WriteLine($"{_endMessage()} in {_watch.ElapsedMilliseconds:n0}ms.");
+            System.Console.WriteLine($"{_endMessage()} in {_watch.ElapsedMilliseconds:n0}ms.\r\n");
         }
     }
 }

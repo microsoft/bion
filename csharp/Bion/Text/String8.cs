@@ -12,6 +12,9 @@ namespace Bion.Text
 
         public static readonly String8 Empty = new String8(null, 0, 0);
 
+        private String8(byte[] array) : this(array, 0, array.Length)
+        { }
+
         private String8(byte[] array, int index, int length)
         {
             Array = array;
@@ -19,11 +22,26 @@ namespace Bion.Text
             Length = length;
         }
 
-        public String8(string value)
+        public static String8 Copy(string value, ref byte[] convertBuffer)
         {
-            Array = Encoding.UTF8.GetBytes(value);
-            Index = 0;
-            Length = Array.Length;
+            // Start with maximum possible needed byte length
+            int length = value.Length * 3;
+
+            // If buffer isn't big enough, get real length
+            if (convertBuffer == null || convertBuffer.Length < length)
+            {
+                length = Encoding.UTF8.GetByteCount(value);
+            }
+
+            // If buffer isn't big enough, expand
+            if (convertBuffer == null || convertBuffer.Length < length)
+            {
+                convertBuffer = new byte[length];
+            }
+
+            // Convert and return String8
+            length = Encoding.UTF8.GetBytes(value, convertBuffer);
+            return new String8(convertBuffer, 0, length);
         }
 
         public static String8 Reference(byte[] array, int index, int length)

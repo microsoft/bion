@@ -3,7 +3,7 @@ using System;
 
 namespace Bion.Text
 {
-    internal class WordSplitter
+    public class WordSplitter
     {
         private static bool[] _letterOrDigitLookup;
 
