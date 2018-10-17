@@ -42,7 +42,7 @@ namespace Bion.Test.Text
                 {
                     for (int i = 0; i < 100000; ++i)
                     {
-                        NumberConverter.WriteSixBit(writer, (uint)i);
+                        NumberConverter.WriteSixBitTerminated(writer, (uint)i);
                     }
                 },
                 (reader) =>
@@ -50,7 +50,7 @@ namespace Bion.Test.Text
                     int expected = 0;
                     while (!reader.EndOfStream)
                     {
-                        int value = (int)NumberConverter.ReadSixBit(reader);
+                        int value = (int)NumberConverter.ReadSixBitTerminated(reader);
                         Assert.AreEqual(expected, value);
                         expected++;
                     }

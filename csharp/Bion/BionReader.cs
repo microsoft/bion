@@ -10,14 +10,17 @@ namespace Bion
     public unsafe class BionReader : IDisposable
     {
         private BufferedReader _reader;
+        private WordCompressor _compressor;
+        private byte[] _decompressBuffer;
 
         private BionMarker _currentMarker;
         private int _currentLength;
         private int _currentDepth;
 
-        private ulong _currentDecoded;
+        private ulong _currentDecodedNumber;
         private String8 _currentString;
         private string _currentDecodedString;
+        private int _currentCompressedStringStart;
 
         // Lookups: Marker to Depth, Length, TokenType
         private static sbyte[] DepthLookup = Enumerable.Repeat((sbyte)0, 256).ToArray();
@@ -36,16 +39,15 @@ namespace Bion
             LengthLookup[(byte)BionMarker.StringLength5b] = 5;
             LengthLookup[(byte)BionMarker.StringLength2b] = 2;
             LengthLookup[(byte)BionMarker.StringLength1b] = 1;
-            LengthLookup[(byte)BionMarker.StringLookup1b] = -1;
+            LengthLookup[(byte)BionMarker.StringCompressedTerminated] = -1;
 
             LengthLookup[(byte)BionMarker.PropertyNameLength5b] = 5;
             LengthLookup[(byte)BionMarker.PropertyNameLength2b] = 2;
             LengthLookup[(byte)BionMarker.PropertyNameLength1b] = 1;
-            LengthLookup[(byte)BionMarker.PropertyNameLookup1b] = -1;
-            LengthLookup[(byte)BionMarker.PropertyNameLookup2b] = -2;
+            LengthLookup[(byte)BionMarker.PropertyNameCompressedTerminated] = -1;
 
             // Float/NegativeInt/Int
-            for(int i = 0xB0; i < 0xE0; ++i)
+            for (int i = 0xB0; i < 0xE0; ++i)
             {
                 LengthLookup[i] = (sbyte)(i & 15);
             }
@@ -58,16 +60,17 @@ namespace Bion
 
             Array.Fill(TokenLookup, BionToken.Float, 0xB0, 0xC0 - 0xB0);
             Array.Fill(TokenLookup, BionToken.Integer, 0xC0, 0xF0 - 0xC0);
-            Array.Fill(TokenLookup, BionToken.PropertyName, 0xF3, 5);
-            Array.Fill(TokenLookup, BionToken.String, 0xF8, 4);
+            Array.Fill(TokenLookup, BionToken.PropertyName, 0xF3, 4);
+            Array.Fill(TokenLookup, BionToken.String, 0xF7, 4);
         }
 
-        public BionReader(Stream stream): this(new BufferedReader(stream))
+        public BionReader(Stream stream, WordCompressor compressor = null) : this(new BufferedReader(stream), compressor)
         { }
 
-        public BionReader(BufferedReader reader)
+        public BionReader(BufferedReader reader, WordCompressor compressor = null)
         {
             _reader = reader;
+            _compressor = compressor;
         }
 
         public long BytesRead => _reader.BytesRead;
@@ -91,16 +94,24 @@ namespace Bion
             _currentLength = LengthLookup[marker];
             TokenType = TokenLookup[marker];
 
-            if (_currentLength > 0)
+            if (_currentLength < 0)
+            {
+                _currentLength = LengthIncludingTerminator();
+                _currentDecodedString = null;
+                _currentCompressedStringStart = _reader.Index;
+                _reader.Index += _currentLength;
+            }
+            else if (_currentLength > 0)
             {
                 // Read value (non-string) or length (string)
-                _currentDecoded = NumberConverter.ReadSevenBitExplicit(_reader, _currentLength);
+                _currentDecodedNumber = NumberConverter.ReadSevenBitExplicit(_reader, _currentLength);
 
                 // Read value (string)
                 if (marker >= 0xF0)
                 {
+                    _currentCompressedStringStart = -1;
                     _currentDecodedString = null;
-                    _currentLength = (int)_currentDecoded;
+                    _currentLength = (int)_currentDecodedNumber;
 
                     _reader.EnsureSpace(_currentLength);
                     _currentString = String8.Reference(_reader.Buffer, _reader.Index, _currentLength);
@@ -173,10 +184,10 @@ namespace Bion
             // Negate if type was NegativeInteger
             if (_currentMarker < BionMarker.Integer)
             {
-                return SafeNegate(_currentDecoded);
+                return SafeNegate(_currentDecodedNumber);
             }
 
-            return (long)_currentDecoded;
+            return (long)_currentDecodedNumber;
         }
 
         public unsafe double CurrentFloat()
@@ -184,7 +195,7 @@ namespace Bion
             if (TokenType != BionToken.Float) throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a float type.");
 
             // Decode as an integer and coerce .NET into reinterpreting the bytes
-            ulong value = _currentDecoded;
+            ulong value = _currentDecodedNumber;
 
             if (_currentLength <= 5)
             {
@@ -193,7 +204,7 @@ namespace Bion
             }
             else
             {
-                
+
                 return *(double*)&value;
             }
         }
@@ -205,7 +216,7 @@ namespace Bion
 
             if (_currentDecodedString == null)
             {
-                _currentDecodedString = _currentString.ToString();
+                _currentDecodedString = CurrentString8().ToString();
             }
 
             return _currentDecodedString;
@@ -214,7 +225,54 @@ namespace Bion
         public String8 CurrentString8()
         {
             if (TokenType != BionToken.PropertyName && TokenType != BionToken.String) throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a string type.");
+
+            if (_currentCompressedStringStart != -1)
+            {
+                DecompressString();
+                _currentCompressedStringStart = -1;
+            }
+
             return _currentString;
+        }
+
+        private int LengthIncludingTerminator()
+        {
+            int lengthRead = 0;
+            int lengthToRead = 16 * 1024;
+
+            int endIndex = -1;
+            while (endIndex == -1)
+            {
+                // Read a block of bytes
+                _reader.EnsureSpace(lengthToRead);
+                _currentCompressedStringStart = _reader.Index;
+
+                // Look for the EndValue marker (only *after* previously read bytes)
+                endIndex = ByteVector.IndexOf((byte)BionMarker.EndValue, _reader.Buffer, _reader.Index + lengthRead, _reader.Length);
+
+                // Read more next time (without advancing index)
+                lengthRead += lengthToRead;
+            }
+
+            // Return the number of characters to the terminator
+            return (endIndex + 1) - _reader.Index;
+        }
+
+        private void DecompressString()
+        {
+            if (_decompressBuffer == null) { _decompressBuffer = new byte[1024]; }
+            using (BufferedReader reader = BufferedReader.FromArray(_reader.Buffer, _currentCompressedStringStart, _reader.Index - _currentCompressedStringStart - 1))
+            using (BufferedWriter writer = new BufferedWriter(null, _decompressBuffer))
+            {
+                // Decompress the content
+                _compressor.Decompress(reader, writer);
+
+                // Capture the (possibly resized) buffer
+                _decompressBuffer = writer.Buffer;
+
+                // Make a String8 referencing the full decompressed value
+                _currentString = String8.Reference(_decompressBuffer, 0, writer.Index);
+            }
         }
 
         private long SafeNegate(ulong value)
@@ -232,6 +290,12 @@ namespace Bion
             {
                 _reader.Dispose();
                 _reader = null;
+            }
+
+            if (_compressor != null)
+            {
+                _compressor.Dispose();
+                _compressor = null;
             }
         }
     }

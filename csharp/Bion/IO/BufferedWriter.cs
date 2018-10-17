@@ -83,7 +83,7 @@ namespace Bion.IO
         /// </summary>
         public void Flush()
         {
-            if(Index > 0)
+            if(Index > 0 && _stream != null)
             {
                 _stream.Write(Buffer, 0, Index);
                 _bytesWritten += Index;

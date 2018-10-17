@@ -149,7 +149,8 @@ namespace Bion.Console
                     using (BufferedReader reader = new BufferedReader(File.OpenRead(toPath), readBuffer))
                     using (BufferedWriter writer = new BufferedWriter(File.Create(tempPath), writeBuffer))
                     {
-                        compressor.Optimize(reader, writer);
+                        uint[] map = compressor.OptimizeIndex();
+                        compressor.RewriteOptimized(map, reader, writer);
                     }
 
                     toPath = tempPath;
@@ -178,9 +179,28 @@ namespace Bion.Console
 
         private static void ConvertAndBackTest(string fromPath, string jsonPath, string bionPath)
         {
-            ToBion(fromPath, bionPath);
-            ToJson(bionPath, jsonPath);
-            Compare(fromPath, bionPath);
+            //ToBion(fromPath, bionPath);
+            //ToJson(bionPath, jsonPath);
+            //Compare(fromPath, bionPath);
+            
+            string toPath = bionPath;
+            string dictionaryPath = Path.ChangeExtension(toPath, ".Dictionary.bion"); ;
+
+            using (new ConsoleWatch($"Converting {fromPath} to {toPath}...",
+                () => $"Done. {LengthMB(fromPath)} JSON to {LengthMB(toPath)} BION + {LengthMB(dictionaryPath)} Index"))
+            {
+                using (JsonTextReader reader = new JsonTextReader(new StreamReader(fromPath)))
+                using (BionWriter writer = new BionWriter(new BufferedWriter(File.Create(toPath)), WordCompressor.OpenWrite(dictionaryPath)))
+                {
+                    JsonBionConverter.JsonToBion(reader, writer);
+                }
+            }
+
+            using (JsonTextReader jsonReader = new JsonTextReader(new StreamReader(fromPath)))
+            using (BionReader bionReader = new BionReader(new BufferedReader(File.OpenRead(toPath)), WordCompressor.OpenRead(dictionaryPath)))
+            {
+                JsonBionComparer.Compare(jsonReader, bionReader);
+            }
         }
 
         private static void ReadSpeed(string filePath)

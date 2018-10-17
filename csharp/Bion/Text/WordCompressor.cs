@@ -51,7 +51,7 @@ namespace Bion.Text
                 {
                     // If this is word is definitely complete, write it
                     uint wordIndex = _words.FindOrAdd(word);
-                    NumberConverter.WriteSevenBitTerminated(writer, wordIndex);
+                    NumberConverter.WriteSixBitTerminated(writer, wordIndex);
                 }
                 else if(!reader.EndOfStream)
                 {
@@ -65,15 +65,18 @@ namespace Bion.Text
             }
         }
 
-        public void Optimize(BufferedReader reader, BufferedWriter writer)
+        public uint[] OptimizeIndex()
         {
-            uint[] map = _words.Optimize();
+            return _words.Optimize();
+        }
 
+        public void RewriteOptimized(uint[] map, BufferedReader reader, BufferedWriter writer)
+        {
             while (!reader.EndOfStream)
             {
-                ulong index = NumberConverter.ReadSevenBitTerminated(reader);
+                ulong index = NumberConverter.ReadSixBitTerminated(reader);
                 uint remapped = map[index];
-                NumberConverter.WriteSevenBitTerminated(writer, remapped);
+                NumberConverter.WriteSixBitTerminated(writer, remapped);
             }
         }
 
@@ -81,7 +84,7 @@ namespace Bion.Text
         {
             while (!reader.EndOfStream)
             {
-                ulong wordIndex = NumberConverter.ReadSevenBitTerminated(reader);
+                ulong wordIndex = NumberConverter.ReadSixBitTerminated(reader);
                 String8 word = _words[wordIndex];
 
                 writer.EnsureSpace(word.Length);
@@ -180,7 +183,7 @@ namespace Bion.Text
             writer.WriteStartArray();
             foreach (WordEntry entry in Words)
             {
-                writer.WriteValue(entry.Value.Span);
+                writer.WriteValue(entry.Value);
                 writer.WriteValue(entry.Count);
             }
             writer.WriteEndArray();

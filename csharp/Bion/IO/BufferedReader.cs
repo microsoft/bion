@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Bion.Text;
+using System;
 using System.IO;
+using System.Text;
 
 namespace Bion.IO
 {
@@ -57,6 +59,53 @@ namespace Bion.IO
             EnsureSpace(1);
         }
 
+        private BufferedReader(byte[] source, int index, int length)
+        {
+            Buffer = source;
+            Index = index;
+            Length = index + length;
+            _stream = null;
+            _streamDone = true;
+            CloseStream = false;
+        }
+
+        /// <summary>
+        ///  Construct a BufferedReader to read only the provided array part.
+        /// </summary>
+        /// <param name="source">byte[] to read</param>
+        /// <param name="index">Index from which to read</param>
+        /// <param name="length">Length to read</param>
+        /// <returns>BufferedReader reading over array only</returns>
+        public static BufferedReader FromArray(byte[] source, int index, int length)
+        {
+            return new BufferedReader(source, index, length);
+        }
+
+        /// <summary>
+        ///  Construct a BufferedReader to read the UTF8 bytes of a string.
+        /// </summary>
+        /// <param name="text">String to convert</param>
+        /// <param name="convertBuffer">Reusable buffer to convert into</param>
+        /// <returns>BufferedReader reading string value only</returns>
+        public static BufferedReader FromString(string text, ref byte[] convertBuffer)
+        {
+            int length = Encoding.UTF8.GetByteCount(text);
+            if (convertBuffer == null || convertBuffer.Length < length) { convertBuffer = new byte[length]; }
+            Encoding.UTF8.GetBytes(text, convertBuffer);
+
+            return BufferedReader.FromArray(convertBuffer, 0, length);
+        }
+
+        /// <summary>
+        ///  Construct a BufferedReader to read a String8 value.
+        /// </summary>
+        /// <param name="text">String8 to read</param>
+        /// <returns>BufferedReader reading String8 value only</returns>
+        public static BufferedReader FromString(String8 text)
+        {
+            return BufferedReader.FromArray(text.Array, text.Index, text.Length);
+        }
+
         /// <summary>
         ///  True if stream has ended and all buffered bytes were consumed.
         /// </summary>
@@ -79,7 +128,7 @@ namespace Bion.IO
             if (bytesLeft >= length) { return true; }
 
             byte[] toFill = Buffer;
-            
+
             // If the buffer is too small, increase it
             if (length > Buffer.Length)
             {
@@ -95,12 +144,18 @@ namespace Bion.IO
             // Fill the remainder of the buffer
             if (!_streamDone)
             {
-                Length += _stream.Read(toFill, bytesLeft, toFill.Length - bytesLeft);
-                _streamDone = Length < toFill.Length;
+                Length += Read(toFill, bytesLeft, toFill.Length - bytesLeft, out _streamDone);
             }
 
             _bytesRead += Length - bytesLeft;
             return Length >= length;
+        }
+
+        protected virtual int Read(byte[] buffer, int index, int length, out bool streamDone)
+        {
+            int lengthRead = _stream.Read(buffer, index, length);
+            streamDone = (lengthRead < length);
+            return lengthRead;
         }
 
         public void Dispose()

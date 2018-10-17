@@ -10,6 +10,8 @@ namespace Bion.Text
         public int Index;
         public int Length;
 
+        public static readonly String8 Empty = new String8(null, 0, 0);
+
         private String8(byte[] array, int index, int length)
         {
             Array = array;

@@ -1,4 +1,5 @@
 ﻿using Bion.IO;
+using Bion.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,16 +14,21 @@ namespace Bion
         public const int MaxTwoByteLength = 16383;
 
         private BufferedWriter _writer;
+
+        private WordCompressor _compressor;
+        private byte[] _stringConvertBuffer;
+
         private Stack<long> _containers;
 
         public long BytesWritten => _writer.BytesWritten;
 
-        public BionWriter(Stream stream) : this(new BufferedWriter(stream))
+        public BionWriter(Stream stream, WordCompressor compressor = null) : this(new BufferedWriter(stream), compressor)
         { }
 
-        public BionWriter(BufferedWriter writer)
+        public BionWriter(BufferedWriter writer, WordCompressor compressor = null)
         {
             _writer = writer;
+            _compressor = compressor;
             _containers = new Stack<long>();
         }
 
@@ -115,9 +121,9 @@ namespace Bion
             WriteStringValue(BionToken.String, value);
         }
 
-        public void WriteValue(ReadOnlySpan<byte> utf8Text)
+        public void WriteValue(String8 value)
         {
-            WriteStringValue(BionToken.String, utf8Text);
+            WriteStringValue(BionToken.String, value);
         }
 
         public void WritePropertyName(string name)
@@ -125,9 +131,9 @@ namespace Bion
             WriteStringValue(BionToken.PropertyName, name);
         }
 
-        public void WritePropertyName(ReadOnlySpan<byte> utf8Text)
+        public void WritePropertyName(String8 value)
         {
-            WriteStringValue(BionToken.PropertyName, utf8Text);
+            WriteStringValue(BionToken.PropertyName, value);
         }
 
         private void WriteStringLength(BionToken marker, int stringLength)
@@ -157,15 +163,32 @@ namespace Bion
             _writer.Buffer[index] = (byte)((int)marker + markerAdjustment);
         }
 
-        private void WriteStringValue(BionToken markerType, ReadOnlySpan<byte> value)
+        private void WriteStringValue(BionToken markerType, String8 value)
         {
-            // Write marker and length
-            WriteStringLength(markerType, value.Length);
+            if (_compressor == null)
+            {
+                // Write marker and length
+                WriteStringLength(markerType, value.Length);
 
-            // Write value
-            _writer.EnsureSpace(value.Length);
-            value.CopyTo(_writer.Buffer.AsSpan(_writer.Index));
-            _writer.Index += value.Length;
+                // Write value
+                _writer.EnsureSpace(value.Length);
+                value.CopyTo(_writer.Buffer, _writer.Index);
+                _writer.Index += value.Length;
+            }
+            else
+            {
+                // Write marker for compressed, terminated value
+                Write((byte)((int)markerType - 3));
+
+                // Compress and write value
+                using (BufferedReader reader = BufferedReader.FromString(value))
+                {
+                    _compressor.Compress(reader, _writer);
+                }
+
+                // Write end token
+                Write(BionMarker.EndValue);
+            }
         }
 
         private void WriteStringValue(BionToken markerType, string value)
@@ -176,15 +199,32 @@ namespace Bion
                 return;
             }
 
-            int length = Encoding.UTF8.GetByteCount(value);
+            if (_compressor == null)
+            {
+                int length = Encoding.UTF8.GetByteCount(value);
 
-            // Write marker and length
-            WriteStringLength(markerType, length);
+                // Write marker and length
+                WriteStringLength(markerType, length);
 
-            // Encode and writer value
-            _writer.EnsureSpace(length);
-            Encoding.UTF8.GetBytes(value, 0, value.Length, _writer.Buffer, _writer.Index);
-            _writer.Index += length;
+                // Encode and writer value
+                _writer.EnsureSpace(length);
+                Encoding.UTF8.GetBytes(value, 0, value.Length, _writer.Buffer, _writer.Index);
+                _writer.Index += length;
+            }
+            else
+            {
+                // Write marker for compressed, terminated value
+                Write((byte)((int)markerType - 3));
+
+                // Compress and write value
+                using (BufferedReader reader = BufferedReader.FromString(value, ref _stringConvertBuffer))
+                {
+                    _compressor.Compress(reader, _writer);
+                }
+
+                // Write end token
+                Write(BionMarker.EndValue);
+            }
         }
 
         private void WriteVariableInteger(BionMarker marker, ulong value)
@@ -242,6 +282,12 @@ namespace Bion
             {
                 _writer.Dispose();
                 _writer = null;
+            }
+
+            if (_compressor != null)
+            {
+                _compressor.Dispose();
+                _compressor = null;
             }
         }
     }

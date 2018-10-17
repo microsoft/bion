@@ -55,7 +55,7 @@
         /// </summary>
         /// <param name="value">Value to write</param>
         /// <param name="writer">BufferedWriter to write to</param>
-        public static void WriteSixBit(BufferedWriter writer, ulong value)
+        public static void WriteSixBitTerminated(BufferedWriter writer, ulong value)
         {
             writer.EnsureSpace(11);
 
@@ -74,7 +74,7 @@
         /// </summary>
         /// <param name="reader">BufferedReader to read from</param>
         /// <returns>Value read</returns>
-        public static ulong ReadSixBit(BufferedReader reader)
+        public static ulong ReadSixBitTerminated(BufferedReader reader)
         {
             reader.EnsureSpace(11);
 
