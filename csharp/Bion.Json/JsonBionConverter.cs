@@ -10,7 +10,7 @@ namespace Bion.Json
     {
         public static void JsonToBion(string jsonPath, string bionPath, string toDictionaryPath = null)
         {
-            using (WordCompressor compressor = (toDictionaryPath == null ? null : WordCompressor.OpenWrite(toDictionaryPath)))
+            using (WordCompressor compressor = (String.IsNullOrEmpty(toDictionaryPath) ? null : WordCompressor.OpenWrite(toDictionaryPath)))
             {
                 string toPath = (compressor == null ? bionPath : Path.ChangeExtension(bionPath, ".preopt.bion"));
 
@@ -87,7 +87,7 @@ namespace Bion.Json
 
         public static void BionToJson(string bionPath, string jsonPath, string fromDictionaryPath = null)
         {
-            using (WordCompressor compressor = (fromDictionaryPath == null ? null : WordCompressor.OpenRead(fromDictionaryPath)))
+            using (WordCompressor compressor = (String.IsNullOrEmpty(fromDictionaryPath) ? null : WordCompressor.OpenRead(fromDictionaryPath)))
             using (BionReader reader = new BionReader(File.OpenRead(bionPath), compressor))
             using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(jsonPath)))
             {

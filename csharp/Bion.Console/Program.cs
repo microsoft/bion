@@ -32,8 +32,8 @@ namespace Bion.Console
     Bion.Console expand <compressedPath> <outputPath> <fromDictionaryPath>
       Expand a word compressed file to the output path.
 
-    Bion.Console count <bionOrJsonPath>
-      Count tokens in file; used to show read speed.
+    Bion.Console read <bionOrJsonPath>
+      Test read performance; read all, count tokens only, and skip everything.
 ";
 
         private static int Main(string[] args)
@@ -69,9 +69,11 @@ namespace Bion.Console
                         if (args.Length < 4) { throw new UsageException("expand requires an input, output, and dictionary path."); }
                         Expand(args[1], args[2], args[3]);
                         break;
-                    case "count":
+                    case "read":
                         if (args.Length < 2) { throw new UsageException("count requires an input path."); }
+                        Read(args[1], (args.Length > 2 ? args[2] : null));
                         Count(args[1], (args.Length > 2 ? args[2] : null));
+                        Skip(args[1], (args.Length > 2 ? args[2] : null));
                         break;
                     case "compare":
                         if (args.Length < 3) { throw new UsageException("compare requires expected and actual file paths."); }
@@ -109,7 +111,7 @@ namespace Bion.Console
             VerifyFileExists(jsonPath);
 
             using (new ConsoleWatch($"Converting {jsonPath} to {bionPath}...",
-                () => $"Done. {FileLength.MB(jsonPath)} JSON to {FileLength.MB(bionPath)} BION{(dictionaryPath == null ? "" : $" + {FileLength.MB(dictionaryPath)} dictionary")} ({FileLength.Percentage(jsonPath, bionPath, dictionaryPath)})"))
+                () => $"Done. {FileLength.MB(jsonPath)} JSON to {FileLength.MB(bionPath)} BION{(String.IsNullOrEmpty(dictionaryPath) ? "" : $" + {FileLength.MB(dictionaryPath)} dictionary")} ({FileLength.Percentage(jsonPath, bionPath, dictionaryPath)})"))
             {
                 JsonBionConverter.JsonToBion(jsonPath, bionPath, dictionaryPath);
             }
@@ -190,13 +192,75 @@ namespace Bion.Console
             return (error == null ? 0 : -3);
         }
 
+        private static void Read(string filePath, string fromDictionaryPath)
+        {
+            VerifyFileExists(filePath);
+            VerifyFileExists(fromDictionaryPath);
+            long tokenCount = 0;
+
+            using (new ConsoleWatch($"Reading [Full] {filePath} ({FileLength.MB(filePath)})...",
+                () => $"Done; {tokenCount:n0} tokens found in file"))
+            {
+                if (filePath.EndsWith(".bion", StringComparison.OrdinalIgnoreCase))
+                {
+                    using (WordCompressor compressor = (fromDictionaryPath == null ? null : WordCompressor.OpenRead(fromDictionaryPath)))
+                    using (BionReader reader = new BionReader(File.OpenRead(filePath), compressor))
+                    {
+                        while (reader.Read())
+                        {
+                            tokenCount++;
+
+                            switch (reader.TokenType)
+                            {
+                                case BionToken.PropertyName:
+                                case BionToken.String:
+                                    String8 value8 = reader.CurrentString8();
+                                    //string valueS = reader.CurrentString();
+                                    break;
+                                case BionToken.Integer:
+                                    long valueI = reader.CurrentInteger();
+                                    break;
+                                case BionToken.Float:
+                                    double valueF = reader.CurrentFloat();
+                                    break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    using (JsonTextReader reader = new JsonTextReader(new StreamReader(filePath)))
+                    {
+                        while (reader.Read())
+                        {
+                            tokenCount++;
+
+                            switch (reader.TokenType)
+                            {
+                                case JsonToken.PropertyName:
+                                case JsonToken.String:
+                                    string valueS = (string)reader.Value;
+                                    break;
+                                case JsonToken.Integer:
+                                    long valueI = (long)reader.Value;
+                                    break;
+                                case JsonToken.Float:
+                                    double valueF = (double)reader.Value;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private static void Count(string filePath, string fromDictionaryPath)
         {
             VerifyFileExists(filePath);
             VerifyFileExists(fromDictionaryPath);
             long tokenCount = 0;
 
-            using (new ConsoleWatch($"Reading {filePath} ({FileLength.MB(filePath)})...",
+            using (new ConsoleWatch($"Reading [Count] {filePath} ({FileLength.MB(filePath)})...",
                 () => $"Done; {tokenCount:n0} tokens found in file"))
             {
                 if (filePath.EndsWith(".bion", StringComparison.OrdinalIgnoreCase))
@@ -218,6 +282,32 @@ namespace Bion.Console
                         {
                             tokenCount++;
                         }
+                    }
+                }
+            }
+        }
+
+        private static void Skip(string filePath, string fromDictionaryPath)
+        {
+            VerifyFileExists(filePath);
+            VerifyFileExists(fromDictionaryPath);
+
+            using (new ConsoleWatch($"Reading [Skip All] {filePath} ({FileLength.MB(filePath)})..."))
+            {
+                if (filePath.EndsWith(".bion", StringComparison.OrdinalIgnoreCase))
+                {
+                    using (WordCompressor compressor = (fromDictionaryPath == null ? null : WordCompressor.OpenRead(fromDictionaryPath)))
+                    using (BionReader reader = new BionReader(File.OpenRead(filePath), compressor))
+                    {
+                        reader.Skip();
+                    }
+                }
+                else
+                {
+                    using (JsonTextReader reader = new JsonTextReader(new StreamReader(filePath)))
+                    {
+                        reader.Read();
+                        reader.Skip();
                     }
                 }
             }
