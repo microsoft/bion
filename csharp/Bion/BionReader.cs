@@ -235,6 +235,34 @@ namespace Bion
             return _currentString;
         }
 
+        public void RewriteOptimized(BufferedWriter writer)
+        {
+            uint[] map = _compressor.OptimizeIndex();
+            using (BufferedReader inner = BufferedReader.FromArray(_reader.Buffer, 0, 0))
+            {
+                while (this.Read())
+                {
+                    writer.EnsureSpace(_currentLength + 1);
+                    writer.Buffer[writer.Index++] = (byte)_currentMarker;
+
+                    if (LengthLookup[(byte)_currentMarker] >= 0)
+                    {
+                        // Everything but compressed text: write bytes out
+                        Buffer.BlockCopy(_reader.Buffer, _reader.Index - _currentLength, writer.Buffer, writer.Index, _currentLength);
+                        writer.Index += _currentLength;
+                    }
+                    else
+                    {
+                        // Compressed Test: Rewrite the text segment
+                        inner.ReadSlice(_reader.Buffer, _reader.Index - _currentLength, _reader.Index - 1);
+                        _compressor.RewriteOptimized(map, inner, writer);
+
+                        writer.Buffer[writer.Index++] = (byte)BionMarker.EndValue;
+                    }
+                }
+            }
+        }
+
         private int LengthIncludingTerminator()
         {
             int readSize = 16 * 1024;

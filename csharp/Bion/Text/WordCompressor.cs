@@ -17,7 +17,7 @@ namespace Bion.Text
 
         public static WordCompressor OpenWrite(string dictionaryPath)
         {
-            return new WordCompressor() { _writeToStream = File.OpenWrite(dictionaryPath) };
+            return new WordCompressor() { _writeToStream = File.Create(dictionaryPath) };
         }
 
         public static WordCompressor OpenRead(string dictionaryPath)

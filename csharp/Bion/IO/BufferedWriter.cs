@@ -73,14 +73,16 @@ namespace Bion.IO
         /// <param name="length">Length in bytes required to write</param>
         public void EnsureSpace(int length)
         {
-            if(Buffer.Length - Index < length)
+            int bytesLeft = Buffer.Length - Index;
+            if(bytesLeft < length)
             {
                 Flush();
 
-                if (Buffer.Length - Index < length)
+                bytesLeft = Buffer.Length - Index;
+                if (bytesLeft < length)
                 {
                     int newLength = Buffer.Length * 2;
-                    if (length > newLength) newLength = length;
+                    if (Index + length > newLength) newLength = Index + length;
 
                     byte[] newBuffer = new byte[newLength];
                     System.Buffer.BlockCopy(Buffer, 0, newBuffer, 0, Index);

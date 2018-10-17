@@ -107,6 +107,22 @@ namespace Bion.IO
         }
 
         /// <summary>
+        ///  Repoint a BufferedReader at an array segment.
+        ///  Used to read from arrays without constructing BufferedReaders constantly.
+        /// </summary>
+        /// <param name="source">Array to read from</param>
+        /// <param name="index">Index to read from</param>
+        /// <param name="end">Index to read before</param>
+        public void ReadSlice(byte[] source, int index, int end)
+        {
+            _streamDone = true;
+            _stream = null;
+            Buffer = source;
+            Index = index;
+            Length = end;
+        }
+
+        /// <summary>
         ///  True if stream has ended and all buffered bytes were consumed.
         /// </summary>
         public bool EndOfStream => (_streamDone && Index == Length);

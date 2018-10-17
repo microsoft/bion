@@ -1,4 +1,5 @@
-﻿using Bion.Text;
+﻿using Bion.IO;
+using Bion.Text;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -10,10 +11,28 @@ namespace Bion.Json
         public static void JsonToBion(string jsonPath, string bionPath, string toDictionaryPath = null)
         {
             using (WordCompressor compressor = (toDictionaryPath == null ? null : WordCompressor.OpenWrite(toDictionaryPath)))
-            using (JsonTextReader reader = new JsonTextReader(new StreamReader(jsonPath)))
-            using (BionWriter writer = new BionWriter(File.Create(bionPath), compressor))
             {
-                JsonToBion(reader, writer);
+                string toPath = (compressor == null ? bionPath : Path.ChangeExtension(bionPath, ".preopt.bion"));
+
+                using (JsonTextReader reader = new JsonTextReader(new StreamReader(jsonPath)))
+                using (BionWriter writer = new BionWriter(File.Create(toPath), compressor))
+                {
+                    JsonToBion(reader, writer);
+                }
+
+                if (compressor != null)
+                {
+                    using (BionReader reader = new BionReader(File.OpenRead(toPath), compressor))
+                    using (BufferedWriter writer = new BufferedWriter(File.Create(bionPath)))
+                    {
+                        reader.RewriteOptimized(writer);
+                    }
+
+                    File.Delete(toPath);
+
+                    // :/ Rewrite compressor; pre-optimize pass calls Dispose which writes it too early.
+                    compressor.Write(File.OpenWrite(toDictionaryPath));
+                }
             }
         }
 
@@ -45,7 +64,6 @@ namespace Bion.Json
                     case JsonToken.Integer:
                         writer.WriteValue((long)reader.Value);
                         break;
-
                     case JsonToken.Boolean:
                         writer.WriteValue((bool)reader.Value);
                         break;
@@ -54,6 +72,12 @@ namespace Bion.Json
                         break;
                     case JsonToken.Float:
                         writer.WriteValue((double)reader.Value);
+                        break;
+                    case JsonToken.Date:
+                        writer.WriteValue(((DateTime)reader.Value).ToString("yyyy-MM-ddThh:mm:ss.FFFFFFFZ"));
+                        break;
+                    case JsonToken.Comment:
+                        // Nothing Written
                         break;
                     default:
                         throw new NotImplementedException($"JsonToBion not implemented for {reader.TokenType}.");

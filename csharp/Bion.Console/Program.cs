@@ -71,7 +71,7 @@ namespace Bion.Console
                         break;
                     case "count":
                         if (args.Length < 2) { throw new UsageException("count requires an input path."); }
-                        Count(args[1]);
+                        Count(args[1], (args.Length > 2 ? args[2] : null));
                         break;
                     case "compare":
                         if (args.Length < 3) { throw new UsageException("compare requires expected and actual file paths."); }
@@ -93,7 +93,7 @@ namespace Bion.Console
                 return 0;
             }
             catch (UsageException ex)
-            { 
+            {
                 System.Console.Write(ex.Message);
                 return -2;
             }
@@ -176,8 +176,8 @@ namespace Bion.Console
             using (new ConsoleWatch($"Comparing {expectedPath} to {actualPath}...",
                 () => $"Done; {(error == null ? "files identical" : error)}"))
             {
-                if (Path.GetExtension(expectedPath).Equals("json", StringComparison.OrdinalIgnoreCase)
-                && Path.GetExtension(actualPath).Equals("json", StringComparison.OrdinalIgnoreCase))
+                if (Path.GetExtension(expectedPath).Equals(".json", StringComparison.OrdinalIgnoreCase)
+                && Path.GetExtension(actualPath).Equals(".json", StringComparison.OrdinalIgnoreCase))
                 {
                     error = FileComparer.JsonEqual(expectedPath, actualPath);
                 }
@@ -190,9 +190,10 @@ namespace Bion.Console
             return (error == null ? 0 : -3);
         }
 
-        private static void Count(string filePath)
+        private static void Count(string filePath, string fromDictionaryPath)
         {
             VerifyFileExists(filePath);
+            VerifyFileExists(fromDictionaryPath);
             long tokenCount = 0;
 
             using (new ConsoleWatch($"Reading {filePath} ({FileLength.MB(filePath)})...",
@@ -200,7 +201,8 @@ namespace Bion.Console
             {
                 if (filePath.EndsWith(".bion", StringComparison.OrdinalIgnoreCase))
                 {
-                    using (BionReader reader = new BionReader(File.OpenRead(filePath)))
+                    using (WordCompressor compressor = (fromDictionaryPath == null ? null : WordCompressor.OpenRead(fromDictionaryPath)))
+                    using (BionReader reader = new BionReader(File.OpenRead(filePath), compressor))
                     {
                         while (reader.Read())
                         {
