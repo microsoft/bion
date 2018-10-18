@@ -98,6 +98,8 @@ namespace Bion.Json
 
         public static void BionToJson(BionReader reader, JsonTextWriter writer)
         {
+            long previousPosition = 0;
+
             while (reader.Read())
             {
                 switch (reader.TokenType)
@@ -134,8 +136,11 @@ namespace Bion.Json
                         writer.WriteNull();
                         break;
                     default:
-                        throw new NotImplementedException($"BionToJson not implemented for {reader.TokenType}.");
+                        throw new NotImplementedException($"BionToJson not implemented for {reader.TokenType} @{previousPosition}.");
                 }
+
+                previousPosition = reader.BytesRead;
+                if (previousPosition == 30204) System.Diagnostics.Debugger.Break();
             }
         }
     }
