@@ -70,6 +70,16 @@ namespace Bion.IO
         }
 
         /// <summary>
+        ///  Construct a BufferedReader to read only the provided array.
+        /// </summary>
+        /// <param name="source">byte[] to read</param>
+        /// <returns>BufferedReader reading over array only</returns>
+        public static BufferedReader FromArray(byte[] source)
+        {
+            return new BufferedReader(source, 0, source.Length);
+        }
+
+        /// <summary>
         ///  Construct a BufferedReader to read only the provided array part.
         /// </summary>
         /// <param name="source">byte[] to read</param>
