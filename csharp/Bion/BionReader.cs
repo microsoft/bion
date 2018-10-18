@@ -11,7 +11,8 @@ namespace Bion
     {
         private BufferedReader _reader;
         private WordCompressor _compressor;
-        private byte[] _decompressBuffer;
+        private BufferedReader _decompressReader;
+        private BufferedWriter _decompressWriter;
 
         private BionMarker _currentMarker;
         private int _currentLength;
@@ -288,19 +289,20 @@ namespace Bion
 
         private void DecompressString()
         {
-            if (_decompressBuffer == null) { _decompressBuffer = new byte[1024]; }
-            using (BufferedReader reader = BufferedReader.FromArray(_reader.Buffer, _currentCompressedStringStart, _reader.Index - _currentCompressedStringStart - 1))
-            using (BufferedWriter writer = BufferedWriter.ToArray(_decompressBuffer))
+            if (_decompressReader == null)
             {
-                // Decompress the content
-                _compressor.Expand(reader, writer);
-
-                // Capture the (possibly resized) buffer
-                _decompressBuffer = writer.Buffer;
-
-                // Make a String8 referencing the full decompressed value
-                _currentString = String8.Reference(_decompressBuffer, 0, writer.Index);
+                _decompressReader = BufferedReader.FromArray(_reader.Buffer, 0, 0);
+                _decompressWriter = BufferedWriter.ToArray(new byte[1024]);
             }
+
+            _decompressReader.ReadSlice(_reader.Buffer, _currentCompressedStringStart, _reader.Index - 1);
+            _decompressWriter.Index = 0;
+
+            // Decompress the content
+            _compressor.Expand(_decompressReader, _decompressWriter);
+
+            // Make a String8 referencing the full decompressed value
+            _currentString = String8.Reference(_decompressWriter.Buffer, 0, _decompressWriter.Index);
         }
 
         private long SafeNegate(ulong value)

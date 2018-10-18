@@ -9,6 +9,7 @@ namespace Bion.Text
     {
         private WordIndex _words;
         private Stream _writeToStream;
+        private ulong[] _block = new ulong[128];
 
         private WordCompressor()
         {
@@ -121,14 +122,16 @@ namespace Bion.Text
         {
             while (!reader.EndOfStream)
             {
-                ulong wordIndex = NumberConverter.ReadSixBitTerminated(reader);
-                String8 word = _words[wordIndex];
+                int count = NumberConverter.ReadSixBitTerminatedBlock(reader, _block);
+                for (int i = 0; i < count; ++i)
+                {
+                    ulong wordIndex = _block[i];
+                    String8 word = _words[wordIndex];
 
-                writer.EnsureSpace(word.Length);
-                if (writer.Buffer.Length - writer.Index < word.Length) System.Diagnostics.Debugger.Break();
-
-                word.CopyTo(writer.Buffer, writer.Index);
-                writer.Index += word.Length;
+                    writer.EnsureSpace(word.Length);
+                    word.CopyTo(writer.Buffer, writer.Index);
+                    writer.Index += word.Length;
+                }
             }
         }
 
