@@ -36,7 +36,7 @@ namespace Bion.Vector
 
             fixed (byte* contentPtr = &content[0])
             {
-                int fullBlockLength = endIndex & ~31;
+                int fullBlockLength = endIndex - 32;
 
                 int i;
                 for (i = index; i < fullBlockLength; i += 32)
@@ -106,7 +106,7 @@ namespace Bion.Vector
 
             fixed (byte* contentPtr = &content[0])
             {
-                int fullBlockLength = endIndex & ~31;
+                int fullBlockLength = endIndex - 32;
 
                 int i;
                 for (i = index; i < fullBlockLength; i += 32)

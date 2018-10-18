@@ -81,9 +81,9 @@ namespace Bion.Console
                     case "roundtrip":
                         if (args.Length < 2) { throw new UsageException("roundtrip requires a json input file path and a bion output file path."); }
                         string jsonPath = args[1];
-                        string bionPath = (args.Length > 2 ? args[2] : Path.ChangeExtension(jsonPath, ".bion"));
-                        string bionDictPath = (args.Length > 3 ? args[3] : Path.ChangeExtension(jsonPath, ".dict.bion"));
-                        string comparePath = (args.Length > 4 ? args[4] : Path.ChangeExtension(jsonPath, ".compare.json"));
+                        string bionPath = (args.Length > 2 ? args[2] : InFolder("Out", Path.ChangeExtension(jsonPath, ".bion")));
+                        string bionDictPath = (args.Length > 3 ? args[3] : InFolder("Out", Path.ChangeExtension(jsonPath, ".dict.bion")));
+                        string comparePath = (args.Length > 4 ? args[4] : InFolder("Out", Path.ChangeExtension(jsonPath, ".compare.json")));
 
                         ToBion(jsonPath, bionPath, bionDictPath);
                         ToJson(bionPath, comparePath, bionDictPath);
@@ -315,8 +315,24 @@ namespace Bion.Console
 
         private static string VerifyFileExists(string filePath)
         {
-            if (filePath != null && !File.Exists(filePath)) throw new UsageException($"File {filePath} not found.");
+            if (filePath != null && !File.Exists(filePath)) { throw new UsageException($"File {filePath} not found."); }
             return filePath;
+        }
+
+        private static string InFolder(string subfolder, string filePath)
+        {
+            if (String.IsNullOrEmpty(filePath)) { return filePath; }
+
+            // Get the path of the new subfolder to create
+            string directory = Path.GetDirectoryName(filePath);
+            string newDirectory = Path.Combine(directory, subfolder);
+
+            // Ensure it exists
+            Directory.CreateDirectory(newDirectory);
+
+            // Combine and return the altered path
+            string name = Path.GetFileName(filePath);
+            return Path.Combine(newDirectory, name);
         }
     }
 

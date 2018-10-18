@@ -87,6 +87,47 @@ namespace Bion.Test.Text
             );
         }
 
+        [TestMethod]
+        public void RoundTrip_IntBlock()
+        {
+            int[] block = new int[128];
+            int blockIndex;
+
+            BufferedRoundTrip("IntBlock.bin",
+                (writer) =>
+                {
+                    blockIndex = 0;
+
+                    for (int i = 0; i < 100000; ++i)
+                    {
+                        block[blockIndex++] = i;
+                        if (blockIndex == 128)
+                        {
+                            NumberConverter.WriteIntBlock(writer, block, blockIndex);
+                            blockIndex = 0;
+                        }
+                    }
+
+                    NumberConverter.WriteIntBlock(writer, block, blockIndex);
+                },
+                (reader) =>
+                {
+                    int expected = 0;
+                    while (!reader.EndOfStream)
+                    {
+                        int count = NumberConverter.ReadIntBlock(reader, block);
+                        for(int i = 0; i < count; ++i)
+                        {
+                            Assert.AreEqual(expected, block[i]);
+                            expected++;
+                        }
+                    }
+
+                    Assert.AreEqual(100000, expected);
+                }
+            );
+        }
+
         private static void BufferedRoundTrip(string fileName, Action<BufferedWriter> write, Action<BufferedReader> read)
         {
             long bytes;

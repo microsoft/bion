@@ -1,4 +1,6 @@
-﻿namespace Bion.IO
+﻿using System;
+
+namespace Bion.IO
 {
     /// <summary>
     ///  NumberConverter provides methods to read and write fixed and
@@ -92,6 +94,35 @@
         }
 
         /// <summary>
+        ///  Read the next bytes from the reader as a variable length,
+        ///  6-bit encoded integer.
+        /// </summary>
+        /// <param name="reader">BufferedReader to read from</param>
+        /// <returns>Value read</returns>
+        public static int ReadSixBitTerminatedBlock(BufferedReader reader, ulong[] block)
+        {
+            reader.EnsureSpace(block.Length * 11);
+
+            int index = 0;
+            while (index < block.Length && !reader.EndOfStream)
+            {
+                ulong value = 0;
+                int current = 0, shift = 0;
+
+                while (current <= 0x3F)
+                {
+                    current = reader.Buffer[reader.Index++];
+                    value += (ulong)(current & 0x3F) << shift;
+                    shift += 6;
+                }
+
+                block[index++] = value;
+            }
+
+            return index;
+        }
+
+        /// <summary>
         ///  Write value as a fixed length, 7-bit encoded integer.
         ///  All bytes start with a zero bit.
         /// </summary>
@@ -174,6 +205,22 @@
             }
 
             return value;
+        }
+
+        public static void WriteIntBlock(BufferedWriter writer, int[] values, int length)
+        {
+            int byteLength = 4 * length;
+            writer.EnsureSpace(byteLength);
+            Buffer.BlockCopy(values, 0, writer.Buffer, writer.Index, byteLength);
+            writer.Index += byteLength;
+        }
+
+        public static int ReadIntBlock(BufferedReader reader, int[] values)
+        {
+            int available = Math.Min(4 * values.Length, reader.EnsureSpace(4 * values.Length));
+            Buffer.BlockCopy(reader.Buffer, reader.Index, values, 0, available);
+            reader.Index += available;
+            return (available / 4);
         }
     }
 }
