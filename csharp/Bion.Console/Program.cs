@@ -44,26 +44,33 @@ namespace Bion.Console
                 return -2;
             }
 
+            string fromPath;
             string mode = args[0].ToLowerInvariant();
             try
             {
                 switch (mode)
                 {
                     case "tobion":
-                        if (args.Length < 3) { throw new UsageException("toBion requires a json input file path and a bion output file path."); }
-                        ToBion(args[1], args[2], (args.Length > 3 ? args[3] : null));
+                        if (args.Length < 2) { throw new UsageException("toBion requires a json input file path."); }
+                        fromPath = args[1];
+                        ToBion(fromPath, 
+                            OrDefault(args, 2, ChangePath(fromPath, ".bion", "Out")), 
+                            OrDefault(args, 3, ChangePath(fromPath, ".dict.bion", "Out")));
                         break;
                     case "tojson":
                         if (args.Length < 3) { throw new UsageException("fromBion requires a bion input file path and a json output file path."); }
                         ToJson(args[1], args[2], (args.Length > 3 ? args[3] : null));
                         break;
                     case "nows":
-                        if (args.Length < 3) { throw new UsageException("nows requires json input and output file paths."); }
-                        NoWhitespace(args[1], args[2]);
+                        if (args.Length < 2) { throw new UsageException("nows requires a json input path."); }
+                        NoWhitespace(args[1], OrDefault(args, 2, ChangePath(args[1], ".nows.json")));
                         break;
                     case "compress":
-                        if (args.Length < 4) { throw new UsageException("compress requires an input, output, and dictionary path."); }
-                        Compress(args[1], args[2], args[3]);
+                        if (args.Length < 2) { throw new UsageException("compress requires an input path."); }
+                        fromPath = args[1];
+                        Compress(fromPath,
+                            OrDefault(args, 2, ChangePath(fromPath, ".cmp", "Out")),
+                            OrDefault(args, 3, ChangePath(fromPath, ".dict.cmp", "Out")));
                         break;
                     case "expand":
                         if (args.Length < 4) { throw new UsageException("expand requires an input, output, and dictionary path."); }
@@ -80,14 +87,14 @@ namespace Bion.Console
                         return Compare(args[1], args[2]);
                     case "roundtrip":
                         if (args.Length < 2) { throw new UsageException("roundtrip requires a json input file path and a bion output file path."); }
-                        string jsonPath = args[1];
-                        string bionPath = (args.Length > 2 ? args[2] : InFolder("Out", Path.ChangeExtension(jsonPath, ".bion")));
-                        string bionDictPath = (args.Length > 3 ? args[3] : InFolder("Out", Path.ChangeExtension(jsonPath, ".dict.bion")));
-                        string comparePath = (args.Length > 4 ? args[4] : InFolder("Out", Path.ChangeExtension(jsonPath, ".compare.json")));
+                        fromPath = args[1];
+                        string bionPath = OrDefault(args, 2, ChangePath(fromPath, ".bion", "Out"));
+                        string bionDictPath = OrDefault(args, 3, ChangePath(fromPath, ".dict.bion", "Out"));
+                        string comparePath = OrDefault(args, 4, ChangePath(fromPath, ".compare.json", "Out"));
 
-                        ToBion(jsonPath, bionPath, bionDictPath);
+                        ToBion(fromPath, bionPath, bionDictPath);
                         ToJson(bionPath, comparePath, bionDictPath);
-                        return Compare(jsonPath, comparePath);
+                        return Compare(fromPath, comparePath);
                     default:
                         throw new UsageException($"Unknown mode '{mode}'. Run without arguments for usage.");
                 }
@@ -319,20 +326,29 @@ namespace Bion.Console
             return filePath;
         }
 
-        private static string InFolder(string subfolder, string filePath)
+        private static string OrDefault(string[] args, int index, string defaultValue)
         {
+            return (args.Length > index ? args[index] : defaultValue);
+        }
+
+        private static string ChangePath(string filePath, string withExtension = null, string inFolder = null)
+        {
+            string path = filePath;
             if (String.IsNullOrEmpty(filePath)) { return filePath; }
 
-            // Get the path of the new subfolder to create
-            string directory = Path.GetDirectoryName(filePath);
-            string newDirectory = Path.Combine(directory, subfolder);
+            if (withExtension != null)
+            {
+                path = Path.ChangeExtension(path, withExtension);
+            }
 
-            // Ensure it exists
-            Directory.CreateDirectory(newDirectory);
+            if (inFolder != null)
+            {
+                string newDirectory = Path.Combine(Path.GetDirectoryName(path), inFolder);
+                Directory.CreateDirectory(newDirectory);
+                path = Path.Combine(newDirectory, Path.GetFileName(path));
+            }
 
-            // Combine and return the altered path
-            string name = Path.GetFileName(filePath);
-            return Path.Combine(newDirectory, name);
+            return path;
         }
     }
 

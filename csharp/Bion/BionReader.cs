@@ -241,25 +241,31 @@ namespace Bion
             uint[] map = _compressor.OptimizeIndex();
             using (BufferedReader inner = BufferedReader.FromArray(_reader.Buffer, 0, 0))
             {
+                long last = 0;
+
                 while (this.Read())
                 {
-                    writer.EnsureSpace(_currentLength + 1);
-                    writer.Buffer[writer.Index++] = (byte)_currentMarker;
+                    int length = (int)(this.BytesRead - last);
+                    writer.EnsureSpace(length);
 
                     if (LengthLookup[(byte)_currentMarker] >= 0)
                     {
                         // Everything but compressed text: write bytes out
-                        Buffer.BlockCopy(_reader.Buffer, _reader.Index - _currentLength, writer.Buffer, writer.Index, _currentLength);
-                        writer.Index += _currentLength;
+                        Buffer.BlockCopy(_reader.Buffer, _reader.Index - length, writer.Buffer, writer.Index, length);
+                        writer.Index += length;
                     }
                     else
                     {
+                        writer.Buffer[writer.Index++] = (byte)_currentMarker;
+
                         // Compressed Test: Rewrite the text segment
                         inner.ReadSlice(_reader.Buffer, _reader.Index - _currentLength, _reader.Index - 1);
                         _compressor.RewriteOptimized(map, inner, writer);
 
                         writer.Buffer[writer.Index++] = (byte)BionMarker.EndValue;
                     }
+
+                    last = this.BytesRead;
                 }
             }
         }
