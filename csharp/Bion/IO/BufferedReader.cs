@@ -56,7 +56,6 @@ namespace Bion.IO
             _stream = stream;
             Buffer = buffer;
             CloseStream = true;
-            EnsureSpace(1);
         }
 
         private BufferedReader(byte[] source, int index, int length)
@@ -148,7 +147,7 @@ namespace Bion.IO
         /// </summary>
         /// <param name="length">Length in bytes required in buffer</param>
         /// <returns>Length available, which may be more or less than desired length.</returns>
-        public int EnsureSpace(int length)
+        public int EnsureSpace(int length, int maxReadLength = -1)
         {
             int bytesLeft = (Length - Index);
             if (bytesLeft >= length) { return bytesLeft; }
@@ -170,7 +169,10 @@ namespace Bion.IO
             // Fill the remainder of the buffer
             if (!_streamDone)
             {
-                Length += Read(toFill, bytesLeft, toFill.Length - bytesLeft, out _streamDone);
+                int lengthToRead = toFill.Length - bytesLeft;
+                if (maxReadLength > 0 && maxReadLength < lengthToRead) { lengthToRead = maxReadLength; }
+
+                Length += Read(toFill, bytesLeft, lengthToRead, out _streamDone);
             }
 
             _bytesRead += Length - bytesLeft;
@@ -186,6 +188,9 @@ namespace Bion.IO
 
         public void Seek(long offset, SeekOrigin origin)
         {
+            // Do nothing if already in correct position
+            if (origin == SeekOrigin.Begin && offset == BytesRead) { return; }
+            
             // Seek
             _stream.Seek(offset, origin);
 

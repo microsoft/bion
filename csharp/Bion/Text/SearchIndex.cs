@@ -28,6 +28,9 @@ namespace Bion
         private int[] NextMatchIndex;
         private int Count;
 
+        public long WordTotal { get; private set; }
+        public long NonDuplicateTotal { get; private set; }
+
         public SearchIndexWriter(string outputPath, int wordCount, int size)
         {
             OutputPath = outputPath;
@@ -61,6 +64,7 @@ namespace Bion
         /// <param name="position">Byte offset where word appears</param>
         public void Add(uint wordIndex, long position)
         {
+            WordTotal++;
             int matchIndex = Count;
 
             int last = LastWordMatch[wordIndex];
@@ -85,6 +89,7 @@ namespace Bion
             LastWordMatch[wordIndex] = matchIndex;
 
             Count++;
+            NonDuplicateTotal++;
 
             if (Count == MatchPositions.Length)
             {
