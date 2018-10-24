@@ -236,10 +236,11 @@ namespace Bion
             return _currentString;
         }
 
-        public void RewriteOptimized(BufferedWriter writer)
+        public void RewriteOptimized(BufferedWriter writer, string indexPath = null)
         {
             uint[] map = _compressor.OptimizeIndex();
             using (BufferedReader inner = BufferedReader.FromArray(_reader.Buffer, 0, 0))
+            using (SearchIndexWriter indexWriter = (indexPath == null ? null : new SearchIndexWriter(indexPath, map.Length, 128 * 1024)))
             {
                 long last = 0;
 
@@ -260,7 +261,7 @@ namespace Bion
 
                         // Compressed Test: Rewrite the text segment
                         inner.ReadSlice(_reader.Buffer, _reader.Index - _currentLength, _reader.Index - 1);
-                        _compressor.RewriteOptimized(map, inner, writer);
+                        _compressor.RewriteOptimized(map, inner, writer, indexWriter);
 
                         writer.Buffer[writer.Index++] = (byte)BionMarker.EndValue;
                     }

@@ -22,10 +22,12 @@ namespace Bion.Json
 
                 if (compressor != null)
                 {
+                    string indexPath = Path.ChangeExtension(bionPath, ".idx");
+
                     using (BionReader reader = new BionReader(File.OpenRead(toPath), compressor))
                     using (BufferedWriter writer = new BufferedWriter(File.Create(bionPath)))
                     {
-                        reader.RewriteOptimized(writer);
+                        reader.RewriteOptimized(writer, indexPath);
                     }
 
                     File.Delete(toPath);

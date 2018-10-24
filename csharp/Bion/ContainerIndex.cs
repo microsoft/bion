@@ -61,11 +61,11 @@ namespace Bion
         }
     }
 
-    public class BionIndex
+    public class ContainerIndex
     {
         private List<IndexEntry> _index;
 
-        public BionIndex()
+        public ContainerIndex()
         {
             _index = new List<IndexEntry>();
         }

@@ -184,6 +184,18 @@ namespace Bion.IO
             return lengthRead;
         }
 
+        public void Seek(long offset, SeekOrigin origin)
+        {
+            // Seek
+            _stream.Seek(offset, origin);
+
+            // Mark stream not done and buffer empty
+            _bytesRead = _stream.Position;
+            _streamDone = false;
+            Index = 0;
+            Length = 0;
+        }
+
         public void Dispose()
         {
             if (_stream != null)

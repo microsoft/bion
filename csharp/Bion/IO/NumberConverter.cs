@@ -6,8 +6,27 @@ namespace Bion.IO
     ///  NumberConverter provides methods to read and write fixed and
     ///  variable length integers.
     /// </summary>
-    public class NumberConverter
+    public static class NumberConverter
     {
+        public static void Write(this BufferedWriter writer, int value)
+        {
+            writer.EnsureSpace(4);
+            writer.Buffer[writer.Index + 0] = (byte)value;
+            writer.Buffer[writer.Index + 1] = (byte)(value >> 8);
+            writer.Buffer[writer.Index + 2] = (byte)(value >> 16);
+            writer.Buffer[writer.Index + 3] = (byte)(value >> 24);
+            writer.Index += 4;
+        }
+
+        public static int ReadInt32(this BufferedReader reader)
+        {
+            reader.EnsureSpace(4);
+            int value = (int)(reader.Buffer[reader.Index] | reader.Buffer[reader.Index + 1] << 8 | reader.Buffer[reader.Index + 2] << 16 | reader.Buffer[reader.Index + 3] << 24);
+            reader.Index += 4;
+
+            return value;
+        }
+
         /// <summary>
         ///  Write value as a variable length, 7-bit encoded integer.
         ///  The last byte has a leading one bit, the others don't.
@@ -215,9 +234,9 @@ namespace Bion.IO
             writer.Index += byteLength;
         }
 
-        public static int ReadIntBlock(BufferedReader reader, int[] values)
+        public static int ReadIntBlock(BufferedReader reader, int[] values, int length)
         {
-            int available = Math.Min(4 * values.Length, reader.EnsureSpace(4 * values.Length));
+            int available = Math.Min(4 * length, reader.EnsureSpace(4 * length));
             Buffer.BlockCopy(reader.Buffer, reader.Index, values, 0, available);
             reader.Index += available;
             return (available / 4);

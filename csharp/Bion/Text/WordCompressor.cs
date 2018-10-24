@@ -108,12 +108,14 @@ namespace Bion.Text
             return _words.Optimize();
         }
 
-        public void RewriteOptimized(uint[] map, BufferedReader reader, BufferedWriter writer)
+        public void RewriteOptimized(uint[] map, BufferedReader reader, BufferedWriter writer, SearchIndexWriter indexWriter = null)
         {
+            long valueStart = writer.BytesWritten;
             while (!reader.EndOfStream)
             {
                 ulong index = NumberConverter.ReadSixBitTerminated(reader);
                 uint remapped = map[index];
+                indexWriter?.Add(remapped, valueStart);
                 NumberConverter.WriteSixBitTerminated(writer, remapped);
             }
         }

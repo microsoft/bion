@@ -115,7 +115,7 @@ namespace Bion.Test.Text
                     int expected = 0;
                     while (!reader.EndOfStream)
                     {
-                        int count = NumberConverter.ReadIntBlock(reader, block);
+                        int count = NumberConverter.ReadIntBlock(reader, block, block.Length);
                         for(int i = 0; i < count; ++i)
                         {
                             Assert.AreEqual(expected, block[i]);
@@ -124,6 +124,32 @@ namespace Bion.Test.Text
                     }
 
                     Assert.AreEqual(100000, expected);
+                }
+            );
+        }
+
+        [TestMethod]
+        public void RoundTrip_Int()
+        {
+            BufferedRoundTrip("Int.bin",
+                (writer) =>
+                {
+                    for (int i = 0; i < 10000; ++i)
+                    {
+                        NumberConverter.Write(writer, i);
+                    }
+                },
+                (reader) =>
+                {
+                    int expected = 0;
+                    while (!reader.EndOfStream)
+                    {
+                        int value = NumberConverter.ReadInt32(reader);
+                        Assert.AreEqual(expected, value);
+                        expected++;
+                    }
+
+                    Assert.AreEqual(10000, expected);
                 }
             );
         }
