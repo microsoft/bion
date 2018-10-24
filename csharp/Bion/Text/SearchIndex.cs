@@ -62,7 +62,7 @@ namespace Bion
         /// </summary>
         /// <param name="wordIndex">Index of Word (from Word Compressor list)</param>
         /// <param name="position">Byte offset where word appears</param>
-        public void Add(uint wordIndex, long position)
+        public void Add(int wordIndex, long position)
         {
             WordTotal++;
             int matchIndex = Count;
@@ -142,7 +142,7 @@ namespace Bion
 
                 long[] positions = null;
 
-                for (uint wordIndex = 0; wordIndex < WordCount; ++wordIndex)
+                for (int wordIndex = 0; wordIndex < WordCount; ++wordIndex)
                 {
                     for (int readerIndex = 0; readerIndex < readers.Length; ++readerIndex)
                     {
@@ -300,7 +300,7 @@ namespace Bion
         /// <param name="wordIndex">Index of word to find matches for</param>
         /// <param name="buffer">Array to write match positions to</param>
         /// <returns>Number of matches written to array</returns>
-        public int OffsetsForWord(uint wordIndex, ref long[] buffer)
+        public int OffsetsForWord(int wordIndex, ref long[] buffer)
         {
             // Find start and end of matches
             long startOffset = _firstMatchOffset[wordIndex];
@@ -312,7 +312,7 @@ namespace Bion
 
             // Read the match bytes
             _reader.Seek(startOffset, SeekOrigin.Begin);
-            _reader.EnsureSpace(length);
+            _reader.EnsureSpace(length, length);
 
             // Decode to non-relative longs
             int count = 0;

@@ -238,7 +238,7 @@ namespace Bion
 
         public void RewriteOptimized(BufferedWriter writer, string indexPath = null)
         {
-            uint[] map = _compressor.OptimizeIndex();
+            int[] map = _compressor.OptimizeIndex();
             using (BufferedReader inner = BufferedReader.FromArray(_reader.Buffer, 0, 0))
             using (SearchIndexWriter indexWriter = (indexPath == null ? null : new SearchIndexWriter(indexPath, map.Length, 128 * 1024)))
             {

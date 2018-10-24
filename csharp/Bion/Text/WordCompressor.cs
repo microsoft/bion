@@ -49,7 +49,7 @@ namespace Bion.Text
                 // Optimize Pass
                 if (optimize)
                 {
-                    uint[] map = compressor.OptimizeIndex();
+                    int[] map = compressor.OptimizeIndex();
                     using (BufferedReader reader = new BufferedReader(File.OpenRead(firstWritePath)))
                     using (BufferedWriter writer = new BufferedWriter(File.Create(toPath)))
                     {
@@ -88,8 +88,8 @@ namespace Bion.Text
                 if (reader.Index < reader.Length || reader.EndOfStream)
                 {
                     // If this is word is definitely complete, write it
-                    uint wordIndex = _words.FindOrAdd(word);
-                    NumberConverter.WriteSixBitTerminated(writer, wordIndex);
+                    int wordIndex = _words.FindOrAdd(word);
+                    NumberConverter.WriteSixBitTerminated(writer, (ulong)wordIndex);
                 }
                 else if(!reader.EndOfStream)
                 {
@@ -103,20 +103,25 @@ namespace Bion.Text
             }
         }
 
-        public uint[] OptimizeIndex()
+        public int[] OptimizeIndex()
         {
             return _words.Optimize();
         }
 
-        public void RewriteOptimized(uint[] map, BufferedReader reader, BufferedWriter writer, SearchIndexWriter indexWriter = null)
+        public bool TryGetWordIndex(String8 word, out int index)
+        {
+            return _words.TryFind(word, out index);
+        }
+
+        public void RewriteOptimized(int[] map, BufferedReader reader, BufferedWriter writer, SearchIndexWriter indexWriter = null)
         {
             long valueStart = writer.BytesWritten;
             while (!reader.EndOfStream)
             {
                 ulong index = NumberConverter.ReadSixBitTerminated(reader);
-                uint remapped = map[index];
+                int remapped = map[index];
                 indexWriter?.Add(remapped, valueStart);
-                NumberConverter.WriteSixBitTerminated(writer, remapped);
+                NumberConverter.WriteSixBitTerminated(writer, (ulong)remapped);
             }
         }
 
@@ -178,7 +183,7 @@ namespace Bion.Text
 
         public String8 this[ulong index] => Words[(int)index].Value;
 
-        public uint FindOrAdd(String8 word)
+        public int FindOrAdd(String8 word)
         {
             int index;
             if(Index.TryGetValue(word, out index))
@@ -187,7 +192,7 @@ namespace Bion.Text
                 entry.Count++;
                 Words[index] = entry;
 
-                return (uint)index;
+                return index;
             }
 
             index = Words.Count;
@@ -196,12 +201,17 @@ namespace Bion.Text
             Words.Add(new WordEntry(wordCopy, 1));
             Index[wordCopy] = index;
 
-            return (uint)index;
+            return index;
         }
 
-        public uint[] Optimize()
+        public bool TryFind(String8 word, out int index)
         {
-            uint[] remapping = new uint[Words.Count];
+            return Index.TryGetValue(word, out index);
+        }
+
+        public int[] Optimize()
+        {
+            int[] remapping = new int[Words.Count];
 
             // Sort words in descending frequency order
             Words.Sort((left, right) => right.Count.CompareTo(left.Count));
@@ -209,7 +219,7 @@ namespace Bion.Text
             // Look up the old index for each word to map to the new index
             for(int i = 0; i < Words.Count; ++i)
             {
-                remapping[Index[Words[i].Value]] = (uint)i;
+                remapping[Index[Words[i].Value]] = i;
             }
 
             // Rebuild the index on the new order

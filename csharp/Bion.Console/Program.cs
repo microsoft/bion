@@ -53,8 +53,8 @@ namespace Bion.Console
                     case "tobion":
                         if (args.Length < 2) { throw new UsageException("toBion requires a json input file path."); }
                         fromPath = args[1];
-                        ToBion(fromPath, 
-                            OrDefault(args, 2, ChangePath(fromPath, ".bion", "Out")), 
+                        ToBion(fromPath,
+                            OrDefault(args, 2, ChangePath(fromPath, ".bion", "Out")),
                             OrDefault(args, 3, ChangePath(fromPath, ".dict.bion", "Out")));
                         break;
                     case "tojson":
@@ -95,6 +95,12 @@ namespace Bion.Console
                         ToBion(fromPath, bionPath, bionDictPath);
                         ToJson(bionPath, comparePath, bionDictPath);
                         return Compare(fromPath, comparePath);
+
+                    case "search":
+                        if (args.Length < 3) { throw new UsageException("search requires a bion file path and search string."); }
+                        Search(args[1], args[2]);
+                        break;
+
                     default:
                         throw new UsageException($"Unknown mode '{mode}'. Run without arguments for usage.");
                 }
@@ -291,6 +297,55 @@ namespace Bion.Console
                         }
                     }
                 }
+            }
+        }
+
+        private static void Search(string filePath, string term)
+        {
+            long[] matchPositions = null;
+            int matchCount = -1;
+
+            using (new ConsoleWatch($"Finding '{term}' in '{filePath}'..."))
+            {
+                WordCompressor compressor = null;
+                SearchIndexReader indexReader = null;
+
+                try
+                {
+                    using (new ConsoleWatch("Loading Word Index..."))
+                    {
+                        compressor = WordCompressor.OpenRead(Path.ChangeExtension(filePath, ".dict.bion"));
+                    }
+
+                    using (new ConsoleWatch("Loading Search Index..."))
+                    {
+                        indexReader = new SearchIndexReader(Path.ChangeExtension(filePath, ".idx"));
+                    }
+
+                    using (new ConsoleWatch("Finding Matches..."))
+                    {
+                        byte[] convertBuffer = null;
+                        int wordIndex;
+                        if (compressor.TryGetWordIndex(String8.Copy(term, ref convertBuffer), out wordIndex))
+                        {
+                            matchCount = indexReader.OffsetsForWord(wordIndex, ref matchPositions);
+                        }
+                    }
+                }
+                finally
+                {
+                    compressor?.Dispose();
+                    indexReader?.Dispose();
+                }
+            }
+
+            if (matchCount == -1)
+            {
+                System.Console.WriteLine($"'{term}' not found.");
+            }
+            else
+            {
+                System.Console.WriteLine($"'{term}' found {matchCount:n0} times. First Offset: {matchPositions?[0]:n0}.");
             }
         }
 

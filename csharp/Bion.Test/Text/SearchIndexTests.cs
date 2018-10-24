@@ -27,7 +27,7 @@ namespace Bion.Test.Text
                 int position = 0;
                 for(int occurrence = 0; occurrence < occurrences; ++occurrence)
                 {
-                    for(uint wordIndex = 0; wordIndex < wordCount; ++wordIndex)
+                    for(int wordIndex = 0; wordIndex < wordCount; ++wordIndex)
                     {
                         writer.Add(wordIndex, position);
                         position++;
@@ -39,7 +39,7 @@ namespace Bion.Test.Text
             {
                 long[] positions = new long[occurrences];
 
-                for (uint wordIndex = 0; wordIndex < wordCount; ++wordIndex)
+                for (int wordIndex = 0; wordIndex < wordCount; ++wordIndex)
                 {
                     // Read matches for word
                     int matchCount = reader.OffsetsForWord(wordIndex, ref positions);
