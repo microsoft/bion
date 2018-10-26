@@ -142,7 +142,6 @@ namespace Bion.Json
                 }
 
                 previousPosition = reader.BytesRead;
-                if (previousPosition == 30204) System.Diagnostics.Debugger.Break();
             }
         }
     }

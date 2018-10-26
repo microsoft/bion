@@ -20,6 +20,11 @@ namespace Bion.Test.Text
 
             Assert.IsTrue(one.Equals(one2));
             Assert.AreEqual(one.GetHashCode(), one2.GetHashCode());
+
+            Assert.IsTrue(one.CompareTo(two) < 0);
+            Assert.IsTrue(two.CompareTo(one) > 0);
+            Assert.AreEqual(0, one.CompareTo(one2));
+            Assert.AreEqual(0, one.CompareTo(one));
         }
     }
 }

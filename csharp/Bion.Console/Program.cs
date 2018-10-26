@@ -98,7 +98,7 @@ namespace Bion.Console
 
                     case "search":
                         if (args.Length < 3) { throw new UsageException("search requires a bion file path and search string."); }
-                        Search(args[1], args[2]);
+                        Search(args[1], args[2], (args.Length > 3 ? int.Parse(args[3]) : 1));
                         break;
 
                     default:
@@ -300,45 +300,52 @@ namespace Bion.Console
             }
         }
 
-        private static void Search(string filePath, string term)
+        private static void Search(string filePath, string term, int iterations = 1)
         {
             long[] matchPositions = null;
             int matchCount = -1;
 
-            for (int i = 0; i < 20; ++i)
+            using (new ConsoleWatch($"Finding '{term}' in '{filePath}' {iterations:n0}x..."))
             {
-                using (new ConsoleWatch($"Finding '{term}' in '{filePath}'..."))
-                {
-                    WordCompressor compressor = null;
-                    SearchIndexReader indexReader = null;
+                WordCompressor compressor = null;
+                SearchIndexReader indexReader = null;
 
-                    try
+                try
+                {
+                    using (new ConsoleWatch("Loading Word Index..."))
                     {
-                        using (new ConsoleWatch("Loading Word Index..."))
+                        for (int i = 0; i < iterations; ++i)
                         {
                             compressor = WordCompressor.OpenRead(Path.ChangeExtension(filePath, ".dict.bion"));
                         }
+                    }
 
-                        using (new ConsoleWatch("Loading Search Index..."))
+                    using (new ConsoleWatch("Loading Search Index..."))
+                    {
+                        for (int i = 0; i < iterations; ++i)
                         {
                             indexReader = new SearchIndexReader(Path.ChangeExtension(filePath, ".idx"));
                         }
+                    }
 
-                        using (new ConsoleWatch("Finding Matches..."))
+                    using (new ConsoleWatch("Finding Matches..."))
+                    {
+                        byte[] convertBuffer = null;
+                        int wordIndex;
+
+                        for (int i = 0; i < iterations; ++i)
                         {
-                            byte[] convertBuffer = null;
-                            int wordIndex;
                             if (compressor.TryGetWordIndex(String8.Copy(term, ref convertBuffer), out wordIndex))
                             {
                                 matchCount = indexReader.OffsetsForWord(wordIndex, ref matchPositions);
                             }
                         }
                     }
-                    finally
-                    {
-                        compressor?.Dispose();
-                        indexReader?.Dispose();
-                    }
+                }
+                finally
+                {
+                    compressor?.Dispose();
+                    indexReader?.Dispose();
                 }
             }
 

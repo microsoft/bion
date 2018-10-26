@@ -1,10 +1,12 @@
 ﻿using Bion.Core;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Bion.Text
 {
-    public struct String8 : IEquatable<String8>
+    public struct String8 : IEquatable<String8>, IComparable<String8>
     {
         public byte[] Array;
         public int Index;
@@ -90,7 +92,7 @@ namespace Bion.Text
         {
             if (this.Length != other.Length) { return false; }
 
-            for(int i = 0; i < this.Length; ++i)
+            for (int i = 0; i < this.Length; ++i)
             {
                 if (this.Array[this.Index + i] != other.Array[other.Index + i]) { return false; }
             }
@@ -106,6 +108,40 @@ namespace Bion.Text
         public override string ToString()
         {
             return Encoding.UTF8.GetString(Array, Index, Length);
+        }
+
+        /// <summary>
+        ///  Compare this String8 to another one. Returns which String8 sorts earlier.
+        /// </summary>
+        /// <param name="other">String8 to compare to</param>
+        /// <returns>Negative if this String8 sorts earlier, zero if equal, positive if this String8 sorts later</returns>
+        public int CompareTo(String8 other)
+        {
+            // If String8s point to the same thing, return the same
+            if (other.Index == Index && other.Array == Array && other.Length == Length) { return 0; }
+
+            // If one or the other is empty, the non-empty one is greater
+            if (this.Length == 0)
+            {
+                return (other.Length == 0 ? 0 : -1);
+            }
+            else if (other.Length == 0)
+            {
+                return 1;
+            }
+
+            // Next, compare up to the length both strings are
+            int cmp = 0;
+            int commonLength = Math.Min(this.Length, other.Length);
+            for (int i = 0; i < commonLength && cmp == 0; ++i)
+            {
+                cmp = this.Array[Index + i].CompareTo(other.Array[other.Index + i]);
+            }
+
+            if (cmp != 0) { return cmp; }
+
+            // If all bytes are equal, the longer one is later
+            return Length.CompareTo(other.Length);
         }
     }
 }

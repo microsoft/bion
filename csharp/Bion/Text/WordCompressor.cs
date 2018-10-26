@@ -7,6 +7,8 @@ namespace Bion.Text
 {
     public class WordCompressor : IDisposable
     {
+        public const int BitsPerByte = 6;
+
         private WordIndex _words;
         private Stream _writeToStream;
         private ulong[] _block = new ulong[128];
@@ -211,8 +213,27 @@ namespace Bion.Text
 
         public bool TryFind(String8 word, out int index)
         {
-            if (!this.Indexed) { Reindex(); }
-            return Index.TryGetValue(word, out index);
+            if (this.Indexed)
+            {
+                return Index.TryGetValue(word, out index);
+            }
+            else
+            {
+                WordEntry stub = new WordEntry(word);
+
+                index = -1;
+                int countDone = 0;
+                int countForLength = 1 << WordCompressor.BitsPerByte;
+                do
+                {
+                    int countToDo = Math.Min(countForLength, Words.Count - countDone);
+                    index = Words.BinarySearch(countDone, countToDo, stub, WordEntryWordComparer.Instance);
+                    countDone += countToDo;
+                    countForLength = countForLength << WordCompressor.BitsPerByte;
+                } while (index < 0 && countDone < Words.Count);
+
+                return (index >= 0);
+            }
         }
 
         public int[] Optimize()
@@ -220,8 +241,19 @@ namespace Bion.Text
             if (!this.Indexed) { Reindex(); }
             int[] remapping = new int[Words.Count];
 
-            // Sort words in descending frequency order
+            // First, sort words in descending frequency order
             Words.Sort((left, right) => right.Count.CompareTo(left.Count));
+
+            // Next, within each set with the same byte length, sort by ordinal
+            int countDone = 0;
+            int countForLength = 1 << WordCompressor.BitsPerByte;
+            do
+            {
+                int countToDo = Math.Min(countForLength, Words.Count - countDone);
+                Words.Sort(countDone, countToDo, WordEntryWordComparer.Instance);
+                countDone += countToDo;
+                countForLength = countForLength << WordCompressor.BitsPerByte;
+            } while (countDone < Words.Count);
 
             // Look up the old index for each word to map to the new index
             for(int i = 0; i < Words.Count; ++i)
@@ -304,6 +336,21 @@ namespace Bion.Text
         {
             this.Value = value;
             this.Count = count;
+        }
+
+        public override string ToString()
+        {
+            return $"\"{Value}\" ({Count:n0})";
+        }
+    }
+
+    internal class WordEntryWordComparer : IComparer<WordEntry>
+    {
+        public static readonly WordEntryWordComparer Instance = new WordEntryWordComparer();
+
+        public int Compare(WordEntry left, WordEntry right)
+        {
+            return left.Value.CompareTo(right.Value);
         }
     }
 }
