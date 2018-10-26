@@ -116,6 +116,8 @@ namespace Bion.Text
             return _words.TryFind(word, out index);
         }
 
+        public String8 this[int wordIndex] => _words[wordIndex];
+
         public void RewriteOptimized(int[] map, BufferedReader reader, BufferedWriter writer, SearchIndexWriter indexWriter = null)
         {
             long valueStart = writer.BytesWritten;
@@ -135,7 +137,7 @@ namespace Bion.Text
                 int count = NumberConverter.ReadSixBitTerminatedBlock(reader, _block);
                 for (int i = 0; i < count; ++i)
                 {
-                    ulong wordIndex = _block[i];
+                    int wordIndex = (int)_block[i];
                     String8 word = _words[wordIndex];
 
                     writer.EnsureSpace(word.Length);
@@ -186,7 +188,7 @@ namespace Bion.Text
             this.Indexed = true;
         }
 
-        public String8 this[ulong index] => Words[(int)index].Value;
+        public String8 this[int index] => Words[index].Value;
 
         public int FindOrAdd(String8 word)
         {

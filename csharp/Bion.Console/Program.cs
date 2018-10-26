@@ -55,7 +55,7 @@ namespace Bion.Console
                         fromPath = args[1];
                         ToBion(fromPath,
                             OrDefault(args, 2, ChangePath(fromPath, ".bion", "Out")),
-                            OrDefault(args, 3, ChangePath(fromPath, ".dict.bion", "Out")));
+                            (args.Length > 3 ? args[3] : null));
                         break;
                     case "tojson":
                         if (args.Length < 3) { throw new UsageException("fromBion requires a bion input file path and a json output file path."); }
