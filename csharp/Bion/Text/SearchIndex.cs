@@ -16,6 +16,8 @@ namespace Bion
     /// </remarks>
     public class SearchIndexWriter : IDisposable
     {
+        internal const int Shift = 2;
+
         private string OutputPath;
         private string WorkingPath;
         private int BlockCount;
@@ -209,6 +211,9 @@ namespace Bion
         /// <param name="position">Position in file where word occurs</param>
         public void WritePosition(long position)
         {
+            // Shift to reduce size; only an approximate position will be returned
+            position = position >> SearchIndexWriter.Shift;
+
             if (_lastPosition == -1)
             {
                 NumberConverter.WriteSevenBitTerminated(_writer, (ulong)position);
@@ -320,7 +325,7 @@ namespace Bion
             while (_reader.BytesRead < endOffset)
             {
                 long value = last + (long)NumberConverter.ReadSevenBitTerminated(_reader);
-                buffer[count++] = value;
+                buffer[count++] = value << SearchIndexWriter.Shift;
                 last = value;
             }
 

@@ -20,6 +20,7 @@ namespace Bion.Test.Text
             int wordCount = 100;
             int occurrences = 10;
             int indexBufferSize = (requireMerge ? 500 : 1000);
+            int increment = 16;
 
             string path = "SearchIndex.idx";
             using (SearchIndexWriter writer = new SearchIndexWriter(path, 100, indexBufferSize))
@@ -30,7 +31,7 @@ namespace Bion.Test.Text
                     for(int wordIndex = 0; wordIndex < wordCount; ++wordIndex)
                     {
                         writer.Add(wordIndex, position);
-                        position++;
+                        position += increment;
                     }
                 }
             }
@@ -50,7 +51,7 @@ namespace Bion.Test.Text
                     // Verify matches are where expected
                     for(int occurrence = 0; occurrence < occurrences; ++occurrence)
                     {
-                        long expected = wordIndex + (occurrence * wordCount);
+                        long expected = increment * (wordIndex + (occurrence * wordCount));
                         Assert.AreEqual(expected, positions[occurrence]);
                     }
                 }

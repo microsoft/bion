@@ -23,8 +23,9 @@ namespace Bion.Text
 
         public static WordCompressor OpenRead(string dictionaryPath)
         {
+            // NOTE: WordIndex must be read from a 'ReadAll' BufferedReader because it isn't copying the words.
             WordCompressor compressor = new WordCompressor();
-            using (BionReader reader = new BionReader(File.OpenRead(dictionaryPath)))
+            using (BionReader reader = new BionReader(BufferedReader.ReadAll(dictionaryPath)))
             {
                 compressor.Read(reader);
             }
@@ -174,17 +175,21 @@ namespace Bion.Text
     {
         private List<WordEntry> Words;
         private Dictionary<String8, int> Index;
+        private bool Indexed;
 
         public WordIndex()
         {
             this.Words = new List<WordEntry>();
             this.Index = new Dictionary<String8, int>();
+            this.Indexed = true;
         }
 
         public String8 this[ulong index] => Words[(int)index].Value;
 
         public int FindOrAdd(String8 word)
         {
+            if (!this.Indexed) { Reindex(); }
+
             int index;
             if(Index.TryGetValue(word, out index))
             {
@@ -206,11 +211,13 @@ namespace Bion.Text
 
         public bool TryFind(String8 word, out int index)
         {
+            if (!this.Indexed) { Reindex(); }
             return Index.TryGetValue(word, out index);
         }
 
         public int[] Optimize()
         {
+            if (!this.Indexed) { Reindex(); }
             int[] remapping = new int[Words.Count];
 
             // Sort words in descending frequency order
@@ -235,6 +242,8 @@ namespace Bion.Text
         public void Write(BionWriter writer)
         {
             writer.WriteStartArray();
+            writer.WriteValue(Words.Count);
+
             foreach (WordEntry entry in Words)
             {
                 writer.WriteValue(entry.Value);
@@ -245,24 +254,44 @@ namespace Bion.Text
 
         public void Read(BionReader reader)
         {
-            Words.Clear();
-            Index.Clear();
-
             reader.Read(BionToken.StartArray);
+            reader.Read(BionToken.Integer);
+            int wordCount = (int)reader.CurrentInteger();
+
+            Words.Clear();
+            Words.Capacity = wordCount;
+
+            Index.Clear();
+            Indexed = false;
 
             while (true)
             {
                 reader.Read();
                 if (reader.TokenType == BionToken.EndArray) { break; }
 
+                // NOTE: Not copying word. Must use a 'ReadAll' BufferedReader
                 reader.Expect(BionToken.String);
-                String8 value = String8.Copy(reader.CurrentString8());
+                String8 value = reader.CurrentString8();
 
                 reader.Read(BionToken.Integer);
                 int count = (int)reader.CurrentInteger();
-                Index[value] = Words.Count;
+                
+                // Add to List, but not Index. Index will be populated when first needed.
                 Words.Add(new WordEntry(value, count));
             }
+        }
+
+        private void Reindex()
+        {
+            Index.EnsureCapacity(Words.Count);
+
+            for (int i = 0; i < Words.Count; ++i)
+            {
+                WordEntry entry = Words[i];
+                Index[entry.Value] = i;
+            }
+
+            Indexed = true;
         }
     }
 

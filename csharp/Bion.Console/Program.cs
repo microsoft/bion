@@ -305,37 +305,40 @@ namespace Bion.Console
             long[] matchPositions = null;
             int matchCount = -1;
 
-            using (new ConsoleWatch($"Finding '{term}' in '{filePath}'..."))
+            for (int i = 0; i < 20; ++i)
             {
-                WordCompressor compressor = null;
-                SearchIndexReader indexReader = null;
-
-                try
+                using (new ConsoleWatch($"Finding '{term}' in '{filePath}'..."))
                 {
-                    using (new ConsoleWatch("Loading Word Index..."))
-                    {
-                        compressor = WordCompressor.OpenRead(Path.ChangeExtension(filePath, ".dict.bion"));
-                    }
+                    WordCompressor compressor = null;
+                    SearchIndexReader indexReader = null;
 
-                    using (new ConsoleWatch("Loading Search Index..."))
+                    try
                     {
-                        indexReader = new SearchIndexReader(Path.ChangeExtension(filePath, ".idx"));
-                    }
-
-                    using (new ConsoleWatch("Finding Matches..."))
-                    {
-                        byte[] convertBuffer = null;
-                        int wordIndex;
-                        if (compressor.TryGetWordIndex(String8.Copy(term, ref convertBuffer), out wordIndex))
+                        using (new ConsoleWatch("Loading Word Index..."))
                         {
-                            matchCount = indexReader.OffsetsForWord(wordIndex, ref matchPositions);
+                            compressor = WordCompressor.OpenRead(Path.ChangeExtension(filePath, ".dict.bion"));
+                        }
+
+                        using (new ConsoleWatch("Loading Search Index..."))
+                        {
+                            indexReader = new SearchIndexReader(Path.ChangeExtension(filePath, ".idx"));
+                        }
+
+                        using (new ConsoleWatch("Finding Matches..."))
+                        {
+                            byte[] convertBuffer = null;
+                            int wordIndex;
+                            if (compressor.TryGetWordIndex(String8.Copy(term, ref convertBuffer), out wordIndex))
+                            {
+                                matchCount = indexReader.OffsetsForWord(wordIndex, ref matchPositions);
+                            }
                         }
                     }
-                }
-                finally
-                {
-                    compressor?.Dispose();
-                    indexReader?.Dispose();
+                    finally
+                    {
+                        compressor?.Dispose();
+                        indexReader?.Dispose();
+                    }
                 }
             }
 

@@ -116,6 +116,21 @@ namespace Bion.IO
         }
 
         /// <summary>
+        ///  Construct a BufferedReader to read a file in one buffer.
+        /// </summary>
+        /// <param name="filePath">File to Read</param>
+        /// <returns>BufferedReader to read whole file</returns>
+        public static BufferedReader ReadAll(string filePath)
+        {
+            long fileSize = new FileInfo(filePath).Length;
+
+            BufferedReader reader = new BufferedReader(File.OpenRead(filePath), new byte[fileSize + 1]);
+            reader.EnsureSpace((int)(fileSize + 1));
+
+            return reader;
+        }
+
+        /// <summary>
         ///  Repoint a BufferedReader at an array segment.
         ///  Used to read from arrays without constructing BufferedReaders constantly.
         /// </summary>
@@ -150,7 +165,7 @@ namespace Bion.IO
         public int EnsureSpace(int length, int maxReadLength = -1)
         {
             int bytesLeft = (Length - Index);
-            if (bytesLeft >= length) { return bytesLeft; }
+            if (_streamDone || bytesLeft >= length) { return bytesLeft; }
 
             byte[] toFill = Buffer;
 
