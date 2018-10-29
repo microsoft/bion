@@ -9,7 +9,7 @@
 
         String = 0xFA,              // Encoding must equal longest (5b) String
 
-        PropertyName = 0xF6,        // Encoding must equal longest (5b) PropertyName
+        PropertyName = 0xF7,        // Encoding must equal longest (5b) PropertyName
 
         Null = 0xF2,
         True = 0xF1,
@@ -33,14 +33,15 @@
         StringLength5b = 0xFA,
         StringLength2b = 0xF9,
         StringLength1b = 0xF8,
-        StringCompressedTerminated = 0xF7,
-        String = 0xF7,
+        String = 0xF8,
 
-        PropertyNameLength5b = 0xF6,
-        PropertyNameLength2b = 0xF5,
-        PropertyNameLength1b = 0xF4,
+        PropertyNameLength5b = 0xF7,
+        PropertyNameLength2b = 0xF6,
+        PropertyNameLength1b = 0xF5,
+        PropertyName = 0xF5,
+
+        StringCompressedTerminated = 0xF4,
         PropertyNameCompressedTerminated = 0xF3,
-        PropertyName = 0xF3,
 
         Null = 0xF2,
         True = 0xF1,

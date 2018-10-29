@@ -178,7 +178,7 @@ namespace Bion
             else
             {
                 // Write marker for compressed, terminated value
-                Write((byte)((int)markerType - 3));
+                Write((byte)(markerType == BionToken.String ? BionMarker.StringCompressedTerminated : BionMarker.PropertyNameCompressedTerminated));
 
                 // Compress and write value
                 using (BufferedReader reader = BufferedReader.FromString(value))
@@ -214,7 +214,7 @@ namespace Bion
             else
             {
                 // Write marker for compressed, terminated value
-                Write((byte)((int)markerType - 3));
+                Write((byte)(markerType == BionToken.String ? BionMarker.StringCompressedTerminated : BionMarker.PropertyNameCompressedTerminated));
 
                 // Compress and write value
                 using (BufferedReader reader = BufferedReader.FromString(value, ref _stringConvertBuffer))

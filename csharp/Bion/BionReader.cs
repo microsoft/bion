@@ -61,8 +61,10 @@ namespace Bion
 
             Array.Fill(TokenLookup, BionToken.Float, 0xB0, 0xC0 - 0xB0);
             Array.Fill(TokenLookup, BionToken.Integer, 0xC0, 0xF0 - 0xC0);
-            Array.Fill(TokenLookup, BionToken.PropertyName, 0xF3, 4);
-            Array.Fill(TokenLookup, BionToken.String, 0xF7, 4);
+            Array.Fill(TokenLookup, BionToken.PropertyName, 0xF5, 3);
+            Array.Fill(TokenLookup, BionToken.String, 0xF8, 3);
+            TokenLookup[(byte)BionMarker.StringCompressedTerminated] = BionToken.String;
+            TokenLookup[(byte)BionMarker.PropertyNameCompressedTerminated] = BionToken.PropertyName;
         }
 
         public BionReader(Stream stream, WordCompressor compressor = null) : this(new BufferedReader(stream), compressor)

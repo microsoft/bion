@@ -339,7 +339,7 @@ namespace Bion.Console
                             if (compressor.TryGetWordIndex(String8.Copy(term, ref convertBuffer), out wordIndex))
                             {
                                 SearchResult matches = indexReader.Find(wordIndex);
-                                while(!matches.Done)
+                                while (!matches.Done)
                                 {
                                     matchCount += matches.Page(ref matchPositions);
                                 }
@@ -363,6 +363,65 @@ namespace Bion.Console
                 System.Console.WriteLine($"'{term}' found {matchCount:n0} times. First Offset: {matchPositions?[0]:n0}.");
             }
         }
+
+        //private static void SearchReal(string filePath, string propertyName, string term)
+        //{
+        //    byte[] propertyName8 = null, term8 = null;
+        //    SearchReal(filePath, String8.Copy(propertyName, ref propertyName8), String8.Copy(term, ref term8));
+        //}
+
+        //private static void SearchReal(string filePath, String8 propertyName, String8 term)
+        //{
+        //    int matchCount = 0;
+        //    long[] termPositions = new long[256];
+
+        //    WordCompressor compressor = null;
+        //    SearchIndexReader indexReader = null;
+        //    BionReader bionReader = null;
+
+        //    try
+        //    {
+        //        using (new ConsoleWatch("Loading Dictionary, Search Index..."))
+        //        {
+        //            compressor = WordCompressor.OpenRead(Path.ChangeExtension(filePath, ".dict.bion"));
+        //            indexReader = new SearchIndexReader(Path.ChangeExtension(filePath, ".idx"));
+        //            bionReader = new BionReader(File.OpenRead(filePath), compressor);
+        //        }
+
+        //        using (new ConsoleWatch($"Finding \"{propertyName}\":\"{term}\"..."))
+        //        {
+        //            // Look up words
+        //            int propertyNameIndex;
+        //            if (!compressor.TryGetWordIndex(propertyName, out propertyNameIndex))
+        //            {
+        //                System.Console.WriteLine($"\"{propertyName}\" not found.");
+        //            }
+
+        //            int containsWordIndex;
+        //            if (!compressor.TryGetWordIndex(term, out containsWordIndex))
+        //            {
+        //                System.Console.WriteLine($"\"{term}\" not found.");
+        //            }
+
+        //            // Find matches
+        //            SearchResult wordMatches = indexReader.Find(containsWordIndex);
+        //            while (!wordMatches.Done)
+        //            {
+        //                int count = wordMatches.Page(ref termPositions);
+        //                for (int i = 0; i < count; ++i)
+        //                {
+                            
+        //                }
+        //            }
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        compressor?.Dispose();
+        //        indexReader?.Dispose();
+        //        bionReader?.Dispose();
+        //    }
+        //}
 
         private static void Skip(string filePath, string fromDictionaryPath)
         {
