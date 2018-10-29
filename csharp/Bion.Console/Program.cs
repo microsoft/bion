@@ -302,7 +302,7 @@ namespace Bion.Console
 
         private static void Search(string filePath, string term, int iterations = 1)
         {
-            long[] matchPositions = null;
+            long[] matchPositions = new long[256];
             int matchCount = -1;
 
             using (new ConsoleWatch($"Finding '{term}' in '{filePath}' {iterations:n0}x..."))
@@ -332,12 +332,17 @@ namespace Bion.Console
                     {
                         byte[] convertBuffer = null;
                         int wordIndex;
+                        matchCount = 0;
 
                         for (int i = 0; i < iterations; ++i)
                         {
                             if (compressor.TryGetWordIndex(String8.Copy(term, ref convertBuffer), out wordIndex))
                             {
-                                matchCount = indexReader.OffsetsForWord(wordIndex, ref matchPositions);
+                                SearchResult matches = indexReader.Find(wordIndex);
+                                while(!matches.Done)
+                                {
+                                    matchCount += matches.Page(ref matchPositions);
+                                }
                             }
                         }
                     }

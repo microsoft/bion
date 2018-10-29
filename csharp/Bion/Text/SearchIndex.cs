@@ -142,16 +142,20 @@ namespace Bion
                     readers[i] = new SearchIndexReader(Path.Combine(WorkingPath, $"{i}.idx"));
                 }
 
-                long[] positions = null;
+                long[] positions = new long[256];
 
                 for (int wordIndex = 0; wordIndex < WordCount; ++wordIndex)
                 {
                     for (int readerIndex = 0; readerIndex < readers.Length; ++readerIndex)
                     {
-                        int count = readers[readerIndex].OffsetsForWord(wordIndex, ref positions);
-                        for (int i = 0; i < count; ++i)
+                        SearchResult result = readers[readerIndex].Find(wordIndex);
+                        while(!result.Done)
                         {
-                            writer.WritePosition(positions[i]);
+                            int count = result.Page(ref positions);
+                            for (int i = 0; i < count; ++i)
+                            {
+                                writer.WritePosition(positions[i]);
+                            }
                         }
                     }
 
@@ -298,38 +302,15 @@ namespace Bion
         }
 
         /// <summary>
-        ///  Find all of the file offsets for the word with the given index
-        ///  and write them to the provided array. The array will be reallocated
-        ///  if it isn't large enough.
+        ///  Return a SearchResult with all results for the given word index.
         /// </summary>
         /// <param name="wordIndex">Index of word to find matches for</param>
-        /// <param name="buffer">Array to write match positions to</param>
-        /// <returns>Number of matches written to array</returns>
-        public int OffsetsForWord(int wordIndex, ref long[] buffer)
+        /// <returns>SearchResult to read all matches</returns>
+        public SearchResult Find(int wordIndex)
         {
-            // Find start and end of matches
             long startOffset = _firstMatchOffset[wordIndex];
             long endOffset = _firstMatchOffset[wordIndex + 1];
-            int length = (int)(endOffset - startOffset);
-
-            // Ensure buffer definitely long enough
-            if (buffer == null || buffer.Length < length) { buffer = new long[length]; }
-
-            // Read the match bytes
-            _reader.Seek(startOffset, SeekOrigin.Begin);
-            _reader.EnsureSpace(length, length);
-
-            // Decode to non-relative longs
-            int count = 0;
-            long last = 0;
-            while (_reader.BytesRead < endOffset)
-            {
-                long value = last + (long)NumberConverter.ReadSevenBitTerminated(_reader);
-                buffer[count++] = value << SearchIndexWriter.Shift;
-                last = value;
-            }
-
-            return count;
+            return new SearchResult(_reader, startOffset, endOffset);
         }
 
         public void Dispose()
@@ -339,6 +320,49 @@ namespace Bion
                 _reader.Dispose();
                 _reader = null;
             }
+        }
+    }
+
+    public class SearchResult
+    {
+        private BufferedReader Reader;
+
+        private long IndexStartOffset;
+        private long IndexEndOffset;
+
+        private long CurrentOffset;
+        private long LastValue;
+
+        public SearchResult(BufferedReader reader, long startOffset, long endOffset)
+        {
+            Reader = reader;
+            IndexStartOffset = startOffset;
+            IndexEndOffset = endOffset;
+            CurrentOffset = IndexStartOffset;
+        }
+
+        public bool Done => CurrentOffset >= IndexEndOffset;
+
+        public int Page(ref long[] matches)
+        {
+            int lengthLeft = (int)(IndexEndOffset - CurrentOffset);
+            int lengthToGet = Math.Min(lengthLeft, matches.Length * 10);
+
+            // Read the match bytes
+            Reader.Seek(CurrentOffset, SeekOrigin.Begin);
+            Reader.EnsureSpace(lengthToGet, lengthLeft);
+
+            // Decode to non-relative longs
+            int count = 0;
+            while (Reader.BytesRead < IndexEndOffset && count < matches.Length)
+            {
+                long value = LastValue + (long)NumberConverter.ReadSevenBitTerminated(Reader);
+                matches[count++] = value << SearchIndexWriter.Shift;
+                LastValue = value;
+            }
+
+            CurrentOffset = Reader.BytesRead;
+            return count;
         }
     }
 }

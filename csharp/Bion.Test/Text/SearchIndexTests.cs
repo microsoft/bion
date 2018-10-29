@@ -42,8 +42,14 @@ namespace Bion.Test.Text
 
                 for (int wordIndex = 0; wordIndex < wordCount; ++wordIndex)
                 {
+                    int matchCount = 0;
+
                     // Read matches for word
-                    int matchCount = reader.OffsetsForWord(wordIndex, ref positions);
+                    SearchResult result = reader.Find(wordIndex);
+                    while(!result.Done)
+                    {
+                        matchCount += result.Page(ref positions);
+                    }
 
                     // There should be 10 for every word
                     Assert.AreEqual(occurrences, matchCount);
