@@ -1,110 +1,165 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Bion
 {
     public struct IndexEntry
     {
-        public uint ParentIndex;
-        public ulong StartByteOffset;
-        public ulong ByteLength;
-        public object Identifier;
-        public uint Count;
+        public long EndByteOffset;
+        public long ByteLength;
+        public int ParentIndex;
 
-        public void Read(BionReader reader)
+        public long StartByteOffset => EndByteOffset - ByteLength;
+
+        public static IndexEntry Empty = new IndexEntry(-1, 0);
+
+        public IndexEntry(long endByteOffset, long byteLength)
         {
-            reader.Read(BionToken.StartArray);
-
-            reader.Read(BionToken.Integer);
-            this.StartByteOffset = (ulong)reader.CurrentInteger();
-
-            reader.Read(BionToken.Integer);
-            this.ByteLength = (ulong)reader.CurrentInteger();
-
-            reader.Read();
-            if (reader.TokenType == BionToken.String)
-            {
-                this.Identifier = reader.CurrentString();
-            }
-            else if (reader.TokenType == BionToken.Integer)
-            {
-                this.Identifier = (ulong)reader.CurrentInteger();
-            }
-            else
-            {
-                throw new BionSyntaxException(reader, "string or integer");
-            }
-
-            reader.Read(BionToken.Integer);
-            this.Count = (uint)reader.CurrentInteger();
-
-            reader.Read(BionToken.EndArray);
-        }
-
-        public void Write(BionWriter writer)
-        {
-            writer.WriteStartArray();
-            writer.WriteValue(this.StartByteOffset);
-            writer.WriteValue(this.ByteLength);
-
-            string identifier = this.Identifier as string;
-            if (identifier != null)
-            {
-                writer.WriteValue(identifier);
-            }
-            else
-            {
-                writer.WriteValue((ulong)this.Identifier);
-            }
-
-            writer.WriteValue(this.Count);
-            writer.WriteEndArray();
+            this.EndByteOffset = endByteOffset;
+            this.ByteLength = byteLength;
+            this.ParentIndex = -1;
         }
     }
 
-    public class ContainerIndex
+    internal class IndexEntryEndOffsetComparer : IComparer<IndexEntry>
+    {
+        public static IndexEntryEndOffsetComparer Instance = new IndexEntryEndOffsetComparer();
+
+        public int Compare(IndexEntry x, IndexEntry y)
+        {
+            return x.EndByteOffset.CompareTo(y.EndByteOffset);
+        }
+    }
+
+    public class ContainerIndex : IDisposable
     {
         private List<IndexEntry> _index;
+        private Stream _writeToStream;
+        public int Count => _index.Count;
 
-        public ContainerIndex()
+        private ContainerIndex()
         {
             _index = new List<IndexEntry>();
         }
 
-        public void Add(IndexEntry entry)
+        public static ContainerIndex OpenWrite(string indexPath)
         {
-            _index.Add(entry);
+            return new ContainerIndex() { _writeToStream = File.Create(indexPath) };
         }
 
-        // TODO: Skip or Skip helping method.
-        // TODO: Get path by offset and offset for path; or closest BionIndex can get.
-        // Are these implemented in BionReader or here?
+        public static ContainerIndex OpenRead(string indexPath)
+        {
+            ContainerIndex index = new ContainerIndex();
+            index.Read(File.OpenRead(indexPath));
+            return index;
+        }
+
+        public void Add(long startByteOffset, long endByteOffset)
+        {
+            _index.Add(new IndexEntry(endByteOffset, endByteOffset - startByteOffset));
+        }
+
+        public IndexEntry NearestIndexedContainer(long position)
+        {
+            // Find the first container which ends after this position
+            int containerIndex = _index.BinarySearch(new IndexEntry(position, 0), IndexEntryEndOffsetComparer.Instance);
+            if (containerIndex < 0) containerIndex = ~containerIndex;
+
+            return (containerIndex >= _index.Count ? IndexEntry.Empty : _index[containerIndex]);
+        }
+
+        public IndexEntry Parent(IndexEntry entry)
+        {
+            if (entry.ParentIndex < 0 || entry.ParentIndex >= _index.Count) { return IndexEntry.Empty; }
+            return _index[entry.ParentIndex];
+        }
+
+        public void Read(Stream stream)
+        {
+            using (BionReader reader = new BionReader(stream))
+            {
+                Read(reader);
+            }
+        }
 
         public void Read(BionReader reader)
         {
             reader.Read(BionToken.StartArray);
 
-            while(reader.Read())
+            // Read the Container Index
+            long lastEndPosition = 0;
+            while (reader.Read())
             {
-                if (reader.TokenType == BionToken.EndArray) break;
+                if (reader.TokenType == BionToken.EndArray) { break; }
 
-                IndexEntry entry = new IndexEntry();
-                entry.Read(reader);
-                _index.Add(entry);
+                reader.Read(BionToken.Integer);
+                long endPosition = lastEndPosition + reader.CurrentInteger();
+
+                reader.Read(BionToken.Integer);
+                long byteLength = reader.CurrentInteger();
+
+                reader.Read(BionToken.EndArray);
+
+                _index.Add(new IndexEntry(endPosition, byteLength));
+                lastEndPosition = endPosition;
             }
 
-            // TODO: Identify and map parent indices. (Backward walk)
+            // Reconstruct the hierarchy
+            for (int i = _index.Count - 2; i >= 0; --i)
+            {
+                IndexEntry current = _index[i];
+
+                // Find the parent - the first container which starts before this one
+                int parentIndex = i + 1;
+                while (parentIndex != -1)
+                {
+                    if (_index[parentIndex].StartByteOffset < current.StartByteOffset)
+                    {
+                        current.ParentIndex = parentIndex;
+                        _index[i] = current;
+                        break;
+                    }
+
+                    parentIndex = _index[parentIndex].ParentIndex;
+                }
+            }
         }
-        
+
+        public void Write(Stream stream)
+        {
+            using (BionWriter writer = new BionWriter(stream))
+            {
+                Write(writer);
+            }
+        }
+
         public void Write(BionWriter writer)
         {
             writer.WriteStartArray();
 
-            foreach(IndexEntry entry in _index)
+            long lastEndPosition = 0;
+
+            foreach (IndexEntry entry in _index)
             {
-                entry.Write(writer);
+                writer.WriteStartArray();
+                writer.WriteValue(entry.EndByteOffset - lastEndPosition);
+                writer.WriteValue(entry.ByteLength);
+                writer.WriteEndArray();
+
+                lastEndPosition = entry.EndByteOffset;
             }
 
             writer.WriteEndArray();
+        }
+
+        public void Dispose()
+        {
+            if (_writeToStream != null)
+            {
+                Write(_writeToStream);
+                _writeToStream = null;
+            }
         }
     }
 }
