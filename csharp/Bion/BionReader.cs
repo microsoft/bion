@@ -11,6 +11,8 @@ namespace Bion
     {
         private BufferedReader _reader;
         private WordCompressor _compressor;
+        private ContainerIndex _containerIndex;
+
         private BufferedReader _decompressReader;
         private BufferedWriter _decompressWriter;
 
@@ -67,13 +69,14 @@ namespace Bion
             TokenLookup[(byte)BionMarker.PropertyNameCompressedTerminated] = BionToken.PropertyName;
         }
 
-        public BionReader(Stream stream, WordCompressor compressor = null) : this(new BufferedReader(stream), compressor)
+        public BionReader(Stream stream, WordCompressor compressor = null, ContainerIndex containerIndex = null) : this(new BufferedReader(stream), compressor, containerIndex)
         { }
 
-        public BionReader(BufferedReader reader, WordCompressor compressor = null)
+        public BionReader(BufferedReader reader, WordCompressor compressor = null, ContainerIndex containerIndex = null)
         {
             _reader = reader;
             _compressor = compressor;
+            _containerIndex = containerIndex;
         }
 
         public long BytesRead => _reader.BytesRead;
@@ -296,11 +299,13 @@ namespace Bion
             return _currentString;
         }
 
-        public void RewriteOptimized(BufferedWriter writer, string indexPath = null)
+        public void RewriteOptimized(BufferedWriter writer, string containerIndexPath = null, string searchIndexPath = null)
         {
             int[] map = _compressor.OptimizeIndex();
+
             using (BufferedReader inner = BufferedReader.FromArray(_reader.Buffer, 0, 0))
-            using (SearchIndexWriter indexWriter = (indexPath == null ? null : new SearchIndexWriter(indexPath, map.Length, 128 * 1024)))
+            using (ContainerIndex containerIndex = (containerIndexPath == null ? null : ContainerIndex.OpenWrite(containerIndexPath)))
+            using (SearchIndexWriter indexWriter = (searchIndexPath == null ? null : new SearchIndexWriter(searchIndexPath, map.Length, 128 * 1024)))
             {
                 long last = 0;
 
@@ -324,6 +329,18 @@ namespace Bion
                         _compressor.RewriteOptimized(map, inner, writer, indexWriter);
 
                         writer.Buffer[writer.Index++] = (byte)BionMarker.EndValue;
+                    }
+
+                    if ((byte)_currentMarker >= (byte)BionMarker.EndArray)
+                    {
+                        if ((byte)_currentMarker >= (byte)BionMarker.StartArray)
+                        {
+                            containerIndex?.Start(writer.BytesWritten);
+                        }
+                        else
+                        {
+                            containerIndex?.End(writer.BytesWritten);
+                        }
                     }
 
                     last = this.BytesRead;

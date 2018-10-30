@@ -116,7 +116,7 @@ namespace Bion.Text
             return _words.TryFind(word, out index);
         }
 
-        public String8 this[int wordIndex] => _words[wordIndex];
+        public WordEntry this[int wordIndex] => _words[wordIndex];
 
         public void RewriteOptimized(int[] map, BufferedReader reader, BufferedWriter writer, SearchIndexWriter indexWriter = null)
         {
@@ -138,7 +138,7 @@ namespace Bion.Text
                 for (int i = 0; i < count; ++i)
                 {
                     int wordIndex = (int)_block[i];
-                    String8 word = _words[wordIndex];
+                    String8 word = _words[wordIndex].Word;
 
                     writer.EnsureSpace(word.Length);
                     word.CopyTo(writer.Buffer, writer.Index);
@@ -188,7 +188,7 @@ namespace Bion.Text
             this.Indexed = true;
         }
 
-        public String8 this[int index] => Words[index].Value;
+        public WordEntry this[int index] => Words[index];
 
         public int FindOrAdd(String8 word)
         {
@@ -260,14 +260,14 @@ namespace Bion.Text
             // Look up the old index for each word to map to the new index
             for(int i = 0; i < Words.Count; ++i)
             {
-                remapping[Index[Words[i].Value]] = i;
+                remapping[Index[Words[i].Word]] = i;
             }
 
             // Rebuild the index on the new order
             Index.Clear();
             for (int i = 0; i < Words.Count; ++i)
             {
-                Index[Words[i].Value] = i;
+                Index[Words[i].Word] = i;
             }
 
             return remapping;
@@ -280,7 +280,7 @@ namespace Bion.Text
 
             foreach (WordEntry entry in Words)
             {
-                writer.WriteValue(entry.Value);
+                writer.WriteValue(entry.Word);
                 writer.WriteValue(entry.Count);
             }
             writer.WriteEndArray();
@@ -322,7 +322,7 @@ namespace Bion.Text
             for (int i = 0; i < Words.Count; ++i)
             {
                 WordEntry entry = Words[i];
-                Index[entry.Value] = i;
+                Index[entry.Word] = i;
             }
 
             Indexed = true;
@@ -331,18 +331,18 @@ namespace Bion.Text
 
     public struct WordEntry
     {
-        public String8 Value;
+        public String8 Word;
         public int Count;
 
-        public WordEntry(String8 value, int count = 0)
+        public WordEntry(String8 word, int count = 0)
         {
-            this.Value = value;
+            this.Word = word;
             this.Count = count;
         }
 
         public override string ToString()
         {
-            return $"\"{Value}\" ({Count:n0})";
+            return $"\"{Word}\" ({Count:n0})";
         }
     }
 
@@ -352,7 +352,7 @@ namespace Bion.Text
 
         public int Compare(WordEntry left, WordEntry right)
         {
-            return left.Value.CompareTo(right.Value);
+            return left.Word.CompareTo(right.Word);
         }
     }
 }

@@ -15,19 +15,20 @@ namespace Bion.Json
                 string toPath = (compressor == null ? bionPath : Path.ChangeExtension(bionPath, ".preopt.bion"));
 
                 using (JsonTextReader reader = new JsonTextReader(new StreamReader(jsonPath)))
-                using (BionWriter writer = new BionWriter(File.Create(toPath), compressor))
+                using (BionWriter writer = new BionWriter(File.Create(toPath), compressor: compressor))
                 {
                     JsonToBion(reader, writer);
                 }
 
                 if (compressor != null)
                 {
-                    string indexPath = Path.ChangeExtension(bionPath, ".idx");
+                    string containerIndexPath = Path.ChangeExtension(bionPath, ".cdx");
+                    string searchIndexPath = Path.ChangeExtension(bionPath, ".idx");
 
-                    using (BionReader reader = new BionReader(File.OpenRead(toPath), compressor))
+                    using (BionReader reader = new BionReader(File.OpenRead(toPath), compressor: compressor))
                     using (BufferedWriter writer = new BufferedWriter(File.Create(bionPath)))
                     {
-                        reader.RewriteOptimized(writer, indexPath);
+                        reader.RewriteOptimized(writer, containerIndexPath, searchIndexPath);
                     }
 
                     File.Delete(toPath);

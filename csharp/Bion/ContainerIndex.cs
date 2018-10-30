@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Bion
 {
-    public struct IndexEntry
+    public struct ContainerEntry
     {
         public long EndByteOffset;
         public long ByteLength;
@@ -12,21 +12,21 @@ namespace Bion
 
         public long StartByteOffset => EndByteOffset - ByteLength;
 
-        public static IndexEntry Empty = new IndexEntry(-1, 0);
+        public static ContainerEntry Empty = new ContainerEntry(-1, -1);
 
-        public IndexEntry(long endByteOffset, long byteLength)
+        public ContainerEntry(long startByteOffset, long endByteOffset)
         {
             this.EndByteOffset = endByteOffset;
-            this.ByteLength = byteLength;
+            this.ByteLength = endByteOffset - startByteOffset;
             this.ParentIndex = -1;
         }
     }
 
-    internal class IndexEntryEndOffsetComparer : IComparer<IndexEntry>
+    internal class IndexEntryEndOffsetComparer : IComparer<ContainerEntry>
     {
         public static IndexEntryEndOffsetComparer Instance = new IndexEntryEndOffsetComparer();
 
-        public int Compare(IndexEntry x, IndexEntry y)
+        public int Compare(ContainerEntry x, ContainerEntry y)
         {
             return x.EndByteOffset.CompareTo(y.EndByteOffset);
         }
@@ -34,13 +34,19 @@ namespace Bion
 
     public class ContainerIndex : IDisposable
     {
-        private List<IndexEntry> _index;
+        public const int ContainerLengthCutoff = 1024;
+
+        private List<ContainerEntry> _index;
         private Stream _writeToStream;
+        private Stack<long> _currentStack;
+        private long _lastEnd;
+
         public int Count => _index.Count;
 
         private ContainerIndex()
         {
-            _index = new List<IndexEntry>();
+            _index = new List<ContainerEntry>();
+            _currentStack = new Stack<long>();
         }
 
         public static ContainerIndex OpenWrite(string indexPath)
@@ -55,23 +61,34 @@ namespace Bion
             return index;
         }
 
-        public void Add(long startByteOffset, long endByteOffset)
+        public void Start(long containerStartOffset)
         {
-            _index.Add(new IndexEntry(endByteOffset, endByteOffset - startByteOffset));
+            _currentStack.Push(containerStartOffset);
         }
 
-        public IndexEntry NearestIndexedContainer(long position)
+        public void End(long containerEndOffset)
+        {
+            ContainerEntry entry = new ContainerEntry(_currentStack.Pop(), containerEndOffset);
+
+            if (entry.ByteLength >= ContainerLengthCutoff || containerEndOffset - _lastEnd >= ContainerLengthCutoff)
+            {
+                _index.Add(entry);
+                _lastEnd = containerEndOffset;
+            }
+        }
+
+        public ContainerEntry NearestIndexedContainer(long position)
         {
             // Find the first container which ends after this position
-            int containerIndex = _index.BinarySearch(new IndexEntry(position, 0), IndexEntryEndOffsetComparer.Instance);
+            int containerIndex = _index.BinarySearch(new ContainerEntry(position, position), IndexEntryEndOffsetComparer.Instance);
             if (containerIndex < 0) containerIndex = ~containerIndex;
 
-            return (containerIndex >= _index.Count ? IndexEntry.Empty : _index[containerIndex]);
+            return (containerIndex >= _index.Count ? ContainerEntry.Empty : _index[containerIndex]);
         }
 
-        public IndexEntry Parent(IndexEntry entry)
+        public ContainerEntry Parent(ContainerEntry entry)
         {
-            if (entry.ParentIndex < 0 || entry.ParentIndex >= _index.Count) { return IndexEntry.Empty; }
+            if (entry.ParentIndex < 0 || entry.ParentIndex >= _index.Count) { return ContainerEntry.Empty; }
             return _index[entry.ParentIndex];
         }
 
@@ -101,14 +118,14 @@ namespace Bion
 
                 reader.Read(BionToken.EndArray);
 
-                _index.Add(new IndexEntry(endPosition, byteLength));
+                _index.Add(new ContainerEntry(endPosition - byteLength, endPosition));
                 lastEndPosition = endPosition;
             }
 
             // Reconstruct the hierarchy
             for (int i = _index.Count - 2; i >= 0; --i)
             {
-                IndexEntry current = _index[i];
+                ContainerEntry current = _index[i];
 
                 // Find the parent - the first container which starts before this one
                 int parentIndex = i + 1;
@@ -140,7 +157,7 @@ namespace Bion
 
             long lastEndPosition = 0;
 
-            foreach (IndexEntry entry in _index)
+            foreach (ContainerEntry entry in _index)
             {
                 writer.WriteStartArray();
                 writer.WriteValue(entry.EndByteOffset - lastEndPosition);

@@ -12,19 +12,25 @@ namespace Bion.Test
 
             using (ContainerIndex index = ContainerIndex.OpenWrite("Sample.cdx"))
             {
+                // Add three top level containers
+                index.Start(threshold - 3);
+                index.Start(threshold - 2);
+                index.Start(threshold - 1);
+
                 // Add 100 adjacent peers
                 for (int i = 1; i <= 100; ++i)
                 {
                     int start = i * threshold;
-                    index.Add(start, start + threshold - 1);
+                    index.Start(start);
+                    index.End(start + threshold - 1);
                 }
 
                 int end = (101 * threshold) - 1;
 
-                // Add three top level parents
-                index.Add(threshold - 1, end + 1);
-                index.Add(threshold - 2, end + 2);
-                index.Add(threshold - 3, end + 3);
+                // Close the top level parents
+                index.End(end + 1);
+                index.End(end + 2);
+                index.End(end + 3);
             }
 
             using (ContainerIndex index = ContainerIndex.OpenRead("Sample.cdx"))
@@ -44,7 +50,7 @@ namespace Bion.Test
                     Assert.AreEqual(start, index.NearestIndexedContainer(end).StartByteOffset);
 
                     // Verify the correct three parents are returned
-                    IndexEntry entry = index.NearestIndexedContainer(start);
+                    ContainerEntry entry = index.NearestIndexedContainer(start);
 
                     entry = index.Parent(entry);
                     Assert.AreEqual(threshold - 1, entry.StartByteOffset);

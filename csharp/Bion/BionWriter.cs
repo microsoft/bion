@@ -1,7 +1,6 @@
 ﻿using Bion.IO;
 using Bion.Text;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -14,22 +13,21 @@ namespace Bion
         public const int MaxTwoByteLength = 16383;
 
         private BufferedWriter _writer;
-
+        private ContainerIndex _containerIndex;
         private WordCompressor _compressor;
+        
         private byte[] _stringConvertBuffer;
-
-        private Stack<long> _containers;
 
         public long BytesWritten => _writer.BytesWritten;
 
-        public BionWriter(Stream stream, WordCompressor compressor = null) : this(new BufferedWriter(stream), compressor)
+        public BionWriter(Stream stream, ContainerIndex containerIndex = null, WordCompressor compressor = null) : this(new BufferedWriter(stream), containerIndex, compressor)
         { }
 
-        public BionWriter(BufferedWriter writer, WordCompressor compressor = null)
+        public BionWriter(BufferedWriter writer, ContainerIndex containerIndex = null, WordCompressor compressor = null)
         {
             _writer = writer;
+            _containerIndex = containerIndex;
             _compressor = compressor;
-            _containers = new Stack<long>();
         }
 
         public void WriteStartObject()
@@ -248,16 +246,13 @@ namespace Bion
         private void WriteStartContainer(BionMarker container)
         {
             Write(container);
-            _containers.Push(_writer.BytesWritten);
+            _containerIndex?.Start(_writer.BytesWritten);
         }
 
         private void WriteEndContainer(BionMarker container)
         {
             Write(container);
-
-            long end = _writer.BytesWritten;
-            long start = _containers.Pop();
-            long length = _writer.BytesWritten - start - 4;
+            _containerIndex?.End(_writer.BytesWritten);
         }
 
         private void Write(BionMarker marker)
