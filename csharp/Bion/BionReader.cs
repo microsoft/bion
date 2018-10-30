@@ -78,18 +78,20 @@ namespace Bion
 
         public long BytesRead => _reader.BytesRead;
         public BionToken TokenType { get; private set; }
+        public int Depth => _currentDepth;
 
         public bool Read()
         {
+            _reader.EnsureSpace(20);
+
             // Check for end (after reading one thing at the root depth)
-            if (_currentDepth == 0 && BytesRead > 0)
+            if (_reader.EndOfStream)
             {
                 TokenType = BionToken.None;
                 return false;
             }
 
             // Read the marker
-            _reader.EnsureSpace(20);
             byte marker = _reader.Buffer[_reader.Index++];
 
             // Identify the token type and length
@@ -167,6 +169,62 @@ namespace Bion
                 }
 
                 _reader.Index = _reader.Length;
+            }
+        }
+
+        public bool SeekToParent()
+        {
+            _reader.Index--;
+
+            int batchSize = 64 * 1024;
+            int targetDepth = _currentDepth - 1;
+            long end = _reader.BytesRead;
+
+            while(end > 0)
+            {
+                // Look for a StartObject or StartArray
+                for(int i = _reader.Index; i >= 0; --i)
+                {
+                    _currentDepth -= DepthLookup[_reader.Buffer[i]];
+                    if(_currentDepth == targetDepth)
+                    {
+                        _reader.Index = i;
+                        return true;
+                    }
+                }
+
+                // Record target is before this
+                end = _reader.BytesRead - _reader.Index;
+
+                // Read the previous batch of the file
+                int nextSize = (int)Math.Min(end, batchSize);
+                _reader.Seek(end - nextSize, SeekOrigin.Begin);
+                _reader.EnsureSpace(nextSize, nextSize);
+                _reader.Index = _reader.Length - 1;
+            }
+
+            _reader.Index = 0;
+            return false;
+        }
+
+        public void Seek(long position)
+        {
+            // ISSUE: Don't know depth after seek
+            _currentDepth = 0;
+
+            // Move to before the container
+            int marginBefore = (position < 1024 ? (int)position : 1024);
+            long seekTo = position - marginBefore;
+
+            _reader.Seek(seekTo, SeekOrigin.Begin);
+            _reader.EnsureSpace(marginBefore + 4);
+            _reader.Index = marginBefore;
+
+            // Find start of value (0xF3 or 0xF4)
+            for (int i = 0; i < 4; ++i)
+            {
+                if (_reader.Buffer[_reader.Index] > 0xF0) break;
+                _reader.Index++;
             }
         }
 

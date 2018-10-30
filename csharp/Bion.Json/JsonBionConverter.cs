@@ -101,6 +101,7 @@ namespace Bion.Json
         public static void BionToJson(BionReader reader, JsonTextWriter writer)
         {
             long previousPosition = 0;
+            int untilDepth = reader.Depth;
 
             while (reader.Read())
             {
@@ -142,6 +143,7 @@ namespace Bion.Json
                 }
 
                 previousPosition = reader.BytesRead;
+                if (reader.Depth == untilDepth) { break; }
             }
         }
     }

@@ -51,14 +51,68 @@ namespace Bion.Vector
                     uint matchBits = unchecked((uint)Avx2.MoveMask(matchV));
                     if(matchBits != 0)
                     {
-                        // Not Yet Supported [.NET Core 2.1]
-                        //return i + (int)Lzcnt.LeadingZeroCount(matchBits);
-
-                        return IndexOfCs(value, content, i, i + 32);
+                        return i + (int)TrailingZeroCount(matchBits);
                     }
                 }
 
                 return IndexOfCs(value, content, i, endIndex);
+            }
+        }
+
+        public static int GreaterThan(byte cutoff, byte[] content, int index, int endIndex)
+        {
+            if (endIndex - index > 128 && Avx2.IsSupported)
+            {
+                return GreaterThanAvx(cutoff, content, index, endIndex);
+            }
+            else
+            {
+                return GreaterThanCs(cutoff, content, index, endIndex);
+            }
+        }
+
+        private static int GreaterThanCs(byte cutoff, byte[] content, int index, int endIndex)
+        {
+            int i;
+            for (i = index; i < endIndex; ++i)
+            {
+                if (content[i] > cutoff) { return i; }
+            }
+
+            return -1;
+        }
+
+        private static int GreaterThanAvx(byte cutoff, byte[] content, int index, int endIndex)
+        {
+            // Load a vector to convert unsigned to signed value order (only signed compare supported)
+            Vector256<sbyte> toSignedV = SetAllTo(128);
+
+            Vector256<sbyte> toFindV = SetAllTo(cutoff);
+            toFindV = Avx2.Subtract(toFindV, toSignedV);
+
+            fixed (byte* contentPtr = &content[0])
+            {
+                int fullBlockLength = endIndex - 32;
+
+                int i;
+                for (i = index; i < fullBlockLength; i += 32)
+                {
+                    // Load a vector of content
+                    Vector256<sbyte> contentV = Unsafe.ReadUnaligned<Vector256<sbyte>>(&contentPtr[i]);
+                    contentV = Avx2.Subtract(contentV, toSignedV);
+
+                    // Make a mask of matches
+                    Vector256<sbyte> matchV = Avx2.CompareGreaterThan(contentV, toFindV);
+
+                    // Convert to a bit vector
+                    uint matchBits = unchecked((uint)Avx2.MoveMask(matchV));
+                    if (matchBits != 0)
+                    {
+                        return i + (int)TrailingZeroCount(matchBits);
+                    }
+                }
+
+                return GreaterThanCs(cutoff, content, i, endIndex);
             }
         }
 
@@ -156,6 +210,23 @@ namespace Bion.Vector
 
             // Load into a Vector256 and return
             return Unsafe.Read<Vector256<sbyte>>(_loader);
+        }
+
+        private const uint DeBruijnSequence = 0x077CB531U;
+        private static readonly int[] DeBruijnTrailingZeroCount =
+        {
+            0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
+            31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+        };
+
+        private static int TrailingZeroCount(uint bits)
+        {
+            // Should be this, but it's not in the JIT as of .NET Core 2.1
+            //return unchecked((int)Bmi1.TrailingZeroCount(bits));
+
+            // http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup
+            if (bits == 0) return 32;
+            return DeBruijnTrailingZeroCount[(unchecked((uint)((int)bits & -(int)bits)) * DeBruijnSequence) >> 27];
         }
     }
 }

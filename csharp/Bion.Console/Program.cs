@@ -101,6 +101,11 @@ namespace Bion.Console
                         Search(args[1], args[2], (args.Length > 3 ? int.Parse(args[3]) : 1));
                         break;
 
+                    case "searchreal":
+                        if (args.Length < 3) { throw new UsageException("search requires a bion file path and search string."); }
+                        SearchReal(args[1], "snippet", args[2]);
+                        break;
+
                     default:
                         throw new UsageException($"Unknown mode '{mode}'. Run without arguments for usage.");
                 }
@@ -364,64 +369,115 @@ namespace Bion.Console
             }
         }
 
-        //private static void SearchReal(string filePath, string propertyName, string term)
-        //{
-        //    byte[] propertyName8 = null, term8 = null;
-        //    SearchReal(filePath, String8.Copy(propertyName, ref propertyName8), String8.Copy(term, ref term8));
-        //}
+        private static void SearchReal(string filePath, string propertyName, string term)
+        {
+            byte[] propertyName8 = null, term8 = null;
+            SearchReal(filePath, String8.Copy(propertyName, ref propertyName8), String8.Copy(term, ref term8));
+        }
 
-        //private static void SearchReal(string filePath, String8 propertyName, String8 term)
-        //{
-        //    int matchCount = 0;
-        //    long[] termPositions = new long[256];
+        private static void SearchReal(string filePath, String8 propertyName, String8 term)
+        {
+            byte[] resultsB = null;
+            String8 results = String8.Copy("results", ref resultsB);
 
-        //    WordCompressor compressor = null;
-        //    SearchIndexReader indexReader = null;
-        //    BionReader bionReader = null;
+            int matchCount = 0;
+            long[] termPositions = new long[256];
 
-        //    try
-        //    {
-        //        using (new ConsoleWatch("Loading Dictionary, Search Index..."))
-        //        {
-        //            compressor = WordCompressor.OpenRead(Path.ChangeExtension(filePath, ".dict.bion"));
-        //            indexReader = new SearchIndexReader(Path.ChangeExtension(filePath, ".idx"));
-        //            bionReader = new BionReader(File.OpenRead(filePath), compressor);
-        //        }
+            WordCompressor compressor = null;
+            SearchIndexReader indexReader = null;
+            BionReader bionReader = null;
 
-        //        using (new ConsoleWatch($"Finding \"{propertyName}\":\"{term}\"..."))
-        //        {
-        //            // Look up words
-        //            int propertyNameIndex;
-        //            if (!compressor.TryGetWordIndex(propertyName, out propertyNameIndex))
-        //            {
-        //                System.Console.WriteLine($"\"{propertyName}\" not found.");
-        //            }
+            string outputPath = Path.ChangeExtension(filePath, ".search.json");
+            using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(outputPath)))
+            {
+                try
+                {
+                    writer.Formatting = Formatting.Indented;
+                    writer.WriteStartArray();
 
-        //            int containsWordIndex;
-        //            if (!compressor.TryGetWordIndex(term, out containsWordIndex))
-        //            {
-        //                System.Console.WriteLine($"\"{term}\" not found.");
-        //            }
+                    using (new ConsoleWatch("Loading Dictionary, Search Index..."))
+                    {
+                        compressor = WordCompressor.OpenRead(Path.ChangeExtension(filePath, ".dict.bion"));
+                        indexReader = new SearchIndexReader(Path.ChangeExtension(filePath, ".idx"));
+                        bionReader = new BionReader(File.OpenRead(filePath), compressor);
+                    }
 
-        //            // Find matches
-        //            SearchResult wordMatches = indexReader.Find(containsWordIndex);
-        //            while (!wordMatches.Done)
-        //            {
-        //                int count = wordMatches.Page(ref termPositions);
-        //                for (int i = 0; i < count; ++i)
-        //                {
-                            
-        //                }
-        //            }
-        //        }
-        //    }
-        //    finally
-        //    {
-        //        compressor?.Dispose();
-        //        indexReader?.Dispose();
-        //        bionReader?.Dispose();
-        //    }
-        //}
+                    long runResultsStart = 0;
+                    while(bionReader.Read())
+                    {
+                        if(bionReader.TokenType == BionToken.PropertyName && bionReader.CurrentString8().Equals(results))
+                        {
+                            runResultsStart = bionReader.BytesRead;
+                            break;
+                        }
+                    }
+
+                    using (new ConsoleWatch($"Finding \"{propertyName}\":\"{term}\"...",
+                        () => $"Done. Wrote {matchCount:n0} matches to {outputPath}"))
+                    {
+                        // Look up words
+                        int propertyNameIndex;
+                        if (!compressor.TryGetWordIndex(propertyName, out propertyNameIndex))
+                        {
+                            System.Console.WriteLine($"\"{propertyName}\" not found.");
+                        }
+
+                        int containsWordIndex;
+                        if (!compressor.TryGetWordIndex(term, out containsWordIndex))
+                        {
+                            System.Console.WriteLine($"\"{term}\" not found.");
+                        }
+
+                        // Find matches
+                        long lastResultPosition = -1;
+
+                        SearchResult wordMatches = indexReader.Find(containsWordIndex);
+                        while (!wordMatches.Done)
+                        {
+                            int count = wordMatches.Page(ref termPositions);
+                            for (int i = 0; i < count; ++i)
+                            {
+                                // Find the result containing the term
+                                bionReader.Seek(termPositions[i]);
+
+                                // NOTE: Not right. Not finding the right level and not de-duping results properly.
+                                // TODO: Speed up seek if target already in buffer?
+
+                                // Walk up to the containing run
+                                long last = bionReader.BytesRead;
+                                long current = bionReader.BytesRead;
+                                while(current != runResultsStart)
+                                {
+                                    bionReader.SeekToParent();
+                                    last = current;
+                                    current = bionReader.BytesRead;
+                                }
+
+                                if (last != lastResultPosition)
+                                {
+                                    lastResultPosition = last;
+                                    matchCount++;
+
+                                    // Seek to the result
+                                    bionReader.Seek(last);
+
+                                    // Write just this object as JSON
+                                    JsonBionConverter.BionToJson(bionReader, writer);
+                                }
+                            }
+                        }
+
+                        writer.WriteEndArray();
+                    }
+                }
+                finally
+                {
+                    compressor?.Dispose();
+                    indexReader?.Dispose();
+                    bionReader?.Dispose();
+                }
+            }
+        }
 
         private static void Skip(string filePath, string fromDictionaryPath)
         {
