@@ -395,10 +395,10 @@ namespace Bion.Console
             {
                 using (new ConsoleWatch("Loading Dictionary, Search Index..."))
                 {
-                    compressor = WordCompressor.OpenRead(Path.ChangeExtension(filePath, ".dict.bion"));
-                    containerIndex = ContainerIndex.OpenRead(Path.ChangeExtension(filePath, ".cdx"));
-                    searchIndexReader = new SearchIndexReader(Path.ChangeExtension(filePath, ".idx"));
-                    bionReader = new BionReader(File.OpenRead(filePath), containerIndex: containerIndex, compressor: compressor);
+                    compressor = Memory.Log("Dictionary", () => WordCompressor.OpenRead(Path.ChangeExtension(filePath, ".dict.bion")));
+                    containerIndex = Memory.Log("ContainerIndex", () => ContainerIndex.OpenRead(Path.ChangeExtension(filePath, ".cdx")));
+                    searchIndexReader = Memory.Log("SearchIndex", () => new SearchIndexReader(Path.ChangeExtension(filePath, ".idx")));
+                    bionReader = Memory.Log("BionReader", () => new BionReader(File.OpenRead(filePath), containerIndex: containerIndex, compressor: compressor));
                 }
 
                 using (new ConsoleWatch($"Finding \"{propertyName}\":\"{term}\" [{iterations:n0}x]...",

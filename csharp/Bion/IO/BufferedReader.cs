@@ -203,8 +203,16 @@ namespace Bion.IO
 
         public void Seek(long offset, SeekOrigin origin)
         {
-            // Do nothing if already in correct position
-            if (origin == SeekOrigin.Begin && offset == BytesRead) { return; }
+            // Do nothing if desired offset already in buffer
+            if (origin == SeekOrigin.Begin)
+            {
+                long bufferStartOffset = _bytesRead - Length;
+                if (offset >= bufferStartOffset && offset <= _bytesRead)
+                {
+                    Index = (int)(offset - bufferStartOffset);
+                    return;
+                }
+            }
             
             // Seek
             _stream.Seek(offset, origin);
