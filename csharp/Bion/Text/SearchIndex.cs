@@ -323,7 +323,25 @@ namespace Bion
         }
     }
 
-    public class SearchResult
+    public interface ISearchResult
+    {
+        bool Done { get; }
+        int Page(ref long[] matches);
+    }
+
+    public class EmptyResult : ISearchResult
+    {
+        public static EmptyResult Instance = new EmptyResult();
+
+        public bool Done => true;
+
+        public int Page(ref long[] matches)
+        {
+            return 0;
+        }
+    }
+
+    public class SearchResult : ISearchResult
     {
         private BufferedReader Reader;
 

@@ -26,6 +26,16 @@ namespace Bion
             this.ParentIndex = -1;
         }
 
+        public bool IsEmpty()
+        {
+            return this.StartByteOffset == -1;
+        }
+
+        public bool Contains(long position)
+        {
+            return this.EndByteOffset >= position && this.StartByteOffset <= position;
+        }
+
         public bool Equals(ContainerEntry other)
         {
             return this.EndByteOffset == other.EndByteOffset;
@@ -85,7 +95,7 @@ namespace Bion
             int depth = _currentStack.Count;
 
             // Index this container if it's long enough, it's far enough away from the last indexed container, or if we indexed a descendant of it
-            if (entry.ByteLength >= ContainerLengthCutoff 
+            if (entry.ByteLength >= ContainerLengthCutoff
                 || containerEndOffset - _lastIndexedEnd >= ContainerLengthCutoff
                 || _mustIndexDepth == depth)
             {
@@ -107,7 +117,7 @@ namespace Bion
         public ContainerEntry NearestIndexedContainer(long position)
         {
             // We want the first container which ends after the position and starts before it.
-            
+
             // All containers ending before position can't contain it.
             // Find the first container ending after position.
             int indexAfter = IndexOfFirstEndingAfter(position);
@@ -117,7 +127,7 @@ namespace Bion
 
             // Find the first ancestor of the container which starts before position
             ContainerEntry candidate = this[indexAfter];
-            while(candidate.StartByteOffset > position)
+            while (candidate.StartByteOffset > position)
             {
                 candidate = Parent(candidate);
             }
@@ -134,7 +144,7 @@ namespace Bion
 
             // Find the first ancestor of the container which has the desired parent
             ContainerEntry candidate = this[indexBefore];
-            while(candidate.ParentIndex != parent.Index && candidate.ParentIndex >= 0)
+            while (candidate.ParentIndex != parent.Index && candidate.ParentIndex >= 0)
             {
                 candidate = Parent(candidate);
             }
@@ -148,19 +158,28 @@ namespace Bion
             return _index[entry.ParentIndex];
         }
 
-        public ContainerEntry AncestorAtDepth(ContainerEntry entry, int depth)
+        public int Depth(ContainerEntry entry)
         {
-            int depthCounted = 0;
+            int depth = 0;
+
             ContainerEntry ancestor = entry;
-            while(ancestor.Index != -1)
+            while (ancestor.Index != -1)
             {
-                depthCounted++;
+                depth++;
                 ancestor = Parent(ancestor);
             }
 
-            int currentDepth = depthCounted;
-            ancestor = entry;
-            while(currentDepth != depth)
+            return depth;
+        }
+
+        public ContainerEntry AncestorAtDepth(ContainerEntry entry, int depth)
+        {
+            int entryDepth = Depth(entry);
+            if (entryDepth < depth) { return ContainerEntry.Empty; }
+
+            int currentDepth = entryDepth;
+            ContainerEntry ancestor = entry;
+            while (currentDepth != depth)
             {
                 ancestor = Parent(ancestor);
                 currentDepth--;

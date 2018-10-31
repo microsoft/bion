@@ -169,6 +169,7 @@ namespace Bion
                 if (endIndex < _reader.Length)
                 {
                     _reader.Index = endIndex + 1;
+                    _currentDepth = depth;
                     return;
                 }
 
@@ -333,8 +334,6 @@ namespace Bion
 
                     last = this.BytesRead;
                 }
-
-                if (indexWriter != null) { Console.WriteLine($"Index: {indexWriter.WordTotal:n0} total words, {indexWriter.NonDuplicateTotal:n0} non-duplicate."); }
             }
         }
 

@@ -4,6 +4,7 @@ using Bion.Json;
 using Bion.Text;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
@@ -57,14 +58,17 @@ namespace Bion.Console
                             OrDefault(args, 2, ChangePath(fromPath, ".bion", "Out")),
                             (args.Length > 3 ? args[3] : null));
                         break;
+
                     case "tojson":
                         if (args.Length < 3) { throw new UsageException("fromBion requires a bion input file path and a json output file path."); }
                         ToJson(args[1], args[2], (args.Length > 3 ? args[3] : null));
                         break;
+
                     case "nows":
                         if (args.Length < 2) { throw new UsageException("nows requires a json input path."); }
                         NoWhitespace(args[1], OrDefault(args, 2, ChangePath(args[1], ".nows.json")));
                         break;
+
                     case "compress":
                         if (args.Length < 2) { throw new UsageException("compress requires an input path."); }
                         fromPath = args[1];
@@ -72,24 +76,28 @@ namespace Bion.Console
                             OrDefault(args, 2, ChangePath(fromPath, ".cmp", "Out")),
                             OrDefault(args, 3, ChangePath(fromPath, ".dict.cmp", "Out")));
                         break;
+
                     case "expand":
                         if (args.Length < 4) { throw new UsageException("expand requires an input, output, and dictionary path."); }
                         Expand(args[1], args[2], args[3]);
                         break;
+
                     case "read":
                         if (args.Length < 2) { throw new UsageException("count requires an input path."); }
                         Read(args[1], (args.Length > 2 ? args[2] : null));
                         Count(args[1], (args.Length > 2 ? args[2] : null));
                         Skip(args[1], (args.Length > 2 ? args[2] : null));
                         break;
+
                     case "compare":
                         if (args.Length < 3) { throw new UsageException("compare requires expected and actual file paths."); }
                         return Compare(args[1], args[2]);
+
                     case "roundtrip":
                         if (args.Length < 2) { throw new UsageException("roundtrip requires a json input file path and a bion output file path."); }
                         fromPath = args[1];
                         string bionPath = OrDefault(args, 2, ChangePath(fromPath, ".bion", "Out"));
-                        string bionDictPath = OrDefault(args, 3, ChangePath(fromPath, ".dict.bion", "Out"));
+                        string bionDictPath = OrDefault(args, 3, ChangePath(fromPath, ".wdx", "Out"));
                         string comparePath = OrDefault(args, 4, ChangePath(fromPath, ".compare.json", "Out"));
 
                         ToBion(fromPath, bionPath, bionDictPath);
@@ -98,12 +106,17 @@ namespace Bion.Console
 
                     case "search":
                         if (args.Length < 3) { throw new UsageException("search requires a bion file path and search string."); }
-                        Search(args[1], args[2], (args.Length > 3 ? int.Parse(args[3]) : 1));
+                        Search(args[1], args[2]);
                         break;
 
-                    case "searchreal":
-                        if (args.Length < 3) { throw new UsageException("search requires a bion file path and search string."); }
-                        SearchReal(args[1], "snippet", args[2]);
+                    case "index":
+                        if (args.Length < 3) { throw new UsageException("index requires an input root path and output root path."); }
+                        Index(args[1], args[2]);
+                        break;
+
+                    case "searchall":
+                        if (args.Length < 2) { throw new UsageException("searchAll requires a bion root path."); }
+                        SearchAll(args[1]);
                         break;
 
                     default:
@@ -132,6 +145,26 @@ namespace Bion.Console
                 () => $"Done. {FileLength.MB(jsonPath)} JSON to {FileLength.MB(bionPath)} BION{(String.IsNullOrEmpty(dictionaryPath) ? "" : $" + {FileLength.MB(dictionaryPath)} dictionary")} ({FileLength.Percentage(jsonPath, bionPath, dictionaryPath)})"))
             {
                 JsonBionConverter.JsonToBion(jsonPath, bionPath, dictionaryPath);
+            }
+        }
+
+        private static void Index(string jsonRootPath, string bionRootPath)
+        {
+            using (new ConsoleWatch($"Converting under \"{jsonRootPath}\" to \"{bionRootPath}\"..."))
+            {
+                jsonRootPath = Path.GetFullPath(jsonRootPath);
+
+                foreach (string jsonFilePath in Directory.EnumerateFiles(jsonRootPath, "*.*", SearchOption.AllDirectories))
+                {
+                    string jsonFilePathUnderRoot = jsonFilePath.Substring(jsonRootPath.Length + 1);
+                    string outputPath = Path.ChangeExtension(Path.Combine(bionRootPath, jsonFilePathUnderRoot), ".bion");
+                    if (!File.Exists(outputPath))
+                    {
+                        System.Console.WriteLine($"  {jsonFilePathUnderRoot}");
+                        Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+                        JsonBionConverter.JsonToBion(jsonFilePath, outputPath, Path.ChangeExtension(outputPath, ".wdx"));
+                    }
+                }
             }
         }
 
@@ -305,200 +338,6 @@ namespace Bion.Console
             }
         }
 
-        private static void Search(string filePath, string term, int iterations = 1)
-        {
-            long[] matchPositions = new long[256];
-            int matchCount = -1;
-
-            using (new ConsoleWatch($"Finding '{term}' in '{filePath}' {iterations:n0}x..."))
-            {
-                WordCompressor compressor = null;
-                SearchIndexReader indexReader = null;
-
-                try
-                {
-                    using (new ConsoleWatch("Loading Word Index..."))
-                    {
-                        for (int i = 0; i < iterations; ++i)
-                        {
-                            compressor = WordCompressor.OpenRead(Path.ChangeExtension(filePath, ".dict.bion"));
-                        }
-                    }
-
-                    using (new ConsoleWatch("Loading Search Index..."))
-                    {
-                        for (int i = 0; i < iterations; ++i)
-                        {
-                            indexReader = new SearchIndexReader(Path.ChangeExtension(filePath, ".idx"));
-                        }
-                    }
-
-                    using (new ConsoleWatch("Finding Matches..."))
-                    {
-                        byte[] convertBuffer = null;
-                        int wordIndex;
-                        matchCount = 0;
-
-                        for (int i = 0; i < iterations; ++i)
-                        {
-                            if (compressor.TryGetWordIndex(String8.Copy(term, ref convertBuffer), out wordIndex))
-                            {
-                                SearchResult matches = indexReader.Find(wordIndex);
-                                while (!matches.Done)
-                                {
-                                    matchCount += matches.Page(ref matchPositions);
-                                }
-                            }
-                        }
-                    }
-                }
-                finally
-                {
-                    compressor?.Dispose();
-                    indexReader?.Dispose();
-                }
-            }
-
-            if (matchCount == -1)
-            {
-                System.Console.WriteLine($"'{term}' not found.");
-            }
-            else
-            {
-                System.Console.WriteLine($"'{term}' found {matchCount:n0} times. First Offset: {matchPositions?[0]:n0}.");
-            }
-        }
-
-        private static void SearchReal(string filePath, string propertyName, string term)
-        {
-            byte[] propertyName8 = null, term8 = null;
-            SearchReal(filePath, String8.Copy(propertyName, ref propertyName8), String8.Copy(term, ref term8));
-        }
-
-        private static void SearchReal(string filePath, String8 propertyName, String8 term)
-        {
-            int iterations = 100;
-
-            int matchCount = 0;
-            long[] termPositions = new long[256];
-
-            WordCompressor compressor = null;
-            SearchIndexReader searchIndexReader = null;
-            ContainerIndex containerIndex = null;
-            BionReader bionReader = null;
-
-            ContainerEntry lastRunResults = ContainerEntry.Empty;
-
-            string outputPath = Path.ChangeExtension(filePath, ".search.json");
-
-            try
-            {
-                using (new ConsoleWatch("Loading Dictionary, Search Index..."))
-                {
-                    compressor = Memory.Log("Dictionary", () => WordCompressor.OpenRead(Path.ChangeExtension(filePath, ".dict.bion")));
-                    containerIndex = Memory.Log("ContainerIndex", () => ContainerIndex.OpenRead(Path.ChangeExtension(filePath, ".cdx")));
-                    searchIndexReader = Memory.Log("SearchIndex", () => new SearchIndexReader(Path.ChangeExtension(filePath, ".idx")));
-                    bionReader = Memory.Log("BionReader", () => new BionReader(File.OpenRead(filePath), containerIndex: containerIndex, compressor: compressor));
-                }
-
-                using (new ConsoleWatch($"Finding \"{propertyName}\":\"{term}\" [{iterations:n0}x]...",
-                        () => $"Done. Wrote {matchCount:n0} matches to {outputPath}"))
-                {
-                    for (int iteration = 0; iteration < iterations; ++iteration)
-                    {
-                        matchCount = 0;
-
-                        using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(outputPath)))
-                        {
-                            writer.Formatting = Formatting.Indented;
-                            writer.WriteStartArray();
-
-                            // Look up words
-                            int propertyNameIndex;
-                            if (!compressor.TryGetWordIndex(propertyName, out propertyNameIndex))
-                            {
-                                System.Console.WriteLine($"\"{propertyName}\" not found.");
-                            }
-
-                            int containsWordIndex;
-                            if (!compressor.TryGetWordIndex(term, out containsWordIndex))
-                            {
-                                System.Console.WriteLine($"\"{term}\" not found.");
-                            }
-
-                            // Find matches
-                            long lastResultPosition = -1;
-
-                            SearchResult wordMatches = searchIndexReader.Find(containsWordIndex);
-                            while (!wordMatches.Done)
-                            {
-                                int count = wordMatches.Page(ref termPositions);
-                                for (int i = 0; i < count; ++i)
-                                {
-                                    long position = termPositions[i];
-
-                                    ContainerEntry nearest = containerIndex.NearestIndexedContainer(position);
-                                    ContainerEntry runResultsArray = containerIndex.AncestorAtDepth(nearest, 4);
-                                    if (!runResultsArray.Equals(lastRunResults))
-                                    {
-                                        // TODO: Write run
-                                        lastRunResults = runResultsArray;
-                                    }
-
-                                    // If a container under the results array was found, we have the result
-                                    if (!nearest.Equals(runResultsArray))
-                                    {
-                                        ContainerEntry result = containerIndex.AncestorAtDepth(nearest, 5);
-
-                                        if (result.StartByteOffset != lastResultPosition)
-                                        {
-                                            matchCount++;
-                                            lastResultPosition = result.StartByteOffset;
-                                            bionReader.Seek(result.StartByteOffset);
-                                            JsonBionConverter.BionToJson(bionReader, writer);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // If not, seek to the last result before the desired position
-                                        ContainerEntry closest = containerIndex.LastChildBefore(runResultsArray, position);
-                                        bionReader.Seek(closest.EndByteOffset);
-
-                                        // Skip results until we read the desired one
-                                        long resultPosition = bionReader.BytesRead;
-                                        long nextPosition = resultPosition;
-
-                                        while (nextPosition < position)
-                                        {
-                                            bionReader.Skip();
-                                            resultPosition = nextPosition;
-                                            nextPosition = bionReader.BytesRead;
-                                        }
-
-                                        if (resultPosition != lastResultPosition)
-                                        {
-                                            matchCount++;
-                                            lastResultPosition = resultPosition;
-                                            bionReader.Seek(resultPosition);
-                                            JsonBionConverter.BionToJson(bionReader, writer);
-                                        }
-                                    }
-                                }
-                            }
-
-                            writer.WriteEndArray();
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                compressor?.Dispose();
-                searchIndexReader?.Dispose();
-                bionReader?.Dispose();
-            }
-        }
-
         private static void Skip(string filePath, string fromDictionaryPath)
         {
             VerifyFileExists(filePath);
@@ -521,6 +360,118 @@ namespace Bion.Console
                         reader.Read();
                         reader.Skip();
                     }
+                }
+            }
+        }
+
+        private static void Search(string filePath, string term)
+        {
+            byte[] term8 = null;
+            Search(filePath, String8.Copy(term, ref term8));
+        }
+
+        private static void Search(string filePath, String8 term)
+        {
+            int iterations = 100;
+            int matchCount = 0;
+
+            string outputPath = Path.ChangeExtension(filePath, ".search.json");
+            BionSearcher searcher = null;
+            try
+            {
+                using (new ConsoleWatch($"Loading {filePath}..."))
+                {
+                    searcher = new BionSearcher(filePath, 3);
+                }
+
+                using (new ConsoleWatch($"Finding \"{term}\" [{iterations:n0}x]...",
+                        () => $"Done. Wrote {matchCount:n0} matches to {outputPath}"))
+                {
+                    for (int iteration = 0; iteration < iterations; ++iteration)
+                    {
+                        ISearchResult result = searcher.Find(term);
+                        using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(outputPath)))
+                        {
+                            writer.Formatting = Formatting.Indented;
+                            writer.WriteStartArray();
+
+                            matchCount = searcher.Write(writer, result, 0, -1);
+
+                            writer.WriteEndArray();
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                searcher?.Dispose();
+            }
+        }
+
+        private static void SearchAll(string bionRootPath)
+        {
+            List<BionSearcher> searchers = new List<BionSearcher>();
+            try
+            {
+                using (new ConsoleWatch($"Loading Indices under {bionRootPath}...",
+                    () => $"Done; {searchers.Count:n0} loaded."))
+                {
+                    foreach (string bionFilePath in Directory.GetFiles(bionRootPath, "*.bion", SearchOption.AllDirectories))
+                    {
+                        BionSearcher searcher = new BionSearcher(bionFilePath, 4);
+
+                        lock (searchers)
+                        {
+                            searchers.Add(searcher);
+                        }
+                    }
+                }
+
+                int searchCount = 0;
+                int resultLimit = 100;
+                string outputRoot = "SearchOut";
+                byte[] buffer = null;
+
+                string outputPath = null;
+                int matchCount = 0;
+
+                Directory.CreateDirectory(outputRoot);
+
+                while (true)
+                {
+                    System.Console.Write("> ");
+                    string query = System.Console.ReadLine().Trim();
+                    if (String.IsNullOrEmpty(query)) break;
+
+                    String8 term = String8.Copy(query, ref buffer);
+
+                    matchCount = 0;
+                    searchCount++;
+                    outputPath = Path.Combine(outputRoot, $"Results.{searchCount}.json");
+
+                    using (new ConsoleWatch("", () => $"Done. {matchCount:n0} matches to {outputPath}"))
+                    {
+                        using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(outputPath)))
+                        {
+                            writer.Formatting = Formatting.Indented;
+                            writer.WriteStartArray();
+
+                            for (int i = 0; i < searchers.Count; ++i)
+                            {
+                                ISearchResult result = searchers[i].Find(term);
+                                matchCount += searchers[i].Write(writer, result, 0, resultLimit - matchCount);
+
+                                if (matchCount >= resultLimit) break;
+                            }
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                foreach(BionSearcher searcher in searchers)
+                {
+                    searcher.Dispose();
                 }
             }
         }
