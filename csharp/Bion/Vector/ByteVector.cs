@@ -185,8 +185,8 @@ namespace Bion.Vector
                     if(depth - endCount <= 0)
                     {
                         // If there are enough end containers here to reach the root, we have to check the order
-                        int inner = SkipCs(content, index, index + 32, ref depth);
-                        if (index < index + 32) return inner;
+                        int inner = SkipCs(content, i, i + 32, ref depth);
+                        if (inner < i + 32) return inner;
                     }
                     else
                     {

@@ -91,7 +91,7 @@ namespace Bion.Json
         public static void BionToJson(string bionPath, string jsonPath, string fromDictionaryPath = null)
         {
             using (WordCompressor compressor = (String.IsNullOrEmpty(fromDictionaryPath) ? null : WordCompressor.OpenRead(fromDictionaryPath)))
-            using (BionReader reader = new BionReader(File.OpenRead(bionPath), compressor))
+            using (BionReader reader = new BionReader(File.OpenRead(bionPath), compressor:compressor))
             using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(jsonPath)))
             {
                 writer.Formatting = Formatting.Indented;

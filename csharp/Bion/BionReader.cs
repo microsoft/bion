@@ -69,10 +69,10 @@ namespace Bion
             TokenLookup[(byte)BionMarker.PropertyNameCompressedTerminated] = BionToken.PropertyName;
         }
 
-        public BionReader(Stream stream, WordCompressor compressor = null, ContainerIndex containerIndex = null) : this(new BufferedReader(stream), compressor, containerIndex)
+        public BionReader(Stream stream, ContainerIndex containerIndex = null, WordCompressor compressor = null) : this(new BufferedReader(stream), containerIndex, compressor)
         { }
 
-        public BionReader(BufferedReader reader, WordCompressor compressor = null, ContainerIndex containerIndex = null)
+        public BionReader(BufferedReader reader, ContainerIndex containerIndex = null, WordCompressor compressor = null)
         {
             _reader = reader;
             _compressor = compressor;
@@ -132,6 +132,7 @@ namespace Bion
                 _currentDepth += DepthLookup[marker];
             }
 
+            if (TokenType == BionToken.None) { throw new BionSyntaxException($"Invalid Bion Token 0x{_currentMarker:x2} @{BytesRead:n0}."); }
             return true;
         }
 
@@ -162,7 +163,7 @@ namespace Bion
             int innerDepth = 1;
             while (!_reader.EndOfStream)
             {
-                _reader.EnsureSpace(128 * 1024);
+                _reader.EnsureSpace(16 * 1024);
                 int endIndex = ByteVector.Skip(_reader.Buffer, _reader.Index, _reader.Length, ref innerDepth);
 
                 if (endIndex < _reader.Length)
@@ -215,20 +216,7 @@ namespace Bion
             // ISSUE: Don't know depth after seek
             _currentDepth = 0;
 
-            // Move to before the container
-            int marginBefore = (position < 1024 ? (int)position : 1024);
-            long seekTo = position - marginBefore;
-
-            _reader.Seek(seekTo, SeekOrigin.Begin);
-            _reader.EnsureSpace(marginBefore + 4);
-            _reader.Index = marginBefore;
-
-            // Find start of value (0xF3 or 0xF4)
-            for (int i = 0; i < 4; ++i)
-            {
-                if (_reader.Buffer[_reader.Index] > 0xF0) break;
-                _reader.Index++;
-            }
+            _reader.Seek(position, SeekOrigin.Begin);
         }
 
         public bool CurrentBool()
@@ -335,7 +323,7 @@ namespace Bion
                     {
                         if ((byte)_currentMarker >= (byte)BionMarker.StartArray)
                         {
-                            containerIndex?.Start(writer.BytesWritten);
+                            containerIndex?.Start(writer.BytesWritten - 1);
                         }
                         else
                         {

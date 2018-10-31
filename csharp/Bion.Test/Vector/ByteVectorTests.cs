@@ -46,6 +46,10 @@ namespace Bion.Test.Vector
             byte[] sample = Enumerable.Repeat((byte)0, 255).ToArray();
             sample[0] = (byte)BionToken.StartArray;
             sample[1] = (byte)BionToken.StartObject;
+
+            sample[10] = (byte)BionToken.StartArray;
+            sample[11] = (byte)BionToken.EndArray;
+
             sample[250] = (byte)BionToken.EndObject;
             sample[251] = (byte)BionToken.EndArray;
 

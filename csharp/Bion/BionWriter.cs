@@ -245,13 +245,17 @@ namespace Bion
 
         private void WriteStartContainer(BionMarker container)
         {
-            Write(container);
+            // Start Index is bytes written *before* start marker, so seek will find the start marker
             _containerIndex?.Start(_writer.BytesWritten);
+
+            Write(container);
         }
 
         private void WriteEndContainer(BionMarker container)
         {
             Write(container);
+
+            // End Index is bytes written *after* end marker, so seek will find the next thing
             _containerIndex?.End(_writer.BytesWritten);
         }
 

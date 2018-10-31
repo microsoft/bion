@@ -1,4 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Bion.Json;
+using Bion.Text;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO;
 
 namespace Bion.Test
 {
@@ -66,5 +69,46 @@ namespace Bion.Test
                 }
             }
         }
+
+        [TestMethod]
+        public void ContainerIndex_EndToEnd()
+        {
+            string jsonFilePath = @"Content\Medium.json";
+            string bionFilePath = Path.ChangeExtension(jsonFilePath, ".bion");
+            string dictionaryPath = Path.ChangeExtension(bionFilePath, "dict.bion");
+            string comparePath = Path.ChangeExtension(jsonFilePath, "compare.json");
+            JsonBionConverter.JsonToBion(jsonFilePath, bionFilePath, dictionaryPath);
+
+            using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
+            using (ContainerIndex cIndex = ContainerIndex.OpenRead(Path.ChangeExtension(bionFilePath, ".cdx")))
+            using (BionReader reader = new BionReader(File.OpenRead(bionFilePath), cIndex, compressor))
+            {
+                for(int i = 0; i < cIndex.Count; ++i)
+                {
+                    ContainerEntry container = cIndex[i];
+                    
+                    // Seek to container start
+                    reader.Seek(container.StartByteOffset);
+
+                    // Verify a container start is there
+                    int depth = reader.Depth;
+                    reader.Read();
+
+                    bool isObject = (reader.TokenType == BionToken.StartObject);
+                    Assert.AreEqual((isObject ? BionToken.StartObject : BionToken.StartArray), reader.TokenType);
+
+                    // Read until the depth is back to the same value
+                    while(reader.Depth != depth)
+                    {
+                        reader.Read();
+                    }
+
+                    // Verify this is the end container position
+                    Assert.AreEqual((isObject ? BionToken.EndObject : BionToken.EndArray), reader.TokenType);
+                    Assert.AreEqual(container.EndByteOffset, reader.BytesRead);
+                }
+            }
+        }
+
     }
 }
