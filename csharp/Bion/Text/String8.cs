@@ -22,6 +22,12 @@ namespace Bion.Text
             Length = length;
         }
 
+        public static String8 CopyExpensive(string value)
+        {
+            byte[] singleUse = null;
+            return Copy(value, ref singleUse);
+        }
+
         public static String8 Copy(string value, ref byte[] convertBuffer)
         {
             // Start with maximum possible needed byte length

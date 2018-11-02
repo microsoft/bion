@@ -4,54 +4,32 @@ using System.IO;
 
 namespace Bion
 {
-    public struct ContainerEntry : IEquatable<ContainerEntry>
-    {
-        public long EndByteOffset;
-        public long ByteLength;
-        public int Index;
-        public int ParentIndex;
-
-        public long StartByteOffset => EndByteOffset - ByteLength;
-
-        public static ContainerEntry Empty = new ContainerEntry(-1);
-
-        public ContainerEntry(long position) : this(position, position, -1)
-        { }
-
-        public ContainerEntry(long startByteOffset, long endByteOffset, int index)
-        {
-            this.EndByteOffset = endByteOffset;
-            this.ByteLength = endByteOffset - startByteOffset;
-            this.Index = index;
-            this.ParentIndex = -1;
-        }
-
-        public bool IsEmpty()
-        {
-            return this.StartByteOffset == -1;
-        }
-
-        public bool Contains(long position)
-        {
-            return this.EndByteOffset >= position && this.StartByteOffset <= position;
-        }
-
-        public bool Equals(ContainerEntry other)
-        {
-            return this.EndByteOffset == other.EndByteOffset;
-        }
-    }
-
-    internal class IndexEntryEndOffsetComparer : IComparer<ContainerEntry>
-    {
-        public static IndexEntryEndOffsetComparer Instance = new IndexEntryEndOffsetComparer();
-
-        public int Compare(ContainerEntry x, ContainerEntry y)
-        {
-            return x.EndByteOffset.CompareTo(y.EndByteOffset);
-        }
-    }
-
+    /// <summary>
+    ///  ContainerIndex is a partial set of the containers in a document, sorted by the end position of the containers.
+    /// </summary>
+    /// <remarks>
+    ///  ContainerIndex includes:
+    ///    - All containers longer than the length cutoff
+    ///    - Each container which ends farther than the cutoff after the previous indexed container
+    ///    - All ancestors of indexed containers.
+    ///  
+    ///  This causes it to include roughly one container per cutoff, so that depth in the document
+    ///  and ancestor hierarchy can be determined for any position by scanning at most cutoff bytes
+    ///  away.
+    ///  
+    ///  This means the overall size is usually the size of each container (roughly 10b) per cutoff (2KB).
+    ///  If the document is deeply nested, many more containers may be included as ancestors of the "one per cutoff".
+    ///  
+    ///  It's hard to reason about containers found in the index.
+    ///  
+    ///  For a document position, we find the first container which ends at or after the position.
+    ///   All previous containers end before the position, so they could not include it.
+    ///   If the first container ending after the position starts:
+    ///    - Before position, it's always the deepest container including the position (because ancestors of this container end later).
+    ///    - After position, then the first ancestor which includes the position is the deepest container including position.
+    /// 
+    ///  Depth can be determined for containers by walking up the parent hierarchy, because all ancestors of indexed containers must be included.
+    /// </remarks>
     public class ContainerIndex : IDisposable
     {
         public const int ContainerLengthCutoff = 2048;
@@ -114,6 +92,13 @@ namespace Bion
             return containerIndex;
         }
 
+        public ContainerEntry FirstEndingAfter(long position)
+        {
+            int indexAfter = IndexOfFirstEndingAfter(position);
+            if (indexAfter >= _index.Count) { return ContainerEntry.Empty; }
+            return this[indexAfter];
+        }
+
         public ContainerEntry NearestIndexedContainer(long position)
         {
             // We want the first container which ends after the position and starts before it.
@@ -133,22 +118,6 @@ namespace Bion
             }
 
             // Since all ancestors of indexed containers are indexed, this must be the closest indexed ancestor.
-            return candidate;
-        }
-
-        public ContainerEntry LastChildBefore(ContainerEntry parent, long position)
-        {
-            // Find the container before the first one ending after position.
-            int indexBefore = IndexOfFirstEndingAfter(position) - 1;
-            if (indexBefore <= 0) return ContainerEntry.Empty;
-
-            // Find the first ancestor of the container which has the desired parent
-            ContainerEntry candidate = this[indexBefore];
-            while (candidate.ParentIndex != parent.Index && candidate.ParentIndex >= 0)
-            {
-                candidate = Parent(candidate);
-            }
-
             return candidate;
         }
 
@@ -205,15 +174,11 @@ namespace Bion
             long lastEndPosition = 0;
             while (reader.Read())
             {
-                if (reader.TokenType == BionToken.EndArray) { break; }
-
-                reader.Read(BionToken.Integer);
+                if (reader.TokenType != BionToken.Integer) { break; }
                 long endPosition = lastEndPosition + reader.CurrentInteger();
 
                 reader.Read(BionToken.Integer);
                 long byteLength = reader.CurrentInteger();
-
-                reader.Read(BionToken.EndArray);
 
                 _index.Add(new ContainerEntry(endPosition - byteLength, endPosition, _index.Count));
                 lastEndPosition = endPosition;
@@ -256,10 +221,8 @@ namespace Bion
 
             foreach (ContainerEntry entry in _index)
             {
-                writer.WriteStartArray();
                 writer.WriteValue(entry.EndByteOffset - lastEndPosition);
                 writer.WriteValue(entry.ByteLength);
-                writer.WriteEndArray();
 
                 lastEndPosition = entry.EndByteOffset;
             }
@@ -274,6 +237,54 @@ namespace Bion
                 Write(_writeToStream);
                 _writeToStream = null;
             }
+        }
+    }
+
+    public struct ContainerEntry : IEquatable<ContainerEntry>
+    {
+        public long EndByteOffset;
+        public long ByteLength;
+        public int Index;
+        public int ParentIndex;
+
+        public long StartByteOffset => EndByteOffset - ByteLength;
+
+        public static ContainerEntry Empty = new ContainerEntry(-1);
+
+        public ContainerEntry(long position) : this(position, position, -1)
+        { }
+
+        public ContainerEntry(long startByteOffset, long endByteOffset, int index)
+        {
+            this.EndByteOffset = endByteOffset;
+            this.ByteLength = endByteOffset - startByteOffset;
+            this.Index = index;
+            this.ParentIndex = -1;
+        }
+
+        public bool IsEmpty()
+        {
+            return this.StartByteOffset == -1;
+        }
+
+        public bool Contains(long position)
+        {
+            return this.EndByteOffset >= position && this.StartByteOffset <= position;
+        }
+
+        public bool Equals(ContainerEntry other)
+        {
+            return this.EndByteOffset == other.EndByteOffset;
+        }
+    }
+
+    internal class IndexEntryEndOffsetComparer : IComparer<ContainerEntry>
+    {
+        public static IndexEntryEndOffsetComparer Instance = new IndexEntryEndOffsetComparer();
+
+        public int Compare(ContainerEntry x, ContainerEntry y)
+        {
+            return x.EndByteOffset.CompareTo(y.EndByteOffset);
         }
     }
 }

@@ -372,7 +372,7 @@ namespace Bion.Console
 
         private static void Search(string filePath, String8 term)
         {
-            int iterations = 100;
+            int iterations = 1;
             int matchCount = 0;
 
             string outputPath = Path.ChangeExtension(filePath, ".search.json");

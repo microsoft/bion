@@ -150,7 +150,20 @@ namespace Bion
 
         public void Skip()
         {
+            // If this container is indexed, skip by seeking
+            if(_containerIndex != null)
+            {
+                ContainerEntry entry = _containerIndex.NearestIndexedContainer(BytesRead);
+
+                if (entry.StartByteOffset == BytesRead)
+                {
+                    _reader.Seek(entry.EndByteOffset, SeekOrigin.Begin);
+                    return;
+                }
+            }
+
             // Record depth
+            long start = BytesRead;
             int depth = _currentDepth;
 
             // Read one token
@@ -159,7 +172,15 @@ namespace Bion
             // If it wasn't a container, we're done
             if (depth == _currentDepth) return;
 
-            // Otherwise, find the matching end container
+            SkipRest();
+            long lengthSkipped = BytesRead - start;
+        }
+
+        public void SkipRest()
+        {
+            int depth = _currentDepth;
+
+            // Find the closing container for the container we're in
             int innerDepth = 1;
             while (!_reader.EndOfStream)
             {
@@ -169,7 +190,7 @@ namespace Bion
                 if (endIndex < _reader.Length)
                 {
                     _reader.Index = endIndex + 1;
-                    _currentDepth = depth;
+                    _currentDepth = depth - 1;
                     return;
                 }
 

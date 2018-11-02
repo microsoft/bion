@@ -22,7 +22,7 @@ namespace Json.Consolidate
         public string OutputDirectory;
         public const long TargetSizeBytes = 512 * 1024 * 1024;   // 512 MB
 
-        private int _countForDay;
+        private int _countForSet;
         private string _outputPath;
         private StreamWriter _sWriter;
         private JsonTextWriter _writer;
@@ -38,25 +38,28 @@ namespace Json.Consolidate
 
         public void Consolidate()
         {
+            Console.WriteLine($"Consolidating in \"{SourceDirectory}\" into \"{OutputDirectory}\"...");
+
             // For each day in the source directory tree, ...
             foreach (string yearFolder in Directory.GetDirectories(SourceDirectory))
             {
                 foreach (string monthFolder in Directory.GetDirectories(yearFolder))
                 {
-                    foreach (string dayFolder in Directory.GetDirectories(monthFolder))
+                    //foreach (string dayFolder in Directory.GetDirectories(monthFolder))
                     {
-                        string outputDay = Path.Combine(OutputDirectory, Path.GetFileName(yearFolder), Path.GetFileName(monthFolder), Path.GetFileName(dayFolder));
+                        string inputFolder = monthFolder; //dayFolder;
+                        string outputFolder = Path.Combine(OutputDirectory, Path.GetFileName(yearFolder), Path.GetFileName(monthFolder));//, Path.GetFileName(dayFolder));
 
                         // If the output was already written, stop
-                        if (Directory.Exists(outputDay)) { continue; }
+                        if (Directory.Exists(outputFolder)) { continue; }
 
-                        _countForDay = 1;
+                        _countForSet = 1;
 
                         try
                         {
-                            foreach (string jsonFile in Directory.GetFiles(dayFolder, "*.*", SearchOption.AllDirectories))
+                            foreach (string jsonFile in Directory.EnumerateFiles(monthFolder, "*.*", SearchOption.AllDirectories))
                             {
-                                EnsureWriter(outputDay);
+                                EnsureWriter(outputFolder);
 
                                 // Copy the JSON file (without whitespace)
                                 using (JsonTextReader reader = new JsonTextReader(new StreamReader(jsonFile)))
@@ -75,6 +78,8 @@ namespace Json.Consolidate
                     }
                 }
             }
+
+            Console.WriteLine("Done.");
         }
 
         private void EnsureWriter(string outputDay)
@@ -86,7 +91,7 @@ namespace Json.Consolidate
             if (_writer == null)
             {
                 Directory.CreateDirectory(outputDay);
-                _outputPath = Path.Combine(outputDay, $"Block.{_countForDay}.json");
+                _outputPath = Path.Combine(outputDay, $"Block.{_countForSet}.json");
                 _sWriter = new StreamWriter(_outputPath);
                 _writer = new JsonTextWriter(_sWriter);
 
@@ -111,7 +116,7 @@ namespace Json.Consolidate
                 _sWriter = null;
 
                 Console.WriteLine($" => {_outputPath}");
-                _countForDay++;
+                _countForSet++;
             }
         }
     }

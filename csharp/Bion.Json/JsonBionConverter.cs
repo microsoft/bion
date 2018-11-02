@@ -41,57 +41,62 @@ namespace Bion.Json
 
         public static void JsonToBion(JsonTextReader reader, BionWriter writer)
         {
-            while(reader.Read())
+            while (reader.Read())
             {
-                switch (reader.TokenType)
-                {
-                    case JsonToken.StartObject:
-                        writer.WriteStartObject();
-                        break;
-                    case JsonToken.StartArray:
-                        writer.WriteStartArray();
-                        break;
-                    case JsonToken.EndObject:
-                        writer.WriteEndObject();
-                        break;
-                    case JsonToken.EndArray:
-                        writer.WriteEndArray();
-                        break;
-                    case JsonToken.PropertyName:
-                        writer.WritePropertyName((string)reader.Value);
-                        break;
-                    case JsonToken.String:
-                        string value = (string)reader.Value;
-                        writer.WriteValue(value);
-                        break;
-                    case JsonToken.Integer:
-                        writer.WriteValue((long)reader.Value);
-                        break;
-                    case JsonToken.Boolean:
-                        writer.WriteValue((bool)reader.Value);
-                        break;
-                    case JsonToken.Null:
-                        writer.WriteNull();
-                        break;
-                    case JsonToken.Float:
-                        writer.WriteValue((double)reader.Value);
-                        break;
-                    case JsonToken.Date:
-                        writer.WriteValue(((DateTime)reader.Value).ToString("yyyy-MM-ddThh:mm:ss.FFFFFFFZ"));
-                        break;
-                    case JsonToken.Comment:
-                        // Nothing Written
-                        break;
-                    default:
-                        throw new NotImplementedException($"JsonToBion not implemented for {reader.TokenType}.");
-                }
+                WriteToken(reader, writer);
+            }
+        }
+
+        public static void WriteToken(JsonTextReader reader, BionWriter writer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.StartObject:
+                    writer.WriteStartObject();
+                    break;
+                case JsonToken.StartArray:
+                    writer.WriteStartArray();
+                    break;
+                case JsonToken.EndObject:
+                    writer.WriteEndObject();
+                    break;
+                case JsonToken.EndArray:
+                    writer.WriteEndArray();
+                    break;
+                case JsonToken.PropertyName:
+                    writer.WritePropertyName((string)reader.Value);
+                    break;
+                case JsonToken.String:
+                    string value = (string)reader.Value;
+                    writer.WriteValue(value);
+                    break;
+                case JsonToken.Integer:
+                    writer.WriteValue((long)reader.Value);
+                    break;
+                case JsonToken.Boolean:
+                    writer.WriteValue((bool)reader.Value);
+                    break;
+                case JsonToken.Null:
+                    writer.WriteNull();
+                    break;
+                case JsonToken.Float:
+                    writer.WriteValue((double)reader.Value);
+                    break;
+                case JsonToken.Date:
+                    writer.WriteValue(((DateTime)reader.Value).ToString("yyyy-MM-ddThh:mm:ss.FFFFFFFZ"));
+                    break;
+                case JsonToken.Comment:
+                    // Nothing Written
+                    break;
+                default:
+                    throw new NotImplementedException($"JsonToBion not implemented for {reader.TokenType} @({reader.LineNumber}, {reader.LinePosition}).");
             }
         }
 
         public static void BionToJson(string bionPath, string jsonPath, string fromDictionaryPath = null)
         {
             using (WordCompressor compressor = (String.IsNullOrEmpty(fromDictionaryPath) ? null : WordCompressor.OpenRead(fromDictionaryPath)))
-            using (BionReader reader = new BionReader(File.OpenRead(bionPath), compressor:compressor))
+            using (BionReader reader = new BionReader(File.OpenRead(bionPath), compressor: compressor))
             using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(jsonPath)))
             {
                 writer.Formatting = Formatting.Indented;
@@ -101,50 +106,52 @@ namespace Bion.Json
 
         public static void BionToJson(BionReader reader, JsonTextWriter writer)
         {
-            long previousPosition = 0;
             int untilDepth = reader.Depth;
 
             while (reader.Read())
             {
-                switch (reader.TokenType)
-                {
-                    case BionToken.StartObject:
-                        writer.WriteStartObject();
-                        break;
-                    case BionToken.StartArray:
-                        writer.WriteStartArray();
-                        break;
-                    case BionToken.EndObject:
-                        writer.WriteEndObject();
-                        break;
-                    case BionToken.EndArray:
-                        writer.WriteEndArray();
-                        break;
-                    case BionToken.PropertyName:
-                        writer.WritePropertyName(reader.CurrentString());
-                        break;
-                    case BionToken.String:
-                        writer.WriteValue(reader.CurrentString());
-                        break;
-                    case BionToken.Integer:
-                        writer.WriteValue(reader.CurrentInteger());
-                        break;
-                    case BionToken.Float:
-                        writer.WriteValue(reader.CurrentFloat());
-                        break;
-                    case BionToken.True:
-                    case BionToken.False:
-                        writer.WriteValue(reader.CurrentBool());
-                        break;
-                    case BionToken.Null:
-                        writer.WriteNull();
-                        break;
-                    default:
-                        throw new NotImplementedException($"BionToJson not implemented for {reader.TokenType} @{previousPosition}.");
-                }
-
-                previousPosition = reader.BytesRead;
+                WriteToken(reader, writer);
                 if (reader.Depth == untilDepth) { break; }
+            }
+        }
+
+        public static void WriteToken(BionReader reader, JsonTextWriter writer)
+        {
+            switch (reader.TokenType)
+            {
+                case BionToken.StartObject:
+                    writer.WriteStartObject();
+                    break;
+                case BionToken.StartArray:
+                    writer.WriteStartArray();
+                    break;
+                case BionToken.EndObject:
+                    writer.WriteEndObject();
+                    break;
+                case BionToken.EndArray:
+                    writer.WriteEndArray();
+                    break;
+                case BionToken.PropertyName:
+                    writer.WritePropertyName(reader.CurrentString());
+                    break;
+                case BionToken.String:
+                    writer.WriteValue(reader.CurrentString());
+                    break;
+                case BionToken.Integer:
+                    writer.WriteValue(reader.CurrentInteger());
+                    break;
+                case BionToken.Float:
+                    writer.WriteValue(reader.CurrentFloat());
+                    break;
+                case BionToken.True:
+                case BionToken.False:
+                    writer.WriteValue(reader.CurrentBool());
+                    break;
+                case BionToken.Null:
+                    writer.WriteNull();
+                    break;
+                default:
+                    throw new NotImplementedException($"BionToJson not implemented for {reader.TokenType} @{reader.BytesRead}.");
             }
         }
     }
