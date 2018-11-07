@@ -50,7 +50,7 @@ namespace Bion
             LengthLookup[(byte)BionMarker.PropertyNameCompressedTerminated] = -1;
 
             // Float/NegativeInt/Int
-            for (int i = 0xB0; i < 0xE0; ++i)
+            for (int i = 0xC0; i < 0xF0; ++i)
             {
                 LengthLookup[i] = (sbyte)(i & 15);
             }
@@ -61,8 +61,9 @@ namespace Bion
                 TokenLookup[i] = (BionToken)i;
             }
 
-            Array.Fill(TokenLookup, BionToken.Float, 0xB0, 0xC0 - 0xB0);
-            Array.Fill(TokenLookup, BionToken.Integer, 0xC0, 0xF0 - 0xC0);
+            Array.Fill(TokenLookup, BionToken.Float, 0xC0, 16);
+            Array.Fill(TokenLookup, BionToken.Integer, 0xD0, 16);
+            Array.Fill(TokenLookup, BionToken.Integer, 0xE0, 16);
             Array.Fill(TokenLookup, BionToken.PropertyName, 0xF5, 3);
             Array.Fill(TokenLookup, BionToken.String, 0xF8, 3);
             TokenLookup[(byte)BionMarker.StringCompressedTerminated] = BionToken.String;
@@ -132,7 +133,7 @@ namespace Bion
                 _currentDepth += DepthLookup[marker];
             }
 
-            if (TokenType == BionToken.None) { throw new BionSyntaxException($"Invalid Bion Token 0x{_currentMarker:x2} @{BytesRead:n0}."); }
+            if (TokenType == BionToken.None) { throw new BionSyntaxException($"Invalid Bion Token 0x{_currentMarker:X2} @{BytesRead:n0}."); }
             return true;
         }
 
@@ -145,7 +146,7 @@ namespace Bion
 
         public void Expect(BionToken expected)
         {
-            if (this.TokenType != expected) throw new BionSyntaxException(this, expected);
+            if (this.TokenType != expected) { throw new BionSyntaxException(this, expected); }
         }
 
         public void Skip()
@@ -243,17 +244,14 @@ namespace Bion
 
         public bool CurrentBool()
         {
-            if (TokenType == BionToken.True) return true;
-            if (TokenType == BionToken.False) return false;
+            if (TokenType == BionToken.True) { return true; }
+            if (TokenType == BionToken.False) { return false; }
             throw new InvalidCastException($"@{BytesRead}: TokenType {TokenType} isn't a boolean type.");
         }
 
         public long CurrentInteger()
         {
-            if (TokenType != BionToken.Integer) throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't an integer type.");
-
-            // Inline Integer
-            if (_currentLength == 0) return ((int)_currentMarker & 0x0F);
+            if (TokenType != BionToken.Integer) { throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't an integer type."); }
 
             // Negate if type was NegativeInteger
             if (_currentMarker < BionMarker.Integer)
@@ -266,7 +264,7 @@ namespace Bion
 
         public unsafe double CurrentFloat()
         {
-            if (TokenType != BionToken.Float) throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a float type.");
+            if (TokenType != BionToken.Float) { throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a float type."); }
 
             // Decode as an integer and coerce .NET into reinterpreting the bytes
             ulong value = _currentDecodedNumber;
@@ -285,8 +283,8 @@ namespace Bion
 
         public string CurrentString()
         {
-            if (TokenType == BionToken.Null) return null;
-            if (TokenType != BionToken.PropertyName && TokenType != BionToken.String) throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a string type.");
+            if (TokenType == BionToken.Null) { return null; }
+            if (TokenType != BionToken.PropertyName && TokenType != BionToken.String) { throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a string type."); } 
 
             if (_currentDecodedString == null)
             {
@@ -298,7 +296,7 @@ namespace Bion
 
         public String8 CurrentString8()
         {
-            if (TokenType != BionToken.PropertyName && TokenType != BionToken.String) throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a string type.");
+            if (TokenType != BionToken.PropertyName && TokenType != BionToken.String) { throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a string type."); }
 
             if (_currentCompressedStringStart != -1)
             {

@@ -15,9 +15,8 @@
         True = 0xF1,
         False = 0xF0,
 
-        Float = 0xE0,
-
-        Integer = 0xB0,
+        Integer = 0xD0,
+        Float = 0xC0,
 
         None = 0x00,                // End of File or Read not called yet.
     }
@@ -47,9 +46,8 @@
         True = 0xF1,
         False = 0xF0,
 
-        InlineInteger = 0xE0,
-        Integer = 0xD0,
-        NegativeInteger = 0xC0,
-        Float = 0xB0
+        Integer = 0xE0,
+        NegativeInteger = 0xD0,
+        Float = 0xC0
     }
 }

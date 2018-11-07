@@ -8,7 +8,6 @@ namespace Bion
 {
     public unsafe class BionWriter : IDisposable
     {
-        public const int MaxInlineInteger = 15;
         public const int MaxOneByteLength = 127;
         public const int MaxTwoByteLength = 16383;
 
@@ -77,10 +76,6 @@ namespace Bion
             if (value < 0)
             {
                 WriteVariableInteger(BionMarker.NegativeInteger, (ulong)(-value));
-            }
-            else if (value <= MaxInlineInteger)
-            {
-                Write(BionMarker.InlineInteger, (byte)value);
             }
             else
             {

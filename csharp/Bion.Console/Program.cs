@@ -414,7 +414,7 @@ namespace Bion.Console
             try
             {
                 using (new ConsoleWatch($"Loading Indices under {bionRootPath}...",
-                    () => $"Done; {searchers.Count:n0} loaded."))
+                    () => $"Done; {searchers.Count:n0} loaded"))
                 {
                     foreach (string bionFilePath in Directory.GetFiles(bionRootPath, "*.bion", SearchOption.AllDirectories))
                     {
