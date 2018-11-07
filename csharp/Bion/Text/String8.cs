@@ -86,6 +86,31 @@ namespace Bion.Text
             Buffer.BlockCopy(this.Array, this.Index, array, index, this.Length);
         }
 
+        /// <summary>
+        ///  Return the first index at which the passed string appears in this string.
+        /// </summary>
+        /// <param name="value">Value to find</param>
+        /// <param name="startIndex">First index at which to check</param>
+        /// <returns>Index of first occurrence of value or -1 if not found</returns>
+        public int IndexOf(String8 value, int startIndex = 0)
+        {
+            int length = value.Length;
+
+            int end = Index + Length - value.Length + 1;
+            for (int start = Index + startIndex; start < end; ++start)
+            {
+                int i = 0;
+                for (; i < length; ++i)
+                {
+                    if (Array[start + i] != value.Array[value.Index + i]) break;
+                }
+
+                if (i == length) return start - Index;
+            }
+
+            return -1;
+        }
+
         public override bool Equals(object obj)
         {
             if (!(obj is String8)) { return false; }
