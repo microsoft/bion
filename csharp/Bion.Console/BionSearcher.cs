@@ -1,4 +1,5 @@
-﻿using Bion.Json;
+﻿using Bion.Core;
+using Bion.Json;
 using Bion.Text;
 using Newtonsoft.Json;
 using System;
@@ -21,10 +22,10 @@ namespace Bion.Console
 
         public BionSearcher(string bionFilePath, int runDepth)
         {
-            _compressor = WordCompressor.OpenRead(Path.ChangeExtension(bionFilePath, ".wdx"));
-            _containerIndex = ContainerIndex.OpenRead(Path.ChangeExtension(bionFilePath, ".cdx"));
-            _searchIndexReader = new SearchIndexReader(Path.ChangeExtension(bionFilePath, ".idx"));
-            _bionReader = new BionReader(File.OpenRead(bionFilePath), containerIndex: _containerIndex, compressor: _compressor);
+            _compressor = Memory.Log("Dictionary", () => WordCompressor.OpenRead(Path.ChangeExtension(bionFilePath, ".wdx")));
+            _containerIndex = Memory.Log("ContainerIndex", () => ContainerIndex.OpenRead(Path.ChangeExtension(bionFilePath, ".cdx")));
+            _searchIndexReader = Memory.Log("SearchIndex", () => new SearchIndexReader(Path.ChangeExtension(bionFilePath, ".idx")));
+            _bionReader = Memory.Log("BionReader", () => new BionReader(File.OpenRead(bionFilePath), containerIndex: _containerIndex, compressor: _compressor));
 
             _runDepth = runDepth;
             _termPositions = new long[256];

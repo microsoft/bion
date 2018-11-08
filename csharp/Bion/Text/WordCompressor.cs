@@ -25,9 +25,8 @@ namespace Bion.Text
 
         public static WordCompressor OpenRead(string dictionaryPath)
         {
-            // NOTE: WordIndex must be read from a 'ReadAll' BufferedReader because it isn't copying the words.
             WordCompressor compressor = new WordCompressor();
-            using (BionReader reader = new BionReader(BufferedReader.ReadAll(dictionaryPath)))
+            using (BionReader reader = new BionReader(File.OpenRead(dictionaryPath)))
             {
                 compressor.Read(reader);
             }
@@ -116,7 +115,7 @@ namespace Bion.Text
             return _words.TryFind(word, out index);
         }
 
-        public WordEntry this[int wordIndex] => _words[wordIndex];
+        public WordIndex.WordEntry this[int wordIndex] => _words[wordIndex];
 
         public void RewriteOptimized(int[] map, BufferedReader reader, BufferedWriter writer, SearchIndexWriter indexWriter = null)
         {
@@ -177,18 +176,22 @@ namespace Bion.Text
 
     public class WordIndex
     {
-        private List<WordEntry> Words;
+        private String8Set Words;
+        private List<int> Counts;
+
         private Dictionary<String8, int> Index;
         private bool Indexed;
 
         public WordIndex()
         {
-            this.Words = new List<WordEntry>();
+            this.Words = new String8Set();
+            this.Counts = new List<int>();
             this.Index = new Dictionary<String8, int>();
             this.Indexed = true;
         }
 
-        public WordEntry this[int index] => Words[index];
+        public WordEntry this[int index] => new WordEntry(this, index);
+        public int Count => Words.Count;
 
         public int FindOrAdd(String8 word)
         {
@@ -197,18 +200,15 @@ namespace Bion.Text
             int index;
             if(Index.TryGetValue(word, out index))
             {
-                WordEntry entry = Words[index];
-                entry.Count++;
-                Words[index] = entry;
-
+                Counts[index]++;
                 return index;
             }
 
             index = Words.Count;
-            String8 wordCopy = String8.Copy(word);
+            Words.Add(word);
+            Counts.Add(1);
 
-            Words.Add(new WordEntry(wordCopy, 1));
-            Index[wordCopy] = index;
+            Index[Words[index]] = index;
 
             return index;
         }
@@ -221,15 +221,13 @@ namespace Bion.Text
             }
             else
             {
-                WordEntry stub = new WordEntry(word);
-
                 index = -1;
                 int countDone = 0;
                 int countForLength = 1 << WordCompressor.BitsPerByte;
                 do
                 {
                     int countToDo = Math.Min(countForLength, Words.Count - countDone);
-                    index = Words.BinarySearch(countDone, countToDo, stub, WordEntryWordComparer.Instance);
+                    index = Words.BinarySearch(countDone, countToDo, word);
                     countDone += countToDo;
                     countForLength = countForLength << WordCompressor.BitsPerByte;
                 } while (index < 0 && countDone < Words.Count);
@@ -241,34 +239,46 @@ namespace Bion.Text
         public int[] Optimize()
         {
             if (!this.Indexed) { Reindex(); }
-            int[] remapping = new int[Words.Count];
+            int[] remapping = new int[Count];
+
+            int[] indices = new int[Count];
+            for(int i = 0; i < indices.Length; ++i)
+            {
+                indices[i] = i;
+            }
 
             // First, sort words in descending frequency order
-            Words.Sort((left, right) => right.Count.CompareTo(left.Count));
+            Array.Sort(indices, new CountDescendingComparer(this));
 
             // Next, within each set with the same byte length, sort by ordinal
+            IComparer<int> wordComparer = new WordComparer(this);
             int countDone = 0;
             int countForLength = 1 << WordCompressor.BitsPerByte;
             do
             {
-                int countToDo = Math.Min(countForLength, Words.Count - countDone);
-                Words.Sort(countDone, countToDo, WordEntryWordComparer.Instance);
+                int countToDo = Math.Min(countForLength, Count - countDone);
+                Array.Sort(indices, countDone, countToDo, wordComparer);
                 countDone += countToDo;
                 countForLength = countForLength << WordCompressor.BitsPerByte;
-            } while (countDone < Words.Count);
+            } while (countDone < Count);
 
             // Look up the old index for each word to map to the new index
-            for(int i = 0; i < Words.Count; ++i)
+            for(int i = 0; i < Count; ++i)
             {
-                remapping[Index[Words[i].Word]] = i;
+                remapping[indices[i]] = i;
             }
 
-            // Rebuild the index on the new order
-            Index.Clear();
-            for (int i = 0; i < Words.Count; ++i)
+            // Rebuild the word set
+            String8Set newSet = new String8Set(Words.Count, Words.LengthBytes);
+            for(int i = 0; i < Count; ++i)
             {
-                Index[Words[i].Word] = i;
+                newSet.Add(Words[indices[i]]);
             }
+            Words = newSet;
+
+            // Clear the index (rebuild if needed later)
+            Index.Clear();
+            Indexed = false;
 
             return remapping;
         }
@@ -278,10 +288,10 @@ namespace Bion.Text
             writer.WriteStartArray();
             writer.WriteValue(Words.Count);
 
-            foreach (WordEntry entry in Words)
+            for(int i = 0; i < Count; ++i)
             {
-                writer.WriteValue(entry.Word);
-                writer.WriteValue(entry.Count);
+                writer.WriteValue(Words[i]);
+                writer.WriteValue(Counts[i]);
             }
             writer.WriteEndArray();
         }
@@ -293,7 +303,6 @@ namespace Bion.Text
             int wordCount = (int)reader.CurrentInteger();
 
             Words.Clear();
-            Words.Capacity = wordCount;
 
             Index.Clear();
             Indexed = false;
@@ -309,10 +318,14 @@ namespace Bion.Text
 
                 reader.Read(BionToken.Integer);
                 int count = (int)reader.CurrentInteger();
-                
+
                 // Add to List, but not Index. Index will be populated when first needed.
-                Words.Add(new WordEntry(value, count));
+                Words.Add(value);
+                Counts.Add(count);
             }
+
+            // Set capacity exact to save RAM
+            Words.SetCapacity(Words.LengthBytes);
         }
 
         private void Reindex()
@@ -321,38 +334,60 @@ namespace Bion.Text
 
             for (int i = 0; i < Words.Count; ++i)
             {
-                WordEntry entry = Words[i];
+                WordEntry entry = this[i];
                 Index[entry.Word] = i;
             }
 
             Indexed = true;
         }
-    }
 
-    public struct WordEntry
-    {
-        public String8 Word;
-        public int Count;
-
-        public WordEntry(String8 word, int count = 0)
+        public struct WordEntry
         {
-            this.Word = word;
-            this.Count = count;
+            private WordIndex _container;
+            private int _index;
+            public String8 Word => _container.Words[_index];
+            public int Count => _container.Counts[_index];
+
+            public WordEntry(WordIndex container, int index)
+            {
+                _container = container;
+                _index = index;
+            }
+
+            public override string ToString()
+            {
+                return $"\"{Word}\" ({Count:n0})";
+            }
         }
 
-        public override string ToString()
+        internal class WordComparer : IComparer<int>
         {
-            return $"\"{Word}\" ({Count:n0})";
+            private WordIndex _index;
+
+            public WordComparer(WordIndex index)
+            {
+                _index = index;
+            }
+
+            public int Compare(int left, int right)
+            {
+                return _index.Words[left].CompareTo(_index.Words[right]);
+            }
         }
-    }
 
-    internal class WordEntryWordComparer : IComparer<WordEntry>
-    {
-        public static readonly WordEntryWordComparer Instance = new WordEntryWordComparer();
-
-        public int Compare(WordEntry left, WordEntry right)
+        internal class CountDescendingComparer : IComparer<int>
         {
-            return left.Word.CompareTo(right.Word);
+            private WordIndex _index;
+
+            public CountDescendingComparer(WordIndex index)
+            {
+                _index = index;
+            }
+
+            public int Compare(int left, int right)
+            {
+                return _index.Counts[right].CompareTo(_index.Counts[left]);
+            }
         }
     }
 }

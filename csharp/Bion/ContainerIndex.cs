@@ -203,6 +203,9 @@ namespace Bion
                     parentIndex = _index[parentIndex].ParentIndex;
                 }
             }
+
+            // Size exact 
+            _index.Capacity = _index.Count;
         }
 
         public void Write(Stream stream)

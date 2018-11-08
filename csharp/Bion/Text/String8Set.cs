@@ -95,6 +95,20 @@ namespace Bion.Text
             Count = 0;
         }
 
+        public void SetCapacity(int capacity)
+        {
+            if (capacity < _bytesUsed) { throw new ArgumentOutOfRangeException("capacity"); }
+            if (_bytes.Length == capacity) { return; }
+
+            byte[] newBytes = new byte[capacity];
+            if (_bytesUsed > 0)
+            {
+                Buffer.BlockCopy(_bytes, 0, newBytes, 0, _bytesUsed);
+            }
+
+            _bytes = newBytes;
+        }
+
         public int IndexOf(String8 item)
         {
             for (int i = 0; i < Count; ++i)
@@ -160,6 +174,63 @@ namespace Bion.Text
             {
                 // Nothing to do
             }
+        }
+
+        public int BinarySearch(String8 value)
+        {
+            return BinarySearch(0, Count, value);
+        }
+
+        public int BinarySearch(int index, int length, String8 value)
+        {
+            if (value.Length == 0)
+            {
+                return ~0;
+            }
+
+            // Binary search sorted strings for the value
+            int min = index;
+            int max = index + length - 1;
+            int mid = 0;
+            int cmp = 0;
+            String8 valueHere = String8.Empty;
+
+            while (min <= max)
+            {
+                mid = (min + max) / 2;
+                valueHere = this[mid];
+
+                cmp = value.CompareTo(valueHere);
+                if (cmp == 0)
+                {
+                    // 'value' Found - look for bounds
+                    break;
+                }
+                else if (cmp > 0)
+                {
+                    // 'value' is later - look after valueHere
+                    min = mid + 1;
+                }
+                else
+                {
+                    // 'value' is earlier - look before valueHere
+                    max = mid - 1;
+                }
+            }
+
+            // If no match, set both bounds to insertion position
+            if (cmp > 0)
+            {
+                // If 'value' was after last comparison, we'd insert after it
+                return ~(mid + 1);
+            }
+            else if (cmp < 0)
+            {
+                // If 'value' was before last comparison, we'd insert before it
+                return ~mid;
+            }
+
+            return mid;
         }
     }
 }
