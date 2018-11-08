@@ -204,7 +204,7 @@ namespace Bion.Text
                 return index;
             }
 
-            index = Words.Count;
+            index = Count;
             Words.Add(word);
             Counts.Add(1);
 
@@ -226,11 +226,11 @@ namespace Bion.Text
                 int countForLength = 1 << WordCompressor.BitsPerByte;
                 do
                 {
-                    int countToDo = Math.Min(countForLength, Words.Count - countDone);
+                    int countToDo = Math.Min(countForLength, Count - countDone);
                     index = Words.BinarySearch(countDone, countToDo, word);
                     countDone += countToDo;
                     countForLength = countForLength << WordCompressor.BitsPerByte;
-                } while (index < 0 && countDone < Words.Count);
+                } while (index < 0 && countDone < Count);
 
                 return (index >= 0);
             }
@@ -269,7 +269,7 @@ namespace Bion.Text
             }
 
             // Rebuild the word set
-            String8Set newSet = new String8Set(Words.Count, Words.LengthBytes);
+            String8Set newSet = new String8Set(Count, Words.LengthBytes);
             for(int i = 0; i < Count; ++i)
             {
                 newSet.Add(Words[indices[i]]);
@@ -286,7 +286,7 @@ namespace Bion.Text
         public void Write(BionWriter writer)
         {
             writer.WriteStartArray();
-            writer.WriteValue(Words.Count);
+            writer.WriteValue(Count);
 
             for(int i = 0; i < Count; ++i)
             {
@@ -330,9 +330,10 @@ namespace Bion.Text
 
         private void Reindex()
         {
-            Index.EnsureCapacity(Words.Count);
+            Index.EnsureCapacity(Count);
+            Index.Clear();
 
-            for (int i = 0; i < Words.Count; ++i)
+            for (int i = 0; i < Count; ++i)
             {
                 WordEntry entry = this[i];
                 Index[entry.Word] = i;
