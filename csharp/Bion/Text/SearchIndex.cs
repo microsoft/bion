@@ -279,6 +279,7 @@ namespace Bion
     {
         private BufferedReader _reader;
         private int[] _firstMatchOffset;
+        public int WordCount => _firstMatchOffset.Length - 1;
 
         /// <summary>
         ///  Build a reader for the given index.

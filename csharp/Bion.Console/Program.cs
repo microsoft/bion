@@ -119,6 +119,10 @@ namespace Bion.Console
                         SearchAll(args[1]);
                         break;
 
+                    case "test":
+                        Benchmark.Test();
+                        break;
+
                     default:
                         throw new UsageException($"Unknown mode '{mode}'. Run without arguments for usage.");
                 }
