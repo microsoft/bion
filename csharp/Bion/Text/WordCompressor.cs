@@ -34,6 +34,9 @@ namespace Bion.Text
             return compressor;
         }
 
+        public int WordCount => _words.Count;
+        public WordIndex.WordEntry this[int wordIndex] => _words[wordIndex];
+
         public static void Compress(string fromPath, string toPath, string toDictionaryPath, bool optimize = true)
         {
             using (WordCompressor compressor = WordCompressor.OpenWrite(toDictionaryPath))
@@ -113,9 +116,7 @@ namespace Bion.Text
         public bool TryGetWordIndex(String8 word, out int index)
         {
             return _words.TryFind(word, out index);
-        }
-
-        public WordIndex.WordEntry this[int wordIndex] => _words[wordIndex];
+        }        
 
         public void RewriteOptimized(int[] map, BufferedReader reader, BufferedWriter writer, SearchIndexWriter indexWriter = null)
         {

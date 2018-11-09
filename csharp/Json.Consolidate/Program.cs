@@ -20,7 +20,7 @@ namespace Json.Consolidate
     {
         public string SourceDirectory;
         public string OutputDirectory;
-        public const long TargetSizeBytes = 512 * 1024 * 1024;   // 512 MB
+        public const long TargetSizeBytes = 1024 * 1024 * 1024;   // 1 GB
 
         private int _countForSet;
         private string _outputPath;
