@@ -32,14 +32,14 @@ namespace Bion.IO
             // Ensure space for delta base, control bytes, delta base, and max width values
             _writer.EnsureSpace(4 + BlockSize / 4 + BlockSize * 4);
 
-            // Find minimum for block (ideally, base might sometimes be best as a bigger value)
-            int deltaBase = _buffer[0];
-            for (int i = 1; i < BlockSize; ++i)
-            {
-                if (_buffer[i] < deltaBase) { deltaBase = _buffer[i]; }
-            }
+            //// Find minimum for block (ideally, base might sometimes be best as a bigger value)
+            //int deltaBase = _buffer[0];
+            //for (int i = 1; i < BlockSize; ++i)
+            //{
+            //    if (_buffer[i] < deltaBase) { deltaBase = _buffer[i]; }
+            //}
 
-            _writer.Write(deltaBase);
+            //_writer.Write(deltaBase);
 
             // Skip control bytes (for now)
             long controlStart = _writer.Index;
@@ -49,7 +49,7 @@ namespace Bion.IO
 
             for (int i = 0; i < BlockSize; ++i)
             {
-                int value = _buffer[i] - deltaBase;
+                int value = _buffer[i];// - deltaBase;
                 int length = ByteLength(value);
 
                 // Write value
@@ -123,7 +123,7 @@ namespace Bion.IO
             _reader.EnsureSpace(4 + BlockSize / 4 + BlockSize * 4);
 
             // Read delta
-            int deltaBase = _reader.ReadInt32();
+            //int deltaBase = _reader.ReadInt32();
 
             // Skip over control bytes
             int controlStart = _reader.Index;
@@ -150,8 +150,8 @@ namespace Bion.IO
                     value += _reader.Buffer[_reader.Index++];
                 }
 
-                // Add delta
-                value += deltaBase;
+                //// Add delta
+                //value += deltaBase;
 
                 _buffer[i] = value;
             }

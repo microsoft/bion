@@ -7,7 +7,7 @@ namespace Bion.Console
 {
     public static class Benchmark
     {
-        public const int BlockSize = 16;
+        public const int BlockSize = 64;
 
         public static void Test()
         {
@@ -17,13 +17,13 @@ namespace Bion.Console
 
             //ReadBytes(filePath, bufferSize);
             //ReadBufferedReader(filePath, bufferSize);
-            //Read6Bit(filePath, bufferSize);
+            Read6Bit(filePath, bufferSize);
 
-            TranslateSixBit(filePath, blockPath);
-            //ReadNumberBlock(blockPath, bufferSize);
+            //TranslateSixBit(filePath, blockPath);
+            ReadNumberBlock(blockPath, bufferSize);
 
-            TranslateSearchIndex(@"C:\Download\Sarif\Out\SarifSearch.All.idx", @"C:\Download\Sarif\Out\SarifSearch.All.idx.blk");
-            //ReadNumberBlock(@"C:\Download\Sarif\Out\SarifSearch.All.idx.blk", bufferSize);
+            //TranslateSearchIndex(@"C:\Download\Sarif\Out\SarifSearch.All.idx", @"C:\Download\Sarif\Out\SarifSearch.All.idx.blk");
+            ReadNumberBlock(@"C:\Download\Sarif\Out\SarifSearch.All.idx.blk", bufferSize);
         }
 
         public static void ReadBytes(string filePath, int bufferSizeBytes)
@@ -146,13 +146,16 @@ namespace Bion.Console
                 {
                     for(int i = 0; i < reader.WordCount; ++i)
                     {
+                        int last = 0;
                         SearchResult result = reader.Find(i);
                         while(!result.Done)
                         {
                             int count = result.Page(ref decoded);
                             for(int j = 0; j < count; ++j)
                             {
-                                writer.Write((int)decoded[j]);
+                                int current = (int)decoded[j];
+                                writer.Write(current - last);
+                                last = current;
                             }
                         }
                     }
