@@ -35,14 +35,14 @@ namespace Bion.Console
             //TranslateSixBit(compressedPath, compressedPath + ".blk");
             //ReadIntBlock(compressedPath + ".blk", bufferSize);
 
-            //TranslateSearchIndex(searchIndexPath, searchIndexPath + ".blk");
+            TranslateSearchIndex(searchIndexPath, searchIndexPath + ".blk", true);
             //ReadIntBlock(searchIndexPath + ".blk", bufferSize);
 
-            //TranslateDictionaryPositions(dictionaryPath, dictionaryPath + ".blk");
+            TranslateDictionaryPositions(dictionaryPath, dictionaryPath + ".blk", true);
             //ReadIntBlock(dictionaryPath + ".blk", bufferSize);
 
             WriteSyntheticBlock(syntheticBlockPath, 256 * 1024 * 1024);
-            //ReadIntBlock(syntheticBlockPath, bufferSize);
+            ReadIntBlock(syntheticBlockPath, bufferSize);
         }
 
         public static void ReadBytes(string filePath, int bufferSizeBytes)
@@ -111,7 +111,7 @@ namespace Bion.Console
             byte[] buffer = new byte[bufferSizeBytes];
             long totalSize = 0;
 
-            using (new ConsoleWatch($"ReadNumberBlock(\"{filePath}\", {bufferSizeBytes})", () => $"Done; {totalSize:n0} bytes"))
+            using (new ConsoleWatch($"ReadIntBlock(\"{filePath}\", {bufferSizeBytes})", () => $"Done; {totalSize:n0} bytes"))
             {
                 using (BufferedReader bufferedReader = new BufferedReader(File.OpenRead(filePath), buffer))
                 using (IntBlockReader reader = new IntBlockReader(bufferedReader))
@@ -120,13 +120,14 @@ namespace Bion.Console
                     {
                         int count = reader.Next(out block);
                         totalSize += 4 * count;
-                        if (count < 128) { break; }
+                        if (count < IntBlock.BlockSize) { break; }
                     }
                 }
             }
 
+            totalSize = 0;
             using (BufferedReader bufferedReader = BufferedReader.ReadAll(filePath))
-            using (new ConsoleWatch($"ReadNumberBlock(\"{filePath}\", {bufferSizeBytes})", () => $"[ReadAll]; {totalSize:n0} bytes"))
+            using (new ConsoleWatch($"ReadIntBlock(\"{filePath}\", {bufferSizeBytes})", () => $"[ReadAll]; {totalSize:n0} bytes"))
             {
                 using (IntBlockReader reader = new IntBlockReader(bufferedReader))
                 {
@@ -134,7 +135,7 @@ namespace Bion.Console
                     {
                         int count = reader.Next(out block);
                         totalSize += 4 * count;
-                        if (count < 128) { break; }
+                        if (count < IntBlock.BlockSize) { break; }
                     }
                 }
             }
@@ -168,14 +169,16 @@ namespace Bion.Console
             }
         }
 
-        public static void TranslateSearchIndex(string filePath, string outPath)
+        public static void TranslateSearchIndex(string filePath, string outPath, bool absolute)
         {
             long[] decoded = new long[BlockSize];
-            long totalDecodedBytes = 0;
+            long intCount = 0;
+            long bytesWritten = 0;
 
-            using (new ConsoleWatch($"TranslateSearchIndex(\"{filePath}\", \"{outPath}\")", () => $"Done. {totalDecodedBytes:n0} uncompressed equivalent."))
+            using(new ConsoleWatch($"Translating \"{filePath}\" to block \"{outPath}\"...",
+                () => $"{intCount:n0} entries, written to {bytesWritten:n0} bytes ({((float)(8 * bytesWritten) / (float)(intCount)):n2} bits per position)"))
             {
-                using (IntBlockWriter writer = new IntBlockWriter(new BufferedWriter(File.Create(outPath))))
+                using (IntBlockWriter writer = new IntBlockWriter(new BufferedWriter(outPath)))
                 using (SearchIndexReader reader = new SearchIndexReader(filePath))
                 {
                     for (int i = 0; i < reader.WordCount; ++i)
@@ -188,15 +191,44 @@ namespace Bion.Console
                             for (int j = 0; j < count; ++j)
                             {
                                 int current = (int)decoded[j];
-                                writer.Write(current - last);
-                                //writer.Write(current);
+                                writer.Write((absolute ? current : current - last));
                                 last = current;
                             }
 
-                            totalDecodedBytes += count * 4;
+                            intCount += count;
                         }
                     }
                 }
+
+                bytesWritten = new FileInfo(outPath).Length;
+            }
+        }
+
+        public static void TranslateDictionaryPositions(string dictionaryPath, string blockPath, bool absolute)
+        {
+            int wordCount = 0;
+            int totalLength = 0;
+            long bytesWritten = 0;
+
+            using (new ConsoleWatch($"Translating {dictionaryPath} positions to {blockPath}...",
+                () => $"{wordCount:n0} words, total length {totalLength:n0}, written to {bytesWritten:n0} bytes ({((float)(8 * bytesWritten) / (float)(wordCount)):n2} bits per position)"))
+            {
+                using (IntBlockWriter writer = new IntBlockWriter(new BufferedWriter(blockPath)))
+                using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
+                {
+                    wordCount = compressor.WordCount;
+                    writer.Write(0);
+
+                    for (int wordIndex = 0; wordIndex < compressor.WordCount; ++wordIndex)
+                    {
+                        int length = compressor[wordIndex].Word.Length;
+                        totalLength += length;
+
+                        writer.Write((absolute ? totalLength : length));
+                    }
+                }
+
+                bytesWritten = new FileInfo(blockPath).Length;
             }
         }
 
@@ -229,35 +261,6 @@ namespace Bion.Console
             }
 
             System.Console.WriteLine($"Total {total:n0}b for {wordCount:n0} words. Avg:{((float)total / (float)wordCount):n2} bytes.");
-        }
-
-        public static void TranslateDictionaryPositions(string dictionaryPath, string blockPath)
-        {
-            int wordCount = 0;
-            int totalLength = 0;
-            long bytesWritten = 0;
-
-            using (new ConsoleWatch($"Translating {dictionaryPath} positions to {blockPath}...",
-                () => $"{wordCount:n0} words, total length {totalLength:n0}, written to {bytesWritten:n0} bytes ({((float)(8 * bytesWritten) / (float)(wordCount)):n2} bits per position)"))
-            {
-                using (IntBlockWriter writer = new IntBlockWriter(new BufferedWriter(blockPath)))
-                using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
-                {
-                    wordCount = compressor.WordCount;
-                    writer.Write(0);
-
-                    for (int wordIndex = 0; wordIndex < compressor.WordCount; ++wordIndex)
-                    {
-                        int length = compressor[wordIndex].Word.Length;
-                        totalLength += length;
-
-                        //writer.Write(totalLength);
-                        writer.Write(length);
-                    }
-                }
-
-                bytesWritten = new FileInfo(blockPath).Length;
-            }
         }
 
         public static void WriteWordsForLength(string dictionaryPath, int length)
@@ -402,7 +405,7 @@ namespace Bion.Console
                 {
                     for (long i = 0; i < count; ++i)
                     {
-                        int value = (int)(i & 63);
+                        int value = (int)(i & 15);
                         //writer.Write(value);
 
                         block[index++] = value;
