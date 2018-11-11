@@ -13,7 +13,8 @@ namespace Bion.Test.Vector
         [TestMethod]
         public void IntBlock_Scenarios()
         {
-            Random r = new Random(6);
+            Random r;
+            int last;
 
             // Zero: 1 byte (noAdjustMarker)
             RoundTrip(Enumerable.Repeat(0, 128).ToArray(), 1);
@@ -28,24 +29,36 @@ namespace Bion.Test.Vector
             RoundTrip(Enumerable.Range(0, 128).Reverse().ToArray(), 8);
 
             // 0-15 random: 65 bytes (adjustMarker, 4 bit x 128 = 64 bytes)
-            RoundTrip(Build(128, () => r.Next(16)), 65);
+            r = new Random(6);
+            RoundTrip(Build(128, (i) => r.Next(16)), 65);
 
             // 0-63 random: 97 bytes (adjustMarker, 6 bit x 128 = 96 bytes)
-            RoundTrip(Build(128, () => r.Next(64)), 97);
+            r = new Random(6);
+            RoundTrip(Build(128, (i) => r.Next(64)), 97);
 
             // Short, Zero: 3 bytes (countMarker, 1b Count, noAdjustMarker)
             RoundTrip(Enumerable.Repeat(0, 50).ToArray(), 3);
 
             // Normal + Short, 97 bytes + 15 bytes (countMarker, 1b Count, adjustMarker, 6 bit x [10 -> 16] = 12 bytes)
-            RoundTrip(Build(138, () => r.Next(64)), 97 + 15);           
+            r = new Random(6);
+            RoundTrip(Build(138, (i) => r.Next(64)), 97 + 15);
+
+            // Ascending with randomness. 101 bytes (baseMarker, 1b base, slopeMarker, 1b slope, adjustMarker, 6 bit x 128 = 96 bytes)
+            r = new Random(6);
+            last = 0;
+            RoundTrip(Build(128, (i) => { last += 2 + r.Next(4); return last; }), 101);
+
+            // Full random int. 513 bytes (adjustMarker, 32 bit x 128 = 512 bytes)
+            r = new Random(6);
+            RoundTrip(Build(128, (i) => r.Next() - (int.MaxValue / 2)), 513);
         }
 
-        private static int[] Build(int count, Func<int> next)
+        private static int[] Build(int count, Func<int, int> next)
         {
             int[] array = new int[count];
             for (int i = 0; i < array.Length; ++i)
             {
-                array[i] = next();
+                array[i] = next(i);
             }
             return array;
         }
@@ -62,7 +75,7 @@ namespace Bion.Test.Vector
                 }
             }
 
-            Assert.AreEqual(new FileInfo(fileName).Length, expectedLength);
+            Assert.AreEqual(expectedLength, new FileInfo(fileName).Length);
 
             using (IntBlockReader reader = new IntBlockReader(new BufferedReader(File.OpenRead(fileName))))
             {
