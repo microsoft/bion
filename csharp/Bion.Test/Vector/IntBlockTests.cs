@@ -16,6 +16,9 @@ namespace Bion.Test.Vector
             Random r;
             int last;
 
+            // Encode/Decode debugging
+            RoundTrip(Build(128, (i) => (i & 15)), 65);
+
             // Zero: 1 byte (noAdjustMarker)
             RoundTrip(Enumerable.Repeat(0, 128).ToArray(), 1);
 

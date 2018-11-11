@@ -201,6 +201,8 @@ namespace Bion.Vector
 
         private static Vector256<sbyte> SetAllTo(byte value)
         {
+            // Replace with: Avx.Set1<sbyte>(unchecked((sbyte)value)); MissingMethodException in .NET Core 2.1.
+
             // Make 32 copies of value
             sbyte* _loader = stackalloc sbyte[32];
             for (int i = 0; i < 32; ++i)

@@ -1,5 +1,8 @@
 ﻿using Bion.IO;
 using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.X86;
 
 namespace Bion.Vector
 {
@@ -272,8 +275,17 @@ namespace Bion.Vector
             byte adjustmentMarker = marker;
             byte adjustmentBitLength = (byte)(marker - IntBlockPlan.AdjustmentMarker);
 
+            //ReadScalar(count, baseV, slope, adjustmentBitLength);
+            IntBlockVectorReader.ReadVector(count, baseV, slope, adjustmentBitLength, _reader, _buffer);
+       
+            return count;
+        }
+
+        private void ReadScalar(byte count, int baseV, int slope, byte adjustmentBitLength)
+        {
             if (adjustmentBitLength == 0)
             {
+                // If no adjustments, calculate each value
                 int unadjusted = baseV;
                 for (int i = 0; i < count; ++i)
                 {
@@ -310,8 +322,6 @@ namespace Bion.Vector
                     unadjusted += slope;
                 }
             }
-
-            return count;
         }
 
         private int ReadComponent(byte componentMarker, byte componentMarkerBase)
@@ -330,6 +340,152 @@ namespace Bion.Vector
         {
             _reader?.Dispose();
             _reader = null;
+        }
+    }
+
+    internal static class IntBlockVectorReader
+    {
+        private static sbyte[] ShuffleMasks;
+        private static int[] MultiplyMasks;
+
+        static IntBlockVectorReader()
+        {
+            // Build Shuffle and Multiply masks for each possible increment bit length
+            ShuffleMasks = new sbyte[32 * 33];
+            MultiplyMasks = new int[8 * 33];
+
+            int shuffleIndex = 0;
+            int multiplyIndex = 0;
+
+            // For Each bit length... 
+            for (int bitLength = 0; bitLength <= 32; ++bitLength)
+            {
+                int bitOffset = 0;
+
+                // For the two halves (we decode two 4-int segments at a time)
+                for (int vectorIndex = 0; vectorIndex < 2; ++vectorIndex)
+                {
+                    // For each int to decode
+                    for (int intIndex = 0; intIndex < 4; ++intIndex)
+                    {
+                        // The shuffle mask selects the four bytes where the bits begin
+                        for (int byteIndex = 0; byteIndex < 4; ++byteIndex)
+                        {
+                            ShuffleMasks[shuffleIndex++] = (sbyte)((bitOffset / 8) + (3 - byteIndex));
+                        }
+
+                        // The multiply mask shifts the bits to the top of that byte
+                        MultiplyMasks[multiplyIndex++] = 1 << (bitOffset & 7);
+
+                        // Update bit offset for next compressed int
+                        bitOffset += bitLength;
+                    }
+
+                    // The second 4 ints will load the then-closest byte, resetting the byte offset
+                    bitOffset = bitOffset & 7;
+                }
+            }
+        }
+
+        public static unsafe void ReadVector(byte count, int baseV, int slope, byte adjustmentBitLength, BufferedReader reader, int[] buffer)
+        {
+            // Build first unadjusted vector and per-vector increment
+            Vector128<int> unadjusted = SetIncrement(baseV, slope);
+            Vector128<int> increment = Set1(slope * 4);
+
+            if (adjustmentBitLength == 0)
+            {
+                // If no adjustments, calculate in blocks and return
+                fixed (int* resultPtr = buffer)
+                {
+                    for (int i = 0; i < count; i += 4)
+                    {
+                        Unsafe.WriteUnaligned(&resultPtr[i], unadjusted);
+                        unadjusted = Sse2.Add(unadjusted, increment);
+                    }
+                }
+
+                return;
+            }
+
+            fixed (byte* bufferPtr = reader.Buffer)
+            fixed (int* resultPtr = buffer)
+            fixed (sbyte* shuffleMaskPtr = ShuffleMasks)
+            fixed (int* multiplyMaskPtr = MultiplyMasks)
+            {
+                int index = reader.Index;
+
+                // Calculate bytes consumed for the first and second four ints decoded (different for odd bit lengths)
+                byte bytesPerEight = adjustmentBitLength;
+                byte bytes1 = (byte)(bytesPerEight / 2);
+
+                // Calculate how much to shift values (from top of each int to bottom)
+                byte shiftRightBits = (byte)(32 - adjustmentBitLength);
+
+                // Get shuffle mask (to get correct bits) and multiply value (to shift to top of each int) for halves
+                Vector128<sbyte> shuffle1 = Unsafe.ReadUnaligned<Vector128<sbyte>>(&shuffleMaskPtr[32 * adjustmentBitLength]);
+                Vector128<int> multiply1 = Unsafe.ReadUnaligned<Vector128<int>>(&multiplyMaskPtr[8 * adjustmentBitLength]);
+
+                Vector128<sbyte> shuffle2 = Unsafe.ReadUnaligned<Vector128<sbyte>>(&shuffleMaskPtr[32 * adjustmentBitLength + 16]);
+                Vector128<int> multiply2 = Unsafe.ReadUnaligned<Vector128<int>>(&multiplyMaskPtr[8 * adjustmentBitLength + 4]);
+
+                for (int i = 0; i < count; i += 8, index += bytesPerEight)
+                {
+                    // Read source bytes
+                    Vector128<int> vector1 = Unsafe.ReadUnaligned<Vector128<int>>(&bufferPtr[index]);
+                    Vector128<int> vector2 = Unsafe.ReadUnaligned<Vector128<int>>(&bufferPtr[index + bytes1]);
+
+                    // Shuffle to get the right bytes in each integer
+                    vector1 = Sse.StaticCast<sbyte, int>(Ssse3.Shuffle(Sse.StaticCast<int, sbyte>(vector1), shuffle1));
+                    vector2 = Sse.StaticCast<sbyte, int>(Ssse3.Shuffle(Sse.StaticCast<int, sbyte>(vector2), shuffle2));
+
+                    // Multiply to shift each int so the desired bits are at the top
+                    vector1 = Sse41.MultiplyLow(vector1, multiply1);
+                    vector2 = Sse41.MultiplyLow(vector2, multiply2);
+
+                    // Shift the desired bits to the bottom and zero the top
+                    vector1 = Sse2.ShiftRightLogical(vector1, shiftRightBits);
+                    vector2 = Sse2.ShiftRightLogical(vector2, shiftRightBits);
+
+                    // Add the delta base value
+                    vector1 = Sse2.Add(vector1, unadjusted);
+                    unadjusted = Sse2.Add(unadjusted, increment);
+
+                    vector2 = Sse2.Add(vector2, unadjusted);
+                    unadjusted = Sse2.Add(unadjusted, increment);
+
+                    // Write the decoded integers
+                    Unsafe.WriteUnaligned(&resultPtr[i], vector1);
+                    Unsafe.WriteUnaligned(&resultPtr[i + 4], vector2);
+                }
+
+                reader.Index = index;
+            }
+        }
+
+        private static unsafe Vector128<int> Set1(int value)
+        {
+            int* array = stackalloc int[4];
+            array[0] = value;
+            array[1] = value;
+            array[2] = value;
+            array[3] = value;
+
+            return Unsafe.ReadUnaligned<Vector128<int>>(array);
+        }
+
+        private static unsafe Vector128<int> SetIncrement(int baseV, int slope)
+        {
+            int current = baseV;
+
+            int* array = stackalloc int[4];
+            for (int i = 0; i < 4; ++i)
+            {
+                array[i] = current;
+                current += slope;
+            }
+
+            return Unsafe.ReadUnaligned<Vector128<int>>(array);
         }
     }
 }

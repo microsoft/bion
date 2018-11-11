@@ -294,7 +294,7 @@ namespace Bion.Console
 
                 Vector128<int> multiplyBy = Unsafe.ReadUnaligned<Vector128<int>>(&maskPtr[controlByte]);
 
-                //Vector128<int> addValue = Avx2.BroadcastElementToVector128(Unsafe.ReadUnaligned<Vector128<int>>(&index));
+                //Vector128<int> addValue = Sse.Set1<int>(index);
                 int* addValue = stackalloc int[4];
                 for(int i = 0; i < 4; ++i)
                 {
