@@ -64,23 +64,23 @@ namespace Bion.Test.Vector
 
             Assert.AreEqual(new FileInfo(fileName).Length, expectedLength);
 
-            //using (IntBlockReader reader = new IntBlockReader(new BufferedReader(File.OpenRead(fileName))))
-            //{
-            //    int[] readValues;
-            //    int index = 0;
-            //    int count = 0;
+            using (IntBlockReader reader = new IntBlockReader(new BufferedReader(File.OpenRead(fileName))))
+            {
+                int[] readValues;
+                int index = 0;
+                int count = 0;
 
-            //    do
-            //    {
-            //        count = reader.Next(out readValues);
-            //        for (int i = 0; i < count; ++i)
-            //        {
-            //            Assert.AreEqual(values[index++], readValues[i]);
-            //        }
-            //    } while (count == IntBlockPlan.BlockSize);
+                do
+                {
+                    count = reader.Next(out readValues);
+                    for (int i = 0; i < count; ++i)
+                    {
+                        Assert.AreEqual(values[index++], readValues[i]);
+                    }
+                } while (count == IntBlockPlan.BlockSize);
 
-            //    Assert.AreEqual(values.Length, index);
-            //}
+                Assert.AreEqual(values.Length, index);
+            }
         }
     }
 }
