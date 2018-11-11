@@ -6,14 +6,17 @@ using System.Runtime.Intrinsics.X86;
 
 namespace Bion.Vector
 {
-    public struct IntBlockPlan
+    public static class IntBlock
     {
         public const int BlockSize = 128;
         public const byte CountMarker = 0x00;
         public const byte BaseMarker = 0x01;
         public const byte SlopeMarker = 0x05;
         public const byte AdjustmentMarker = 0x10;
+    }
 
+    public struct IntBlockPlan
+    {
         public byte Count;
         public int Base;
         public int Slope;
@@ -82,20 +85,22 @@ namespace Bion.Vector
             return (byte)((count + 7) & ~7);
         }
 
-        public static IntBlockPlan Plan(int[] values, byte count)
+        public static IntBlockPlan Plan(int[] values, int index, int endIndex)
         {
-            // If only one value, write base only
-            if (count == 1) { return new IntBlockPlan(count, values[0], 0, 0); }
+            byte count = (byte)(endIndex - index);
 
-            int first = values[0];
+            // If only one value, write base only
+            if (count == 1) { return new IntBlockPlan(count, values[index], 0, 0); }
+
+            int first = values[index];
             int min = first;
-            int max = min;
-            int minSlope = values[1] - first;
+            int max = first;
+            int minSlope = values[index + 1] - first;
 
             // Find Min/Max and Min/Max Slope
             for (int i = 1; i < count; ++i)
             {
-                int value = values[i];
+                int value = values[index + i];
                 if (value < min) { min = value; }
                 if (value > max) { max = value; }
 
@@ -108,7 +113,7 @@ namespace Bion.Vector
             for (int i = 1; i < count; ++i)
             {
                 int line = first + minSlope * i;
-                int adjustment = values[i] - line;
+                int adjustment = values[index + i] - line;
                 if (adjustment > maxAdjustment) { maxAdjustment = adjustment; }
             }
 
@@ -136,40 +141,61 @@ namespace Bion.Vector
         public IntBlockWriter(BufferedWriter writer)
         {
             _writer = writer;
-            _buffer = new int[IntBlockPlan.BlockSize];
+            _buffer = new int[IntBlock.BlockSize];
             _bufferCount = 0;
         }
 
         public void Write(int value)
         {
             _buffer[_bufferCount++] = value;
-            if (_bufferCount == IntBlockPlan.BlockSize) { WriteBlock(); }
+            if (_bufferCount == IntBlock.BlockSize) { WriteBlock(_buffer, 0, _bufferCount); }
         }
 
-        private void WriteBlock()
+        public void Write(int[] array, int index, int endIndex)
         {
-            if (_bufferCount == 0) { return; }
+            int length = endIndex - index;
+            if (_bufferCount == 0 && length == IntBlock.BlockSize)
+            {
+                WriteBlock(array, index, endIndex);
+            }
+            else
+            {
+                while (index < endIndex)
+                {
+                    int countToCopy = Math.Min(IntBlock.BlockSize - _bufferCount, endIndex - index);
+                    Buffer.BlockCopy(array, index, _buffer, _bufferCount, countToCopy * 4);
+                    index += countToCopy;
+
+                    if (_bufferCount == IntBlock.BlockSize) { WriteBlock(_buffer, 0, _bufferCount); }
+                }
+            }
+        }
+
+        private void WriteBlock(int[] array, int index, int endIndex)
+        {
+            int length = endIndex - index;
+            if (length == 0) { return; }
 
             // Choose how to encode
-            IntBlockPlan plan = IntBlockPlan.Plan(_buffer, _bufferCount);
+            IntBlockPlan plan = IntBlockPlan.Plan(array, index, endIndex);
 
             _writer.EnsureSpace(plan.TotalBytes);
 
             // Write count (if needed)
-            if (plan.Count != IntBlockPlan.BlockSize)
+            if (plan.Count != IntBlock.BlockSize)
             {
-                _writer.Buffer[_writer.Index++] = IntBlockPlan.CountMarker;
+                _writer.Buffer[_writer.Index++] = IntBlock.CountMarker;
                 _writer.Buffer[_writer.Index++] = plan.Count;
             }
 
             // Write base, if needed
-            WriteComponent(plan.Base, plan.BaseBytes, IntBlockPlan.BaseMarker);
+            WriteComponent(plan.Base, plan.BaseBytes, IntBlock.BaseMarker);
 
             // Write slope, if needed
-            WriteComponent(plan.Slope, plan.SlopeBytes, IntBlockPlan.SlopeMarker);
+            WriteComponent(plan.Slope, plan.SlopeBytes, IntBlock.SlopeMarker);
 
             // Write adjustment marker
-            _writer.Buffer[_writer.Index++] = (byte)(IntBlockPlan.AdjustmentMarker + plan.BitsPerAdjustment);
+            _writer.Buffer[_writer.Index++] = (byte)(IntBlock.AdjustmentMarker + plan.BitsPerAdjustment);
 
             // Write adjustment bits
             if (plan.BitsPerAdjustment > 0)
@@ -180,7 +206,7 @@ namespace Bion.Vector
                 for (int i = 0; i < plan.AdjustmentCount; ++i)
                 {
                     // Calculate adjustment (zero once out of real values)
-                    ulong adjustment = unchecked((uint)(i >= plan.Count ? 0 : _buffer[i] - (plan.Base + plan.Slope * i)));
+                    ulong adjustment = unchecked((uint)(i >= plan.Count ? 0 : array[index + i] - (plan.Base + plan.Slope * i)));
 
                     // Add new value to bits left to write at top of long
                     toWrite += adjustment << (64 - plan.BitsPerAdjustment - bitsLeftToWrite);
@@ -219,7 +245,7 @@ namespace Bion.Vector
 
         public void Dispose()
         {
-            WriteBlock();
+            WriteBlock(_buffer, 0, _bufferCount);
 
             _writer?.Dispose();
             _writer = null;
@@ -234,7 +260,7 @@ namespace Bion.Vector
         public IntBlockReader(BufferedReader reader)
         {
             _reader = reader;
-            _buffer = new int[IntBlockPlan.BlockSize];
+            _buffer = new int[IntBlock.BlockSize];
         }
 
         public int Next(out int[] buffer)
@@ -248,36 +274,36 @@ namespace Bion.Vector
             // TODO: Reuse plan on read to store components.
 
             // Component defaults
-            byte count = IntBlockPlan.BlockSize;
+            byte count = IntBlock.BlockSize;
             int baseV = 0;
             int slope = 0;
 
             // Read components
             byte marker = _reader.Buffer[_reader.Index++];
-            while (marker < IntBlockPlan.AdjustmentMarker)
+            while (marker < IntBlock.AdjustmentMarker)
             {
-                if (marker == IntBlockPlan.CountMarker)
+                if (marker == IntBlock.CountMarker)
                 {
                     count = _reader.Buffer[_reader.Index++];
                 }
-                else if (marker < IntBlockPlan.SlopeMarker)
+                else if (marker < IntBlock.SlopeMarker)
                 {
-                    baseV = ReadComponent(marker, IntBlockPlan.BaseMarker);
+                    baseV = ReadComponent(marker, IntBlock.BaseMarker);
                 }
                 else
                 {
-                    slope = ReadComponent(marker, IntBlockPlan.SlopeMarker);
+                    slope = ReadComponent(marker, IntBlock.SlopeMarker);
                 }
 
                 marker = _reader.Buffer[_reader.Index++];
             }
 
             byte adjustmentMarker = marker;
-            byte adjustmentBitLength = (byte)(marker - IntBlockPlan.AdjustmentMarker);
+            byte adjustmentBitLength = (byte)(marker - IntBlock.AdjustmentMarker);
 
             //ReadScalar(count, baseV, slope, adjustmentBitLength);
             IntBlockVectorReader.ReadVector(count, baseV, slope, adjustmentBitLength, _reader, _buffer);
-       
+
             return count;
         }
 

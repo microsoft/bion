@@ -58,6 +58,13 @@ namespace Bion.IO
             CloseStream = true;
         }
 
+        /// <summary>
+        ///  Construct a BufferedReader reading the given file path.
+        /// </summary>
+        /// <param name="filePath">Path of file to read</param>
+        public BufferedReader(string filePath) : this(File.OpenRead(filePath))
+        { }
+
         private BufferedReader(byte[] source, int index, int length)
         {
             Buffer = source;

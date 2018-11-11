@@ -17,27 +17,27 @@ namespace Bion.Test.Vector
             int last;
 
             // Encode/Decode debugging
-            RoundTrip(Build(128, (i) => (i & 15)), 65);
+            RoundTrip(Build(IntBlock.BlockSize, (i) => (i & 15)), 65);
 
             // Zero: 1 byte (noAdjustMarker)
-            RoundTrip(Enumerable.Repeat(0, 128).ToArray(), 1);
+            RoundTrip(Enumerable.Repeat(0, IntBlock.BlockSize).ToArray(), 1);
 
             // 10: 3 bytes (baseMarker, 1b Base, noAdjustMarker)
-            RoundTrip(Enumerable.Repeat(10, 128).ToArray(), 3);
+            RoundTrip(Enumerable.Repeat(10, IntBlock.BlockSize).ToArray(), 3);
 
             // 0-127: 3 bytes (slopeMarker, 1b slope, noAdjustMarker)
-            RoundTrip(Enumerable.Range(0, 128).ToArray(), 3);
+            RoundTrip(Enumerable.Range(0, IntBlock.BlockSize).ToArray(), 3);
 
             // 127-0: 8 bytes (baseMarker, 1b base, slopeMarker, 4b slope, noAdjustMarker)
-            RoundTrip(Enumerable.Range(0, 128).Reverse().ToArray(), 8);
+            RoundTrip(Enumerable.Range(0, IntBlock.BlockSize).Reverse().ToArray(), 8);
 
-            // 0-15 random: 65 bytes (adjustMarker, 4 bit x 128 = 64 bytes)
+            // 0-15 random: 65 bytes (adjustMarker, 4 bit x IntBlock.BlockSize = 64 bytes)
             r = new Random(6);
-            RoundTrip(Build(128, (i) => r.Next(16)), 65);
+            RoundTrip(Build(IntBlock.BlockSize, (i) => r.Next(16)), 65);
 
-            // 0-63 random: 97 bytes (adjustMarker, 6 bit x 128 = 96 bytes)
+            // 0-63 random: 97 bytes (adjustMarker, 6 bit x IntBlock.BlockSize = 96 bytes)
             r = new Random(6);
-            RoundTrip(Build(128, (i) => r.Next(64)), 97);
+            RoundTrip(Build(IntBlock.BlockSize, (i) => r.Next(64)), 97);
 
             // Short, Zero: 3 bytes (countMarker, 1b Count, noAdjustMarker)
             RoundTrip(Enumerable.Repeat(0, 50).ToArray(), 3);
@@ -46,14 +46,14 @@ namespace Bion.Test.Vector
             r = new Random(6);
             RoundTrip(Build(138, (i) => r.Next(64)), 97 + 15);
 
-            // Ascending with randomness. 101 bytes (baseMarker, 1b base, slopeMarker, 1b slope, adjustMarker, 6 bit x 128 = 96 bytes)
+            // Ascending with randomness. 101 bytes (baseMarker, 1b base, slopeMarker, 1b slope, adjustMarker, 6 bit x IntBlock.BlockSize = 96 bytes)
             r = new Random(6);
             last = 0;
-            RoundTrip(Build(128, (i) => { last += 2 + r.Next(4); return last; }), 101);
+            RoundTrip(Build(IntBlock.BlockSize, (i) => { last += 2 + r.Next(4); return last; }), 101);
 
-            // Full random int. 513 bytes (adjustMarker, 32 bit x 128 = 512 bytes)
+            // Full random int. 513 bytes (adjustMarker, 32 bit x IntBlock.BlockSize = 512 bytes)
             r = new Random(6);
-            RoundTrip(Build(128, (i) => r.Next() - (int.MaxValue / 2)), 513);
+            RoundTrip(Build(IntBlock.BlockSize, (i) => r.Next() - (int.MaxValue / 2)), 513);
         }
 
         private static int[] Build(int count, Func<int, int> next)
@@ -93,7 +93,7 @@ namespace Bion.Test.Vector
                     {
                         Assert.AreEqual(values[index++], readValues[i]);
                     }
-                } while (count == IntBlockPlan.BlockSize);
+                } while (count == IntBlock.BlockSize);
 
                 Assert.AreEqual(values.Length, index);
             }

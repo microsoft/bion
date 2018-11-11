@@ -1,6 +1,7 @@
 ﻿using Bion.Core;
 using Bion.IO;
 using Bion.Text;
+using Bion.Vector;
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -15,25 +16,33 @@ namespace Bion.Console
 
         public static void Test()
         {
-            string filePath = @"C:\Download\Sarif\Out\SarifSearch.All.cmp";
-            string blockPath = @"C:\Download\Sarif\Out\SarifSearch.All.blk";
+            string syntheticBlockPath = @"C:\Download\Sarif\Out\BlockTest.blk";
+
+            string compressedPath = @"C:\Download\Sarif\Out\SarifSearch.All.cmp";
+            string dictionaryPath = @"C:\Download\Sarif\Out\SarifSearch.All.wdx";
+            string searchIndexPath = @"C:\Download\Sarif\Out\SarifSearch.All.idx";
             int bufferSize = 64 * 1024;
 
-            //string dictionaryPath = @"C:\Download\Sarif\Out\SarifSearch.All.wdx";
             //DictionaryLengths(dictionaryPath);
             //WriteWordsForLength(dictionaryPath, 52);
 
-            //ReadBytes(filePath, bufferSize);
-            ReadBufferedReader(filePath, bufferSize);
-            //Read6Bit(filePath, bufferSize);
+            //ReadBytes(compressedPath, bufferSize);
+            //ReadBufferedReader(compressedPath, bufferSize);
+            //Read6Bit(compressedPath, bufferSize);
 
-            VectorTest(filePath);
+            //VectorTest(compressedPath);
 
-            //TranslateSixBit(filePath, blockPath);
-            //ReadNumberBlock(blockPath, bufferSize);
+            //TranslateSixBit(compressedPath, compressedPath + ".blk");
+            //ReadIntBlock(compressedPath + ".blk", bufferSize);
 
-            //TranslateSearchIndex(@"C:\Download\Sarif\Out\SarifSearch.All.idx", @"C:\Download\Sarif\Out\SarifSearch.All.idx.blk");
-            //ReadNumberBlock(@"C:\Download\Sarif\Out\SarifSearch.All.idx.blk", bufferSize);
+            //TranslateSearchIndex(searchIndexPath, searchIndexPath + ".blk");
+            //ReadIntBlock(searchIndexPath + ".blk", bufferSize);
+
+            //TranslateDictionaryPositions(dictionaryPath, dictionaryPath + ".blk");
+            //ReadIntBlock(dictionaryPath + ".blk", bufferSize);
+
+            WriteSyntheticBlock(syntheticBlockPath, 256 * 1024 * 1024);
+            //ReadIntBlock(syntheticBlockPath, bufferSize);
         }
 
         public static void ReadBytes(string filePath, int bufferSizeBytes)
@@ -96,7 +105,7 @@ namespace Bion.Console
         }
 
 
-        public static void ReadNumberBlock(string filePath, int bufferSizeBytes)
+        public static void ReadIntBlock(string filePath, int bufferSizeBytes)
         {
             int[] block;
             byte[] buffer = new byte[bufferSizeBytes];
@@ -105,14 +114,28 @@ namespace Bion.Console
             using (new ConsoleWatch($"ReadNumberBlock(\"{filePath}\", {bufferSizeBytes})", () => $"Done; {totalSize:n0} bytes"))
             {
                 using (BufferedReader bufferedReader = new BufferedReader(File.OpenRead(filePath), buffer))
-                using (NumberBlockReader reader = new NumberBlockReader(bufferedReader, BlockSize))
+                using (IntBlockReader reader = new IntBlockReader(bufferedReader))
                 {
-                    while (reader.ReadBlock(out block))
+                    while (true)
                     {
-                        // Nothing
+                        int count = reader.Next(out block);
+                        totalSize += 4 * count;
+                        if (count < 128) { break; }
                     }
+                }
+            }
 
-                    totalSize = bufferedReader.BytesRead;
+            using (BufferedReader bufferedReader = BufferedReader.ReadAll(filePath))
+            using (new ConsoleWatch($"ReadNumberBlock(\"{filePath}\", {bufferSizeBytes})", () => $"[ReadAll]; {totalSize:n0} bytes"))
+            {
+                using (IntBlockReader reader = new IntBlockReader(bufferedReader))
+                {
+                    while (true)
+                    {
+                        int count = reader.Next(out block);
+                        totalSize += 4 * count;
+                        if (count < 128) { break; }
+                    }
                 }
             }
         }
@@ -148,10 +171,11 @@ namespace Bion.Console
         public static void TranslateSearchIndex(string filePath, string outPath)
         {
             long[] decoded = new long[BlockSize];
+            long totalDecodedBytes = 0;
 
-            using (new ConsoleWatch($"TranslateSearchIndex(\"{filePath}\", \"{outPath}\")"))
+            using (new ConsoleWatch($"TranslateSearchIndex(\"{filePath}\", \"{outPath}\")", () => $"Done. {totalDecodedBytes:n0} uncompressed equivalent."))
             {
-                using (NumberBlockWriter writer = new NumberBlockWriter(new BufferedWriter(File.Create(outPath)), BlockSize))
+                using (IntBlockWriter writer = new IntBlockWriter(new BufferedWriter(File.Create(outPath))))
                 using (SearchIndexReader reader = new SearchIndexReader(filePath))
                 {
                     for (int i = 0; i < reader.WordCount; ++i)
@@ -165,8 +189,11 @@ namespace Bion.Console
                             {
                                 int current = (int)decoded[j];
                                 writer.Write(current - last);
+                                //writer.Write(current);
                                 last = current;
                             }
+
+                            totalDecodedBytes += count * 4;
                         }
                     }
                 }
@@ -202,6 +229,35 @@ namespace Bion.Console
             }
 
             System.Console.WriteLine($"Total {total:n0}b for {wordCount:n0} words. Avg:{((float)total / (float)wordCount):n2} bytes.");
+        }
+
+        public static void TranslateDictionaryPositions(string dictionaryPath, string blockPath)
+        {
+            int wordCount = 0;
+            int totalLength = 0;
+            long bytesWritten = 0;
+
+            using (new ConsoleWatch($"Translating {dictionaryPath} positions to {blockPath}...",
+                () => $"{wordCount:n0} words, total length {totalLength:n0}, written to {bytesWritten:n0} bytes ({((float)(8 * bytesWritten) / (float)(wordCount)):n2} bits per position)"))
+            {
+                using (IntBlockWriter writer = new IntBlockWriter(new BufferedWriter(blockPath)))
+                using (WordCompressor compressor = WordCompressor.OpenRead(dictionaryPath))
+                {
+                    wordCount = compressor.WordCount;
+                    writer.Write(0);
+
+                    for (int wordIndex = 0; wordIndex < compressor.WordCount; ++wordIndex)
+                    {
+                        int length = compressor[wordIndex].Word.Length;
+                        totalLength += length;
+
+                        //writer.Write(totalLength);
+                        writer.Write(length);
+                    }
+                }
+
+                bytesWritten = new FileInfo(blockPath).Length;
+            }
         }
 
         public static void WriteWordsForLength(string dictionaryPath, int length)
@@ -296,12 +352,12 @@ namespace Bion.Console
 
                 //Vector128<int> addValue = Sse.Set1<int>(index);
                 int* addValue = stackalloc int[4];
-                for(int i = 0; i < 4; ++i)
+                for (int i = 0; i < 4; ++i)
                 {
                     addValue[i] = index;
                 }
                 Vector128<int> addValueV = Unsafe.ReadUnaligned<Vector128<int>>(addValue);
-                
+
                 for (int i = 0; i < 128; i += 4)
                 {
                     // Read source bytes
@@ -330,6 +386,36 @@ namespace Bion.Console
             }
 
             return 128;
+        }
+
+        public static void WriteSyntheticBlock(string blockPath, long count)
+        {
+            int index = 0;
+            int[] block = new int[IntBlock.BlockSize];
+
+            long bytesWritten = 0;
+
+            using (new ConsoleWatch($"Writing Synthetic {count:n0} ints to {blockPath}...",
+                () => $"{count:n0} values, written as {bytesWritten:n0} bytes ({((float)(8 * bytesWritten) / (float)(count)):n2} bits per value)."))
+            {
+                using (IntBlockWriter writer = new IntBlockWriter(new BufferedWriter(blockPath)))
+                {
+                    for (long i = 0; i < count; ++i)
+                    {
+                        int value = (int)(i & 63);
+                        //writer.Write(value);
+
+                        block[index++] = value;
+                        if (index == IntBlock.BlockSize)
+                        {
+                            writer.Write(block, 0, index);
+                            index = 0;
+                        }
+                    }
+                }
+
+                bytesWritten = new FileInfo(blockPath).Length;
+            }
         }
     }
 }

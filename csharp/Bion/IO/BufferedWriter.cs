@@ -56,6 +56,13 @@ namespace Bion.IO
         }
 
         /// <summary>
+        ///  Construct a BufferedWriter for the given file path.
+        /// </summary>
+        /// <param name="filePath">File Path to create</param>
+        public BufferedWriter(string filePath) : this(File.Create(filePath))
+        { }
+
+        /// <summary>
         ///  Return a BufferedWriter which will write to an in-memory byte[] only.
         ///  It will use the passed array, but may have to resize it.
         ///  writer.Buffer[0, writer.Index] will contain the result.
