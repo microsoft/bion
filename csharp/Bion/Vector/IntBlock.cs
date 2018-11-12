@@ -167,6 +167,59 @@ namespace Bion.Vector
             return component;
         }
 
+        public static IntBlock Plan(int[] values, int index, int endIndex)
+        {
+            byte count = (byte)(endIndex - index);
+
+            // If only one value, write base only
+            if (count == 1) { return new IntBlock(count, values[index], 0, 0); }
+
+            int first = values[index];
+
+            // Compute overall slope and consider values around exact (non-int) slope
+            int slopeL = (values[index + count - 1] - first) / (count - 1);
+            int slopeH = slopeL + 1;
+
+            int min = first;
+            int max = first;
+            int minL = first;
+            int maxL = first;
+            int minH = first;
+            int maxH = first;
+
+            // Find absolute and slope-relative min and max
+            int line = 0;
+            for (int i = 1; i < count; ++i)
+            {
+                int value = values[index + i];
+
+                if (value < min) { min = value; }
+                if (value > max) { max = value; }
+
+                line += slopeL;
+                int adjustment = value - line;
+                if (adjustment < minL) { minL = adjustment; }
+                if (adjustment > maxL) { maxL = adjustment; }
+
+                adjustment = value - (line + i);
+                if (adjustment < minH) { minH = adjustment; }
+                if (adjustment > maxH) { maxH = adjustment; }
+            }
+
+            // Measure adjustments from slope and identify ideal base
+            IntBlock adjustmentOnly = new IntBlock(count, 0, 0, (min < 0 ? (byte)32 : BitLength(max)));
+            IntBlock withBase = new IntBlock(count, min, 0, BitLength(max - min));
+            IntBlock baseAndSlopeL = new IntBlock(count, minL, slopeL, BitLength(maxL - minL));
+            IntBlock baseAndSlopeH = new IntBlock(count, minH, slopeH, BitLength(maxH - minH));
+
+            IntBlock plan = adjustmentOnly;
+            if (withBase.TotalBytes < plan.TotalBytes) { plan = withBase; }
+            if (baseAndSlopeL.TotalBytes < plan.TotalBytes) { plan = baseAndSlopeL; }
+            if (baseAndSlopeH.TotalBytes < plan.TotalBytes) { plan = baseAndSlopeH; }
+
+            return plan;
+        }
+
         public int TotalBytes
         {
             get
@@ -213,77 +266,6 @@ namespace Bion.Vector
         {
             // Count must be the next even multiple of 8
             return (byte)((count + 7) & ~7);
-        }
-
-        public static IntBlock Plan(int[] values, int index, int endIndex)
-        {
-            byte count = (byte)(endIndex - index);
-
-            // If only one value, write base only
-            if (count == 1) { return new IntBlock(count, values[index], 0, 0); }
-
-            int first = values[index];
-            int min = first;
-            int max = first;
-
-            int minAdjustment = 0, maxAdjustment = 0;
-
-            // Find Min/Max and compute sums to derive trendline slope
-            for (int i = 1; i < count; ++i)
-            {
-                int value = values[index + i];
-                if (value < min) { min = value; }
-                if (value > max) { max = value; }
-            }
-
-            // Measure adjustments from slope and identify ideal base
-            int overallSlope = (values[index + count - 1] - values[index]) / (count - 1);
-            int slope = overallSlope;
-            TrySlope(values, index, count, overallSlope, ref slope, ref minAdjustment, ref maxAdjustment);
-            TrySlope(values, index, count, overallSlope + 1, ref slope, ref minAdjustment, ref maxAdjustment);
-
-            IntBlock adjustmentOnly = new IntBlock(count, 0, 0, (min < 0 ? (byte)32 : BitLength(max)));
-            IntBlock withBase = new IntBlock(count, min, 0, BitLength(max - min));
-            IntBlock baseAndSlope = new IntBlock(count, minAdjustment, slope, BitLength(maxAdjustment - minAdjustment));
-
-            IntBlock plan = adjustmentOnly;
-            if (withBase.TotalBytes < plan.TotalBytes) { plan = withBase; }
-            if (baseAndSlope.TotalBytes < plan.TotalBytes) { plan = baseAndSlope; }
-
-            return plan;
-        }
-
-        private static bool TrySlope(int[] values, int index, int count, int newSlope, ref int slope, ref int minAdjustment, ref int maxAdjustment)
-        {
-            int minAdjustmentNew = values[index];
-            int maxAdjustmentNew = values[index];
-
-            int line = 0;
-            for (int i = 1; i < count; ++i)
-            {
-                line += newSlope;
-                int adjustment = values[index + i] - line;
-                if (adjustment < minAdjustmentNew) { minAdjustmentNew = adjustment; }
-                if (adjustment > maxAdjustmentNew) { maxAdjustmentNew = adjustment; }
-            }
-
-            if (newSlope == slope)
-            {
-                slope = newSlope;
-                maxAdjustment = maxAdjustmentNew;
-                minAdjustment = minAdjustmentNew;
-                return true;
-            }
-
-            if ((maxAdjustmentNew - minAdjustmentNew) < (maxAdjustment - minAdjustment))
-            {
-                slope = newSlope;
-                maxAdjustment = maxAdjustmentNew;
-                minAdjustment = minAdjustmentNew;
-                return true;
-            }
-
-            return false;
         }
     }
 
