@@ -3,6 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
+using System.Text;
 
 namespace Bion.Vector
 {
@@ -13,6 +14,57 @@ namespace Bion.Vector
         public const byte BaseMarker = 0x01;
         public const byte SlopeMarker = 0x05;
         public const byte AdjustmentMarker = 0x10;
+    }
+
+    public class IntBlockStats
+    {
+        public int TotalBlockCount;
+        public int AdjustmentOnlyCount;
+        public int BaseCount;
+        public int BaseAndSlopeCount;
+        public int[] CountPerLength;
+
+        public IntBlockStats()
+        {
+            this.CountPerLength = new int[33];
+        }
+
+        public void Add(IntBlockPlan plan)
+        {
+            TotalBlockCount++;
+
+            if (plan.Slope != 0)
+            {
+                BaseAndSlopeCount++;
+            }
+            else if (plan.Base != 0)
+            {
+                BaseCount++;
+            }
+            else
+            {
+                AdjustmentOnlyCount++;
+            }
+
+            CountPerLength[plan.BitsPerAdjustment]++;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder result = new StringBuilder();
+            result.AppendLine($"Total: {TotalBlockCount:n0}");
+            result.AppendLine($"AdjOnly: {AdjustmentOnlyCount:n0}");
+            result.AppendLine($"Base: {BaseCount:n0}");
+            result.AppendLine($"BaseAndSlope: {BaseAndSlopeCount:n0}");
+            result.AppendLine();
+
+            for (int i = 0; i < this.CountPerLength.Length; ++i)
+            {
+                result.AppendLine($"{i} bit: {this.CountPerLength[i]:n0}");
+            }
+
+            return result.ToString();
+        }
     }
 
     public struct IntBlockPlan
@@ -95,37 +147,98 @@ namespace Bion.Vector
             int first = values[index];
             int min = first;
             int max = first;
-            int minSlope = values[index + 1] - first;
+            //long sumY = first;
+            //long sumXY = 0;
+            //int minSlope = values[index + 1] - first;
 
-            // Find Min/Max and Min/Max Slope
+            // Find Min/Max and compute sums to derive trendline slope
             for (int i = 1; i < count; ++i)
             {
                 int value = values[index + i];
                 if (value < min) { min = value; }
                 if (value > max) { max = value; }
 
-                int slope = (value - first) / i;
-                if (slope < minSlope) { minSlope = slope; }
+                //sumY += value;
+                //sumXY += i * value;
+
+                //int slopeHere = (value - first) / i;
+                //if (slopeHere < minSlope) { minSlope = slopeHere; }
             }
 
-            // Determine biggest adjustment if using base+slope
-            int maxAdjustment = 0;
-            for (int i = 1; i < count; ++i)
-            {
-                int line = first + minSlope * i;
-                int adjustment = values[index + i] - line;
-                if (adjustment > maxAdjustment) { maxAdjustment = adjustment; }
-            }
+            //// Calculate slope
+            //double denominator = (double)((count - 1) * (count) * (count + 1));
+            //double numerator = (double)(6 * ((2 * sumXY) - ((count - 1) * sumY)));
+            //int computedSlope = (int)(numerator / denominator);
+
+            int overallSlope = (values[index + count - 1] - values[index]) / count;
+
+            // Measure adjustments from slope and identify ideal base
+            int slope;// = computedSlope;
+            int minAdjustment = 0, maxAdjustment = 0;
+
+            //TrySlope(values, index, count, computedSlope, ref slope, ref minAdjustment, ref maxAdjustment);
+            //TrySlope(values, index, count, computedSlope + 1, ref slope, ref minAdjustment, ref maxAdjustment);
+            
+            //// slope = minSlope;
+            //TrySlope(values, index, count, minSlope, ref slope, ref minAdjustment, ref maxAdjustment);
+            //TrySlope(values, index, count, minSlope + 1, ref slope, ref minAdjustment, ref maxAdjustment);
+
+            slope = overallSlope;
+            TrySlope(values, index, count, overallSlope, ref slope, ref minAdjustment, ref maxAdjustment);
+            TrySlope(values, index, count, overallSlope + 1, ref slope, ref minAdjustment, ref maxAdjustment);
+
+            // Try smaller slopes while the result gets better
+            //while (TrySlope(values, index, count, slope - 1, ref slope, ref minAdjustment, ref maxAdjustment));
+
+            // Try bigger slopes while the result gets better
+            //while (TrySlope(values, index, count, slope + 1, ref slope, ref minAdjustment, ref maxAdjustment));
 
             IntBlockPlan adjustmentOnly = new IntBlockPlan(count, 0, 0, (min >= 0 ? max : min));
             IntBlockPlan withBase = new IntBlockPlan(count, min, 0, max - min);
-            IntBlockPlan baseAndSlope = new IntBlockPlan(count, first, minSlope, maxAdjustment);
+            IntBlockPlan baseAndSlope = new IntBlockPlan(count, minAdjustment, slope, maxAdjustment - minAdjustment);
 
             IntBlockPlan plan = adjustmentOnly;
             if (withBase.TotalBytes < plan.TotalBytes) { plan = withBase; }
             if (baseAndSlope.TotalBytes < plan.TotalBytes) { plan = baseAndSlope; }
 
+            //if (baseAndSlopeMin.TotalBytes < plan.TotalBytes)
+            //{
+            //    plan = baseAndSlopeMin;
+            //}
             return plan;
+        }
+
+        private static bool TrySlope(int[] values, int index, int count, int newSlope, ref int slope, ref int minAdjustment, ref int maxAdjustment)
+        {
+            int minAdjustmentNew = values[index];
+            int maxAdjustmentNew = values[index];
+
+            int line = 0;
+            for (int i = 1; i < count; ++i)
+            {
+                line += newSlope;
+                int adjustment = values[index + i] - line;
+                if (adjustment < minAdjustmentNew) { minAdjustmentNew = adjustment; }
+                if (adjustment > maxAdjustmentNew) { maxAdjustmentNew = adjustment; }
+            }
+
+            if (newSlope == slope)
+            {
+                slope = newSlope;
+                maxAdjustment = maxAdjustmentNew;
+                minAdjustment = minAdjustmentNew;
+                return true;
+            }
+
+            if ((maxAdjustmentNew - minAdjustmentNew) < (maxAdjustment - minAdjustment))
+            {
+                slope = newSlope;
+                maxAdjustment = maxAdjustmentNew;
+                minAdjustment = minAdjustmentNew;
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -138,11 +251,15 @@ namespace Bion.Vector
         private int[] _buffer;
         private byte _bufferCount;
 
+        public IntBlockStats Stats;
+
         public IntBlockWriter(BufferedWriter writer)
         {
             _writer = writer;
             _buffer = new int[IntBlock.BlockSize];
             _bufferCount = 0;
+
+            Stats = new IntBlockStats();
         }
 
         public void Write(int value)
@@ -178,6 +295,8 @@ namespace Bion.Vector
 
             // Choose how to encode
             IntBlockPlan plan = IntBlockPlan.Plan(array, index, endIndex);
+
+            Stats?.Add(plan);
 
             _writer.EnsureSpace(plan.TotalBytes);
 

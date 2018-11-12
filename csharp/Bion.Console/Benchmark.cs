@@ -41,8 +41,8 @@ namespace Bion.Console
             TranslateDictionaryPositions(dictionaryPath, dictionaryPath + ".blk", true);
             //ReadIntBlock(dictionaryPath + ".blk", bufferSize);
 
-            WriteSyntheticBlock(syntheticBlockPath, 256 * 1024 * 1024);
-            ReadIntBlock(syntheticBlockPath, bufferSize);
+            //WriteSyntheticBlock(syntheticBlockPath, 256 * 1024 * 1024);
+            //ReadIntBlock(syntheticBlockPath, bufferSize);
         }
 
         public static void ReadBytes(string filePath, int bufferSizeBytes)
@@ -198,6 +198,8 @@ namespace Bion.Console
                             intCount += count;
                         }
                     }
+
+                    System.Console.WriteLine(writer.Stats);
                 }
 
                 bytesWritten = new FileInfo(outPath).Length;
@@ -226,6 +228,8 @@ namespace Bion.Console
 
                         writer.Write((absolute ? totalLength : length));
                     }
+
+                    System.Console.WriteLine(writer.Stats);
                 }
 
                 bytesWritten = new FileInfo(blockPath).Length;
@@ -415,6 +419,8 @@ namespace Bion.Console
                             index = 0;
                         }
                     }
+
+                    System.Console.WriteLine(writer.Stats);
                 }
 
                 bytesWritten = new FileInfo(blockPath).Length;
