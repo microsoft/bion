@@ -79,7 +79,7 @@ namespace Bion.Vector
             this.Base = baseV;
             this.Slope = slope;
             this.BitsPerAdjustment = bitsPerAdjustment;
-            
+
             // Must write an even multiple of 8 counts
             this.AdjustmentCount = RequiredCount(count);
         }
@@ -218,6 +218,29 @@ namespace Bion.Vector
             if (baseAndSlopeH.TotalBytes < plan.TotalBytes) { plan = baseAndSlopeH; }
 
             return plan;
+        }
+
+        private static int PredictedSlope(int[] values, int index, int endIndex)
+        {
+            byte count = (byte)(endIndex - index);
+
+            int first = values[index];
+            long sumY = first;
+            long sumXY = 0;
+
+            // Find Min/Max and compute sums to derive trendline slope
+            for (int i = 1; i < count; ++i)
+            {
+                int value = values[index + i];
+                sumY += value;
+                sumXY += i * value;
+            }
+
+            // Calculate slope
+            double denominator = (double)((count - 1) * (count) * (count + 1));
+            double numerator = (double)(6 * ((2 * sumXY) - ((count - 1) * sumY)));
+
+            return (int)(numerator / denominator);
         }
 
         public int TotalBytes
