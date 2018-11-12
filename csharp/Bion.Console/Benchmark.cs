@@ -41,7 +41,7 @@ namespace Bion.Console
             TranslateDictionaryPositions(dictionaryPath, dictionaryPath + ".blk", true);
             //ReadIntBlock(dictionaryPath + ".blk", bufferSize);
 
-            //WriteSyntheticBlock(syntheticBlockPath, 256 * 1024 * 1024);
+            WriteSyntheticBlock(syntheticBlockPath, 256 * 1024 * 1024);
             //ReadIntBlock(syntheticBlockPath, bufferSize);
         }
 
