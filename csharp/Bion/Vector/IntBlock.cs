@@ -1,5 +1,7 @@
 ﻿using Bion.IO;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
@@ -394,7 +396,7 @@ namespace Bion.Vector
         }
     }
 
-    public class IntBlockReader : IDisposable
+    public class IntBlockReader : IEnumerable<Memory<int>>, IDisposable
     {
         private BufferedReader _reader;
         private int[] _buffer;
@@ -468,6 +470,111 @@ namespace Bion.Vector
         {
             _reader?.Dispose();
             _reader = null;
+        }
+
+        //public Enumerator GetEnumerator()
+        //{
+        //    return new Enumerator(this);
+        //}
+
+        //IEnumerator<int> IEnumerable<int>.GetEnumerator()
+        //{
+        //    return new Enumerator(this);
+        //}
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new PageEnumerator(this);
+        }
+
+        public PageEnumerator GetEnumerator()
+        {
+            return new PageEnumerator(this);
+        }
+
+        IEnumerator<Memory<int>> IEnumerable<Memory<int>>.GetEnumerator()
+        {
+            return new PageEnumerator(this);
+        }
+
+        public struct Enumerator : IEnumerator<int>
+        {
+            private IntBlockReader _reader;
+            private int[] _currentPage;
+            private int _currentPageCount;
+            private int _index;
+            
+            internal Enumerator(IntBlockReader reader)
+            {
+                _reader = reader;
+
+                _currentPage = null;
+                _currentPageCount = 0;
+
+                Current = 0;
+                _index = -1;
+                
+                Reset();
+            }
+
+            public int Current { get; private set; }
+            object IEnumerator.Current => Current;
+
+            public bool MoveNext()
+            {
+                if (_index >= _currentPageCount)
+                {
+                    _currentPageCount = _reader.Next(out _currentPage);
+                    if (_currentPageCount == 0) { return false; }
+                    _index = 0;
+                }
+
+                Current = _currentPage[_index];
+                _index++;
+                return true;
+            }
+
+            public void Reset()
+            {
+                _reader._reader.Seek(0, System.IO.SeekOrigin.Begin);
+
+                _currentPageCount = 0;
+                Current = 0;
+                _index = 0;
+            }
+
+            public void Dispose()
+            { }
+        }
+
+        public struct PageEnumerator : IEnumerator<Memory<int>>
+        {
+            private IntBlockReader _reader;
+            public Memory<int> Current { get; private set; }
+            object IEnumerator.Current => Current;
+
+            internal PageEnumerator(IntBlockReader reader)
+            {
+                _reader = reader;
+                Current = default(Memory<int>);
+                Reset();
+            }
+
+            public bool MoveNext()
+            {
+                int count = _reader.Next(out int[] array);
+                Current = array.AsMemory(0, count);
+                return count > 0;
+            }
+
+            public void Reset()
+            {
+                _reader._reader.Seek(0, System.IO.SeekOrigin.Begin);
+                Current = default(Memory<int>);
+            }
+
+            public void Dispose()
+            { }
         }
     }
 

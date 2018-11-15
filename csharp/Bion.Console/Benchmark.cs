@@ -3,13 +3,67 @@ using Bion.IO;
 using Bion.Text;
 using Bion.Vector;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Runtime.Intrinsics;
-using System.Runtime.Intrinsics.X86;
 
 namespace Bion.Console
 {
+    public class MyArray : IEnumerable<int>
+    {
+        private int[] _inner;
+
+        public MyArray(int[] inner)
+        {
+            _inner = inner;
+        }
+
+        public Enumerator GetEnumerator()
+        {
+            return new Enumerator(_inner);
+        }
+
+        IEnumerator<int> IEnumerable<int>.GetEnumerator()
+        {
+            return new Enumerator(_inner);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new Enumerator(_inner);
+        }
+
+        public class Enumerator : IEnumerator<int>
+        {
+            private int[] _inner;
+            private int _index;
+            private int _current;
+
+            public Enumerator(int[] inner)
+            {
+                _inner = inner;
+            }
+
+            public int Current => _current;
+            object IEnumerator.Current => _current;
+
+            public bool MoveNext()
+            {
+                _current = _inner[_index];
+                _index++;
+                return _index < _inner.Length;
+            }
+
+            public void Reset()
+            {
+                _index = 0;
+            }
+
+            public void Dispose()
+            { }
+        }
+    }
+
     public static class Benchmark
     {
         public const int BlockSize = 64;
@@ -23,26 +77,29 @@ namespace Bion.Console
             string searchIndexPath = @"C:\Download\Sarif\Out\SarifSearch.All.idx";
             int bufferSize = 64 * 1024;
 
+            ArrayTest();
+            //return;
+
             //DictionaryLengths(dictionaryPath);
             //WriteWordsForLength(dictionaryPath, 52);
 
             //ReadBytes(compressedPath, bufferSize);
             //ReadBufferedReader(compressedPath, bufferSize);
-            //Read6Bit(compressedPath, bufferSize);
+            Read6Bit(compressedPath, bufferSize);
 
             //VectorTest(compressedPath);
 
             //TranslateSixBit(compressedPath, compressedPath + ".blk");
             //ReadIntBlock(compressedPath + ".blk", bufferSize);
 
-            TranslateSearchIndex(searchIndexPath, searchIndexPath + ".blk", true);
+            //TranslateSearchIndex(searchIndexPath, searchIndexPath + ".blk", true);
             //ReadIntBlock(searchIndexPath + ".blk", bufferSize);
 
-            TranslateDictionaryPositions(dictionaryPath, dictionaryPath + ".blk", true);
+            //TranslateDictionaryPositions(dictionaryPath, dictionaryPath + ".blk", true);
             //ReadIntBlock(dictionaryPath + ".blk", bufferSize);
 
-            WriteSyntheticBlock(syntheticBlockPath, 256 * 1024 * 1024);
-            //ReadIntBlock(syntheticBlockPath, bufferSize);
+            //WriteSyntheticBlock(syntheticBlockPath, 256 * 1024 * 1024);
+            ReadIntBlock(syntheticBlockPath, bufferSize);
         }
 
         public static void ReadBytes(string filePath, int bufferSizeBytes)
@@ -89,14 +146,22 @@ namespace Bion.Console
             ulong[] decoded = new ulong[bufferSizeBytes / 10];
             byte[] buffer = new byte[bufferSizeBytes];
             long totalSize = 0;
+            long totalCount = 0;
+            ulong total = 0;
 
-            using (new ConsoleWatch($"Read6Bit(\"{filePath}\", {bufferSizeBytes})", () => $"Done; {totalSize:n0} bytes"))
+            using (new ConsoleWatch($"Read6Bit(\"{filePath}\", {bufferSizeBytes})", () => $"Done; {totalSize:n0} bytes; {totalCount:n0} ints"))
             {
                 using (BufferedReader reader = new BufferedReader(File.OpenRead(filePath), buffer))
                 {
                     while (!reader.EndOfStream)
                     {
-                        NumberConverter.ReadSixBitTerminatedBlock(reader, decoded);
+                        int count = NumberConverter.ReadSixBitTerminatedBlock(reader, decoded);
+                        for (int i = 0; i < count; ++i)
+                        {
+                            total += decoded[i];
+                        }
+
+                        totalCount += count;
                     }
 
                     totalSize = reader.BytesRead;
@@ -104,12 +169,12 @@ namespace Bion.Console
             }
         }
 
-
         public static void ReadIntBlock(string filePath, int bufferSizeBytes)
         {
             int[] block;
             byte[] buffer = new byte[bufferSizeBytes];
             long totalSize = 0;
+            long totalCount = 0;
 
             using (new ConsoleWatch($"ReadIntBlock(\"{filePath}\", {bufferSizeBytes})", () => $"Done; {totalSize:n0} bytes"))
             {
@@ -119,24 +184,94 @@ namespace Bion.Console
                     while (true)
                     {
                         int count = reader.Next(out block);
-                        totalSize += 4 * count;
-                        if (count < IntBlock.BlockSize) { break; }
+                        for (int i = 0; i < count; ++i)
+                        {
+                            totalSize += block[i];
+                        }
+
+                        if (count == 0) { break; }
                     }
                 }
             }
 
-            totalSize = 0;
-            using (BufferedReader bufferedReader = BufferedReader.ReadAll(filePath))
-            using (new ConsoleWatch($"ReadIntBlock(\"{filePath}\", {bufferSizeBytes})", () => $"[ReadAll]; {totalSize:n0} bytes"))
+            //for (int j = 0; j < 4; ++j)
             {
-                using (IntBlockReader reader = new IntBlockReader(bufferedReader))
+                totalSize = 0;
+                totalCount = 0;
+                using (BufferedReader bufferedReader = BufferedReader.ReadAll(filePath))
+                using (new ConsoleWatch($"ReadIntBlock(\"{filePath}\", {bufferSizeBytes})", () => $"[ReadAll]; {totalSize:n0} bytes; {totalCount:n0} ints"))
                 {
-                    while (true)
+                    using (IntBlockReader reader = new IntBlockReader(bufferedReader))
                     {
-                        int count = reader.Next(out block);
-                        totalSize += 4 * count;
-                        if (count < IntBlock.BlockSize) { break; }
+                        while (true)
+                        {
+                            int count = reader.Next(out block);
+                            for (int i = 0; i < count; ++i)
+                            {
+                                totalSize += block[i];
+                            }
+
+                            totalCount += count;
+                            if (count == 0) { break; }
+                        }
                     }
+                }
+
+                totalSize = 0;
+                using (BufferedReader bufferedReader = BufferedReader.ReadAll(filePath))
+                using (new ConsoleWatch($"ReadIntBlock(\"{filePath}\", {bufferSizeBytes})", () => $"[ReadAll, ForEach]; {totalSize:n0} bytes"))
+                {
+                    using (IntBlockReader reader = new IntBlockReader(bufferedReader))
+                    {
+                        foreach (Memory<int> page in reader)
+                        {
+                            foreach(int value in page.Span)
+                            {
+                                totalSize += value;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void ArrayTest()
+        {
+            int count = 268435456;
+
+            int[] array = new int[count];
+            for (int i = 0; i < count; ++i)
+            {
+                array[i] = i;
+            }
+
+            long total = 0;
+
+            using (new ConsoleWatch($"For [Array]", () => $"Done with total {total:n0}; {count:n0} ints"))
+            {
+                total = 0;
+                for (int i = 0; i < count; ++i)
+                {
+                    total += array[i];
+                }
+            }
+
+            using (new ConsoleWatch($"ForEach [Array]", () => $"Done with total {total:n0}; {count:n0} ints"))
+            {
+                total = 0;
+                foreach (int i in array)
+                {
+                    total += i;
+                }
+            }
+
+            using (new ConsoleWatch($"ForEach [MyArray]", () => $"Done with total {total:n0}; {count:n0} ints"))
+            {
+                total = 0;
+                MyArray myArray = new MyArray(array);
+                foreach (int i in myArray)
+                {
+                    total += i;
                 }
             }
         }
@@ -150,7 +285,7 @@ namespace Bion.Console
 
             using (new ConsoleWatch($"Translate(\"{filePath}\", {bufferSizeBytes})", () => $"Done; {totalSize:n0} bytes"))
             {
-                using (NumberBlockWriter writer = new NumberBlockWriter(new BufferedWriter(File.Create(outPath)), BlockSize))
+                using (IntBlockWriter writer = new IntBlockWriter(new BufferedWriter(outPath)))
                 using (BufferedReader reader = new BufferedReader(File.OpenRead(filePath), buffer))
                 {
                     while (!reader.EndOfStream)
@@ -175,7 +310,7 @@ namespace Bion.Console
             long intCount = 0;
             long bytesWritten = 0;
 
-            using(new ConsoleWatch($"Translating \"{filePath}\" to block \"{outPath}\"...",
+            using (new ConsoleWatch($"Translating \"{filePath}\" to block \"{outPath}\"...",
                 () => $"{intCount:n0} entries, written to {bytesWritten:n0} bytes ({((float)(8 * bytesWritten) / (float)(intCount)):n2} bits per position)"))
             {
                 using (IntBlockWriter writer = new IntBlockWriter(new BufferedWriter(outPath)))
@@ -283,116 +418,6 @@ namespace Bion.Console
                     }
                 }
             }
-        }
-
-        private static byte[] Lengths = { 4, 8, 12, 16 };
-        private static sbyte[] ShuffleMasks =
-        {
-            -1, -1, -1,  0, -1, -1, -1,  1, -1, -1, -1,  2, -1, -1, -1,  3,         // One Byte 
-            -1, -1,  0,  1, -1, -1,  2,  3, -1, -1,  4,  5, -1, -1,  6,  7,         // Two Bytes
-            -1,  0,  1,  2, -1,  3,  4,  5, -1,  6,  7,  8, -1,  9, 10, 11,         // Three Bytes
-             0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15          // Four Bytes
-        };
-
-        private static int[] MultiplyMasks =
-        {
-            1, 1, 1, 1,     // No multiply shift
-            1, 1, 1, 1,     // No multiply shift
-            1, 1, 1, 1,     // No multiply shift
-            1, 1, 1, 1,     // No multiply shift
-        };
-
-        public static void VectorTest(string filePath)
-        {
-            long decodedBytes = 0;
-            int[] result = new int[128];
-
-            using (new ConsoleWatch($"VectorTest(\"{filePath}\")", () => $"Done; Decoded to {decodedBytes:n0} bytes"))
-            {
-                using (BufferedReader reader = new BufferedReader(File.OpenRead(filePath)))
-                {
-                    while (!reader.EndOfStream)
-                    {
-                        int count = DecodeBlock(reader, result);
-                        decodedBytes += count * 4;
-                    }
-                }
-            }
-
-            using (BufferedReader reader = BufferedReader.ReadAll(filePath))
-            {
-                using (new ConsoleWatch($"VectorTest(\"{filePath}\")", () => $"RAM Done; Decoded to {decodedBytes:n0} bytes"))
-                {
-                    while (!reader.EndOfStream)
-                    {
-                        int count = DecodeBlock(reader, result);
-                        decodedBytes += count * 4;
-                    }
-                }
-            }
-        }
-
-        public unsafe static int DecodeBlock(BufferedReader reader, int[] result)
-        {
-            reader.EnsureSpace(1024);
-            if (reader.Length - reader.Index < 256)
-            {
-                reader.Index = reader.Length;
-                return 0;
-            }
-
-            fixed (int* resultPtr = result)
-            fixed (sbyte* maskPtr = ShuffleMasks)
-            fixed (int* multiplyPtr = MultiplyMasks)
-            fixed (byte* bufferPtr = reader.Buffer)
-            {
-                int index = reader.Index;
-
-                // Read control byte
-                byte controlByte = (byte)(bufferPtr[index++] & 0x3);
-
-                // Lookup length and mask
-                byte length = Lengths[controlByte];
-                Vector128<sbyte> shuffleMask = Unsafe.ReadUnaligned<Vector128<sbyte>>(&maskPtr[controlByte]);
-
-                Vector128<int> multiplyBy = Unsafe.ReadUnaligned<Vector128<int>>(&maskPtr[controlByte]);
-
-                //Vector128<int> addValue = Sse.Set1<int>(index);
-                int* addValue = stackalloc int[4];
-                for (int i = 0; i < 4; ++i)
-                {
-                    addValue[i] = index;
-                }
-                Vector128<int> addValueV = Unsafe.ReadUnaligned<Vector128<int>>(addValue);
-
-                for (int i = 0; i < 128; i += 4)
-                {
-                    // Read source bytes
-                    Vector128<sbyte> data = Unsafe.ReadUnaligned<Vector128<sbyte>>(&bufferPtr[index]);
-                    index += length;
-
-                    Vector128<int> vector;
-
-                    // Shuffle to get the right bytes in each integer
-                    vector = Sse.StaticCast<sbyte, int>(Ssse3.Shuffle(data, shuffleMask));
-
-                    // Multiply to shift each int so the desired bits are at the top
-                    vector = Sse41.MultiplyLow(vector, multiplyBy);
-
-                    // Shift the desired bits to the bottom and zero the top
-                    vector = Sse2.ShiftRightLogical(vector, 16);
-
-                    // Add the delta base value
-                    vector = Sse2.Add(vector, addValueV);
-
-                    // Write the decoded integers
-                    Unsafe.WriteUnaligned(&resultPtr[i], vector);
-                }
-
-                reader.Index = index;
-            }
-
-            return 128;
         }
 
         public static void WriteSyntheticBlock(string blockPath, long count)
