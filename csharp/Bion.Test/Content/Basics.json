@@ -8,6 +8,7 @@
   "SmallFloat": 0.5,
   "EmptyString": "",
   "ShortString": "hello",
+  "DateTimes": [ "2018-09-17", "2018-09-17T07:52:18Z", "2018-09-17T07:52:18.361Z" ],
   "BoolArray": [ true, false, false, false, true, true, true, false ],
   "NestedObject": {
     "ShortString": "InnerValue",

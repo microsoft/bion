@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Bion.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 
@@ -85,9 +86,8 @@ namespace Bion.Test
             using (MemoryStream stream = new MemoryStream())
             {
                 // Write desired value(s) without closing stream
-                using (BionWriter writer = new BionWriter(stream))
+                using (BionWriter writer = new BionWriter(new BufferedWriter(stream) { CloseStream = false }))
                 {
-                    writer.CloseStream = false;
                     write(writer);
                 }
 
@@ -96,9 +96,8 @@ namespace Bion.Test
                 stream.Seek(0, SeekOrigin.Begin);
 
                 // Read, verify, validate position and no more content
-                using (BionReader reader = new BionReader(stream))
+                using (BionReader reader = new BionReader(new BufferedReader(stream) { CloseStream = false }))
                 {
-                    reader.CloseStream = false;
                     readAndVerify(reader);
 
                     Assert.AreEqual(length, reader.BytesRead);

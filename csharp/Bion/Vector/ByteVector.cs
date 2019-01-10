@@ -7,82 +7,131 @@ namespace Bion.Vector
 {
     public static unsafe class ByteVector
     {
-        public static int CountGreaterThan(Span<byte> content, byte cutoff)
+        public static int IndexOf(byte value, byte[] content, int index, int endIndex)
         {
-            if (content.Length > 128 && Avx2.IsSupported)
+            if (endIndex - index > 128 && Avx2.IsSupported)
             {
-                return CountGreaterThanAvx(content, cutoff);
+                return IndexOfAvx(value, content, index, endIndex);
             }
             else
             {
-                return CountGreaterThanCs(content, cutoff);
+                return IndexOfCs(value, content, index, endIndex);
             }
         }
 
-        private static int CountGreaterThanCs(Span<byte> content, byte cutoff)
+        private static int IndexOfCs(byte value, byte[] content, int index, int endIndex)
         {
-            int count = 0;
-
-            for (int i = 0; i < content.Length; ++i)
+            int i;
+            for (i = index; i < endIndex; ++i)
             {
-                if (content[i] > cutoff) count++;
+                if (content[i] == value) { return i; }
             }
 
-            return count;
+            return -1;
         }
 
-        private static int CountGreaterThanAvx(Span<byte> content, byte cutoff)
+        private static int IndexOfAvx(byte value, byte[] content, int index, int endIndex)
         {
-            int count = 0;
-
-            // Load a vector to convert unsigned to signed value order (only signed compare supported)
-            Vector256<sbyte> toSignedV = SetAllTo(128);
-
-            // Load a vector of the compare cutoff and convert to signed
-            Vector256<sbyte> cutoffV = SetAllTo(cutoff);
-            cutoffV = Avx2.Subtract(cutoffV, toSignedV);
+            Vector256<sbyte> toFindV = SetAllTo(value);
 
             fixed (byte* contentPtr = &content[0])
             {
-                int blockLength = content.Length / 32;
-                for (int i = 0; i < blockLength; ++i)
+                int fullBlockLength = endIndex - 32;
+
+                int i;
+                for (i = index; i < fullBlockLength; i += 32)
                 {
-                    // Load a vector of content and convert to signed
-                    Vector256<sbyte> contentV = Unsafe.ReadUnaligned<Vector256<sbyte>>(&contentPtr[i * 32]);
-                    contentV = Avx2.Subtract(contentV, toSignedV);
+                    // Load a vector of content
+                    Vector256<sbyte> contentV = Unsafe.ReadUnaligned<Vector256<sbyte>>(&contentPtr[i]);
 
-                    // Find bytes greater than the cutoff
-                    Vector256<sbyte> result = Avx2.CompareGreaterThan(contentV, cutoffV);
+                    // Make a mask of matches
+                    Vector256<sbyte> matchV = Avx2.CompareEqual(contentV, toFindV);
 
-                    // Convert the byte mask of matches to a bit mask
-                    uint bits = unchecked((uint)Avx2.MoveMask(result));
-
-                    // Count the bits for the number of matches
-                    count += Popcnt.PopCount(bits);
+                    // Convert to a bit vector
+                    uint matchBits = unchecked((uint)Avx2.MoveMask(matchV));
+                    if(matchBits != 0)
+                    {
+                        return i + (int)TrailingZeroCount(matchBits);
+                    }
                 }
 
-                count += CountGreaterThanCs(content.Slice(blockLength * 32), cutoff);
+                return IndexOfCs(value, content, i, endIndex);
             }
-
-            return count;
         }
 
-        public static int Skip(Span<byte> content, ref int depth)
+        public static int GreaterThan(byte cutoff, byte[] content, int index, int endIndex)
         {
-            if (content.Length > 128 && Avx2.IsSupported)
+            if (endIndex - index > 128 && Avx2.IsSupported)
             {
-                return SkipAvx(content, ref depth);
+                return GreaterThanAvx(cutoff, content, index, endIndex);
             }
             else
             {
-                return SkipCs(content, ref depth);
+                return GreaterThanCs(cutoff, content, index, endIndex);
             }
         }
 
-        private static int SkipCs(Span<byte> content, ref int depth)
+        private static int GreaterThanCs(byte cutoff, byte[] content, int index, int endIndex)
         {
             int i;
-            for (i = 0; i < content.Length; ++i)
+            for (i = index; i < endIndex; ++i)
+            {
+                if (content[i] > cutoff) { return i; }
+            }
+
+            return -1;
+        }
+
+        private static int GreaterThanAvx(byte cutoff, byte[] content, int index, int endIndex)
+        {
+            // Load a vector to convert unsigned to signed value order (only signed compare supported)
+            Vector256<sbyte> toSignedV = SetAllTo(128);
+
+            Vector256<sbyte> toFindV = SetAllTo(cutoff);
+            toFindV = Avx2.Subtract(toFindV, toSignedV);
+
+            fixed (byte* contentPtr = &content[0])
+            {
+                int fullBlockLength = endIndex - 32;
+
+                int i;
+                for (i = index; i < fullBlockLength; i += 32)
+                {
+                    // Load a vector of content
+                    Vector256<sbyte> contentV = Unsafe.ReadUnaligned<Vector256<sbyte>>(&contentPtr[i]);
+                    contentV = Avx2.Subtract(contentV, toSignedV);
+
+                    // Make a mask of matches
+                    Vector256<sbyte> matchV = Avx2.CompareGreaterThan(contentV, toFindV);
+
+                    // Convert to a bit vector
+                    uint matchBits = unchecked((uint)Avx2.MoveMask(matchV));
+                    if (matchBits != 0)
+                    {
+                        return i + (int)TrailingZeroCount(matchBits);
+                    }
+                }
+
+                return GreaterThanCs(cutoff, content, i, endIndex);
+            }
+        }
+
+        public static int Skip(byte[] content, int index, int endIndex, ref int depth)
+        {
+            if (endIndex - index > 128 && Avx2.IsSupported)
+            {
+                return SkipAvx(content, index, endIndex, ref depth);
+            }
+            else
+            {
+                return SkipCs(content, index, endIndex, ref depth);
+            }
+        }
+
+        private static int SkipCs(byte[] content, int index, int endIndex, ref int depth)
+        {
+            int i;
+            for (i = index; i < endIndex; ++i)
             {
                 byte value = content[i];
                 if (value > 0xFB)
@@ -97,7 +146,7 @@ namespace Bion.Vector
             return i;
         }
 
-        private static int SkipAvx(Span<byte> content, ref int depth)
+        private static int SkipAvx(byte[] content, int index, int endIndex, ref int depth)
         {
             // Load a vector to convert unsigned to signed value order (only signed compare supported)
             Vector256<sbyte> toSignedV = SetAllTo(128);
@@ -111,10 +160,10 @@ namespace Bion.Vector
 
             fixed (byte* contentPtr = &content[0])
             {
-                int fullBlockLength = content.Length & ~31;
+                int fullBlockLength = endIndex - 32;
 
                 int i;
-                for (i = 0; i < fullBlockLength; i += 32)
+                for (i = index; i < fullBlockLength; i += 32)
                 {
                     // Load a vector of content and convert to signed
                     Vector256<sbyte> contentV = Unsafe.ReadUnaligned<Vector256<sbyte>>(&contentPtr[i]);
@@ -136,8 +185,8 @@ namespace Bion.Vector
                     if(depth - endCount <= 0)
                     {
                         // If there are enough end containers here to reach the root, we have to check the order
-                        int index = SkipCs(content.Slice(i, 32), ref depth);
-                        if (index < 32) return i + index;
+                        int inner = SkipCs(content, i, i + 32, ref depth);
+                        if (inner < i + 32) return inner;
                     }
                     else
                     {
@@ -146,12 +195,14 @@ namespace Bion.Vector
                     }
                 }
 
-                return i + SkipCs(content.Slice(i), ref depth);
+                return SkipCs(content, i, endIndex, ref depth);
             }
         }
 
         private static Vector256<sbyte> SetAllTo(byte value)
         {
+            // Replace with: Avx.Set1<sbyte>(unchecked((sbyte)value)); MissingMethodException in .NET Core 2.1.
+
             // Make 32 copies of value
             sbyte* _loader = stackalloc sbyte[32];
             for (int i = 0; i < 32; ++i)
@@ -161,6 +212,23 @@ namespace Bion.Vector
 
             // Load into a Vector256 and return
             return Unsafe.Read<Vector256<sbyte>>(_loader);
+        }
+
+        private const uint DeBruijnSequence = 0x077CB531U;
+        private static readonly int[] DeBruijnTrailingZeroCount =
+        {
+            0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
+            31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+        };
+
+        private static int TrailingZeroCount(uint bits)
+        {
+            // Should be this, but it's not in the JIT as of .NET Core 2.1
+            //return unchecked((int)Bmi1.TrailingZeroCount(bits));
+
+            // http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup
+            if (bits == 0) return 32;
+            return DeBruijnTrailingZeroCount[(unchecked((uint)((int)bits & -(int)bits)) * DeBruijnSequence) >> 27];
         }
     }
 }

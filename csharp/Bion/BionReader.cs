@@ -1,26 +1,29 @@
-﻿using Bion.Vector;
+﻿using Bion.IO;
+using Bion.Text;
+using Bion.Vector;
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Bion
 {
     public unsafe class BionReader : IDisposable
     {
-        private Stream _stream;
-        private Memory<byte> _buffer;
+        private BufferedReader _reader;
+        private WordCompressor _compressor;
+        private ContainerIndex _containerIndex;
 
-        private BionLookup _lookupDictionary;
+        private BufferedReader _decompressReader;
+        private BufferedWriter _decompressWriter;
 
         private BionMarker _currentMarker;
         private int _currentLength;
         private int _currentDepth;
 
-        private short _lastPropertyLookupIndex;
+        private ulong _currentDecodedNumber;
+        private String8 _currentString;
         private string _currentDecodedString;
-
-        private Encoding _textEncoding = Encoding.UTF8;
+        private int _currentCompressedStringStart;
 
         // Lookups: Marker to Depth, Length, TokenType
         private static sbyte[] DepthLookup = Enumerable.Repeat((sbyte)0, 256).ToArray();
@@ -39,16 +42,15 @@ namespace Bion
             LengthLookup[(byte)BionMarker.StringLength5b] = 5;
             LengthLookup[(byte)BionMarker.StringLength2b] = 2;
             LengthLookup[(byte)BionMarker.StringLength1b] = 1;
-            LengthLookup[(byte)BionMarker.StringLookup1b] = -1;
+            LengthLookup[(byte)BionMarker.StringCompressedTerminated] = -1;
 
             LengthLookup[(byte)BionMarker.PropertyNameLength5b] = 5;
             LengthLookup[(byte)BionMarker.PropertyNameLength2b] = 2;
             LengthLookup[(byte)BionMarker.PropertyNameLength1b] = 1;
-            LengthLookup[(byte)BionMarker.PropertyNameLookup1b] = -1;
-            LengthLookup[(byte)BionMarker.PropertyNameLookup2b] = -2;
+            LengthLookup[(byte)BionMarker.PropertyNameCompressedTerminated] = -1;
 
             // Float/NegativeInt/Int
-            for(int i = 0xB0; i < 0xE0; ++i)
+            for (int i = 0xC0; i < 0xF0; ++i)
             {
                 LengthLookup[i] = (sbyte)(i & 15);
             }
@@ -59,38 +61,42 @@ namespace Bion
                 TokenLookup[i] = (BionToken)i;
             }
 
-            Array.Fill(TokenLookup, BionToken.Float, 0xB0, 0xC0 - 0xB0);
-            Array.Fill(TokenLookup, BionToken.Integer, 0xC0, 0xF0 - 0xC0);
-            Array.Fill(TokenLookup, BionToken.PropertyName, 0xF3, 5);
-            Array.Fill(TokenLookup, BionToken.String, 0xF8, 4);
+            Array.Fill(TokenLookup, BionToken.Float, 0xC0, 16);
+            Array.Fill(TokenLookup, BionToken.Integer, 0xD0, 16);
+            Array.Fill(TokenLookup, BionToken.Integer, 0xE0, 16);
+            Array.Fill(TokenLookup, BionToken.PropertyName, 0xF5, 3);
+            Array.Fill(TokenLookup, BionToken.String, 0xF8, 3);
+            TokenLookup[(byte)BionMarker.StringCompressedTerminated] = BionToken.String;
+            TokenLookup[(byte)BionMarker.PropertyNameCompressedTerminated] = BionToken.PropertyName;
         }
 
-        public BionReader(Stream stream) : this(stream, null)
+        public BionReader(Stream stream, ContainerIndex containerIndex = null, WordCompressor compressor = null) : this(new BufferedReader(stream), containerIndex, compressor)
         { }
 
-        public BionReader(Stream stream, BionLookup lookupDictionary)
+        public BionReader(BufferedReader reader, ContainerIndex containerIndex = null, WordCompressor compressor = null)
         {
-            CloseStream = true;
-            _stream = stream;
-            _lookupDictionary = lookupDictionary;
+            _reader = reader;
+            _compressor = compressor;
+            _containerIndex = containerIndex;
         }
 
-        public long BytesRead { get; private set; }
-        public bool CloseStream { get; set; }
+        public long BytesRead => _reader.BytesRead;
         public BionToken TokenType { get; private set; }
+        public int Depth => _currentDepth;
 
         public bool Read()
         {
+            _reader.EnsureSpace(20);
+
             // Check for end (after reading one thing at the root depth)
-            if (_currentDepth == 0 && BytesRead > 0)
+            if (_reader.EndOfStream)
             {
                 TokenType = BionToken.None;
                 return false;
             }
 
             // Read the marker
-            byte marker = ReadByte();
-            BytesRead++;
+            byte marker = _reader.Buffer[_reader.Index++];
 
             // Identify the token type and length
             _currentMarker = (BionMarker)marker;
@@ -99,31 +105,35 @@ namespace Bion
 
             if (_currentLength < 0)
             {
-                // Negative lengths are lookup strings; look up the value
-                LookupString();
+                _currentLength = LengthIncludingTerminator();
+                _currentDecodedString = null;
+                _currentCompressedStringStart = _reader.Index;
+                _reader.Index += _currentLength;
             }
             else if (_currentLength > 0)
             {
                 // Read value (non-string) or length (string)
-                _buffer = Read(_currentLength);
-                BytesRead += _currentLength;
+                _currentDecodedNumber = NumberConverter.ReadSevenBitExplicit(_reader, _currentLength);
 
                 // Read value (string)
                 if (marker >= 0xF0)
                 {
+                    _currentCompressedStringStart = -1;
                     _currentDecodedString = null;
-                    _currentLength = (int)DecodeUnsignedInteger(_currentLength);
-                    _buffer = Read(_currentLength);
-                    BytesRead += _currentLength;
+                    _currentLength = (int)_currentDecodedNumber;
+
+                    _reader.EnsureSpace(_currentLength);
+                    _currentString = String8.Reference(_reader.Buffer, _reader.Index, _currentLength);
+                    _reader.Index += _currentLength;
                 }
             }
             else
             {
                 // Adjust depth (length 0 tokens only)
                 _currentDepth += DepthLookup[marker];
-                _buffer = Memory<byte>.Empty;
             }
 
+            if (TokenType == BionToken.None) { throw new BionSyntaxException($"Invalid Bion Token 0x{_currentMarker:X2} @{BytesRead:n0}."); }
             return true;
         }
 
@@ -136,12 +146,25 @@ namespace Bion
 
         public void Expect(BionToken expected)
         {
-            if (this.TokenType != expected) throw new BionSyntaxException(this, expected);
+            if (this.TokenType != expected) { throw new BionSyntaxException(this, expected); }
         }
 
         public void Skip()
         {
+            // If this container is indexed, skip by seeking
+            if(_containerIndex != null)
+            {
+                ContainerEntry entry = _containerIndex.NearestIndexedContainer(BytesRead);
+
+                if (entry.StartByteOffset == BytesRead)
+                {
+                    _reader.Seek(entry.EndByteOffset, SeekOrigin.Begin);
+                    return;
+                }
+            }
+
             // Record depth
+            long start = BytesRead;
             int depth = _currentDepth;
 
             // Read one token
@@ -150,56 +173,101 @@ namespace Bion
             // If it wasn't a container, we're done
             if (depth == _currentDepth) return;
 
-            // Otherwise, find the matching end container
-            int innerDepth = 1;
-            while (true)
-            {
-                Span<byte> buffer = Read(128 * 1024).Span;
-                int endIndex = ByteVector.Skip(buffer, ref innerDepth);
+            SkipRest();
+            long lengthSkipped = BytesRead - start;
+        }
 
-                if (endIndex < buffer.Length)
+        public void SkipRest()
+        {
+            int depth = _currentDepth;
+
+            // Find the closing container for the container we're in
+            int innerDepth = 1;
+            while (!_reader.EndOfStream)
+            {
+                _reader.EnsureSpace(16 * 1024);
+                int endIndex = ByteVector.Skip(_reader.Buffer, _reader.Index, _reader.Length, ref innerDepth);
+
+                if (endIndex < _reader.Length)
                 {
-                    Return(buffer.Length - endIndex + 1);
-                    BytesRead += endIndex;
+                    _reader.Index = endIndex + 1;
+                    _currentDepth = depth - 1;
                     return;
                 }
 
-                BytesRead += buffer.Length;
+                _reader.Index = _reader.Length;
             }
+        }
+
+        public bool SeekToParent()
+        {
+            _reader.Index--;
+
+            int batchSize = 64 * 1024;
+            int targetDepth = _currentDepth - 1;
+            long end = _reader.BytesRead;
+
+            while(end > 0)
+            {
+                // Look for a StartObject or StartArray
+                for(int i = _reader.Index; i >= 0; --i)
+                {
+                    _currentDepth -= DepthLookup[_reader.Buffer[i]];
+                    if(_currentDepth == targetDepth)
+                    {
+                        _reader.Index = i;
+                        return true;
+                    }
+                }
+
+                // Record target is before this
+                end = _reader.BytesRead - _reader.Index;
+
+                // Read the previous batch of the file
+                int nextSize = (int)Math.Min(end, batchSize);
+                _reader.Seek(end - nextSize, SeekOrigin.Begin);
+                _reader.EnsureSpace(nextSize, nextSize);
+                _reader.Index = _reader.Length - 1;
+            }
+
+            _reader.Index = 0;
+            return false;
+        }
+
+        public void Seek(long position)
+        {
+            // ISSUE: Don't know depth after seek
+            _currentDepth = 0;
+
+            _reader.Seek(position, SeekOrigin.Begin);
         }
 
         public bool CurrentBool()
         {
-            if (TokenType == BionToken.True) return true;
-            if (TokenType == BionToken.False) return false;
+            if (TokenType == BionToken.True) { return true; }
+            if (TokenType == BionToken.False) { return false; }
             throw new InvalidCastException($"@{BytesRead}: TokenType {TokenType} isn't a boolean type.");
         }
 
         public long CurrentInteger()
         {
-            if (TokenType != BionToken.Integer) throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't an integer type.");
-
-            // Inline Integer
-            if (_currentLength == 0) return ((int)_currentMarker & 0x0F);
-
-            // Decode 7-bit value
-            ulong value = DecodeUnsignedInteger(_currentLength);
+            if (TokenType != BionToken.Integer) { throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't an integer type."); }
 
             // Negate if type was NegativeInteger
             if (_currentMarker < BionMarker.Integer)
             {
-                return SafeNegate(value);
+                return SafeNegate(_currentDecodedNumber);
             }
 
-            return (long)value;
+            return (long)_currentDecodedNumber;
         }
 
         public unsafe double CurrentFloat()
         {
-            if (TokenType != BionToken.Float) throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a float type.");
+            if (TokenType != BionToken.Float) { throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a float type."); }
 
             // Decode as an integer and coerce .NET into reinterpreting the bytes
-            ulong value = DecodeUnsignedInteger(_currentLength);
+            ulong value = _currentDecodedNumber;
 
             if (_currentLength <= 5)
             {
@@ -208,57 +276,125 @@ namespace Bion
             }
             else
             {
-                
+
                 return *(double*)&value;
             }
         }
 
         public string CurrentString()
         {
-            if (TokenType == BionToken.Null) return null;
-            if (TokenType != BionToken.PropertyName && TokenType != BionToken.String) throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a string type.");
+            if (TokenType == BionToken.Null) { return null; }
+            if (TokenType != BionToken.PropertyName && TokenType != BionToken.String) { throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a string type."); } 
 
             if (_currentDecodedString == null)
             {
-                _currentDecodedString = _textEncoding.GetString(_buffer.Span);
+                _currentDecodedString = CurrentString8().ToString();
             }
 
             return _currentDecodedString;
         }
 
-        private void LookupString()
+        public String8 CurrentString8()
         {
-            _currentLength = -_currentLength;
-            _buffer = Read(_currentLength);
-            BytesRead += _currentLength;
+            if (TokenType != BionToken.PropertyName && TokenType != BionToken.String) { throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a string type."); }
 
-            short lookupIndex = (short)DecodeUnsignedInteger(_currentLength);
-            if (_lookupDictionary == null) throw new BionSyntaxException($"@{BytesRead}: Found {TokenType} lookup for index {lookupIndex}, but no LookupDictionary was passed to the reader.");
-
-            if (_currentMarker == BionMarker.StringLookup1b)
+            if (_currentCompressedStringStart != -1)
             {
-                // A string value lookup can only appear right after a property name which is also indexed; look up the index from last time.
-                _currentDecodedString = _lookupDictionary.Value(_lastPropertyLookupIndex, lookupIndex);
+                DecompressString();
+                _currentCompressedStringStart = -1;
             }
-            else
+
+            return _currentString;
+        }
+
+        public void RewriteOptimized(BufferedWriter writer, string containerIndexPath = null, string searchIndexPath = null)
+        {
+            int[] map = _compressor.OptimizeIndex();
+
+            using (BufferedReader inner = BufferedReader.FromArray(_reader.Buffer, 0, 0))
+            using (ContainerIndex containerIndex = (containerIndexPath == null ? null : ContainerIndex.OpenWrite(containerIndexPath)))
+            using (SearchIndexWriter indexWriter = (searchIndexPath == null ? null : new SearchIndexWriter(searchIndexPath, map.Length, 128 * 1024)))
             {
-                _currentDecodedString = _lookupDictionary.PropertyName(lookupIndex);
-                _lastPropertyLookupIndex = lookupIndex;
+                long last = 0;
+
+                while (this.Read())
+                {
+                    int length = (int)(this.BytesRead - last);
+                    writer.EnsureSpace(length);
+
+                    if (LengthLookup[(byte)_currentMarker] >= 0)
+                    {
+                        // Everything but compressed text: write bytes out
+                        Buffer.BlockCopy(_reader.Buffer, _reader.Index - length, writer.Buffer, writer.Index, length);
+                        writer.Index += length;
+                    }
+                    else
+                    {
+                        writer.Buffer[writer.Index++] = (byte)_currentMarker;
+
+                        // Compressed Test: Rewrite the text segment
+                        inner.ReadSlice(_reader.Buffer, _reader.Index - _currentLength, _reader.Index - 1);
+                        _compressor.RewriteOptimized(map, inner, writer, indexWriter);
+
+                        writer.Buffer[writer.Index++] = (byte)BionMarker.EndValue;
+                    }
+
+                    if ((byte)_currentMarker >= (byte)BionMarker.EndArray)
+                    {
+                        if ((byte)_currentMarker >= (byte)BionMarker.StartArray)
+                        {
+                            containerIndex?.Start(writer.BytesWritten - 1);
+                        }
+                        else
+                        {
+                            containerIndex?.End(writer.BytesWritten);
+                        }
+                    }
+
+                    last = this.BytesRead;
+                }
             }
         }
 
-        private ulong DecodeUnsignedInteger(int length)
+        private int LengthIncludingTerminator()
         {
-            ulong value = 0;
+            int readSize = 16 * 1024;
+            int lengthScanned = 0;
 
-            Span<byte> span = _buffer.Span;
-            for (int i = length - 1; i >= 0; --i)
+            int endIndex = -1;
+            while (endIndex == -1)
             {
-                value = value << 7;
-                value += (ulong)(span[i] & 0x7F);
+                // Read a block of bytes
+                _reader.EnsureSpace(readSize);
+
+                // Look for the EndValue marker (only *after* previously read bytes)
+                endIndex = ByteVector.IndexOf((byte)BionMarker.EndValue, _reader.Buffer, _reader.Index + lengthScanned, _reader.Length);
+
+                // Read more next time (without advancing index)
+                lengthScanned = _reader.Length - _reader.Index;
+                readSize *= 2;
             }
 
-            return value;
+            // Return the number of characters to the terminator
+            return (endIndex + 1) - _reader.Index;
+        }
+
+        private void DecompressString()
+        {
+            if (_decompressReader == null)
+            {
+                _decompressReader = BufferedReader.FromArray(_reader.Buffer, 0, 0);
+                _decompressWriter = BufferedWriter.ToArray(new byte[1024]);
+            }
+
+            _decompressReader.ReadSlice(_reader.Buffer, _currentCompressedStringStart, _reader.Index - 1);
+            _decompressWriter.Index = 0;
+
+            // Decompress the content
+            _compressor.Expand(_decompressReader, _decompressWriter);
+
+            // Make a String8 referencing the full decompressed value
+            _currentString = String8.Reference(_decompressWriter.Buffer, 0, _decompressWriter.Index);
         }
 
         private long SafeNegate(ulong value)
@@ -272,72 +408,17 @@ namespace Bion
 
         public void Dispose()
         {
-            if (_stream != null)
+            if (_reader != null)
             {
-                if (CloseStream) _stream.Dispose();
-                _stream = null;
+                _reader.Dispose();
+                _reader = null;
             }
 
-            if(_lookupDictionary != null)
+            if (_compressor != null)
             {
-                _lookupDictionary.Dispose();
-                _lookupDictionary = null;
+                _compressor.Dispose();
+                _compressor = null;
             }
         }
-
-        #region Inlined Buffered Stream
-        byte[] _innerBuffer = new byte[64 * 1024];
-        int _innerIndex;
-        int _innerLength;
-
-        private byte ReadByte()
-        {
-            if (_innerIndex >= _innerLength) ReadNext(1);
-            return _innerBuffer[_innerIndex++];
-        }
-
-        private Memory<byte> Read(int length)
-        {
-            if (_innerIndex + length > _innerLength) length = ReadNext(length);
-            Memory<byte> result = new Memory<byte>(_innerBuffer, _innerIndex, length);
-            _innerIndex += length;
-            return result;
-        }
-
-        private int ReadNext(int size)
-        {
-            byte[] readInto = _innerBuffer;
-
-            // Resize if needed
-            if (size > _innerBuffer.Length)
-            {
-                readInto = new byte[Math.Max(_innerBuffer.Length * 5 / 4, size)];
-            }
-
-            // Copy unused bytes
-            int lengthLeft = _innerLength - _innerIndex;
-            if (lengthLeft > 0)
-            {
-                Buffer.BlockCopy(_innerBuffer, _innerIndex, readInto, 0, lengthLeft);
-            }
-
-            // Fill remaining buffer
-            _innerLength = lengthLeft + _stream.Read(readInto, lengthLeft, readInto.Length - lengthLeft);
-
-            // Reset variables
-            _innerBuffer = readInto;
-            _innerIndex = 0;
-
-            // Return the safe size to read, if less than size
-            return Math.Min(size, _innerLength);
-        }
-
-        private void Return(int length)
-        {
-            // Put 'length' bytes back into the buffer
-            if (_innerIndex < length) throw new InvalidOperationException("Can't rewind data before current buffer.");
-            _innerIndex -= length;
-        }
-        #endregion
     }
 }
