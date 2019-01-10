@@ -27,6 +27,9 @@ namespace Bion.Console
     Bion.Console nows <fromJsonPath> <toJsonPath>
       Rewrite the given JSON file without indenting whitespace.
 
+    Bion.Console addws <fromJsonPath> <toJsonPath>
+      Rewrite the given JSON file with indenting and whitespace.
+
     Bion.Console compress <sourcePath> <compressedPath> <toDictionaryPath>
       Compress the source file using word compression without any format assumptions.
 
@@ -67,6 +70,11 @@ namespace Bion.Console
                     case "nows":
                         if (args.Length < 2) { throw new UsageException("nows requires a json input path."); }
                         NoWhitespace(args[1], OrDefault(args, 2, ChangePath(args[1], ".nows.json")));
+                        break;
+
+                    case "addws":
+                        if (args.Length < 2) { throw new UsageException("addws requires a json input path."); }
+                        AddWhitespace(args[1], OrDefault(args, 2, ChangePath(args[1], ".addws.json")));
                         break;
 
                     case "compress":
@@ -195,6 +203,22 @@ namespace Bion.Console
                 using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(toJsonPath)))
                 {
                     writer.Formatting = Formatting.None;
+                    writer.WriteToken(reader);
+                }
+            }
+        }
+
+        private static void AddWhitespace(string fromJsonPath, string toJsonPath)
+        {
+            VerifyFileExists(fromJsonPath);
+
+            using (new ConsoleWatch($"Writing {fromJsonPath} with formatting to {toJsonPath}...",
+                () => $"Done; {FileLength.MB(fromJsonPath)} => {FileLength.MB(toJsonPath)} ({FileLength.Percentage(fromJsonPath, toJsonPath)})"))
+            {
+                using (JsonTextReader reader = new JsonTextReader(new StreamReader(fromJsonPath)))
+                using (JsonTextWriter writer = new JsonTextWriter(new StreamWriter(toJsonPath)))
+                {
+                    writer.Formatting = Formatting.Indented;
                     writer.WriteToken(reader);
                 }
             }
