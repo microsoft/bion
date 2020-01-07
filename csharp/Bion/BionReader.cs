@@ -171,7 +171,7 @@ namespace Bion
             Read();
 
             // If it wasn't a container, we're done
-            if (depth == _currentDepth) return;
+            if (depth == _currentDepth) { return; }
 
             SkipRest();
             long lengthSkipped = BytesRead - start;
