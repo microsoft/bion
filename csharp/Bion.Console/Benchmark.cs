@@ -11,7 +11,7 @@ namespace Bion.Console
 {
     public class MyArray : IEnumerable<int>
     {
-        private int[] _inner;
+        private readonly int[] _inner;
 
         public MyArray(int[] inner)
         {
@@ -115,7 +115,7 @@ namespace Bion.Console
                     {
                         int length = stream.Read(buffer, 0, buffer.Length);
                         totalSize += length;
-                        if (length < buffer.Length) break;
+                        if (length < buffer.Length) { break; }
                     }
                 }
             }
@@ -385,7 +385,7 @@ namespace Bion.Console
                     int length = compressor[wordIndex].Word.Length;
                     total += length;
 
-                    if (length > 128) length = 128;
+                    if (length > 128) { length = 128; }
                     countForLength[length]++;
                 }
             }
@@ -414,7 +414,7 @@ namespace Bion.Console
                     if (word.Length == length)
                     {
                         System.Console.WriteLine(word);
-                        if (++countWritten == 100) return;
+                        if (++countWritten == 100) { return; }
                     }
                 }
             }

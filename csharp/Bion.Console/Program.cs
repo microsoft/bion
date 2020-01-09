@@ -255,7 +255,7 @@ namespace Bion.Console
             string error = null;
 
             using (new ConsoleWatch($"Comparing {expectedPath} to {actualPath}...",
-                () => $"Done; {(error == null ? "files identical" : error)}"))
+                () => $"Done; {(error ?? "files identical")}"))
             {
                 if (Path.GetExtension(expectedPath).Equals(".json", StringComparison.OrdinalIgnoreCase)
                 && Path.GetExtension(actualPath).Equals(".json", StringComparison.OrdinalIgnoreCase))
