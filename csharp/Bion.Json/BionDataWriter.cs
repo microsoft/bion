@@ -120,7 +120,7 @@ namespace Bion.Json
 
         public override void Close()
         {
-            _writer.Dispose();
+            _writer?.Dispose();
             _writer = null;
         }
 

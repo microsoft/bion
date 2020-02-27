@@ -81,7 +81,7 @@ namespace Bion.Json
 
         public override void Close()
         {
-            _reader.Dispose();
+            _reader?.Dispose();
             _reader = null;
         }
     }
