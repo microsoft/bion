@@ -255,7 +255,7 @@ namespace Bion.Console
             string error = null;
 
             using (new ConsoleWatch($"Comparing {expectedPath} to {actualPath}...",
-                () => $"Done; {(error == null ? "files identical" : error)}"))
+                () => $"Done; {(error ?? "files identical")}"))
             {
                 if (Path.GetExtension(expectedPath).Equals(".json", StringComparison.OrdinalIgnoreCase)
                 && Path.GetExtension(actualPath).Equals(".json", StringComparison.OrdinalIgnoreCase))
@@ -469,7 +469,7 @@ namespace Bion.Console
                 {
                     System.Console.Write("> ");
                     string query = System.Console.ReadLine().Trim();
-                    if (String.IsNullOrEmpty(query)) break;
+                    if (String.IsNullOrEmpty(query)) { break; }
 
                     String8 term = String8.Copy(query, ref buffer);
 
@@ -489,7 +489,7 @@ namespace Bion.Console
                                 ISearchResult result = searchers[i].Find(term);
                                 matchCount += searchers[i].Write(writer, result, 0, resultLimit - matchCount);
 
-                                if (matchCount >= resultLimit) break;
+                                if (matchCount >= resultLimit) { break; }
                             }
                         }
                     }

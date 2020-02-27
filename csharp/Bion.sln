@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2019
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bion", "Bion\Bion.csproj", "{7DFAD9E5-03BE-4079-9F2E-F16189D6ED97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bion", "Bion\Bion.csproj", "{7DFAD9E5-03BE-4079-9F2E-F16189D6ED97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bion.Console", "Bion.Console\Bion.Console.csproj", "{3EABDC16-D350-4C0F-BCA5-B14F9C204602}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bion.Console", "Bion.Console\Bion.Console.csproj", "{3EABDC16-D350-4C0F-BCA5-B14F9C204602}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bion.Test", "Bion.Test\Bion.Test.csproj", "{53D7F4BF-5D81-431F-AC91-FD46CB4BCD2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bion.Test", "Bion.Test\Bion.Test.csproj", "{53D7F4BF-5D81-431F-AC91-FD46CB4BCD2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bion.Json", "Bion.Json\Bion.Json.csproj", "{5C9B967E-E6D0-42F6-85D8-55389DCFE932}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bion.Json", "Bion.Json\Bion.Json.csproj", "{5C9B967E-E6D0-42F6-85D8-55389DCFE932}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

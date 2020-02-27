@@ -1,6 +1,7 @@
 ﻿using Bion.IO;
 using Bion.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 using System;
 using System.IO;
 
@@ -41,9 +42,16 @@ namespace Bion.Json
 
         public static void JsonToBion(JsonTextReader reader, BionWriter writer)
         {
-            while (reader.Read())
+            // 6.0s
+            //while (reader.Read())
+            //{
+            //    WriteToken(reader, writer);
+            //}
+
+            // 7.1s
+            using (BionDataWriter dataWriter = new BionDataWriter(writer))
             {
-                WriteToken(reader, writer);
+                dataWriter.WriteToken(reader);
             }
         }
 
@@ -106,12 +114,19 @@ namespace Bion.Json
 
         public static void BionToJson(BionReader reader, JsonTextWriter writer)
         {
-            int untilDepth = reader.Depth;
+            // 8.6s
+            //int untilDepth = reader.Depth;
 
-            while (reader.Read())
+            //while (reader.Read())
+            //{
+            //    WriteToken(reader, writer);
+            //    if (reader.Depth == untilDepth) { break; }
+            //}
+
+            // 11.4s
+            using (BionDataReader dataReader = new BionDataReader(reader))
             {
-                WriteToken(reader, writer);
-                if (reader.Depth == untilDepth) { break; }
+                writer.WriteToken(dataReader);
             }
         }
 

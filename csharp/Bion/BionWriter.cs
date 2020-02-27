@@ -270,6 +270,11 @@ namespace Bion
             _writer.Buffer[_writer.Index++] = value;
         }
 
+        public void Flush()
+        {
+            _writer.Flush();
+        }
+
         public void Dispose()
         {
             if (_writer != null)
