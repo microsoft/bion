@@ -9,6 +9,7 @@ using Newtonsoft.Json.Bson;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -24,18 +25,18 @@ namespace Map
                 if (args.Length < 2)
                 {
                     Console.WriteLine(@"Usage: Map <jsonFilePath> <mode> [args]
-  Build <ratio>                   - Build JSON map from source document; file path is document, not map
-  Basics <jsonPath?>              - Show size and element count under item.
-  ArrayLengths <jsonPath?>        - Show the size of each element in an array (reveal outliers)
-  Tree <threshold?> <jsonPath?>   - Show tree of elements over threshold (% of parent or absolute size)
-  TreeToDepth <depth> <jsonPath?> - Show tree to a depth limit
-  Extract <jsonPath> <toFile>     - Write element at JsonPath to a new file
-  Indent <toFile>                 - Write indented copy of file 
-  Minify <toFile>                 - Write minified copy of file
-  Convert <fromFile> <toFile>     - Convert to/from JSON, BSON
-  Parse <filePath>                - Parse JSON/BSON files and time
-  Consolidate <toFile>            - Write SarifConsolidator-compressed copy of file
-  LoadSarif <filePath>            - Load into SARIF OM from JSON/BSON
+  Build <ratio>                    - Build JSON map from source document; file path is document, not map
+  Basics <jsonPath?>               - Show size and element count under item. (over length, if included)
+  ArrayLengths <jsonPath?> <over?> - Show the size of each element in an array (reveal outliers)
+  Tree <threshold?> <jsonPath?>    - Show tree of elements over threshold (% of parent or absolute size)
+  TreeToDepth <depth> <jsonPath?>  - Show tree to a depth limit
+  Extract <jsonPath> <toFile>      - Write element at JsonPath to a new file
+  Indent <toFile>                  - Write indented copy of file 
+  Minify <toFile>                  - Write minified copy of file
+  Convert <fromFile> <toFile>      - Convert to/from JSON, BSON
+  Parse <filePath>                 - Parse JSON/BSON files and time
+  Consolidate <toFile>             - Write SarifConsolidator-compressed copy of file
+  LoadSarif <filePath>             - Load into SARIF OM from JSON/BSON
   ");
                     return;
                 }
@@ -106,6 +107,7 @@ namespace Map
                         WriteArrayEntryLengths(
                             root,
                             (args.Length > 2 ? args[2] : ""),
+                            (args.Length > 3 ? int.Parse(args[3]) : -1),
                             Console.Out);
                         break;
 
@@ -382,9 +384,11 @@ namespace Map
             writer.WriteLine($"{jsonPath} is {ToSizeString(current.Length)} and has {current.Count:n0} elements");
         }
 
-        static void WriteArrayEntryLengths(JsonMapNode root, string jsonPath, TextWriter writer)
+        static void WriteArrayEntryLengths(JsonMapNode root, string jsonPath, int threshold, TextWriter writer)
         {
             JsonMapNode current = root.FindByPath(jsonPath);
+            int countWritten = 0;
+            long totalLength = 0;
 
             if (current.ArrayStarts == null)
             {
@@ -399,16 +403,40 @@ namespace Map
             writer.WriteLine($"{jsonPath} is {ToSizeString(current.Length)} and has {current.Count:n0} elements with lengths:");
 
             // ArrayStarts are converted to absolute in JsonMapNode
-            // Difference between [i] and [i - 1] is the length of [i - 1]
             for (int i = 1; i < current.ArrayStarts.Count; ++i)
             {
-                writer.WriteLine($"{current.ArrayStarts[i] - current.ArrayStarts[i - 1]:n0}");
+                // Difference between [i] and [i - 1] is the length of [i - 1]
+                long length = current.ArrayStarts[i] - current.ArrayStarts[i - 1];
+
+                if (length > threshold)
+                {
+                    writer.WriteLine($"[{(i - 1) * current.Every}] => {length:n0}");
+
+                    countWritten++;
+                    totalLength += length;
+                }
             }
 
             // Last element length is approximately from the last start to the array end
-            if (current.Count > 0)
+            if (current.Count > 0 && current.Every == 1)
             {
-                writer.WriteLine($"{current.End - current.ArrayStarts[current.ArrayStarts.Count - 1] - 1:n0}");
+                long lastLength = current.End - current.ArrayStarts[current.ArrayStarts.Count - 1] - 1;
+
+                if (lastLength > threshold)
+                {
+                    writer.WriteLine($"[{current.Count - 1}] => {lastLength:n0}");
+
+                    countWritten++;
+                    totalLength += lastLength;
+                }
+            }
+
+            if (threshold > 0)
+            {
+                double containerPortion = totalLength / (double)root.Length;
+                writer.WriteLine($"Elements with length >= {threshold:n0} bytes:");
+                writer.WriteLine($"  {countWritten:n0} / {current.Count:n0} of elements ({(countWritten / (double)current.Count):p0}).");
+                writer.WriteLine($"  {totalLength:n0} / {current.Length:n0} bytes ({(totalLength / (double)current.Length):p0}).");
             }
         }
 
