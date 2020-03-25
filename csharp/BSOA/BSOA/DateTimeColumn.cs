@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 namespace BSOA
@@ -44,6 +46,16 @@ namespace BSOA
         public void Write(BinaryWriter writer, ref byte[] buffer)
         {
             _innerColumn.Write(writer, ref buffer);
+        }
+
+        public IEnumerator<DateTime> GetEnumerator()
+        {
+            return new ListEnumerator<DateTime>(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new ListEnumerator<DateTime>(this);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -45,7 +44,7 @@ namespace BSOA.Test
             // Bounds checks
             Assert.Throws<ArgumentNullException>(() => new ArraySlice<int>(null, 0, 0));                            // Array null
             Assert.Throws<ArgumentOutOfRangeException>(() => new ArraySlice<int>(sample, -1, 0));                   // index < 0
-            Assert.Throws<ArgumentOutOfRangeException>(() => new ArraySlice<int>(sample, sample.Length, 0));        // index >= array.Length
+            Assert.Throws<ArgumentOutOfRangeException>(() => new ArraySlice<int>(sample, sample.Length + 1, 0));    // index > array.Length
             Assert.Throws<ArgumentOutOfRangeException>(() => new ArraySlice<int>(sample, 0, sample.Length + 1));    // length too long
             Assert.Throws<ArgumentOutOfRangeException>(() => new ArraySlice<int>(sample, 2, sample.Length + 3));
         }
@@ -53,7 +52,7 @@ namespace BSOA.Test
         internal static void VerifyRoundTrip<T>(ArraySlice<T> slice, T[] copyToTargetArray) where T : unmanaged
         {
             ArraySlice<T> roundTripped = BinarySerializable.RoundTrip<ArraySlice<T>>(slice, () => new ArraySlice<T>());
-            VerifySame<T>(slice, roundTripped);
+            ReadOnlyList.VerifySame<T>(slice, roundTripped);
             VerifyCopyTo<T>(roundTripped, copyToTargetArray);
         }
 
@@ -63,38 +62,6 @@ namespace BSOA.Test
             for (int i = 0; i < slice.Count; ++i)
             {
                 Assert.Equal(slice[i], copyToTargetArray[i + 1]);
-            }
-        }
-
-        internal static void VerifySame<T>(ArraySlice<T> expected, ArraySlice<T> actual) where T : unmanaged
-        {
-            // Verify Counts match
-            Assert.Equal(expected.Count, actual.Count);
-
-            // Verify items match (XUnit collection verification)
-            Assert.Equal((IEnumerable<T>)expected, (IEnumerable<T>)actual);
-
-            // Verify indexers work and return the same result
-            for (int i = 0; i < actual.Count; ++i)
-            {
-                Assert.Equal(expected[i], actual[i]);
-            }
-
-            // Verify typed enumerator (MoveNext, Current, Reset)
-            IEnumerator<T> enumerator = actual.GetEnumerator();
-            int index = 0;
-            while(enumerator.MoveNext())
-            {
-                Assert.Equal(expected[index], enumerator.Current);
-                index++;
-            }
-
-            enumerator.Reset();
-            index = 0;
-            while (enumerator.MoveNext())
-            {
-                Assert.Equal(expected[index], enumerator.Current);
-                index++;
             }
         }
     }

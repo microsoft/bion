@@ -1,10 +1,17 @@
 ﻿using BSOA.IO;
+using System.Collections.Generic;
 
 namespace BSOA
 {
-    public interface IColumn<T> : IBinarySerializable
+    public interface IColumn<T> : IReadOnlyList<T>, IBinarySerializable
     {
-        int Count { get; }
-        T this[int index] { get; set; }
+        new T this[int index] { get; set; }
+
+        // int Count { get; }
+        // T this[int index] { get; }
+        // IEnumerator<T> GetEnumerator();
+
+        // void Read(BinaryReader reader, ref byte[] buffer);
+        // void Write(BinaryWriter writer, ref byte[] buffer);
     }
 }

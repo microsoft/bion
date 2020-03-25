@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 namespace BSOA
@@ -23,6 +25,7 @@ namespace BSOA
         {
             get
             {
+                if (index < 0) { throw new IndexOutOfRangeException(); }
                 if (index >= Count) { return ArraySlice<T>.Empty; }
 
                 int chapterIndex = index / ColumnChapter<T>.ChapterRowCount;
@@ -52,7 +55,7 @@ namespace BSOA
             _chapters.Clear();
 
             Count = reader.ReadInt32();
-            
+
             int chapterCount = reader.ReadInt32();
             for (int i = 0; i < chapterCount; ++i)
             {
@@ -72,6 +75,16 @@ namespace BSOA
             {
                 chapter.Write(writer, ref buffer);
             }
+        }
+
+        public IEnumerator<ArraySlice<T>> GetEnumerator()
+        {
+            return new ListEnumerator<ArraySlice<T>>(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new ListEnumerator<ArraySlice<T>>(this);
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using BSOA.Extensions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 
 namespace BSOA
 {
@@ -21,7 +23,7 @@ namespace BSOA
     ///  The overall column uses longs for large values and chapter positions, allowing the column to be over 4 GB.
     /// </remarks>
     /// <typeparam name="T">Type of each part of Values (if each value is a string, this type is char)</typeparam>
-    internal class ColumnChapter<T> : IColumn<ArraySlice<T>> where T : unmanaged
+    internal class ColumnChapter<T> where T : unmanaged
     {
         public const int ChapterRowCount = 1024;
         public const int PageRowCount = 32;
@@ -33,14 +35,23 @@ namespace BSOA
         private T[] _smallValueArray;
         private Dictionary<int, ArraySlice<T>> _largeValueDictionary;
 
+        private bool _requiresTrim;
+
         public int Count { get; set; }
 
         public ColumnChapter()
         {
             Count = 0;
+        }
 
-            _pageStartInChapter = new int[ChapterRowCount / PageRowCount];
-            _valueEndInPage = new ushort[ChapterRowCount];
+        private int EndPosition(int index)
+        {
+            return _pageStartInChapter[index / PageRowCount] + _valueEndInPage[index];
+        }
+
+        private int StartPosition(int index)
+        {
+            return (index == 0 ? 0 : EndPosition(index - 1));
         }
 
         public ArraySlice<T> this[int index]
@@ -53,14 +64,9 @@ namespace BSOA
                 ArraySlice<T> result = default;
                 if (_largeValueDictionary != null && _largeValueDictionary.TryGetValue(index, out result)) { return result; }
 
-                int pageIndex = index / PageRowCount;
-
-                int pagePosition = _pageStartInChapter[pageIndex];
-                int startInPage = (index == 0 ? 0 : _valueEndInPage[index - 1]);
-                int endInPage = _valueEndInPage[index];
-                int length = endInPage - startInPage;
-
-                return new ArraySlice<T>(_smallValueArray, pagePosition + startInPage, length);
+                int position = StartPosition(index);
+                int length = EndPosition(index) - position;
+                return new ArraySlice<T>(_smallValueArray, position, length);
             }
 
             set
@@ -68,45 +74,7 @@ namespace BSOA
                 if (index >= Count) { Count = index + 1; }
                 _largeValueDictionary = _largeValueDictionary ?? new Dictionary<int, ArraySlice<T>>();
                 _largeValueDictionary[index] = value;
-            }
-        }
-
-        public void Trim()
-        {
-            if (_largeValueDictionary != null)
-            {
-                // Compute new size needed for SmallValueArray
-                int totalSmallValueLength = _pageStartInChapter[(Count - 1) / PageRowCount] + _valueEndInPage[Count - 1];
-                int newSmallValueLength = totalSmallValueLength;
-
-                foreach (var pair in _largeValueDictionary)
-                {
-                    int length = pair.Value.Count;
-                    if (length < MaximumSmallValueLength)
-                    {
-                        int index = pair.Key;
-                        int oldLength = _valueEndInPage[index] - (index == 0 ? 0 : _valueEndInPage[index - 1]);
-                        newSmallValueLength += (length - oldLength);
-                    }
-                }
-
-                // Make a new SmallValueArray
-                T[] newSmallValueArray = new T[newSmallValueLength];
-
-                // Copy every small-enough value to the new array and remove from LargeValueDictionary
-                int nextIndex = 0;
-                for (int i = 0; i < Count; ++i)
-                {
-                    ArraySlice<T> value = this[i];
-                    if (value.Count < MaximumSmallValueLength)
-                    {
-                        value.CopyTo(newSmallValueArray, nextIndex);
-                        nextIndex += value.Count;
-                        _largeValueDictionary.Remove(i);
-                    }
-                }
-
-                _smallValueArray = newSmallValueArray;
+                _requiresTrim |= (value.Count <= MaximumSmallValueLength);
             }
         }
 
@@ -145,8 +113,65 @@ namespace BSOA
 
             for (int i = 0; i < largeValueKeys.Length; ++i)
             {
-                _largeValueDictionary[i].Write(writer, ref buffer);
+                _largeValueDictionary[largeValueKeys[i]].Write(writer, ref buffer);
             }
+        }
+
+        public void Trim()
+        {
+            if (_requiresTrim == false) { return; }
+
+            // Compute new size needed for SmallValueArray
+            int totalSmallValueLength = _smallValueArray?.Length ?? 0;
+            int newSmallValueLength = totalSmallValueLength;
+
+            foreach (var pair in _largeValueDictionary)
+            {
+                int length = pair.Value.Count;
+                if (length < MaximumSmallValueLength)
+                {
+                    int index = pair.Key;
+                    int oldLength = (totalSmallValueLength == 0 ? 0 : _valueEndInPage[index] - (index == 0 ? 0 : _valueEndInPage[index - 1]));
+                    newSmallValueLength += (length - oldLength);
+                }
+            }
+
+            // Make new arrays
+            T[] newSmallValueArray = new T[newSmallValueLength];
+            int[] newPageStartInChapter = new int[(Count / PageRowCount) + 1];
+            ushort[] newValueEndInPage = new ushort[Count];
+
+            // Copy every small-enough value to the new array and remove from LargeValueDictionary
+            int currentPageStart = 0;
+            int nextIndex = 0;
+            for (int i = 0; i < Count; ++i)
+            {
+                // Set new page start for each page
+                if ((i % PageRowCount) == 0)
+                {
+                    currentPageStart = nextIndex;
+                    newPageStartInChapter[i / PageRowCount] = currentPageStart;
+                }
+
+                // Get current value
+                ArraySlice<T> value = this[i];
+
+                // Copy the value to the new _smallValueArray, if it fits
+                if (value.Count < MaximumSmallValueLength)
+                {
+                    value.CopyTo(newSmallValueArray, nextIndex);
+                    nextIndex += value.Count;
+                    _largeValueDictionary.Remove(i);
+                }
+
+                // Set new valueEnd
+                newValueEndInPage[i] = (ushort)(nextIndex - currentPageStart);
+            }
+
+            _smallValueArray = newSmallValueArray;
+            _pageStartInChapter = newPageStartInChapter;
+            _valueEndInPage = newValueEndInPage;
+            _requiresTrim = false;
         }
     }
 }

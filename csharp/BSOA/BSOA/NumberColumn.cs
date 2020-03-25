@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 using BSOA.Extensions;
@@ -42,7 +44,7 @@ namespace BSOA
         {
             get
             {
-                if (index < 0) { throw new IndexOutOfRangeException("index"); }
+                if (index < 0) { throw new IndexOutOfRangeException(); }
 
                 // Return the value (or defaultValue if the array is null or smaller than the requested index)
                 return (_array?.Length > index ? _array[index] : _defaultValue);
@@ -78,21 +80,35 @@ namespace BSOA
         {
             int currentLength = _array?.Length ?? 0;
 
-            int newLength = Math.Max(MinimumSize, Math.Max(size, (currentLength + currentLength / 2)));
-            T[] newArray = new T[newLength];
-
-            if (currentLength > 0)
+            if (size > currentLength)
             {
-                _array.CopyTo(newArray, 0);
+                int newLength = Math.Max(MinimumSize, Math.Max(size, (currentLength + currentLength / 2)));
+                T[] newArray = new T[newLength];
+
+                if (currentLength > 0)
+                {
+                    _array.CopyTo(newArray, 0);
+                }
+
+                for (int i = currentLength; i < newLength; ++i)
+                {
+                    newArray[i] = _defaultValue;
+                }
+
+                _array = newArray;
             }
 
-            for (int i = currentLength; i < newLength; ++i)
-            {
-                newArray[i] = _defaultValue;
-            }
-
-            _array = newArray;
             _count = size;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return new ListEnumerator<T>(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new ListEnumerator<T>(this);
         }
     }
 }

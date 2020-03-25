@@ -9,8 +9,8 @@ namespace BSOA
 {
     public struct ArraySlice<T> : IReadOnlyList<T>, IBinarySerializable where T : unmanaged
     {
-        private T[] _array;
-        private int _index;
+        internal T[] _array;
+        internal int _index;
         private int _length;
 
         public T this[int index] => _array[_index + index];
@@ -22,7 +22,7 @@ namespace BSOA
         {
             if (array == null) { throw new ArgumentNullException("array"); }
             if (length < 0) { length = array.Length - index; }
-            if (index < 0 || index >= array.Length) { throw new ArgumentOutOfRangeException("index"); }
+            if (index < 0 || index > array.Length) { throw new ArgumentOutOfRangeException("index"); }
             if (index + length > array.Length) { throw new ArgumentOutOfRangeException("length"); }
             
             _array = array;
@@ -32,12 +32,12 @@ namespace BSOA
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new ArraySliceEnumerator<T>(this);
+            return new ListEnumerator<T>(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new ArraySliceEnumerator<T>(this);
+            return new ListEnumerator<T>(this);
         }
         
         public void CopyTo(T[] other, int toIndex)
@@ -58,37 +58,6 @@ namespace BSOA
         public void Write(BinaryWriter writer, ref byte[] buffer)
         {
             writer.WriteArray<T>(_array, _index, _length, ref buffer);
-        }
-    }
-
-    public struct ArraySliceEnumerator<T> : IEnumerator<T> where T : unmanaged
-    {
-        private ArraySlice<T> _slice;
-        private int _index;
-
-        public ArraySliceEnumerator(ArraySlice<T> slice)
-        {
-            _slice = slice;
-            _index = -1;
-        }
-
-        public T Current => _slice[_index];
-        object IEnumerator.Current => _slice[_index];
-
-        public void Dispose()
-        {
-            // Nothing to Dispose
-        }
-
-        public bool MoveNext()
-        {
-            _index++;
-            return _index < _slice.Count;
-        }
-
-        public void Reset()
-        {
-            _index = -1;
         }
     }
 }

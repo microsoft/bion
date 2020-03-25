@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace BSOA.Extensions
@@ -11,7 +12,7 @@ namespace BSOA.Extensions
             int byteLength = reader.ReadInt32();
             if (byteLength == 0) { return Array.Empty<T>(); }
 
-            int count = byteLength / Marshal.SizeOf(typeof(T));
+            int count = byteLength / SizeOf(typeof(T));
             T[] array = new T[count];
 
             if (buffer == null || buffer.Length < byteLength) { buffer = new byte[byteLength]; }
@@ -29,7 +30,7 @@ namespace BSOA.Extensions
 
         public static void WriteArray<T>(this BinaryWriter writer, T[] array, int index, int count, ref byte[] buffer) where T : unmanaged
         {
-            int elementSize = Marshal.SizeOf(typeof(T));
+            int elementSize = SizeOf(typeof(T));
             int byteOffset = index * elementSize;
             int byteLength = count * elementSize;
             writer.Write(byteLength);
@@ -39,6 +40,30 @@ namespace BSOA.Extensions
                 if (buffer == null || buffer.Length < byteLength) { buffer = new byte[byteLength]; }
                 Buffer.BlockCopy(array, byteOffset, buffer, 0, byteLength);
                 writer.Write(buffer, 0, byteLength);
+            }
+        }
+
+        public static int SizeOf(Type t)
+        {
+            if (t == typeof(bool) || t == typeof(byte) || t == typeof(sbyte))
+            {
+                return 1;
+            }
+            else if (t == typeof(char) || t == typeof(short) || t == typeof(ushort))
+            {
+                return 2;
+            }
+            else if (t == typeof(float) || t == typeof(int) || t == typeof(uint))
+            {
+                return 4;
+            }
+            else if (t == typeof(double) || t == typeof(long) || t == typeof(ulong))
+            {
+                return 8;
+            }
+            else
+            {
+                throw new NotSupportedException($"{t.Name} is not supported as a primitive.");
             }
         }
     }
