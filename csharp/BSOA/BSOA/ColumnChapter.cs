@@ -1,10 +1,7 @@
 ﻿using BSOA.Extensions;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 
 namespace BSOA
 {
@@ -58,15 +55,22 @@ namespace BSOA
         {
             get
             {
-                if (index < 0 || index >= ChapterRowCount) { throw new ArgumentOutOfRangeException("index"); }
-                if (index >= Count) { return ArraySlice<T>.Empty; }
+                // VariableLengthColumn can't pass out of range values
+                // if (index < 0 || index >= ChapterRowCount) { throw new ArgumentOutOfRangeException("index"); }
 
                 ArraySlice<T> result = default;
                 if (_largeValueDictionary != null && _largeValueDictionary.TryGetValue(index, out result)) { return result; }
 
-                int position = StartPosition(index);
-                int length = EndPosition(index) - position;
-                return new ArraySlice<T>(_smallValueArray, position, length);
+                if (index < _valueEndInPage?.Length)
+                {
+                    int position = StartPosition(index);
+                    int length = EndPosition(index) - position;
+                    return new ArraySlice<T>(_smallValueArray, position, length);
+                }
+                else
+                {
+                    return ArraySlice<T>.Empty;
+                }
             }
 
             set
@@ -108,12 +112,15 @@ namespace BSOA
             writer.WriteArray(_valueEndInPage, 0, Count, ref buffer);
             writer.WriteArray(_smallValueArray, ref buffer);
 
-            int[] largeValueKeys = _largeValueDictionary.Keys.ToArray();
+            int[] largeValueKeys = _largeValueDictionary?.Keys.ToArray();
             writer.WriteArray(largeValueKeys, ref buffer);
 
-            for (int i = 0; i < largeValueKeys.Length; ++i)
+            if (largeValueKeys != null)
             {
-                _largeValueDictionary[largeValueKeys[i]].Write(writer, ref buffer);
+                for (int i = 0; i < largeValueKeys.Length; ++i)
+                {
+                    _largeValueDictionary[largeValueKeys[i]].Write(writer, ref buffer);
+                }
             }
         }
 
@@ -128,10 +135,10 @@ namespace BSOA
             foreach (var pair in _largeValueDictionary)
             {
                 int length = pair.Value.Count;
-                if (length < MaximumSmallValueLength)
+                if (length <= MaximumSmallValueLength)
                 {
                     int index = pair.Key;
-                    int oldLength = (totalSmallValueLength == 0 ? 0 : _valueEndInPage[index] - (index == 0 ? 0 : _valueEndInPage[index - 1]));
+                    int oldLength = ((index < _valueEndInPage?.Length) ? EndPosition(index) - StartPosition(index) : 0);
                     newSmallValueLength += (length - oldLength);
                 }
             }
@@ -157,7 +164,7 @@ namespace BSOA
                 ArraySlice<T> value = this[i];
 
                 // Copy the value to the new _smallValueArray, if it fits
-                if (value.Count < MaximumSmallValueLength)
+                if (value.Count <= MaximumSmallValueLength)
                 {
                     value.CopyTo(newSmallValueArray, nextIndex);
                     nextIndex += value.Count;
@@ -168,9 +175,11 @@ namespace BSOA
                 newValueEndInPage[i] = (ushort)(nextIndex - currentPageStart);
             }
 
+            if (_largeValueDictionary.Count == 0) { _largeValueDictionary = null; }
             _smallValueArray = newSmallValueArray;
             _pageStartInChapter = newPageStartInChapter;
             _valueEndInPage = newValueEndInPage;
+            
             _requiresTrim = false;
         }
     }

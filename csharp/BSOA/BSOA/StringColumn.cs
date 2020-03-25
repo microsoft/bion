@@ -36,6 +36,11 @@ namespace BSOA
             _inner.Write(writer, ref buffer);
         }
 
+        public void Trim()
+        {
+            _inner.Trim();
+        }
+
         public IEnumerator<string> GetEnumerator()
         {
             return new ListEnumerator<string>(this);

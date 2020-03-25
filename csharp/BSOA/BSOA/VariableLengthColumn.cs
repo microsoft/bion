@@ -77,6 +77,14 @@ namespace BSOA
             }
         }
 
+        public void Trim()
+        {
+            foreach (ColumnChapter<T> chapter in _chapters)
+            {
+                chapter.Trim();
+            }
+        }
+
         public IEnumerator<ArraySlice<T>> GetEnumerator()
         {
             return new ListEnumerator<ArraySlice<T>>(this);

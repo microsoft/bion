@@ -1,4 +1,5 @@
 ﻿using BSOA.Extensions;
+using System;
 using System.IO;
 using System.Text;
 using Xunit;
@@ -85,6 +86,14 @@ namespace BSOA.Test.Extensions
 
                 Assert.True(buffer?.Length >= 12);
             }
+        }
+
+        [Fact]
+        public void SizeOf()
+        {
+            // Verify char size reported properly (Marshal.SizeOf reports one because it defaults to marshalling to ASCII)
+            Assert.Equal(2, BinaryReaderWriterExtensions.SizeOf(typeof(char)));
+            Assert.Throws<NotSupportedException>(() => BinaryReaderWriterExtensions.SizeOf(typeof(Guid)));
         }
     }
 }

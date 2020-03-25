@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Collections.Generic;
+using Xunit;
 
 namespace BSOA.Test
 {
@@ -19,45 +20,56 @@ namespace BSOA.Test
         public void StringColumn_LongValuesAndMerging()
         { 
             StringColumn column = new StringColumn();
-            StringColumn neverConverted = new StringColumn();
+            List<string> expected = new List<string>();
             StringColumn roundTripped;
 
             // Test values just at and above LargeValue limit
-            column[0] = new string(' ', 2047);
-            column[1] = string.Empty;
-            column[2] = new string(' ', 2048);
+            expected.Add(new string(' ', 2047));
+            expected.Add(string.Empty);
+            expected.Add("Normal");
+            expected.Add(new string(' ', 2048));
 
-            for (int i = 0; i < column.Count; ++i)
+            for (int i = 0; i < expected.Count; ++i)
             {
-                neverConverted[i] = column[i];
+                column[i] = expected[i];
             }
 
-            // Verify RoundTrip
-            roundTripped = BinarySerializable.RoundTrip<StringColumn>(column, () => new StringColumn());
-            Assert.Equal(neverConverted, roundTripped);
+            // Verify values properly captured
+            ReadOnlyList.VerifySame(expected, column);
 
-            // Verify column converted for round tripped also still reports the same values (after the 'Trim()' conversion)
-            Assert.Equal(neverConverted, column);
+            // Proactively Trim (before serialization) and verify values not corrupted
+            column.Trim();
+            ReadOnlyList.VerifySame(expected, column);
+
+            // Verify roundtripped column and column not corrupted by serialization
+            roundTripped = BinarySerializable.RoundTrip<StringColumn>(column, () => new StringColumn());
+            ReadOnlyList.VerifySame(expected, roundTripped);
+            ReadOnlyList.VerifySame(expected, column);
 
             // Set a short value to long and a long value to short, and add another value
-            column[0] = new string(':', 2400);
-            column[2] = "MuchShorter";
-            column[3] = "Simple";
+            expected[0] = new string(':', 2400);
+            expected[2] = "MuchShorter";
+            expected.Add("Simple");
 
-            for (int i = 0; i < column.Count; ++i)
+            for (int i = 0; i < expected.Count; ++i)
             {
-                neverConverted[i] = column[i];
+                column[i] = expected[i];
             }
 
             // Verify values read back correctly immediately
-            Assert.Equal(new string(':', 2400), column[0]);
-            Assert.Equal("MuchShorter", column[2]);
-            Assert.Equal("Simple", column[3]);
+            ReadOnlyList.VerifySame(expected, column);
 
             // Verify values re-roundtrip again properly (merging old and new immutable values)
             roundTripped = BinarySerializable.RoundTrip<StringColumn>(column, () => new StringColumn());
-            Assert.Equal(neverConverted, roundTripped);
-            Assert.Equal(neverConverted, column);
+            ReadOnlyList.VerifySame(expected, roundTripped);
+            ReadOnlyList.VerifySame(expected, column);
+
+            // Add a value causing a gap; verify count, new value returned, values in gap defaulted properly
+            column[100] = "Centennial";
+
+            Assert.Equal(101, column.Count);
+            Assert.Equal("Centennial", column[100]);
+            Assert.Equal(string.Empty, column[99]);
         }
     }
 }
