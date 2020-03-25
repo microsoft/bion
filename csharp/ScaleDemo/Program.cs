@@ -32,9 +32,9 @@ namespace ScaleDemo
                 RegionExtractor.Extract(folderPath, "Original.sarif", 1000000);
             }
 
-            Measure(Normal, jsonPath, "JSON, Newtonsoft -> SDK class", Region);
-            Measure(Custom, jsonPath, "JSON, CustomSerializer -> 'Ex' class", Region2);
-            Measure(Bion, bionPath, "BION, BionDataReader + BionSerializer -> struct", Region3);
+            //Measure(Normal, jsonPath, "JSON, Newtonsoft -> SDK class", Region);
+            //Measure(Custom, jsonPath, "JSON, CustomSerializer -> 'Ex' class", Region2);
+            //Measure(Bion, bionPath, "BION, BionDataReader + BionSerializer -> struct", Region3);
             Measure(Elfie, binPath, "BIN, BlockReader + BlockSerializer -> SoA struct", Region4);
 
             //Measure(DefaultR2, jsonPath, "JSON, custom converter -> 'Ex' class", Region2);

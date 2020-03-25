@@ -1,0 +1,77 @@
+﻿using System.Collections.Generic;
+using System.IO;
+
+namespace BSOA
+{
+    /// <summary>
+    ///  VariableLengthColumn is a column for all types of varying lengths (strings, references, binary).
+    ///  Each value in the column is a T[]. Values under length 2,048 are packed together to avoid per row overhead.
+    /// </summary>
+    /// <typeparam name="T">Type of each element of Values (for StringColumn, T is char)</typeparam>
+    public class VariableLengthColumn<T> : IColumn<ArraySlice<T>> where T : unmanaged
+    {
+        private List<ColumnChapter<T>> _chapters;
+
+        public int Count { get; private set; }
+
+        public VariableLengthColumn()
+        {
+            _chapters = new List<ColumnChapter<T>>();
+        }
+
+        public ArraySlice<T> this[int index]
+        {
+            get
+            {
+                if (index >= Count) { return ArraySlice<T>.Empty; }
+
+                int chapterIndex = index / ColumnChapter<T>.ChapterRowCount;
+                int indexInChapter = index % ColumnChapter<T>.ChapterRowCount;
+
+                return _chapters[chapterIndex][indexInChapter];
+            }
+
+            set
+            {
+                int chapterIndex = index / ColumnChapter<T>.ChapterRowCount;
+                int indexInChapter = index % ColumnChapter<T>.ChapterRowCount;
+
+                if (index >= Count) { Count = index + 1; }
+
+                while (chapterIndex >= _chapters.Count)
+                {
+                    _chapters.Add(new ColumnChapter<T>());
+                }
+
+                _chapters[chapterIndex][indexInChapter] = value;
+            }
+        }
+
+        public void Read(BinaryReader reader, ref byte[] buffer)
+        {
+            _chapters.Clear();
+
+            Count = reader.ReadInt32();
+            
+            int chapterCount = reader.ReadInt32();
+            for (int i = 0; i < chapterCount; ++i)
+            {
+                ColumnChapter<T> chapter = new ColumnChapter<T>();
+                chapter.Read(reader, ref buffer);
+
+                _chapters.Add(chapter);
+            }
+        }
+
+        public void Write(BinaryWriter writer, ref byte[] buffer)
+        {
+            writer.Write(Count);
+            writer.Write(_chapters.Count);
+
+            foreach (ColumnChapter<T> chapter in _chapters)
+            {
+                chapter.Write(writer, ref buffer);
+            }
+        }
+    }
+}
