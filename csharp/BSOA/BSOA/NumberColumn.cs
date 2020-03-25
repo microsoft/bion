@@ -42,7 +42,7 @@ namespace BSOA
         {
             get
             {
-                if (index < 0) { throw new ArgumentOutOfRangeException("index"); }
+                if (index < 0) { throw new IndexOutOfRangeException("index"); }
 
                 // Return the value (or defaultValue if the array is null or smaller than the requested index)
                 return (_array?.Length > index ? _array[index] : _defaultValue);

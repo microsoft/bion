@@ -23,7 +23,7 @@ namespace BSOA
             if (array == null) { throw new ArgumentNullException("array"); }
             if (length < 0) { length = array.Length - index; }
             if (index < 0 || index >= array.Length) { throw new ArgumentOutOfRangeException("index"); }
-            if (length < 0 || index + length > array.Length) { throw new ArgumentOutOfRangeException("length"); }
+            if (index + length > array.Length) { throw new ArgumentOutOfRangeException("length"); }
             
             _array = array;
             _index = index;

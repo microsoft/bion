@@ -3,7 +3,7 @@ using Xunit;
 
 namespace BSOA.Test
 {
-    public class IColumnTests
+    public class Column
     {
         public static void Basics<T>(Func<IColumn<T>> builder, T defaultValue, T otherValue, Func<int, T> valueProvider)
         {
@@ -65,6 +65,9 @@ namespace BSOA.Test
             {
                 Assert.Equal(column[i], roundTripped[i]);
             }
+
+            // Verify indexer range check (< 0 only; columns auto-size for bigger values)
+            Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
         }
     }
 }

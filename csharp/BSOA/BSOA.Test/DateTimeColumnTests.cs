@@ -11,7 +11,7 @@ namespace BSOA.Test
             DateTime defaultValue = DateTime.MinValue.ToUniversalTime();
             DateTime otherValue = DateTime.UtcNow;
 
-            IColumnTests.Basics<DateTime>(
+            Column.Basics<DateTime>(
                 () => new DateTimeColumn(defaultValue),
                 defaultValue,
                 otherValue,

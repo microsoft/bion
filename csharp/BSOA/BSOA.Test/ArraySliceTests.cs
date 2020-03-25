@@ -79,6 +79,23 @@ namespace BSOA.Test
             {
                 Assert.Equal(expected[i], actual[i]);
             }
+
+            // Verify typed enumerator (MoveNext, Current, Reset)
+            IEnumerator<T> enumerator = actual.GetEnumerator();
+            int index = 0;
+            while(enumerator.MoveNext())
+            {
+                Assert.Equal(expected[index], enumerator.Current);
+                index++;
+            }
+
+            enumerator.Reset();
+            index = 0;
+            while (enumerator.MoveNext())
+            {
+                Assert.Equal(expected[index], enumerator.Current);
+                index++;
+            }
         }
     }
 }

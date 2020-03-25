@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using Xunit;
 
 namespace BSOA.Test
@@ -28,7 +26,7 @@ namespace BSOA.Test
 
         private void NumberColumnTest<T>(T defaultValue, T otherValue, Func<int, T> valueProvider) where T : unmanaged, IEquatable<T>
         {
-            IColumnTests.Basics<T>(() => new NumberColumn<T>(defaultValue), defaultValue, otherValue, valueProvider);
+            Column.Basics<T>(() => new NumberColumn<T>(defaultValue), defaultValue, otherValue, valueProvider);
         }
     }
 }
