@@ -12,9 +12,9 @@ namespace BSOA.IO
     ///    - Partial Array reading (read huge array in parts?)
     ///    - Position, Seek, Skip support for partial loading? (Could this be handled in the implementation?)
     /// </remarks>
-    public interface ITreeReader
+    public interface ITreeReader : IDisposable
     {
-        void ReadObject<T>(ref T instance, Dictionary<string, Action<ITreeReader, T>> propertyReaders);
+        void ReadObject<T>(T instance, Dictionary<string, Action<ITreeReader, T>> setters);
 
         bool ReadBoolean();
         short ReadInt16();
