@@ -47,14 +47,14 @@ namespace BSOA.IO
             return _reader.ReadInt64();
         }
 
-        public void ReadObject<T>(T instance, Dictionary<string, Action<ITreeReader, T>> setters)
+        public void ReadObject<T>(T instance, Dictionary<string, Setter<T>> setters)
         {
             Expect(BinaryTreeWriter.StartObject);
 
             string propertyName = _reader.ReadString();
             while (propertyName != BinaryTreeWriter.EndObject)
             {
-                if(!setters.TryGetValue(propertyName, out Action<ITreeReader, T> setter))
+                if(!setters.TryGetValue(propertyName, out Setter<T> setter))
                 {
                     throw new IOException($"BinaryTreeReader encountered unexpected property name parsing {typeof(T).Name}. Read \"{propertyName}\", expected one of \"{String.Join("; ", setters.Keys)}\"at {_reader.BaseStream.Position - (propertyName.Length * 2):n0}");
                 }

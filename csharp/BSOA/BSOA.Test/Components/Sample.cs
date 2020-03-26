@@ -29,7 +29,7 @@ namespace BSOA.Test.Components
             reader.ReadObject<Sample>(this, setters);
         }
 
-        private static Dictionary<string, Action<ITreeReader, Sample>> setters => new Dictionary<string, Action<ITreeReader, Sample>>()
+        private static Dictionary<string, Setter<Sample>> setters => new Dictionary<string, Setter<Sample>>()
         {
             [nameof(IsActive)] = (r, me) => me.IsActive = r.ReadBoolean(),
             [nameof(Age)] = (r, me) => me.Age = r.ReadInt16(),
@@ -64,7 +64,7 @@ namespace BSOA.Test.Components
             reader.ReadObject<SampleContainer>(this, setters);
         }
 
-        private static Dictionary<string, Action<ITreeReader, SampleContainer>> setters => new Dictionary<string, Action<ITreeReader, SampleContainer>>()
+        private static Dictionary<string, Setter<SampleContainer>> setters => new Dictionary<string, Setter<SampleContainer>>()
         {
             [nameof(Main)] = (r, me) => { me.Main = new Sample(); me.Main.Read(r); },
         };

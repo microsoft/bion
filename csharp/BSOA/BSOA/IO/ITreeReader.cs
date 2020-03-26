@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace BSOA.IO
 {
+    public delegate void Setter<T>(ITreeReader reader, T me);
+
     /// <summary>
     ///  ITreeReader is a generic interface for hierarchical deserialization.
     ///  Types in a hierarchy are read as single values, arrays, and sub-objects.
@@ -14,7 +16,7 @@ namespace BSOA.IO
     /// </remarks>
     public interface ITreeReader : IDisposable
     {
-        void ReadObject<T>(T instance, Dictionary<string, Action<ITreeReader, T>> setters);
+        void ReadObject<T>(T instance, Dictionary<string, Setter<T>> setters);
 
         bool ReadBoolean();
         short ReadInt16();
