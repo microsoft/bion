@@ -15,7 +15,7 @@ namespace BSOA.IO
         private BinaryWriter _writer;
         private TreeSerializationSettings _settings;
 
-        public BinaryTreeWriter(Stream  stream, TreeSerializationSettings settings)
+        public BinaryTreeWriter(Stream stream, TreeSerializationSettings settings)
         {
             _writer = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: settings.LeaveStreamOpen);
             _settings = settings;
@@ -30,7 +30,7 @@ namespace BSOA.IO
         {
             _writer.Write(EndObject);
         }
-        
+
         public void Write(string name, string value)
         {
             _writer.Write(name);
@@ -69,8 +69,11 @@ namespace BSOA.IO
 
         public void WriteComponent(string name, ITreeSerializable component)
         {
-            _writer.Write(name);
-            component.Write(this);
+            if (component != null)
+            {
+                _writer.Write(name);
+                component.Write(this);
+            }
         }
 
         public void Dispose()
