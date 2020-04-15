@@ -84,20 +84,20 @@ namespace BSOA
 
         public void Read(BinaryReader reader, ref byte[] buffer)
         {
-            _pageStartInChapter = reader.ReadArray<int>(ref buffer);
-            _valueEndInPage = reader.ReadArray<ushort>(ref buffer);
-            _smallValueArray = reader.ReadArray<T>(ref buffer);
+            _pageStartInChapter = reader.ReadBlockArray<int>(ref buffer);
+            _valueEndInPage = reader.ReadBlockArray<ushort>(ref buffer);
+            _smallValueArray = reader.ReadBlockArray<T>(ref buffer);
 
             Count = _valueEndInPage.Length;
 
             _largeValueDictionary = new Dictionary<int, ArraySlice<T>>();
 
-            int[] largeValueIndices = reader.ReadArray<int>(ref buffer);
+            int[] largeValueIndices = reader.ReadBlockArray<int>(ref buffer);
             if (largeValueIndices.Length > 0)
             {
                 for (int i = 0; i < largeValueIndices.Length; ++i)
                 {
-                    T[] largeValue = reader.ReadArray<T>(ref buffer);
+                    T[] largeValue = reader.ReadBlockArray<T>(ref buffer);
                     _largeValueDictionary[largeValueIndices[i]] = new ArraySlice<T>(largeValue);
                 }
             }
@@ -108,12 +108,12 @@ namespace BSOA
             // Merge changed small values under cutoff into SmallValueArray
             Trim();
 
-            writer.WriteArray(_pageStartInChapter, ref buffer);
-            writer.WriteArray(_valueEndInPage, 0, Count, ref buffer);
-            writer.WriteArray(_smallValueArray, ref buffer);
+            writer.WriteBlockArray(_pageStartInChapter, ref buffer);
+            writer.WriteBlockArray(_valueEndInPage, 0, Count, ref buffer);
+            writer.WriteBlockArray(_smallValueArray, ref buffer);
 
             int[] largeValueKeys = _largeValueDictionary?.Keys.ToArray();
-            writer.WriteArray(largeValueKeys, ref buffer);
+            writer.WriteBlockArray(largeValueKeys, ref buffer);
 
             if (largeValueKeys != null)
             {

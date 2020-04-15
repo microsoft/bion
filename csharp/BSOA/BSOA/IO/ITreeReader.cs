@@ -26,7 +26,8 @@ namespace BSOA.IO
         TreeToken TokenType { get; }
         long Position { get; }
 
-        // Read a value - boolean, string, long, and double must be supported
+        // Return the current token as a typed valued - boolean, string, long, and double must be supported
+        // Unlike JsonReader, this does not read the next token.
         bool ReadAsBoolean();
         string ReadAsString();
         long ReadAsInt64();
@@ -40,6 +41,7 @@ namespace BSOA.IO
         ///  char | byte | sbyte | short | ushort | int | uint | long | ulong | float | double
         ///  
         ///  ITreeReaders must handle null and empty arrays.
+        ///  ReadBlockArray should leave one token, so that Read() called afterward advances to the next token.
         /// </remarks>
         T[] ReadBlockArray<T>() where T : unmanaged;
     }
@@ -86,6 +88,8 @@ namespace BSOA.IO
         /// <param name="setters">Dictionary of setter per field name</param>
         public static void ReadObject<T>(this ITreeReader reader, T instance, Dictionary<string, Setter<T>> setters)
         {
+            if (reader.TokenType == TreeToken.None) { reader.Read(); }
+
             reader.Expect(TreeToken.StartObject);
             reader.Read();
 
@@ -93,14 +97,18 @@ namespace BSOA.IO
             {
                 string propertyName = reader.ReadAsString();
                 reader.Read();
-                
+
                 if (!setters.TryGetValue(propertyName, out Setter<T> setter))
                 {
                     throw new IOException($"{reader.GetType().Name} encountered unexpected property name parsing {nameof(T)}. Read \"{propertyName}\", expected one of \"{String.Join("; ", setters.Keys)}\"at {reader.Position:n0}");
                 }
 
                 setter(reader, instance);
+                reader.Read();
             }
+
+            reader.Expect(TreeToken.EndObject);
+            // EndObject must be left for caller to handle
         }
 
         public static void Expect(this ITreeReader reader, TreeToken expected)

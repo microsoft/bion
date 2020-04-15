@@ -12,6 +12,11 @@ namespace BSOA.IO
         public TreeToken TokenType { get; private set; }
         public long Position => _reader.BaseStream.Position;
 
+        private bool _valueBool;
+        private long _valueLong;
+        private double _valueDouble;
+        private string _valueString;
+
         public BinaryTreeReader(Stream stream, TreeSerializationSettings settings)
         {
             _reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: settings.LeaveStreamOpen);
@@ -25,36 +30,55 @@ namespace BSOA.IO
                 TokenType = TreeToken.None;
                 return false;
             }
-            else
+
+            TokenType = (TreeToken)_reader.ReadByte();
+
+            switch(TokenType)
             {
-                TokenType = (TreeToken)_reader.ReadByte();
-                return true;
+                case TreeToken.Boolean:
+                    _valueBool = _reader.ReadBoolean();
+                    break;
+                case TreeToken.Integer:
+                    _valueLong = _reader.ReadInt64();
+                    break;
+                case TreeToken.Float:
+                    _valueDouble = _reader.ReadDouble();
+                    break;
+                case TreeToken.String:
+                case TreeToken.PropertyName:
+                    _valueString = _reader.ReadString();
+                    break;
+                default:
+                    // Nothing to read or not pre-read
+                    break;
             }
+
+            return true;
         }
 
         public bool ReadAsBoolean()
         {
-            return _reader.ReadBoolean();
-        }
-
-        public string ReadAsString()
-        {
-            return _reader.ReadString();
+            return _valueBool;
         }
 
         public long ReadAsInt64()
         {
-            return _reader.ReadInt64();
+            return _valueLong;
         }
 
         public double ReadAsDouble()
         {
-            return _reader.ReadDouble();
+            return _valueDouble;
+        }
+
+        public string ReadAsString()
+        {
+            return _valueString;
         }
 
         public T[] ReadBlockArray<T>() where T : unmanaged
         {
-            return _reader.ReadArray<T>(ref _settings.Buffer);
+            return _reader.ReadBlockArray<T>(ref _settings.Buffer);
         }
 
         public void Dispose()

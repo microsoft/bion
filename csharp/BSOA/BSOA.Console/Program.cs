@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace BSOA.Console
 {
@@ -20,6 +21,14 @@ namespace BSOA.Console
 
             string json = JsonConvert.SerializeObject(s);
             Sample t = JsonConvert.DeserializeObject<Sample>(json);
+
+            JsonTextReader r = new JsonTextReader(new StringReader(json));
+            while(r.Read())
+            {
+                JsonToken token = r.TokenType;
+                object value = r.Value;
+            }
+
             bool equal = s.Equals(t);
 
             List<Sample> samples = new List<Sample>()

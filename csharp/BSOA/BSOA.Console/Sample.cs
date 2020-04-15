@@ -78,6 +78,8 @@ namespace BSOA.Test.Components
             while(reader.TokenType == JsonToken.PropertyName)
             {
                 string propertyName = (string)reader.Value;
+                
+                //reader.Read();  // ReadAsXXX advances to next token
 
                 if(!setters.TryGetValue(propertyName, out var setter))
                 {
@@ -85,7 +87,7 @@ namespace BSOA.Test.Components
                 }
 
                 setter(reader, value);
-                reader.Read();
+                reader.Read();   // Must advance to next PropertyName or EndObject
             }
 
             reader.Expect(JsonToken.EndObject);

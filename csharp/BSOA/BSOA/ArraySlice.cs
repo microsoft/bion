@@ -50,14 +50,14 @@ namespace BSOA
 
         public void Read(BinaryReader reader, ref byte[] buffer)
         {
-            _array = reader.ReadArray<T>(ref buffer);
+            _array = reader.ReadBlockArray<T>(ref buffer);
             _index = 0;
             _length = _array.Length;
         }
 
         public void Write(BinaryWriter writer, ref byte[] buffer)
         {
-            writer.WriteArray<T>(_array, _index, _length, ref buffer);
+            writer.WriteBlockArray<T>(_array, _index, _length, ref buffer);
         }
     }
 }

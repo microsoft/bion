@@ -83,7 +83,7 @@ namespace BSOA.IO
         public void WriteBlockArray<T>(T[] array, int index, int count) where T : unmanaged
         {
             _writer.Write((byte)TreeToken.BlockArray);
-            _writer.WriteArray<T>(array, index, count, ref _settings.Buffer);
+            _writer.WriteBlockArray<T>(array, index, count, ref _settings.Buffer);
         }
 
         public void Dispose()

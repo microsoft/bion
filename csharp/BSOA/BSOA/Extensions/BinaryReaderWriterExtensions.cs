@@ -5,7 +5,7 @@ namespace BSOA.Extensions
 {
     public static class BinaryReaderWriterExtensions
     {
-        public static T[] ReadArray<T>(this BinaryReader reader, ref byte[] buffer) where T : unmanaged
+        public static T[] ReadBlockArray<T>(this BinaryReader reader, ref byte[] buffer) where T : unmanaged
         {
             int byteLength = reader.ReadInt32();
             if (byteLength == 0) { return Array.Empty<T>(); }
@@ -21,12 +21,12 @@ namespace BSOA.Extensions
             return array;
         }
 
-        public static void WriteArray<T>(this BinaryWriter writer, T[] array, ref byte[] buffer) where T : unmanaged
+        public static void WriteBlockArray<T>(this BinaryWriter writer, T[] array, ref byte[] buffer) where T : unmanaged
         {
-            WriteArray<T>(writer, array, 0, array?.Length ?? 0, ref buffer);
+            WriteBlockArray<T>(writer, array, 0, array?.Length ?? 0, ref buffer);
         }
 
-        public static void WriteArray<T>(this BinaryWriter writer, T[] array, int index, int count, ref byte[] buffer) where T : unmanaged
+        public static void WriteBlockArray<T>(this BinaryWriter writer, T[] array, int index, int count, ref byte[] buffer) where T : unmanaged
         {
             // Negative count means write the rest of the array
             if (count < 0) { count = array?.Length - index ?? 0; }

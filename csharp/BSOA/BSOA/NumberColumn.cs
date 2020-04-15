@@ -67,13 +67,13 @@ namespace BSOA
 
         public void Read(BinaryReader reader, ref byte[] buffer)
         {
-            _array = reader.ReadArray<T>(ref buffer);
+            _array = reader.ReadBlockArray<T>(ref buffer);
             _count = _array.Length;
         }
 
         public void Write(BinaryWriter writer, ref byte[] buffer)
         {
-            writer.WriteArray(_array, 0, _count, ref buffer);
+            writer.WriteBlockArray(_array, 0, _count, ref buffer);
         }
 
         private void ResizeTo(int size)
