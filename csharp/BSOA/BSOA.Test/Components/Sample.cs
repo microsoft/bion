@@ -55,7 +55,7 @@ namespace BSOA.Test.Components
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-            writer.WriteComponent(nameof(Main), this.Main);
+            writer.WriteObject(nameof(Main), this.Main);
             writer.WriteEndObject();
         }
 

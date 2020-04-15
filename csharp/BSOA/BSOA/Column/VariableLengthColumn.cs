@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BSOA.IO;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -50,6 +51,24 @@ namespace BSOA
             }
         }
 
+        public void Trim()
+        {
+            foreach (ColumnChapter<T> chapter in _chapters)
+            {
+                chapter.Trim();
+            }
+        }
+
+        public IEnumerator<ArraySlice<T>> GetEnumerator()
+        {
+            return new ListEnumerator<ArraySlice<T>>(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new ListEnumerator<ArraySlice<T>>(this);
+        }
+
         public void Read(BinaryReader reader, ref byte[] buffer)
         {
             _chapters.Clear();
@@ -77,22 +96,14 @@ namespace BSOA
             }
         }
 
-        public void Trim()
+        public void Read(ITreeReader reader)
         {
-            foreach (ColumnChapter<T> chapter in _chapters)
-            {
-                chapter.Trim();
-            }
+            throw new NotImplementedException();
         }
 
-        public IEnumerator<ArraySlice<T>> GetEnumerator()
+        public void Write(ITreeWriter writer)
         {
-            return new ListEnumerator<ArraySlice<T>>(this);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new ListEnumerator<ArraySlice<T>>(this);
+            throw new NotImplementedException();
         }
     }
 }

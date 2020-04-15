@@ -17,7 +17,7 @@
         String = 9,
         Boolean = 10,
         Null = 11,
-        EndObject = 12,
+        EndObject = 13,
         EndArray = 14,
 
         BlockArray = 18

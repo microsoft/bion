@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using BSOA.Extensions;
+using BSOA.IO;
 
 namespace BSOA
 {
@@ -65,17 +66,6 @@ namespace BSOA
             }
         }
 
-        public void Read(BinaryReader reader, ref byte[] buffer)
-        {
-            _array = reader.ReadBlockArray<T>(ref buffer);
-            _count = _array.Length;
-        }
-
-        public void Write(BinaryWriter writer, ref byte[] buffer)
-        {
-            writer.WriteBlockArray(_array, 0, _count, ref buffer);
-        }
-
         private void ResizeTo(int size)
         {
             int currentLength = _array?.Length ?? 0;
@@ -109,6 +99,28 @@ namespace BSOA
         IEnumerator IEnumerable.GetEnumerator()
         {
             return new ListEnumerator<T>(this);
+        }
+
+        public void Read(BinaryReader reader, ref byte[] buffer)
+        {
+            _array = reader.ReadBlockArray<T>(ref buffer);
+            _count = _array.Length;
+        }
+
+        public void Write(BinaryWriter writer, ref byte[] buffer)
+        {
+            writer.WriteBlockArray(_array, 0, _count, ref buffer);
+        }
+
+        public void Read(ITreeReader reader)
+        {
+            _array = reader.ReadBlockArray<T>();
+            _count = _array.Length;
+        }
+
+        public void Write(ITreeWriter writer)
+        {
+            writer.WriteBlockArray(_array, 0, _count);
         }
     }
 }

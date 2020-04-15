@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BSOA.IO
 {
@@ -110,8 +111,33 @@ namespace BSOA.IO
         }
         #endregion
 
-        // WriteComponent supports writing a subcomponent with name and value in one call.
-        public static void WriteComponent(this ITreeWriter writer, string name, ITreeSerializable component)
+        public static void WriteList<T>(this ITreeWriter writer, IReadOnlyList<T> list) where T : ITreeSerializable
+        {
+            writer.WriteStartArray();
+
+            foreach(T item in list)
+            {
+                item.Write(writer);
+            }
+
+            writer.WriteEndArray();
+        }
+
+        public static void WriteDictionary<T>(this ITreeWriter writer, IReadOnlyDictionary<string, T> dictionary) where T : ITreeSerializable
+        {
+            writer.WriteStartObject();
+
+            foreach(var item in dictionary)
+            {
+                writer.WritePropertyName(item.Key);
+                item.Value.Write(writer);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        // WriteObject supports writing a subcomponent with name and value in one call.
+        public static void WriteObject(this ITreeWriter writer, string name, ITreeSerializable component)
         {
             if (component != null)
             {

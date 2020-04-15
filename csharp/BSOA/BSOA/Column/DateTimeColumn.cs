@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BSOA.IO;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -38,6 +39,16 @@ namespace BSOA
             set { _innerColumn[index] = value.ToUniversalTime().Ticks; }
         }
 
+        public IEnumerator<DateTime> GetEnumerator()
+        {
+            return new ListEnumerator<DateTime>(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new ListEnumerator<DateTime>(this);
+        }
+
         public void Read(BinaryReader reader, ref byte[] buffer)
         {
             _innerColumn.Read(reader, ref buffer);
@@ -48,14 +59,14 @@ namespace BSOA
             _innerColumn.Write(writer, ref buffer);
         }
 
-        public IEnumerator<DateTime> GetEnumerator()
+        public void Read(ITreeReader reader)
         {
-            return new ListEnumerator<DateTime>(this);
+            _innerColumn.Read(reader);
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public void Write(ITreeWriter writer)
         {
-            return new ListEnumerator<DateTime>(this);
+            _innerColumn.Write(writer);
         }
     }
 }

@@ -14,6 +14,7 @@ namespace BSOA.Json
         public JsonTreeWriter(Stream stream, TreeSerializationSettings settings)
         {
             _writer = new JsonTextWriter(new StreamWriter(stream, Encoding.UTF8, 8 * 1024, leaveOpen: settings.LeaveStreamOpen));
+            _writer.Formatting = (settings.Compact ? Formatting.None : Formatting.Indented);
             _settings = settings;
         }
 

@@ -26,6 +26,11 @@ namespace BSOA.Test.Components
                 && this.Position == other.Position;
         }
 
+        public override int GetHashCode()
+        {
+            return this.IsActive.GetHashCode() ^ this.Age.GetHashCode() ^ this.Count.GetHashCode() ^ this.Position.GetHashCode() ^ this.Data.GetHashCode();
+        }
+
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();

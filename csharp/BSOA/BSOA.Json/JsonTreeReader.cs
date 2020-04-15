@@ -1,6 +1,7 @@
 ﻿using BSOA.IO;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 
@@ -51,16 +52,12 @@ namespace BSOA.Json
             this.Expect(TreeToken.StartArray);
 
             int count = _reader.ReadAsInt32().Value;
+            _reader.Read();
 
             T[] array = new T[count];
-            for (int i = 0; i < count; ++i)
-            {
-                if (!_reader.Read()) { throw new IOException($"ReadBlockArray expected {count:n0} items, but end found trying to read item {i:n0}."); }
-                array[i] = (T)_reader.Value;
-            }
 
-            _reader.Read();
-            
+            PrimitiveArrayReader.ReadArray<T>(_reader, array, count);
+
             this.Expect(TreeToken.EndArray);
             // Leave EndArray token for outer reader to Read() past
 
@@ -77,5 +74,7 @@ namespace BSOA.Json
             ((IDisposable)_reader)?.Dispose();
             _reader = null;
         }
+
+        
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BSOA.IO;
+using BSOA.Json;
 using System;
 using System.IO;
 using System.Linq;
@@ -41,6 +42,16 @@ namespace BSOA.Test.Components
             );
         }
 
+        public static T RoundTripJson<T>(T value, Func<T> builder) where T : ITreeSerializable
+        {
+            return RoundTrip<T>(
+                value,
+                builder,
+                (stream, settings) => new JsonTreeWriter(stream, settings),
+                (stream, settings) => new JsonTreeReader(stream, settings)
+            );
+        }
+
         public static T RoundTrip<T>(T value, 
             Func<T> buildT, 
             Func<Stream, TreeSerializationSettings, ITreeWriter> buildWriter,
@@ -48,11 +59,12 @@ namespace BSOA.Test.Components
         {
             T roundTripped = buildT();
 
-            TreeSerializationSettings settings = new TreeSerializationSettings(leaveStreamOpen: true);
+            // Leave stream open and write non-compact (Json indented)
+            TreeSerializationSettings settings = new TreeSerializationSettings(leaveStreamOpen: true) { Compact = false };
 
             using (MemoryStream stream = new MemoryStream())
             {
-                using (BinaryTreeWriter writer = new BinaryTreeWriter(stream, settings))
+                using (ITreeWriter writer = buildWriter(stream, settings))
                 {
                     value.Write(writer);
                 }
@@ -60,7 +72,7 @@ namespace BSOA.Test.Components
                 long position = stream.Position;
                 stream.Seek(0, SeekOrigin.Begin);
 
-                using (BinaryTreeReader reader = new BinaryTreeReader(stream, settings))
+                using (ITreeReader reader = buildReader(stream, settings))
                 {
                     roundTripped.Read(reader);
                 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using BSOA.IO;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
@@ -26,6 +27,21 @@ namespace BSOA
             set => _inner[index] = new ArraySlice<char>(value.ToCharArray());
         }
 
+        public IEnumerator<string> GetEnumerator()
+        {
+            return new ListEnumerator<string>(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new ListEnumerator<string>(this);
+        }
+
+        public void Trim()
+        {
+            _inner.Trim();
+        }
+
         public void Read(BinaryReader reader, ref byte[] buffer)
         {
             _inner.Read(reader, ref buffer);
@@ -36,19 +52,14 @@ namespace BSOA
             _inner.Write(writer, ref buffer);
         }
 
-        public void Trim()
+        public void Read(ITreeReader reader)
         {
-            _inner.Trim();
+            _inner.Read(reader);
         }
 
-        public IEnumerator<string> GetEnumerator()
+        public void Write(ITreeWriter writer)
         {
-            return new ListEnumerator<string>(this);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new ListEnumerator<string>(this);
+            _inner.Write(writer);
         }
     }
 }
