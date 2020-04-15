@@ -16,6 +16,14 @@ namespace BSOA.IO
     ///  arrays have values only.
     ///  
     ///  ITreeReader adds ReadBlockArray, which is critical for great I/O performance for large data
+    ///  
+    ///  ROUGH EDGES:
+    ///   - ReadAs different from JsonReader (don't read next token; need a typed way to get current token value)
+    ///   - ReadBlockArray must be called before next Read(), but other calls don't have to be.
+    ///   - ReadObject needs a way to set defaults for missing and null properties.
+    ///   - Probably want a way to read structs (can't pass instance to setter to set).
+    ///   - ReadDictionary/ReadArray helpers, if written, can't support both primitives and nested ITreeSerializable types easily.
+    ///   - Probably want serializability implemented in a companion class (to allow implementing for built-in types)
     /// </remarks>
     public interface ITreeReader : IDisposable
     {

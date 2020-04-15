@@ -11,7 +11,8 @@ namespace BSOA.Json
         private JsonTextReader _reader;
         private TreeSerializationSettings _settings;
 
-        public TreeToken TokenType { get; private set; }
+        // Note: TreeToken values chosen to match JsonToken enum
+        public TreeToken TokenType => (TreeToken)_reader.TokenType;
         public long Position => _reader.LineNumber;
 
         public JsonTreeReader(Stream stream, TreeSerializationSettings settings)
