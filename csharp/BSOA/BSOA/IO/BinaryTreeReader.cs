@@ -1,6 +1,4 @@
 ﻿using BSOA.Extensions;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -11,67 +9,52 @@ namespace BSOA.IO
         private BinaryReader _reader;
         private TreeSerializationSettings _settings;
 
+        public TreeToken TokenType { get; private set; }
+        public long Position => _reader.BaseStream.Position;
+
         public BinaryTreeReader(Stream stream, TreeSerializationSettings settings)
         {
             _reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: settings.LeaveStreamOpen);
             _settings = settings;
         }
 
-        public T[] ReadArray<T>() where T : unmanaged
+        public bool Read()
         {
-            return _reader.ReadArray<T>(ref _settings.Buffer);
+            if (_reader.BaseStream.Position == _reader.BaseStream.Length)
+            {
+                TokenType = TreeToken.None;
+                return false;
+            }
+            else
+            {
+                TokenType = (TreeToken)_reader.ReadByte();
+                return true;
+            }
         }
 
-        public string ReadString()
-        {
-            return _reader.ReadString();
-        }
-
-        public bool ReadBoolean()
+        public bool ReadAsBoolean()
         {
             return _reader.ReadBoolean();
         }
 
-        public short ReadInt16()
+        public string ReadAsString()
         {
-            return _reader.ReadInt16();
+            return _reader.ReadString();
         }
 
-        public int ReadInt32()
-        {
-            return _reader.ReadInt32();
-        }
-
-        public long ReadInt64()
+        public long ReadAsInt64()
         {
             return _reader.ReadInt64();
         }
 
-        public void ReadObject<T>(T instance, Dictionary<string, Setter<T>> setters)
+        public double ReadAsDouble()
         {
-            Expect(BinaryTreeWriter.StartObject);
-
-            string propertyName = _reader.ReadString();
-            while (propertyName != BinaryTreeWriter.EndObject)
-            {
-                if(!setters.TryGetValue(propertyName, out Setter<T> setter))
-                {
-                    throw new IOException($"BinaryTreeReader encountered unexpected property name parsing {typeof(T).Name}. Read \"{propertyName}\", expected one of \"{String.Join("; ", setters.Keys)}\"at {_reader.BaseStream.Position - (propertyName.Length * 2):n0}");
-                }
-
-                setter(this, instance);
-                propertyName = _reader.ReadString();
-            }
+            return _reader.ReadDouble();
         }
 
-        private void Expect(string expected)
+        public T[] ReadBlockArray<T>() where T : unmanaged
         {
-            string marker = _reader.ReadString();
-
-            if (marker != expected)
-            {
-                throw new IOException($"BinaryTreeReader expected \"{expected}\" but found \"{marker}\" at {_reader.BaseStream.Position - 1:n0}");
-            }
+            return _reader.ReadArray<T>(ref _settings.Buffer);
         }
 
         public void Dispose()

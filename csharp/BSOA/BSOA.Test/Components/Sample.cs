@@ -20,7 +20,7 @@ namespace BSOA.Test.Components
             writer.Write(nameof(Age), Age);
             writer.Write(nameof(Count), Count);
             writer.Write(nameof(Position), Position);
-            writer.WriteArray(nameof(Data), Data);
+            writer.WriteBlockArray(nameof(Data), Data);
             writer.WriteEndObject();
         }
 
@@ -31,11 +31,11 @@ namespace BSOA.Test.Components
 
         private static Dictionary<string, Setter<Sample>> setters => new Dictionary<string, Setter<Sample>>()
         {
-            [nameof(IsActive)] = (r, me) => me.IsActive = r.ReadBoolean(),
-            [nameof(Age)] = (r, me) => me.Age = r.ReadInt16(),
-            [nameof(Count)] = (r, me) => me.Count = r.ReadInt32(),
-            [nameof(Position)] = (r, me) => me.Position = r.ReadInt64(),
-            [nameof(Data)] = (r, me) => me.Data = r.ReadArray<byte>()
+            [nameof(IsActive)] = (r, me) => me.IsActive = r.ReadAsBoolean(),
+            [nameof(Age)] = (r, me) => me.Age = r.ReadAsInt16(),
+            [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
+            [nameof(Position)] = (r, me) => me.Position = r.ReadAsInt64(),
+            [nameof(Data)] = (r, me) => me.Data = r.ReadBlockArray<byte>()
         };
 
         public void AssertEqual(Sample other)

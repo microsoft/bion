@@ -9,9 +9,6 @@ namespace BSOA.IO
     /// </summary>
     public class BinaryTreeWriter : ITreeWriter
     {
-        internal const string StartObject = "\u0002"; // STX (start of text)
-        internal const string EndObject = "\u0003";   // ETX (end of text)
-
         private BinaryWriter _writer;
         private TreeSerializationSettings _settings;
 
@@ -23,57 +20,70 @@ namespace BSOA.IO
 
         public void WriteStartObject()
         {
-            _writer.Write(StartObject);
+            _writer.Write((byte)TreeToken.StartObject);
         }
 
         public void WriteEndObject()
         {
-            _writer.Write(EndObject);
+            _writer.Write((byte)TreeToken.EndObject);
         }
 
-        public void Write(string name, string value)
+        public void WriteStartArray()
         {
+            _writer.Write((byte)TreeToken.StartArray);
+        }
+
+        public void WriteEndArray()
+        {
+            _writer.Write((byte)TreeToken.EndArray);
+        }
+
+        public void WriteNull()
+        {
+            _writer.Write((byte)TreeToken.Null);
+        }
+
+        public void WritePropertyName(string name)
+        {
+            _writer.Write((byte)TreeToken.PropertyName);
             _writer.Write(name);
+        }
+
+        public void WriteValue(bool value)
+        {
+            _writer.Write((byte)TreeToken.Boolean);
             _writer.Write(value);
         }
 
-        public void Write(string name, bool value)
+        public void WriteValue(string value)
         {
-            _writer.Write(name);
-            _writer.Write(value);
-        }
-
-        public void Write(string name, short value)
-        {
-            _writer.Write(name);
-            _writer.Write(value);
-        }
-
-        public void Write(string name, int value)
-        {
-            _writer.Write(name);
-            _writer.Write(value);
-        }
-
-        public void Write(string name, long value)
-        {
-            _writer.Write(name);
-            _writer.Write(value);
-        }
-
-        public void WriteArray<T>(string name, T[] array, int index, int count) where T : unmanaged
-        {
-            _writer.Write(name);
-            _writer.WriteArray<T>(array, index, count, ref _settings.Buffer);
-        }
-
-        public void WriteComponent(string name, ITreeSerializable component)
-        {
-            if (component != null)
+            if (value == null)
             {
-                _writer.Write(name);
-                component.Write(this);
+                WriteNull();
             }
+            else
+            {
+                _writer.Write((byte)TreeToken.String);
+                _writer.Write(value);
+            }
+        }
+
+        public void WriteValue(long value)
+        {
+            _writer.Write((byte)TreeToken.Integer);
+            _writer.Write(value);
+        }
+
+        public void WriteValue(double value)
+        {
+            _writer.Write((byte)TreeToken.Float);
+            _writer.Write(value);
+        }
+
+        public void WriteBlockArray<T>(T[] array, int index, int count) where T : unmanaged
+        {
+            _writer.Write((byte)TreeToken.BlockArray);
+            _writer.WriteArray<T>(array, index, count, ref _settings.Buffer);
         }
 
         public void Dispose()
