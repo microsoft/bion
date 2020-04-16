@@ -62,9 +62,9 @@ namespace BSOA.Test.Components
 
                 using (ITreeReader reader = buildReader(stream, settings))
                 {
-                    // Test Expect failure (should be 'None' when file just opened
-                    reader.Expect(TreeToken.None);
-                    Assert.Throws<IOException>(() => reader.Expect(TreeToken.Boolean));
+                    // Test Expect failure (should not be 'None' when file just opened
+                    Assert.NotEqual(TreeToken.None, reader.TokenType);
+                    Assert.Throws<IOException>(() => reader.Expect(TreeToken.None));
 
                     // Test reading back as wrong type (exception from ReadObject unexpected property name)
                     Assert.Throws<IOException>(() => new SingleContainer<Sample>().Read(reader));
@@ -205,6 +205,10 @@ namespace BSOA.Test.Components
             {
                 using (ITreeReader reader = buildReader(stream, settings))
                 {
+                    // Ensure Readers pre-read first token by default
+                    // Needed to allow single value reading to work without everything having to handle this case everywhere
+                    Assert.NotEqual(TreeToken.None, reader.TokenType);
+
                     roundTripped.Read(reader);
                     
                     // Verify everything read back

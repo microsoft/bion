@@ -1,7 +1,6 @@
 ﻿using BSOA.IO;
 using Newtonsoft.Json;
 using System;
-using System.ComponentModel;
 using System.IO;
 using System.Text;
 
@@ -20,6 +19,9 @@ namespace BSOA.Json
         {
             _reader = new JsonTextReader(new StreamReader(stream, Encoding.UTF8, true, 8 * 1024, leaveOpen: settings.LeaveStreamOpen));
             _settings = settings;
+
+            // TreeReaders required to read the first token on open, to allow single value reading to work
+            Read();
         }
 
         public bool Read()

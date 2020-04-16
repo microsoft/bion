@@ -114,6 +114,8 @@ namespace BSOA.IO
 
         public static void WriteList<T>(this ITreeWriter writer, IReadOnlyList<T> list) where T : ITreeSerializable
         {
+            if (list == null) { writer.WriteNull(); return; }
+
             writer.WriteStartArray();
 
             foreach (T item in list)
@@ -126,6 +128,8 @@ namespace BSOA.IO
 
         public static void WriteDictionary<T>(this ITreeWriter writer, IReadOnlyDictionary<string, T> dictionary) where T : ITreeSerializable
         {
+            if (dictionary == null) { writer.WriteNull(); return; }
+
             writer.WriteStartObject();
 
             foreach (var item in dictionary)
@@ -139,6 +143,8 @@ namespace BSOA.IO
 
         public static void WriteDictionary<T>(this ITreeWriter writer, IReadOnlyDictionary<int, T> dictionary) where T : ITreeSerializable
         {
+            if (dictionary == null) { writer.WriteNull(); return; }
+
             writer.WriteStartArray();
 
             int[] keys = dictionary.Keys.ToArray();

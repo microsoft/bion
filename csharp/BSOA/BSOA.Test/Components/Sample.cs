@@ -138,14 +138,13 @@ namespace BSOA.Test.Components
 
         public void Read(ITreeReader reader)
         {
-            reader.ReadObject(this, setters);
+            // Verify classes can serialize a single item directly
+            Array = reader.ReadBlockArray<T>();
         }
 
         public void Write(ITreeWriter writer)
         {
-            writer.WriteStartObject();
-            writer.WriteBlockArray(nameof(Array), Array);
-            writer.WriteEndObject();
+            writer.WriteBlockArray(Array);
         }
     }
 
@@ -224,9 +223,9 @@ namespace BSOA.Test.Components
 
         private static Dictionary<string, Setter<CollectionContainer<T>>> setters = new Dictionary<string, Setter<CollectionContainer<T>>>()
         {
-            [nameof(List)] = (r, me) => r.ReadList(() => new T(), me.List),
-            [nameof(StringDictionary)] = (r, me) => r.ReadDictionary(() => new T(), me.StringDictionary),
-            [nameof(IntDictionary)] = (r, me) => r.ReadDictionary(() => new T(), me.IntDictionary)
+            [nameof(List)] = (r, me) => me.List = r.ReadList(() => new T()),
+            [nameof(StringDictionary)] = (r, me) => me.StringDictionary = r.ReadStringDictionary(() => new T()),
+            [nameof(IntDictionary)] = (r, me) => me.IntDictionary = r.ReadIntDictionary(() => new T())
         };
 
         public void Read(ITreeReader reader)

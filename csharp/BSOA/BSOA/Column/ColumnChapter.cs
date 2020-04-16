@@ -195,20 +195,24 @@ namespace BSOA
             [PageStart] = (r, me) => me._pageStartInChapter = r.ReadBlockArray<int>(),
             [ValueEnd] = (r, me) => me._valueEndInPage = r.ReadBlockArray<ushort>(),
             [SmallValues] = (r, me) => me._smallValueArray = r.ReadBlockArray<T>(),
-            [LargeValues] = (r, me) => r.ReadDictionary(() => new ArraySlice<T>(), me._largeValueDictionary)
+            [LargeValues] = (r, me) => me._largeValueDictionary = r.ReadIntDictionary(() => new ArraySlice<T>())
         };
 
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters);
+            Count = _valueEndInPage.Length;
         }
 
         public void Write(ITreeWriter writer)
         {
+            // Merge changed small values under cutoff into SmallValueArray
+            Trim();
+
             writer.WriteStartObject();
 
             writer.WritePropertyName(PageStart);
-            writer.WriteBlockArray(_pageStartInChapter, 0, Count);
+            writer.WriteBlockArray(_pageStartInChapter);
 
             writer.WritePropertyName(ValueEnd);
             writer.WriteBlockArray(_valueEndInPage, 0, Count);

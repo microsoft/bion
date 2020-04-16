@@ -80,9 +80,10 @@ namespace BSOA.IO
         }
         #endregion
 
-        public static void ReadList<T>(this ITreeReader reader, Func<T> ctor, IList<T> toList) where T : ITreeSerializable
+        public static List<T> ReadList<T>(this ITreeReader reader, Func<T> ctor) where T : ITreeSerializable
         {
-            toList.Clear();
+            if (reader.TokenType == TreeToken.Null) { return null; }
+            List<T> result = new List<T>();
 
             reader.Expect(TreeToken.StartArray);
             reader.Read();
@@ -92,15 +93,18 @@ namespace BSOA.IO
                 T item = ctor();
                 item.Read(reader);
 
-                toList.Add(item);
+                result.Add(item);
 
                 reader.Read();
             }
+
+            return result;
         }
 
-        public static void ReadDictionary<T>(this ITreeReader reader, Func<T> ctor, IDictionary<string, T> toDictionary) where T : ITreeSerializable
+        public static Dictionary<string, T> ReadStringDictionary<T>(this ITreeReader reader, Func<T> ctor) where T : ITreeSerializable
         {
-            toDictionary.Clear();
+            if (reader.TokenType == TreeToken.Null) { return null; }
+            Dictionary<string, T> result = new Dictionary<string, T>();
 
             reader.Expect(TreeToken.StartObject);
             reader.Read();
@@ -113,17 +117,19 @@ namespace BSOA.IO
                 T value = ctor();
                 value.Read(reader);
 
-                toDictionary[key] = value;
+                result[key] = value;
 
                 reader.Read();
             }
 
             reader.Expect(TreeToken.EndObject);
+            return result;
         }
 
-        public static void ReadDictionary<T>(this ITreeReader reader, Func<T> ctor, IDictionary<int, T> toDictionary) where T : ITreeSerializable
+        public static Dictionary<int, T> ReadIntDictionary<T>(this ITreeReader reader, Func<T> ctor) where T : ITreeSerializable
         {
-            toDictionary.Clear();
+            if (reader.TokenType == TreeToken.Null) { return null; }
+            Dictionary<int, T> result = new Dictionary<int, T>();
 
             reader.Expect(TreeToken.StartArray);
             reader.Read();
@@ -134,14 +140,14 @@ namespace BSOA.IO
             reader.Expect(TreeToken.StartArray);
             reader.Read();
 
-            for(int i = 0; i < keys.Length; ++i)
+            for (int i = 0; i < keys.Length; ++i)
             {
                 int key = keys[i];
 
                 T value = ctor();
                 value.Read(reader);
 
-                toDictionary[key] = value;
+                result[key] = value;
 
                 reader.Read();
             }
@@ -150,6 +156,7 @@ namespace BSOA.IO
             reader.Read();
 
             reader.Expect(TreeToken.EndArray);
+            return result;
         }
 
         /// <summary>
@@ -168,8 +175,6 @@ namespace BSOA.IO
         /// <param name="setters">Dictionary of setter per field name</param>
         public static void ReadObject<T>(this ITreeReader reader, T instance, Dictionary<string, Setter<T>> setters)
         {
-            if (reader.TokenType == TreeToken.None) { reader.Read(); }
-
             reader.Expect(TreeToken.StartObject);
             reader.Read();
 

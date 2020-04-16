@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using BSOA.Test.Components;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -50,22 +50,30 @@ namespace BSOA.Test
                 Assert.Equal(value, column[i]);
             }
 
-            // Roundtrip via MemoryStream
-            IColumn<T> roundTripped = BinarySerializable.RoundTrip<IColumn<T>>(column, builder);
+            // Verify serialization round trip via all current serialization mechanisms
+            VerifySame(column, BinarySerializable.RoundTrip(column, builder));
+            VerifySame(column, TreeSerializable.RoundTripBinary(column, builder));
+            VerifySame(column, TreeSerializable.RoundTripJson(column, builder));
 
-            // Verify Count and Values match
-            Assert.Equal(column.Count, roundTripped.Count);
-
-            // Verify original values written (ensure column not corrupted by serialization)
+            // Verify original values are still there post-serialization (ensure column not corrupted by serialization)
             for (int i = 0; i < column.Count; ++i)
             {
                 T value = (i < 50 || i == 1024 ? valueProvider(i) : defaultValue);
                 Assert.Equal(value, column[i]);
-                Assert.Equal(value, roundTripped[i]);
             }
 
             // Verify indexer range check (< 0 only; columns auto-size for bigger values)
             Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
+        }
+
+        private static void VerifySame<T>(IColumn<T> expected, IColumn<T> actual)
+        {
+            Assert.Equal(expected.Count, actual.Count);
+
+            for (int i = 0; i < expected.Count; ++i)
+            {
+                Assert.Equal(expected[i], actual[i]);
+            }
         }
     }
 }

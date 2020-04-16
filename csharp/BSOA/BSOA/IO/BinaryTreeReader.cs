@@ -21,6 +21,10 @@ namespace BSOA.IO
         {
             _reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: settings.LeaveStreamOpen);
             _settings = settings;
+            
+            // Readers are required to read the first token immediately, so reading single values directly works
+            // (All methods don't have to Read if the TokenType is still None.)
+            Read();
         }
 
         public bool Read()
@@ -33,7 +37,7 @@ namespace BSOA.IO
 
             TokenType = (TreeToken)_reader.ReadByte();
 
-            switch(TokenType)
+            switch (TokenType)
             {
                 case TreeToken.Boolean:
                     _valueBool = _reader.ReadBoolean();

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace BSOA
 {
@@ -96,14 +97,27 @@ namespace BSOA
             }
         }
 
+        private const string Chapters = nameof(Chapters);
+        private static Dictionary<string, Setter<VariableLengthColumn<T>>> setters = new Dictionary<string, Setter<VariableLengthColumn<T>>>()
+        {
+            [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
+            [nameof(Chapters)] = (r, me) => me._chapters = r.ReadList<ColumnChapter<T>>(() => new ColumnChapter<T>())
+        };
+        
         public void Read(ITreeReader reader)
         {
-            reader.ReadList<ColumnChapter<T>>(() => new ColumnChapter<T>(), _chapters);
+            reader.ReadObject(this, setters);
         }
 
         public void Write(ITreeWriter writer)
         {
+            writer.WriteStartObject();
+            writer.Write(nameof(Count), Count);
+
+            writer.WritePropertyName(nameof(Chapters));
             writer.WriteList(_chapters);
+
+            writer.WriteEndObject();
         }
     }
 }
