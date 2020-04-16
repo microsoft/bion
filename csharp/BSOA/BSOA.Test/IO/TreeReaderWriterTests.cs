@@ -20,17 +20,11 @@ namespace BSOA.Test.IO
 
             // List and Dictionary serialization built-ins
             SampleCollections<TreeSample> samples = new SampleCollections<TreeSample>();
-
-            samples.List.Add(sample);
-            samples.List.Add(sample2);
-
-            samples.Dictionary["One"] = sample;
-            samples.Dictionary["Two"] = sample2;
+            samples.Add(sample);
+            samples.Add(sample2);
 
             SampleCollections<TreeSample> samplesRoundTripped = TreeSerializable.RoundTripJson(samples, () => new SampleCollections<TreeSample>());
-
-            Assert.Equal(samples.List, samplesRoundTripped.List);
-            Assert.Equal(samples.Dictionary, samplesRoundTripped.Dictionary);
+            samples.AssertEqual(samplesRoundTripped);
         }
 
         public class TreeSample : ITreeSerializable
@@ -83,18 +77,37 @@ namespace BSOA.Test.IO
         public class SampleCollections<T> : ITreeSerializable where T : ITreeSerializable, new()
         {
             public List<T> List { get; set; }
-            public Dictionary<string, T> Dictionary { get; set; }
+            public Dictionary<string, T> StringDictionary { get; set; }
+            public Dictionary<int, T> IntDictionary { get; set; }
 
             public SampleCollections()
             {
                 List = new List<T>();
-                Dictionary = new Dictionary<string, T>();
+                StringDictionary = new Dictionary<string, T>();
+                IntDictionary = new Dictionary<int, T>();
+            }
+
+            public void Add(T item)
+            {
+                int index = List.Count;
+                
+                List.Add(item);
+                StringDictionary[index.ToString()] = item;
+                IntDictionary[index] = item;
+            }
+
+            public void AssertEqual(SampleCollections<T> other)
+            {
+                Assert.Equal(this.List, other.List);
+                Assert.Equal(this.StringDictionary, other.StringDictionary);
+                Assert.Equal(this.IntDictionary, other.IntDictionary);
             }
 
             private static Dictionary<string, Setter<SampleCollections<T>>> setters = new Dictionary<string, Setter<SampleCollections<T>>>()
             {
                 [nameof(List)] = (r, me) => r.ReadList(() => new T(), me.List),
-                [nameof(Dictionary)] = (r, me) => r.ReadDictionary(() => new T(), me.Dictionary)
+                [nameof(StringDictionary)] = (r, me) => r.ReadDictionary(() => new T(), me.StringDictionary),
+                [nameof(IntDictionary)] = (r, me) => r.ReadDictionary(() => new T(), me.IntDictionary)
             };
 
             public void Read(ITreeReader reader)
@@ -109,8 +122,11 @@ namespace BSOA.Test.IO
                 writer.WritePropertyName(nameof(List));
                 writer.WriteList(List);
 
-                writer.WritePropertyName(nameof(Dictionary));
-                writer.WriteDictionary(Dictionary);
+                writer.WritePropertyName(nameof(StringDictionary));
+                writer.WriteDictionary(StringDictionary);
+
+                writer.WritePropertyName(nameof(IntDictionary));
+                writer.WriteDictionary(IntDictionary);
 
                 writer.WriteEndObject();
             }

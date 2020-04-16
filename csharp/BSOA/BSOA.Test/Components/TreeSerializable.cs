@@ -72,6 +72,9 @@ namespace BSOA.Test.Components
                 long position = stream.Position;
                 stream.Seek(0, SeekOrigin.Begin);
 
+                // Debuggability: To see serialized text
+                //string serializedText = StreamString(stream);
+
                 using (ITreeReader reader = buildReader(stream, settings))
                 {
                     roundTripped.Read(reader);
@@ -82,6 +85,23 @@ namespace BSOA.Test.Components
             }
 
             return roundTripped;
+        }
+
+        private static string StreamString(Stream stream)
+        {
+            long position = stream.Position;
+            stream.Seek(0, SeekOrigin.Begin);
+
+            string text = null;
+
+            using(StreamReader reader = new StreamReader(stream, leaveOpen: true))
+            {
+                text = reader.ReadToEnd();
+            }
+
+            stream.Seek(position, SeekOrigin.Begin);
+
+            return text;
         }
     }
 }

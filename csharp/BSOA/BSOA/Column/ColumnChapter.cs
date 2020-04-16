@@ -1,4 +1,6 @@
 ﻿using BSOA.Extensions;
+using BSOA.IO;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,7 +22,7 @@ namespace BSOA
     ///  The overall column uses longs for large values and chapter positions, allowing the column to be over 4 GB.
     /// </remarks>
     /// <typeparam name="T">Type of each part of Values (if each value is a string, this type is char)</typeparam>
-    internal class ColumnChapter<T> where T : unmanaged
+    internal class ColumnChapter<T> : ITreeSerializable where T : unmanaged
     {
         public const int ChapterRowCount = 1024;
         public const int PageRowCount = 32;
@@ -82,48 +84,6 @@ namespace BSOA
             }
         }
 
-        public void Read(BinaryReader reader, ref byte[] buffer)
-        {
-            _pageStartInChapter = reader.ReadBlockArray<int>(ref buffer);
-            _valueEndInPage = reader.ReadBlockArray<ushort>(ref buffer);
-            _smallValueArray = reader.ReadBlockArray<T>(ref buffer);
-
-            Count = _valueEndInPage.Length;
-
-            _largeValueDictionary = new Dictionary<int, ArraySlice<T>>();
-
-            int[] largeValueIndices = reader.ReadBlockArray<int>(ref buffer);
-            if (largeValueIndices.Length > 0)
-            {
-                for (int i = 0; i < largeValueIndices.Length; ++i)
-                {
-                    T[] largeValue = reader.ReadBlockArray<T>(ref buffer);
-                    _largeValueDictionary[largeValueIndices[i]] = new ArraySlice<T>(largeValue);
-                }
-            }
-        }
-
-        public void Write(BinaryWriter writer, ref byte[] buffer)
-        {
-            // Merge changed small values under cutoff into SmallValueArray
-            Trim();
-
-            writer.WriteBlockArray(_pageStartInChapter, ref buffer);
-            writer.WriteBlockArray(_valueEndInPage, 0, Count, ref buffer);
-            writer.WriteBlockArray(_smallValueArray, ref buffer);
-
-            int[] largeValueKeys = _largeValueDictionary?.Keys.ToArray();
-            writer.WriteBlockArray(largeValueKeys, ref buffer);
-
-            if (largeValueKeys != null)
-            {
-                for (int i = 0; i < largeValueKeys.Length; ++i)
-                {
-                    _largeValueDictionary[largeValueKeys[i]].Write(writer, ref buffer);
-                }
-            }
-        }
-
         public void Trim()
         {
             if (_requiresTrim == false) { return; }
@@ -179,8 +139,87 @@ namespace BSOA
             _smallValueArray = newSmallValueArray;
             _pageStartInChapter = newPageStartInChapter;
             _valueEndInPage = newValueEndInPage;
-            
+
             _requiresTrim = false;
+        }
+
+        public void Read(BinaryReader reader, ref byte[] buffer)
+        {
+            _pageStartInChapter = reader.ReadBlockArray<int>(ref buffer);
+            _valueEndInPage = reader.ReadBlockArray<ushort>(ref buffer);
+            _smallValueArray = reader.ReadBlockArray<T>(ref buffer);
+
+            Count = _valueEndInPage.Length;
+
+            _largeValueDictionary = new Dictionary<int, ArraySlice<T>>();
+
+            int[] largeValueIndices = reader.ReadBlockArray<int>(ref buffer);
+            if (largeValueIndices.Length > 0)
+            {
+                for (int i = 0; i < largeValueIndices.Length; ++i)
+                {
+                    T[] largeValue = reader.ReadBlockArray<T>(ref buffer);
+                    _largeValueDictionary[largeValueIndices[i]] = new ArraySlice<T>(largeValue);
+                }
+            }
+        }
+
+        public void Write(BinaryWriter writer, ref byte[] buffer)
+        {
+            // Merge changed small values under cutoff into SmallValueArray
+            Trim();
+
+            writer.WriteBlockArray(_pageStartInChapter, ref buffer);
+            writer.WriteBlockArray(_valueEndInPage, 0, Count, ref buffer);
+            writer.WriteBlockArray(_smallValueArray, ref buffer);
+
+            int[] largeValueKeys = _largeValueDictionary?.Keys.ToArray();
+            writer.WriteBlockArray(largeValueKeys, ref buffer);
+
+            if (largeValueKeys != null)
+            {
+                for (int i = 0; i < largeValueKeys.Length; ++i)
+                {
+                    _largeValueDictionary[largeValueKeys[i]].Write(writer, ref buffer);
+                }
+            }
+        }
+
+        private const string PageStart = nameof(PageStart);
+        private const string ValueEnd = nameof(ValueEnd);
+        private const string SmallValues = nameof(SmallValues);
+        private const string LargeValues = nameof(LargeValues);
+
+        private static Dictionary<string, Setter<ColumnChapter<T>>> setters = new Dictionary<string, Setter<ColumnChapter<T>>>()
+        {
+            [PageStart] = (r, me) => me._pageStartInChapter = r.ReadBlockArray<int>(),
+            [ValueEnd] = (r, me) => me._valueEndInPage = r.ReadBlockArray<ushort>(),
+            [SmallValues] = (r, me) => me._smallValueArray = r.ReadBlockArray<T>(),
+            [LargeValues] = (r, me) => r.ReadDictionary(() => new ArraySlice<T>(), me._largeValueDictionary)
+        };
+
+        public void Read(ITreeReader reader)
+        {
+            reader.ReadObject(this, setters);
+        }
+
+        public void Write(ITreeWriter writer)
+        {
+            writer.WriteStartObject();
+
+            writer.WritePropertyName(PageStart);
+            writer.WriteBlockArray(_pageStartInChapter, 0, Count);
+
+            writer.WritePropertyName(ValueEnd);
+            writer.WriteBlockArray(_valueEndInPage, 0, Count);
+
+            writer.WritePropertyName(SmallValues);
+            writer.WriteBlockArray(_smallValueArray);
+
+            writer.WritePropertyName(LargeValues);
+            writer.WriteDictionary(_largeValueDictionary);
+
+            writer.WriteEndObject();
         }
     }
 }

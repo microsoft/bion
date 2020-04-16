@@ -98,12 +98,12 @@ namespace BSOA
 
         public void Read(ITreeReader reader)
         {
-            throw new NotImplementedException();
+            reader.ReadList<ColumnChapter<T>>(() => new ColumnChapter<T>(), _chapters);
         }
 
         public void Write(ITreeWriter writer)
         {
-            throw new NotImplementedException();
+            writer.WriteList(_chapters);
         }
     }
 }

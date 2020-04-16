@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BSOA.IO
 {
@@ -115,7 +116,7 @@ namespace BSOA.IO
         {
             writer.WriteStartArray();
 
-            foreach(T item in list)
+            foreach (T item in list)
             {
                 item.Write(writer);
             }
@@ -127,13 +128,32 @@ namespace BSOA.IO
         {
             writer.WriteStartObject();
 
-            foreach(var item in dictionary)
+            foreach (var item in dictionary)
             {
                 writer.WritePropertyName(item.Key);
                 item.Value.Write(writer);
             }
 
             writer.WriteEndObject();
+        }
+
+        public static void WriteDictionary<T>(this ITreeWriter writer, IReadOnlyDictionary<int, T> dictionary) where T : ITreeSerializable
+        {
+            writer.WriteStartArray();
+
+            int[] keys = dictionary.Keys.ToArray();
+            writer.WriteBlockArray(keys);
+
+            writer.WriteStartArray();
+
+            for (int i = 0; i < keys.Length; ++i)
+            {
+                dictionary[keys[i]].Write(writer);
+            }
+
+            writer.WriteEndArray();
+
+            writer.WriteEndArray();
         }
 
         // WriteObject supports writing a subcomponent with name and value in one call.

@@ -121,6 +121,39 @@ namespace BSOA.IO
             reader.Expect(TreeToken.EndObject);
         }
 
+        public static void ReadDictionary<T>(this ITreeReader reader, Func<T> ctor, IDictionary<int, T> toDictionary) where T : ITreeSerializable
+        {
+            toDictionary.Clear();
+
+            reader.Expect(TreeToken.StartArray);
+            reader.Read();
+
+            int[] keys = reader.ReadBlockArray<int>();
+
+            reader.Expect(TreeToken.EndArray);
+            reader.Read();
+
+            reader.Expect(TreeToken.StartArray);
+            reader.Read();
+
+            for(int i = 0; i < keys.Length; ++i)
+            {
+                int key = keys[i];
+
+                T value = ctor();
+                value.Read(reader);
+
+                toDictionary[key] = value;
+
+                reader.Read();
+            }
+
+            reader.Expect(TreeToken.EndArray);
+            reader.Read();
+
+            reader.Expect(TreeToken.EndArray);
+        }
+
         /// <summary>
         ///  ReadObject wraps the loop to read each property in an object and call the corresponding
         ///  setter to set it.
