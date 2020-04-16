@@ -130,9 +130,7 @@ namespace BSOA.IO
 
             int[] keys = reader.ReadBlockArray<int>();
 
-            reader.Expect(TreeToken.EndArray);
             reader.Read();
-
             reader.Expect(TreeToken.StartArray);
             reader.Read();
 
@@ -182,7 +180,7 @@ namespace BSOA.IO
 
                 if (!setters.TryGetValue(propertyName, out Setter<T> setter))
                 {
-                    throw new IOException($"{reader.GetType().Name} encountered unexpected property name parsing {nameof(T)}. Read \"{propertyName}\", expected one of \"{String.Join("; ", setters.Keys)}\"at {reader.Position:n0}");
+                    throw new IOException($"{reader.GetType().Name} encountered unexpected property name parsing {typeof(T).Name}. Read \"{propertyName}\", expected one of \"{String.Join("; ", setters.Keys)}\"at {reader.Position:n0}");
                 }
 
                 setter(reader, instance);

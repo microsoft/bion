@@ -76,7 +76,7 @@ namespace BSOA.Json
         {
             for (int i = 0; i < count; ++i)
             {
-                array[i] = (char)(long)reader.Value;
+                array[i] = ((string)reader.Value)[0];
                 reader.Read();
             }
         }

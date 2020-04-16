@@ -48,6 +48,9 @@ namespace BSOA.IO
                 case TreeToken.PropertyName:
                     _valueString = _reader.ReadString();
                     break;
+                case TreeToken.Null:
+                    _valueString = null;
+                    break;
                 default:
                     // Nothing to read or not pre-read
                     break;
