@@ -3,7 +3,10 @@ using System.Collections.Generic;
 
 namespace BSOA
 {
-    public interface IColumn<T> : IReadOnlyList<T>, IBinarySerializable, ITreeSerializable
+    public interface IColumn : IBinarySerializable, ITreeSerializable
+    { }
+
+    public interface IColumn<T> : IReadOnlyList<T>, IColumn
     {
         new T this[int index] { get; set; }
 

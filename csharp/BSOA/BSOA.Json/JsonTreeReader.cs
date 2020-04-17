@@ -15,8 +15,10 @@ namespace BSOA.Json
         public TreeToken TokenType => (TreeToken)_reader.TokenType;
         public long Position => _reader.LineNumber;
 
-        public JsonTreeReader(Stream stream, TreeSerializationSettings settings)
+        public JsonTreeReader(Stream stream, TreeSerializationSettings settings = null)
         {
+            settings = settings ?? TreeSerializationSettings.DefaultSettings;
+
             _reader = new JsonTextReader(new StreamReader(stream, Encoding.UTF8, true, 8 * 1024, leaveOpen: settings.LeaveStreamOpen));
             _settings = settings;
 

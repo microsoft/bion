@@ -17,8 +17,10 @@ namespace BSOA.IO
         private double _valueDouble;
         private string _valueString;
 
-        public BinaryTreeReader(Stream stream, TreeSerializationSettings settings)
+        public BinaryTreeReader(Stream stream, TreeSerializationSettings settings = null)
         {
+            settings = settings ?? TreeSerializationSettings.DefaultSettings;
+
             _reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: settings.LeaveStreamOpen);
             _settings = settings;
             

@@ -12,8 +12,10 @@ namespace BSOA.IO
         private BinaryWriter _writer;
         private TreeSerializationSettings _settings;
 
-        public BinaryTreeWriter(Stream stream, TreeSerializationSettings settings)
+        public BinaryTreeWriter(Stream stream, TreeSerializationSettings settings = null)
         {
+            settings = settings ?? TreeSerializationSettings.DefaultSettings;
+
             _writer = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: settings.LeaveStreamOpen);
             _settings = settings;
         }
