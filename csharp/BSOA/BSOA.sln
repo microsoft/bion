@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "String8", "..\String8\Strin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Json", "BSOA.Json\BSOA.Json.csproj", "{DC9C4219-4691-4F10-B874-21B686A1EFC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSOA.Demo", "BSOA.Demo\BSOA.Demo.csproj", "{2DB8DA2E-D145-42A1-A021-5451B59F3AD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Demo", "BSOA.Demo\BSOA.Demo.csproj", "{2DB8DA2E-D145-42A1-A021-5451B59F3AD2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
