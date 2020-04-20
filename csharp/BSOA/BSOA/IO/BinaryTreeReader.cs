@@ -97,6 +97,8 @@ namespace BSOA.IO
 
         protected virtual void Dispose(bool disposing)
         {
+            _settings.Buffer = null;
+
             _reader?.Dispose();
             _reader = null;
         }

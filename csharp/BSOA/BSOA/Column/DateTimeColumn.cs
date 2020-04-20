@@ -39,6 +39,11 @@ namespace BSOA
             set { _innerColumn[index] = value.ToUniversalTime().Ticks; }
         }
 
+        public void Clear()
+        {
+            _innerColumn.Clear();
+        }
+
         public IEnumerator<DateTime> GetEnumerator()
         {
             return new ListEnumerator<DateTime>(this);

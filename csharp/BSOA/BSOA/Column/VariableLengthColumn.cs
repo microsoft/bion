@@ -20,6 +20,12 @@ namespace BSOA
 
         public VariableLengthColumn()
         {
+            Clear();
+        }
+
+        public void Clear()
+        {
+            Count = 0;
             _chapters = new List<ColumnChapter<T>>();
         }
 

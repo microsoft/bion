@@ -1,4 +1,4 @@
-﻿namespace ScaleDemo
+﻿namespace BSOA.Demo.Model
 {
     /// <summary>
     ///  Region4 is a struct *and* uses the SoA (struct of Arrays) pattern,

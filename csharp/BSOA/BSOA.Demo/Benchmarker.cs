@@ -1,8 +1,9 @@
-﻿using BSOA.IO;
+﻿using BSOA.Demo.Conversion;
+using BSOA.Demo.Model;
+using BSOA.IO;
 using BSOA.Json;
 using Microsoft.CodeAnalysis.Sarif;
 using Newtonsoft.Json;
-using ScaleDemo;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -69,7 +70,7 @@ namespace BSOA.Demo
                 table = new RegionTable();
                 foreach (Region region in regions)
                 {
-                    table.Add(region);
+                    RegionConverter.Convert(region, table);
                 }
             });
 

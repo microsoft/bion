@@ -27,6 +27,11 @@ namespace BSOA
             set => _inner[index] = new ArraySlice<char>(value.ToCharArray());
         }
 
+        public void Clear()
+        {
+            _inner.Clear();
+        }
+
         public IEnumerator<string> GetEnumerator()
         {
             return new ListEnumerator<string>(this);
