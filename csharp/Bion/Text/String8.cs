@@ -102,10 +102,10 @@ namespace Bion.Text
                 int i = 0;
                 for (; i < length; ++i)
                 {
-                    if (Array[start + i] != value.Array[value.Index + i]) break;
+                    if (Array[start + i] != value.Array[value.Index + i]) { break; }
                 }
 
-                if (i == length) return start - Index;
+                if (i == length) { return start - Index; }
             }
 
             return -1;
@@ -127,6 +127,16 @@ namespace Bion.Text
             }
 
             return true;
+        }
+
+        public static bool operator ==(String8 left, String8 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(String8 left, String8 right)
+        {
+            return !(left == right);
         }
 
         public override int GetHashCode()
