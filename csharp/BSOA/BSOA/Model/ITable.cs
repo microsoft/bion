@@ -3,7 +3,12 @@ using System.Collections.Generic;
 
 namespace BSOA.Model
 {
-    public interface ITable<T> : ITreeSerializable, IReadOnlyList<T>
+    public interface ITable : ITreeSerializable
+    {
+        void Clear();
+    }
+
+    public interface ITable<T> : ITable, IReadOnlyList<T>
     {
         T Add();
     }

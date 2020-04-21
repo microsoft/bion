@@ -169,6 +169,33 @@ namespace BSOA.IO
             return result;
         }
 
+        public static void ReadDictionaryItems<T>(this ITreeReader reader, Dictionary<string, T> dictionary) where T : ITreeSerializable
+        {
+            if (reader.TokenType == TreeToken.Null) { return; }
+
+            reader.Expect(TreeToken.StartObject);
+            reader.Read();
+
+            while (reader.TokenType == TreeToken.PropertyName)
+            {
+                string itemName = reader.ReadAsString();
+                reader.Read();
+
+                if (dictionary.TryGetValue(itemName, out T item))
+                {
+                    item.Read(reader);
+                    reader.Read();
+                }
+                else
+                {
+                    // TODO: Allow ignoring unknown items. Will require ITreeReader.Skip, ITreeReader.Read() to consume BlockArrays
+                    throw new IOException($"{reader.GetType().Name} encountered unknown item name reading Dictionary<string, {typeof(T).Name}>. Read \"{itemName}\", expected one of \"{String.Join("; ", dictionary.Keys)}\"at {reader.Position:n0}");
+                }
+            }
+
+            reader.Expect(TreeToken.EndObject);
+        }
+
         /// <summary>
         ///  ReadObject wraps the loop to read each property in an object and call the corresponding
         ///  setter to set it.

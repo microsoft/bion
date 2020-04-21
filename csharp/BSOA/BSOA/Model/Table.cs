@@ -37,7 +37,7 @@ namespace BSOA.Model
         /// <param name="index">0-based index of item to return</param>
         /// <returns>SoA item instance at index</returns>
         public abstract T this[int index] { get; }
-        
+
         /// <summary>
         ///  Add a new item to the end of this table.
         /// </summary>
@@ -46,6 +46,19 @@ namespace BSOA.Model
         {
             Count++;
             return this[Count - 1];
+        }
+
+        /// <summary>
+        ///  Remove all items from table.
+        /// </summary>
+        public void Clear()
+        {
+            Count = 0;
+
+            foreach (IColumn column in Columns.Values)
+            {
+                column.Clear();
+            }
         }
 
         /// <summary>
@@ -79,37 +92,13 @@ namespace BSOA.Model
         private static Dictionary<string, Setter<Table<T>>> setters = new Dictionary<string, Setter<Table<T>>>()
         {
             [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
-            [nameof(Columns)] = ReadColumns
+            [nameof(Columns)] = (r, me) => r.ReadDictionaryItems(me.Columns),
         };
 
         public void Read(ITreeReader reader)
         {
-            // Clear all columns and current count
-            Count = 0;
-            foreach (IColumn column in Columns.Values)
-            {
-                column.Clear();
-            }
-
-            // Read count and included columns only
+            Clear();
             reader.ReadObject(this, setters);
-        }
-
-        private static void ReadColumns(ITreeReader reader, Table<T> me)
-        {
-            reader.Expect(TreeToken.StartObject);
-            reader.Read();
-
-            while (reader.TokenType == TreeToken.PropertyName)
-            {
-                string tableName = reader.ReadAsString();
-                reader.Read();
-
-                me.Columns[tableName].Read(reader);
-                reader.Read();
-            }
-
-            reader.Expect(TreeToken.EndObject);
         }
 
         public void Write(ITreeWriter writer)

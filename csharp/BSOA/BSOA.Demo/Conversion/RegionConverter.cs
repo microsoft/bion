@@ -7,7 +7,7 @@ namespace BSOA.Demo.Conversion
     {
         public static Region4 Convert(Region region, RegionTable toTable)
         {
-            Region4 result = toTable.Add();
+            Region4 result = new Region4(toTable);
 
             result.StartLine = region.StartLine;
             result.StartColumn = region.StartColumn;

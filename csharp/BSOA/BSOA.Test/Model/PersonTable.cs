@@ -7,17 +7,22 @@ namespace BSOA.Test.Model
     /// </summary>
     public class PersonTable : Table<Person>
     {
+        // Tables need Database reference (so items with only table reference can refer to items in other tables)
+        internal PersonDatabase Database;
+
         // Table needs hardcoded properties for each column
         internal NumberColumn<byte> Age;
         internal StringColumn Name;
 
         // Table constructor creates columns with the desired types and defaults.
         // Column names will be serialized and must be kept stable to maintain file compatibility.
-        public PersonTable() : base()
+        public PersonTable(PersonDatabase database) : base()
         {
+            Database = database;
+
             // NOTE: All columns must be passed to 'AddColumn' so the base class can serialize them
-            this.Age = AddColumn(nameof(Age), new NumberColumn<byte>(0));
-            this.Name = AddColumn(nameof(Name), new StringColumn());
+            Age = AddColumn(nameof(Age), new NumberColumn<byte>(0));
+            Name = AddColumn(nameof(Name), new StringColumn());
         }
 
         // Table provides indexer calling correct item constructor

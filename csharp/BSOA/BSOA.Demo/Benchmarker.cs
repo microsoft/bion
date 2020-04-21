@@ -78,13 +78,14 @@ namespace BSOA.Demo
             {
                 using (JsonTextWriter writer = new JsonTextWriter(File.CreateText(NormalJsonPath)))
                 {
+                    //writer.Formatting = Formatting.Indented;
                     _jsonSerializer.Serialize(writer, regions);
                 }
             });
 
             Time($"Writing as BSOA JSON to '{BsoaJsonPath}'...", () =>
             {
-                using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath)))
+                using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Compact = true }))
                 {
                     table.Write(writer);
                 }
