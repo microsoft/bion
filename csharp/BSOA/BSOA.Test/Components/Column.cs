@@ -54,6 +54,10 @@ namespace BSOA.Test
             ReadOnlyList.VerifySame(column, BinarySerializable.RoundTrip(column, builder));
             ReadOnlyList.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary));
             ReadOnlyList.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Json));
+            
+            // Verify column is properly skippable (required to allow flexible file format schema)
+            TreeSerializer.VerifySkip(column, TreeFormat.Binary);
+            TreeSerializer.VerifySkip(column, TreeFormat.Json);
 
             // Verify original values are still there post-serialization (ensure column not corrupted by serialization)
             for (int i = 0; i < column.Count; ++i)
