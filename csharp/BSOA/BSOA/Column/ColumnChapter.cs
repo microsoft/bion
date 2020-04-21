@@ -195,7 +195,7 @@ namespace BSOA
             [PageStart] = (r, me) => me._pageStartInChapter = r.ReadBlockArray<int>(),
             [ValueEnd] = (r, me) => me._valueEndInPage = r.ReadBlockArray<ushort>(),
             [SmallValues] = (r, me) => me._smallValueArray = r.ReadBlockArray<T>(),
-            [LargeValues] = (r, me) => me._largeValueDictionary = r.ReadIntDictionary(() => new ArraySlice<T>())
+            [LargeValues] = (r, me) => me._largeValueDictionary = r.ReadIntDictionary<ArraySlice<T>>()
         };
 
         public void Read(ITreeReader reader)
@@ -211,14 +211,9 @@ namespace BSOA
 
             writer.WriteStartObject();
 
-            writer.WritePropertyName(PageStart);
-            writer.WriteBlockArray(_pageStartInChapter);
-
-            writer.WritePropertyName(ValueEnd);
-            writer.WriteBlockArray(_valueEndInPage, 0, Count);
-
-            writer.WritePropertyName(SmallValues);
-            writer.WriteBlockArray(_smallValueArray);
+            writer.WriteBlockArray(PageStart, _pageStartInChapter);
+            writer.WriteBlockArray(ValueEnd, _valueEndInPage, 0, Count);
+            writer.WriteBlockArray(SmallValues, _smallValueArray);
 
             writer.WritePropertyName(LargeValues);
             writer.WriteDictionary(_largeValueDictionary);

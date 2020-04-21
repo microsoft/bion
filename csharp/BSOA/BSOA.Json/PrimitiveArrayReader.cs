@@ -58,7 +58,7 @@ namespace BSOA.Json
             }
             else
             {
-                throw new NotImplementedException($"JsonTreeReader ReadBlockArray not implemented for type '{typeof(T).Name}");
+                throw new NotSupportedException($"JsonTreeReader ReadBlockArray not supported for type '{typeof(T).Name}");
             }
         }
 

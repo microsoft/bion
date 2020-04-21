@@ -2,6 +2,15 @@
 
 namespace BSOA.Demo.Model
 {
+    /// <summary>
+    ///  Typed SoA table for SARIF Regions.
+    /// </summary>
+    /// <remarks>
+    ///  - Has strongly typed column properties for instant access by Region properties.
+    ///  - Controls column construction (types and defaults).
+    ///  - Calls AddColumn on columns (so base class can manage serialization)
+    ///  - Provides indexer (controls construction of item instances).
+    /// </remarks>
     public class RegionTable : Table<Region4>
     {
         internal NumberColumn<int> StartLine;
@@ -28,11 +37,5 @@ namespace BSOA.Demo.Model
         }
 
         public override Region4 this[int index] => new Region4(this, index);
-
-        public override Region4 Add()
-        {
-            this.Count++;
-            return this[this.Count - 1];
-        }
     }
 }

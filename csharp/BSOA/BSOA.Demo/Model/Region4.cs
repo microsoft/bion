@@ -6,20 +6,18 @@
     /// </summary>
     public struct Region4
     {
-        private RegionTable Table { get; set; }
-        private int Index { get; set; }
-
-        public Region4(RegionTable table)
-        {
-            table.Add();
-            this.Table = table;
-            this.Index = (table.Count - 1);
-        }
+        private RegionTable Table { get; }
+        private int Index { get; }
 
         public Region4(RegionTable table, int index)
         {
             this.Table = table;
             this.Index = index;
+        }
+
+        public Region4(RegionTable table) : this(table, table.Count)
+        {
+            table.Add();
         }
 
         public int StartLine

@@ -131,11 +131,6 @@ namespace BSOA.Test.Components
             Assert.Equal(Array ?? new T[0], other.Array);
         }
 
-        private static Dictionary<string, Setter<ArrayContainer<T>>> setters = new Dictionary<string, Setter<ArrayContainer<T>>>()
-        {
-            [nameof(Array)] = (r, me) => me.Array = r.ReadBlockArray<T>()
-        };
-
         public void Read(ITreeReader reader)
         {
             // Verify classes can serialize a single item directly
@@ -200,9 +195,21 @@ namespace BSOA.Test.Components
 
         public CollectionContainer()
         {
+            Clear();
+        }
+
+        public void Clear()
+        {
             List = new List<T>();
             StringDictionary = new Dictionary<string, T>();
             IntDictionary = new Dictionary<int, T>();
+        }
+
+        public void SetCollectionsNull()
+        {
+            List = null;
+            StringDictionary = null;
+            IntDictionary = null;
         }
 
         public void Add(T item)
@@ -224,12 +231,13 @@ namespace BSOA.Test.Components
         private static Dictionary<string, Setter<CollectionContainer<T>>> setters = new Dictionary<string, Setter<CollectionContainer<T>>>()
         {
             [nameof(List)] = (r, me) => me.List = r.ReadList(() => new T()),
-            [nameof(StringDictionary)] = (r, me) => me.StringDictionary = r.ReadStringDictionary(() => new T()),
-            [nameof(IntDictionary)] = (r, me) => me.IntDictionary = r.ReadIntDictionary(() => new T())
+            [nameof(StringDictionary)] = (r, me) => me.StringDictionary = r.ReadStringDictionary<T>(),
+            [nameof(IntDictionary)] = (r, me) => me.IntDictionary = r.ReadIntDictionary<T>()
         };
 
         public void Read(ITreeReader reader)
         {
+            Clear();
             reader.ReadObject(this, setters);
         }
 
@@ -249,6 +257,4 @@ namespace BSOA.Test.Components
             writer.WriteEndObject();
         }
     }
-
-    
 }

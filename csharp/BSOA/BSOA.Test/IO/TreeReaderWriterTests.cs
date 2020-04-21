@@ -22,6 +22,12 @@ namespace BSOA.Test.IO
 
             samples.AssertEqual(TreeSerializable.RoundTripJson(samples));
             samples.AssertEqual(TreeSerializable.RoundTripBinary(samples));
+
+
+            // Null List / Dictionary handling
+            samples.SetCollectionsNull();
+            samples.AssertEqual(TreeSerializable.RoundTripJson(samples));
+            samples.AssertEqual(TreeSerializable.RoundTripBinary(samples));
         }
     }
 }

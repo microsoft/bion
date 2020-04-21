@@ -35,6 +35,9 @@ namespace BSOA.Test.Components
             RoundTripArray(new float[] { 0.0f, 100.5f, -2.05f }, buildWriter, buildReader);
             RoundTripArray(new double[] { 0.0f, 100.5f, -2.05f }, buildWriter, buildReader);
 
+            // Verify exception on (expected) unsupported type
+            Assert.Throws<NotSupportedException>(() => RoundTripArray(new decimal[] { 0.01M, 0.02M }, buildWriter, buildReader));
+
             // Null/Empty array handling (currently expected to come back as empty array)
             RoundTripArray<byte>(null, buildWriter, buildReader);
             RoundTripArray<byte>(new byte[] { }, buildWriter, buildReader);
@@ -47,6 +50,9 @@ namespace BSOA.Test.Components
             // Test null string handling
             sample.Name = null;
             sample.AssertEqual(RoundTrip(sample, buildWriter, buildReader));
+
+            // Test settings defaulting
+            sample.AssertEqual(RoundTrip_NullSettings(sample, buildWriter, buildReader));
 
             // Test serialization exceptions
             using (MemoryStream stream = new MemoryStream())
@@ -226,6 +232,40 @@ namespace BSOA.Test.Components
                 {
                     // Verify stream left open if requested
                     long verifyStreamNotDisposed = stream.Position;
+                }
+            }
+
+            return roundTripped;
+        }
+
+        // RoundTrip with all verification
+        public static T RoundTrip_NullSettings<T>(T value,
+            Func<Stream, TreeSerializationSettings, ITreeWriter> buildWriter,
+            Func<Stream, TreeSerializationSettings, ITreeReader> buildReader
+            ) where T : ITreeSerializable, new()
+        {
+            T roundTripped = new T();
+            byte[] buffer = null;
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                using (ITreeWriter writer = buildWriter(stream, null))
+                {
+                    value.Write(writer);
+                }
+
+                // Get bytes to read back from with reader
+                buffer = stream.ToArray();
+            }
+
+            using (MemoryStream stream = new MemoryStream(buffer))
+            {
+                using (ITreeReader reader = buildReader(stream, null))
+                {
+                    roundTripped.Read(reader);
+
+                    // Verify everything read back
+                    Assert.Equal(buffer.Length, stream.Position);
                 }
             }
 

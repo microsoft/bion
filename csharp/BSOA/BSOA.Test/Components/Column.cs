@@ -62,6 +62,12 @@ namespace BSOA.Test
                 Assert.Equal(value, column[i]);
             }
 
+            // Verify clear resets count and that previously set values are back to default if accessed
+            column.Clear();
+            Assert.Equal(0, column.Count);
+            Assert.Equal(defaultValue, column[0]);
+            Assert.Equal(defaultValue, column[1]);
+
             // Verify indexer range check (< 0 only; columns auto-size for bigger values)
             Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
         }

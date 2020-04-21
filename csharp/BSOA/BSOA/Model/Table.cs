@@ -1,12 +1,23 @@
 ﻿using BSOA.IO;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace BSOA.Model
 {
+    /// <summary>
+    ///  BSOA Table is the container class for all SoA model types.
+    ///  Each type is a struct referencing an index in a table, and each property in the struct
+    ///  references the value at that index in the matching column.
+    /// </summary>
+    /// <remarks>
+    ///  See BSOA.Demo
+    /// </remarks>
+    /// <typeparam name="T">SoA Item type this is a Table of</typeparam>
     public abstract class Table<T> : ITable<T>
     {
+        /// <summary>
+        ///  Columns by Name in Table.
+        /// </summary>
         protected Dictionary<string, IColumn> Columns { get; private set; }
 
         public Table()
@@ -14,11 +25,41 @@ namespace BSOA.Model
             Columns = new Dictionary<string, IColumn>();
         }
 
+        /// <summary>
+        ///  Count of items in this Table.
+        ///  Column counts may differ, because they are only increased when each property is set to a non-default value.
+        /// </summary>
         public int Count { get; protected set; }
 
+        /// <summary>
+        ///  Get the item at a given index in this table.
+        /// </summary>
+        /// <param name="index">0-based index of item to return</param>
+        /// <returns>SoA item instance at index</returns>
         public abstract T this[int index] { get; }
-        public abstract T Add();
+        
+        /// <summary>
+        ///  Add a new item to the end of this table.
+        /// </summary>
+        /// <returns>New SoA item instance</returns>
+        public T Add()
+        {
+            Count++;
+            return this[Count - 1];
+        }
 
+        /// <summary>
+        ///  Add a Column to the table set.
+        /// </summary>
+        /// <remarks>
+        ///  Typed tables should add columns to determine types, define default values, and similar.
+        ///  Typed tables should have hardcoded properties per column for fastest use by the item types.
+        ///  Columns must be provided to the table for it to facilitate serialization of them.
+        /// </remarks>
+        /// <typeparam name="U">Type of Column being added</typeparam>
+        /// <param name="name">Name of column</param>
+        /// <param name="column">IColumn instance for column</param>
+        /// <returns>Column instance, for easy assignment to hardcoded properties</returns>
         protected U AddColumn<U>(string name, U column) where U : IColumn
         {
             Columns[name] = column;
@@ -43,13 +84,14 @@ namespace BSOA.Model
 
         public void Read(ITreeReader reader)
         {
-            // Clear previous data
+            // Clear all columns and current count
             Count = 0;
             foreach (IColumn column in Columns.Values)
             {
                 column.Clear();
             }
 
+            // Read count and included columns only
             reader.ReadObject(this, setters);
         }
 

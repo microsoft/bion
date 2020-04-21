@@ -101,6 +101,11 @@ namespace BSOA.IO
             return result;
         }
 
+        public static Dictionary<string, T> ReadStringDictionary<T>(this ITreeReader reader) where T : ITreeSerializable, new()
+        {
+            return ReadStringDictionary<T>(reader, () => new T());
+        }
+
         public static Dictionary<string, T> ReadStringDictionary<T>(this ITreeReader reader, Func<T> ctor) where T : ITreeSerializable
         {
             if (reader.TokenType == TreeToken.Null) { return null; }
@@ -124,6 +129,11 @@ namespace BSOA.IO
 
             reader.Expect(TreeToken.EndObject);
             return result;
+        }
+
+        public static Dictionary<int, T> ReadIntDictionary<T>(this ITreeReader reader) where T : ITreeSerializable, new()
+        {
+            return ReadIntDictionary<T>(reader, () => new T());
         }
 
         public static Dictionary<int, T> ReadIntDictionary<T>(this ITreeReader reader, Func<T> ctor) where T : ITreeSerializable
