@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BSOA.Test.Components;
+using System;
 using System.Linq;
 using Xunit;
 
@@ -18,6 +19,8 @@ namespace BSOA.Test
             Assert.Empty(slice);
             VerifyCopyTo<int>(slice, copyToTarget);
             VerifyRoundTrip<int>(slice, copyToTarget);
+            ReadOnlyList.VerifySame(slice, TreeSerializer.RoundTrip(slice, TreeFormat.Binary));
+            ReadOnlyList.VerifySame(slice, TreeSerializer.RoundTrip(slice, TreeFormat.Json));
 
             // Whole Array
             slice = new ArraySlice<int>(sample);
@@ -26,6 +29,8 @@ namespace BSOA.Test
             Assert.Equal(sample[10], slice[10]);
             VerifyCopyTo<int>(slice, copyToTarget);
             VerifyRoundTrip<int>(slice, copyToTarget);
+            ReadOnlyList.VerifySame(slice, TreeSerializer.RoundTrip(slice, TreeFormat.Binary));
+            ReadOnlyList.VerifySame(slice, TreeSerializer.RoundTrip(slice, TreeFormat.Json));
 
             // Array slice-to-end
             slice = new ArraySlice<int>(sample, index: 10);
@@ -33,6 +38,8 @@ namespace BSOA.Test
             Assert.Equal(sample[20], slice[10]);
             VerifyCopyTo<int>(slice, copyToTarget);
             VerifyRoundTrip<int>(slice, copyToTarget);
+            ReadOnlyList.VerifySame(slice, TreeSerializer.RoundTrip(slice, TreeFormat.Binary));
+            ReadOnlyList.VerifySame(slice, TreeSerializer.RoundTrip(slice, TreeFormat.Json));
 
             // Array slice
             slice = new ArraySlice<int>(sample, index: 10, length: 20);
@@ -40,6 +47,8 @@ namespace BSOA.Test
             Assert.Equal(sample[10], slice[0]);
             VerifyCopyTo<int>(slice, copyToTarget);
             VerifyRoundTrip<int>(slice, copyToTarget);
+            ReadOnlyList.VerifySame(slice, TreeSerializer.RoundTrip(slice, TreeFormat.Binary));
+            ReadOnlyList.VerifySame(slice, TreeSerializer.RoundTrip(slice, TreeFormat.Json));
 
             // Bounds checks
             Assert.Throws<ArgumentNullException>(() => new ArraySlice<int>(null, 0, 0));                            // Array null
@@ -51,7 +60,7 @@ namespace BSOA.Test
 
         internal static void VerifyRoundTrip<T>(ArraySlice<T> slice, T[] copyToTargetArray) where T : unmanaged
         {
-            ArraySlice<T> roundTripped = BinarySerializable.RoundTrip<ArraySlice<T>>(slice, () => new ArraySlice<T>());
+            ArraySlice<T> roundTripped = BinarySerializable.RoundTrip(slice);
             ReadOnlyList.VerifySame<T>(slice, roundTripped);
             VerifyCopyTo<T>(roundTripped, copyToTargetArray);
         }

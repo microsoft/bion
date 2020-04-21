@@ -27,6 +27,9 @@ namespace BSOA.IO
     /// </remarks>
     public interface ITreeReader : IDisposable
     {
+        // Expose settings for Reader, so specific serialization can consider them
+        TreeSerializationSettings Settings { get; }
+
         // Read the next token
         bool Read();
 
@@ -101,6 +104,11 @@ namespace BSOA.IO
             return result;
         }
 
+        public static Dictionary<string, T> ReadStringDictionary<T>(this ITreeReader reader) where T : ITreeSerializable, new()
+        {
+            return ReadStringDictionary<T>(reader, () => new T());
+        }
+
         public static Dictionary<string, T> ReadStringDictionary<T>(this ITreeReader reader, Func<T> ctor) where T : ITreeSerializable
         {
             if (reader.TokenType == TreeToken.Null) { return null; }
@@ -124,6 +132,11 @@ namespace BSOA.IO
 
             reader.Expect(TreeToken.EndObject);
             return result;
+        }
+
+        public static Dictionary<int, T> ReadIntDictionary<T>(this ITreeReader reader) where T : ITreeSerializable, new()
+        {
+            return ReadIntDictionary<T>(reader, () => new T());
         }
 
         public static Dictionary<int, T> ReadIntDictionary<T>(this ITreeReader reader, Func<T> ctor) where T : ITreeSerializable
@@ -160,6 +173,47 @@ namespace BSOA.IO
         }
 
         /// <summary>
+        ///  Read existing items in an existing Dictionary instance.
+        ///  Used with Dictionaries of specific things which may or may not be present in the file, like Table.Columns.
+        /// </summary>
+        /// <typeparam name="T">Type of values in Dictionary</typeparam>
+        /// <param name="reader">ITreeReader to read from</param>
+        /// <param name="dictionary">Dictionary containing items to read</param>
+        /// <param name="throwOnUnknown">True to throw for property name not in Dictionary, false to quietly skip over it</param>
+        public static void ReadDictionaryItems<T>(this ITreeReader reader, Dictionary<string, T> dictionary, bool throwOnUnknown = true) where T : ITreeSerializable
+        {
+            if (reader.TokenType == TreeToken.Null) { return; }
+
+            reader.Expect(TreeToken.StartObject);
+            reader.Read();
+
+            while (reader.TokenType == TreeToken.PropertyName)
+            {
+                string itemName = reader.ReadAsString();
+                reader.Read();
+
+                if (dictionary.TryGetValue(itemName, out T item))
+                {
+                    item.Read(reader);
+                    reader.Read();
+                }
+                else
+                {
+                    if (throwOnUnknown)
+                    {
+                        throw new IOException($"Found unknown {typeof(T).Name} property \"{itemName}\", expected one of \"{String.Join("; ", dictionary.Keys)}\" at {reader.Position:n0} using {reader.GetType().Name}.");
+                    }
+                    else
+                    {
+                        reader.Skip();
+                    }
+                }
+            }
+
+            reader.Expect(TreeToken.EndObject);
+        }
+
+        /// <summary>
         ///  ReadObject wraps the loop to read each property in an object and call the corresponding
         ///  setter to set it.
         /// </summary>
@@ -173,7 +227,8 @@ namespace BSOA.IO
         /// <param name="reader">ITreeReader being read from</param>
         /// <param name="instance">T instance being initialized</param>
         /// <param name="setters">Dictionary of setter per field name</param>
-        public static void ReadObject<T>(this ITreeReader reader, T instance, Dictionary<string, Setter<T>> setters)
+        /// <param name="throwOnUnknown">Throw if property name not in setters found</param>
+        public static void ReadObject<T>(this ITreeReader reader, T instance, Dictionary<string, Setter<T>> setters, bool throwOnUnknown = true)
         {
             reader.Expect(TreeToken.StartObject);
             reader.Read();
@@ -183,19 +238,60 @@ namespace BSOA.IO
                 string propertyName = reader.ReadAsString();
                 reader.Read();
 
-                if (!setters.TryGetValue(propertyName, out Setter<T> setter))
+                if (setters.TryGetValue(propertyName, out Setter<T> setter))
                 {
-                    throw new IOException($"{reader.GetType().Name} encountered unexpected property name parsing {typeof(T).Name}. Read \"{propertyName}\", expected one of \"{String.Join("; ", setters.Keys)}\"at {reader.Position:n0}");
+                    setter(reader, instance);
+                    reader.Read();
                 }
-
-                setter(reader, instance);
-                reader.Read();
+                else
+                {
+                    if (throwOnUnknown)
+                    {
+                        throw new IOException($"Found unknown {typeof(T).Name} property, \"{propertyName}\", expected one of \"{String.Join("; ", setters.Keys)}\" at {reader.Position:n0} using {reader.GetType().Name}.");
+                    }
+                    else
+                    {
+                        reader.Skip();
+                    }
+                }
             }
 
             reader.Expect(TreeToken.EndObject);
             // EndObject must be left for caller to handle
         }
 
+        /// <summary>
+        ///  Skip the current token. 
+        ///  Reads a single token, or skips over an entire subtree for containers.
+        /// </summary>
+        /// <param name="reader">ITreeReader to skip next token from</param>
+        public static void Skip(this ITreeReader reader)
+        {
+            int depth = 0;
+
+            do
+            {
+                switch (reader.TokenType)
+                {
+                    case TreeToken.StartArray:
+                    case TreeToken.StartObject:
+                        depth++;
+                        break;
+                    case TreeToken.EndArray:
+                    case TreeToken.EndObject:
+                        depth--;
+                        break;
+                }
+
+                reader.Read();
+            } while (depth > 0);
+        }
+
+        /// <summary>
+        ///  Verify the current token is a required value, otherwise throw a good exception.
+        /// </summary>
+        /// <param name="reader">ITreeReader to check</param>
+        /// <param name="expected">Current TreeToken expected</param>
         public static void Expect(this ITreeReader reader, TreeToken expected)
         {
             if (reader.TokenType != expected)

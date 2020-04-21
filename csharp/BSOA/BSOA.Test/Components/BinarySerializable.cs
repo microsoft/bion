@@ -8,6 +8,11 @@ namespace BSOA.Test
 {
     public static class BinarySerializable
     {
+        public static T RoundTrip<T>(T value) where T : IBinarySerializable, new()
+        {
+            return RoundTrip(value, () => new T());
+        }
+
         public static T RoundTrip<T>(T value, Func<T> builder) where T : IBinarySerializable
         {
             byte[] buffer = null;

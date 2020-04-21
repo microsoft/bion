@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 
 namespace BSOA
 {
@@ -20,6 +19,12 @@ namespace BSOA
 
         public VariableLengthColumn()
         {
+            Clear();
+        }
+
+        public void Clear()
+        {
+            Count = 0;
             _chapters = new List<ColumnChapter<T>>();
         }
 

@@ -7,8 +7,8 @@ namespace BSOA.IO
     public class BinaryTreeReader : ITreeReader
     {
         private BinaryReader _reader;
-        private TreeSerializationSettings _settings;
 
+        public TreeSerializationSettings Settings { get; }
         public TreeToken TokenType { get; private set; }
         public long Position => _reader.BaseStream.Position;
 
@@ -17,13 +17,15 @@ namespace BSOA.IO
         private double _valueDouble;
         private string _valueString;
 
+        private bool _wasBlockArrayRead;
+
         public BinaryTreeReader(Stream stream, TreeSerializationSettings settings = null)
         {
-            settings = settings ?? TreeSerializationSettings.DefaultSettings;
+            Settings = settings ?? TreeSerializationSettings.DefaultSettings;
 
-            _reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: settings.LeaveStreamOpen);
-            _settings = settings;
-            
+            _reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: Settings.LeaveStreamOpen);
+            _wasBlockArrayRead = true;
+
             // Readers are required to read the first token immediately, so reading single values directly works
             // (All methods don't have to Read if the TokenType is still None.)
             Read();
@@ -31,6 +33,12 @@ namespace BSOA.IO
 
         public bool Read()
         {
+            if (_wasBlockArrayRead == false && TokenType == TreeToken.BlockArray)
+            {
+                _reader.SkipBlockArray();
+                _wasBlockArrayRead = true;
+            }
+
             if (_reader.BaseStream.Position == _reader.BaseStream.Length)
             {
                 TokenType = TreeToken.None;
@@ -56,6 +64,9 @@ namespace BSOA.IO
                     break;
                 case TreeToken.Null:
                     _valueString = null;
+                    break;
+                case TreeToken.BlockArray:
+                    _wasBlockArrayRead = false;
                     break;
                 default:
                     // Nothing to read or not pre-read
@@ -87,7 +98,8 @@ namespace BSOA.IO
 
         public T[] ReadBlockArray<T>() where T : unmanaged
         {
-            return _reader.ReadBlockArray<T>(ref _settings.Buffer);
+            _wasBlockArrayRead = true;
+            return _reader.ReadBlockArray<T>(ref Settings.Buffer);
         }
 
         public void Dispose()
@@ -97,6 +109,8 @@ namespace BSOA.IO
 
         protected virtual void Dispose(bool disposing)
         {
+            Settings.Buffer = null;
+
             _reader?.Dispose();
             _reader = null;
         }

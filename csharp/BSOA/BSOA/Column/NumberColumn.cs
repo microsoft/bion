@@ -66,6 +66,12 @@ namespace BSOA
             }
         }
 
+        public void Clear()
+        {
+            _count = 0;
+            _array = null;
+        }
+
         private void ResizeTo(int size)
         {
             int currentLength = _array?.Length ?? 0;

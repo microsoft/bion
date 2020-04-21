@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace ScaleDemo.SoA
+namespace BSOA.Model
 {
     public class TableEnumerator<T> : IEnumerator<T>
     {
@@ -22,7 +22,7 @@ namespace ScaleDemo.SoA
             Dispose(true);
         }
 
-        public virtual void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         { }
 
         public bool MoveNext()

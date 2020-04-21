@@ -4,7 +4,10 @@ using System.Collections.Generic;
 namespace BSOA
 {
     public interface IColumn : IBinarySerializable, ITreeSerializable
-    { }
+    {
+        // Remove all items from column
+        void Clear();
+    }
 
     public interface IColumn<T> : IReadOnlyList<T>, IColumn
     {

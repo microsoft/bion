@@ -8,6 +8,8 @@ namespace BSOA.Test
     {
         internal static void VerifySame<T>(IReadOnlyList<T> expected, IReadOnlyList<T> actual)
         {
+            int index;
+
             // Verify Counts match
             Assert.Equal(expected.Count, actual.Count);
 
@@ -18,20 +20,22 @@ namespace BSOA.Test
             }
 
             // Verify typed enumerator (MoveNext, Current, Reset)
-            IEnumerator<T> typed = actual.GetEnumerator();
-            int index = 0;
-            while (typed.MoveNext())
+            using (IEnumerator<T> typed = actual.GetEnumerator())
             {
-                Assert.Equal(expected[index], typed.Current);
-                index++;
-            }
+                index = 0;
+                while (typed.MoveNext())
+                {
+                    Assert.Equal(expected[index], typed.Current);
+                    index++;
+                }
 
-            typed.Reset();
-            index = 0;
-            while (typed.MoveNext())
-            {
-                Assert.Equal(expected[index], typed.Current);
-                index++;
+                typed.Reset();
+                index = 0;
+                while (typed.MoveNext())
+                {
+                    Assert.Equal(expected[index], typed.Current);
+                    index++;
+                }
             }
 
             // Verify untyped enumerator
