@@ -21,6 +21,12 @@ namespace BSOA.Extensions
             return array;
         }
 
+        public static void SkipBlockArray(this BinaryReader reader)
+        {
+            int byteLength = reader.ReadInt32();
+            reader.BaseStream.Seek(byteLength, SeekOrigin.Current);
+        }
+
         public static void WriteBlockArray<T>(this BinaryWriter writer, T[] array, ref byte[] buffer) where T : unmanaged
         {
             WriteBlockArray<T>(writer, array, 0, array?.Length ?? 0, ref buffer);

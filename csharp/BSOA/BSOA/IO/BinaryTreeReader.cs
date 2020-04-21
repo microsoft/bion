@@ -17,13 +17,17 @@ namespace BSOA.IO
         private double _valueDouble;
         private string _valueString;
 
+        private bool _wasBlockArrayRead;
+
         public BinaryTreeReader(Stream stream, TreeSerializationSettings settings = null)
         {
             settings = settings ?? TreeSerializationSettings.DefaultSettings;
 
             _reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: settings.LeaveStreamOpen);
             _settings = settings;
-            
+
+            _wasBlockArrayRead = true;
+
             // Readers are required to read the first token immediately, so reading single values directly works
             // (All methods don't have to Read if the TokenType is still None.)
             Read();
@@ -35,6 +39,12 @@ namespace BSOA.IO
             {
                 TokenType = TreeToken.None;
                 return false;
+            }
+
+            if (_wasBlockArrayRead == false && TokenType == TreeToken.BlockArray)
+            {
+                _reader.SkipBlockArray();
+                _wasBlockArrayRead = true;
             }
 
             TokenType = (TreeToken)_reader.ReadByte();
@@ -56,6 +66,9 @@ namespace BSOA.IO
                     break;
                 case TreeToken.Null:
                     _valueString = null;
+                    break;
+                case TreeToken.BlockArray:
+                    _wasBlockArrayRead = false;
                     break;
                 default:
                     // Nothing to read or not pre-read
@@ -87,6 +100,7 @@ namespace BSOA.IO
 
         public T[] ReadBlockArray<T>() where T : unmanaged
         {
+            _wasBlockArrayRead = true;
             return _reader.ReadBlockArray<T>(ref _settings.Buffer);
         }
 
