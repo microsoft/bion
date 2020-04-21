@@ -5,6 +5,22 @@ using Xunit;
 
 namespace BSOA.Test.Components
 {
+    internal class Empty : ITreeSerializable
+    {
+        private static Dictionary<string, Setter<Empty>> setters = new Dictionary<string, Setter<Empty>>();
+
+        public void Read(ITreeReader reader)
+        {
+            reader.ReadObject(this, setters, throwOnUnknown: false);
+        }
+
+        public void Write(ITreeWriter writer)
+        {
+            writer.WriteStartObject();
+            writer.WriteEndObject();
+        }
+    }
+
     /// <summary>
     ///  Sample class for all supported single basic types
     /// </summary>

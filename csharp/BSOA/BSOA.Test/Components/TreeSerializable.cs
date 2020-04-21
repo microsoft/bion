@@ -3,6 +3,7 @@ using BSOA.Json;
 using BSOA.Test.Components;
 using System;
 using System.IO;
+using System.Text.Json;
 using Xunit;
 
 namespace BSOA.Test.Components
@@ -73,10 +74,10 @@ namespace BSOA.Test.Components
             RoundTripArray<byte>(null, format);
             RoundTripArray<byte>(new byte[] { }, format);
 
-            // Test double Dispose handled correctly, 'Compact == false' works, 'LeaveStreamOpen' respected
+            // Test double Dispose handled correctly, 'Verbose == true' works, 'LeaveStreamOpen' respected
             container.AssertEqual(RoundTrip(container, format, testDoubleDispose: true));
             container.AssertEqual(RoundTrip(container, format, new TreeSerializationSettings() { LeaveStreamOpen = true }));
-            container.AssertEqual(RoundTrip(container, format, new TreeSerializationSettings() { Compact = false }));
+            container.AssertEqual(RoundTrip(container, format, new TreeSerializationSettings() { Verbose = true }));
 
             // Test null string handling
             sample.Name = null;
@@ -85,7 +86,10 @@ namespace BSOA.Test.Components
             // Test settings defaulting
             sample.AssertEqual(RoundTrip_NullSettings(sample, format));
 
-            // Test serialization exceptions
+            // Test Skip behavior works for each primitive value
+            VerifySkip(sample, format);
+
+            // Test serialization details
             using (MemoryStream stream = new MemoryStream())
             {
                 TreeSerializationSettings settings = new TreeSerializationSettings() { LeaveStreamOpen = true };
@@ -95,24 +99,17 @@ namespace BSOA.Test.Components
                     sample.Write(writer);
                 }
 
+                long bytesWritten = stream.Position;
                 stream.Seek(0, SeekOrigin.Begin);
 
                 using (ITreeReader reader = Reader(format, stream, settings))
                 {
-                    // Test Expect failure (should not be 'None' when file just opened
+                    // Test 'Expect' throwing (should not be 'None' when file just opened)
                     Assert.NotEqual(TreeToken.None, reader.TokenType);
                     Assert.Throws<IOException>(() => reader.Expect(TreeToken.None));
 
                     // Test reading back as wrong type (exception from ReadObject unexpected property name)
                     Assert.Throws<IOException>(() => new SingleContainer<Sample>().Read(reader));
-                }
-
-                // Read tokens individually and verify 'None' returned at end
-                stream.Seek(0, SeekOrigin.Begin);
-                using (ITreeReader reader = Reader(format, stream, settings))
-                {
-                    while (reader.Read()) { };
-                    Assert.Equal(TreeToken.None, reader.TokenType);
                 }
             }
         }
@@ -126,6 +123,9 @@ namespace BSOA.Test.Components
             // Verify roundtrip reconstructs array properly
             ArrayContainer<T> roundTripped = RoundTrip(arrayContainer, format);
             arrayContainer.AssertEqual(roundTripped);
+
+            // Verify Skip correct for each block array type
+            VerifySkip(arrayContainer, format);
         }
 
         // Reference RoundTrip implementation - no extra verification
@@ -172,7 +172,7 @@ namespace BSOA.Test.Components
             T roundTripped = buildT();
 
             // Request non-compact stream (debuggability)
-            settings ??= new TreeSerializationSettings() { Compact = false };
+            settings ??= new TreeSerializationSettings() { Verbose = true };
 
             byte[] buffer = null;
 
@@ -244,6 +244,9 @@ namespace BSOA.Test.Components
             {
                 using (ITreeWriter writer = Writer(format, stream, null))
                 {
+                    // Writer must initialize settings property even if constructed with null.
+                    Assert.NotNull(writer.Settings);
+
                     value.Write(writer);
                 }
 
@@ -255,6 +258,9 @@ namespace BSOA.Test.Components
             {
                 using (ITreeReader reader = Reader(format, stream, null))
                 {
+                    // Reader must initialize settings property even if constructed with null.
+                    Assert.NotNull(reader.Settings);
+
                     roundTripped.Read(reader);
 
                     // Verify everything read back
@@ -263,6 +269,59 @@ namespace BSOA.Test.Components
             }
 
             return roundTripped;
+        }
+
+        public static void VerifySkip<T>(T value, TreeFormat format) where T : ITreeSerializable
+        {
+            // Test serialization details
+            using (MemoryStream stream = new MemoryStream())
+            {
+                TreeSerializationSettings settings = new TreeSerializationSettings() { LeaveStreamOpen = true };
+
+                using (ITreeWriter writer = Writer(format, stream, settings))
+                {
+                    value.Write(writer);
+                }
+
+                long bytesWritten = stream.Position;
+
+                // Read tokens individually and verify 'None' returned at end
+                stream.Seek(0, SeekOrigin.Begin);
+                using (ITreeReader reader = Reader(format, stream, settings))
+                {
+                    while (reader.Read())
+                    {
+                        // Verify each token type is coming back properly (no reading random bytes)
+                        Assert.True((byte)reader.TokenType <= (byte)TreeToken.BlockArray);
+                    }
+
+                    Assert.Equal(TreeToken.None, reader.TokenType);
+                    Assert.Equal(bytesWritten, stream.Position);
+                }
+
+                // Verify Skip once skips everything (each ITreeSerializable must be one value or one root array or object
+                stream.Seek(0, SeekOrigin.Begin);
+                using (ITreeReader reader = Reader(format, stream, settings))
+                {
+                    reader.Skip();
+                    Assert.Equal(TreeToken.None, reader.TokenType);
+                    Assert.Equal(bytesWritten, stream.Position);
+                }
+
+                // For objects, verify each property can be skipped correctly
+                // Each Skip should read the value, so that the next token is the next PropertyName
+                stream.Seek(0, SeekOrigin.Begin);
+                using (ITreeReader reader = Reader(format, stream, settings))
+                {
+                    if (reader.TokenType == TreeToken.StartObject)
+                    {
+                        Empty empty = new Empty();
+                        empty.Read(reader);
+
+                        Assert.Equal(bytesWritten, stream.Position);
+                    }
+                }
+            }
         }
 
         private static string StreamString(Stream stream)

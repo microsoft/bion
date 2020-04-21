@@ -4,7 +4,8 @@
     {
         public byte[] Buffer;
         public bool LeaveStreamOpen { get; set; }
-        public bool Compact { get; set; }
+        public bool Verbose { get; set; }
+        public bool Strict { get; set; }
 
         public static TreeSerializationSettings DefaultSettings = new TreeSerializationSettings();
 
@@ -12,7 +13,8 @@
         {
             LeaveStreamOpen = leaveStreamOpen;
             Buffer = buffer;
-            Compact = true;
+            Verbose = false;
+            Strict = false;
         }
     }
 }

@@ -9,18 +9,17 @@ namespace BSOA.Json
     public class JsonTreeReader : ITreeReader
     {
         private JsonTextReader _reader;
-        private TreeSerializationSettings _settings;
 
         // Note: TreeToken values chosen to match JsonToken enum
+        public TreeSerializationSettings Settings { get; }
         public TreeToken TokenType => (TreeToken)_reader.TokenType;
         public long Position => _reader.LineNumber;
 
         public JsonTreeReader(Stream stream, TreeSerializationSettings settings = null)
         {
-            settings = settings ?? TreeSerializationSettings.DefaultSettings;
+            Settings = settings ?? TreeSerializationSettings.DefaultSettings;
 
-            _reader = new JsonTextReader(new StreamReader(stream, Encoding.UTF8, true, 8 * 1024, leaveOpen: settings.LeaveStreamOpen));
-            _settings = settings;
+            _reader = new JsonTextReader(new StreamReader(stream, Encoding.UTF8, true, 8 * 1024, leaveOpen: Settings.LeaveStreamOpen));
 
             // TreeReaders required to read the first token on open, to allow single value reading to work
             Read();

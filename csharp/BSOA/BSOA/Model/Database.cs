@@ -33,7 +33,9 @@ namespace BSOA.Model
         public void Read(ITreeReader reader)
         {
             Clear();
-            reader.ReadDictionaryItems(Tables);
+
+            // Read Tables, skipping unknown tables if Settings.Strict == false
+            reader.ReadDictionaryItems(Tables, throwOnUnknown: reader.Settings.Strict);
         }
 
         public void Write(ITreeWriter writer)

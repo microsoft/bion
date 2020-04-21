@@ -85,7 +85,7 @@ namespace BSOA.Demo
 
             Time($"Writing as BSOA JSON to '{BsoaJsonPath}'...", () =>
             {
-                using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Compact = true }))
+                using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Verbose = false }))
                 {
                     table.Write(writer);
                 }

@@ -27,6 +27,9 @@ namespace BSOA.IO
     /// </remarks>
     public interface ITreeReader : IDisposable
     {
+        // Expose settings for Reader, so specific serialization can consider them
+        TreeSerializationSettings Settings { get; }
+
         // Read the next token
         bool Read();
 
@@ -169,7 +172,15 @@ namespace BSOA.IO
             return result;
         }
 
-        public static void ReadDictionaryItems<T>(this ITreeReader reader, Dictionary<string, T> dictionary, bool ignoreUnknown = false) where T : ITreeSerializable
+        /// <summary>
+        ///  Read existing items in an existing Dictionary instance.
+        ///  Used with Dictionaries of specific things which may or may not be present in the file, like Table.Columns.
+        /// </summary>
+        /// <typeparam name="T">Type of values in Dictionary</typeparam>
+        /// <param name="reader">ITreeReader to read from</param>
+        /// <param name="dictionary">Dictionary containing items to read</param>
+        /// <param name="throwOnUnknown">True to throw for property name not in Dictionary, false to quietly skip over it</param>
+        public static void ReadDictionaryItems<T>(this ITreeReader reader, Dictionary<string, T> dictionary, bool throwOnUnknown = true) where T : ITreeSerializable
         {
             if (reader.TokenType == TreeToken.Null) { return; }
 
@@ -188,13 +199,13 @@ namespace BSOA.IO
                 }
                 else
                 {
-                    if (ignoreUnknown)
+                    if (throwOnUnknown)
                     {
-                        reader.Skip();
+                        throw new IOException($"Found unknown {typeof(T).Name} property \"{itemName}\", expected one of \"{String.Join("; ", dictionary.Keys)}\" at {reader.Position:n0} using {reader.GetType().Name}.");
                     }
                     else
                     {
-                        throw new IOException($"{reader.GetType().Name} encountered unknown item name reading Dictionary<string, {typeof(T).Name}>. Read \"{itemName}\", expected one of \"{String.Join("; ", dictionary.Keys)}\"at {reader.Position:n0}");
+                        reader.Skip();
                     }
                 }
             }
@@ -216,7 +227,8 @@ namespace BSOA.IO
         /// <param name="reader">ITreeReader being read from</param>
         /// <param name="instance">T instance being initialized</param>
         /// <param name="setters">Dictionary of setter per field name</param>
-        public static void ReadObject<T>(this ITreeReader reader, T instance, Dictionary<string, Setter<T>> setters, bool ignoreUnknown = false)
+        /// <param name="throwOnUnknown">Throw if property name not in setters found</param>
+        public static void ReadObject<T>(this ITreeReader reader, T instance, Dictionary<string, Setter<T>> setters, bool throwOnUnknown = true)
         {
             reader.Expect(TreeToken.StartObject);
             reader.Read();
@@ -233,13 +245,13 @@ namespace BSOA.IO
                 }
                 else
                 {
-                    if (ignoreUnknown)
+                    if (throwOnUnknown)
                     {
-                        reader.Skip();
+                        throw new IOException($"Found unknown {typeof(T).Name} property, \"{propertyName}\", expected one of \"{String.Join("; ", setters.Keys)}\" at {reader.Position:n0} using {reader.GetType().Name}.");
                     }
                     else
                     {
-                        throw new IOException($"{reader.GetType().Name} encountered unexpected property name parsing {typeof(T).Name}. Read \"{propertyName}\", expected one of \"{String.Join("; ", setters.Keys)}\"at {reader.Position:n0}");
+                        reader.Skip();
                     }
                 }
             }

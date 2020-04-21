@@ -7,8 +7,8 @@ namespace BSOA.IO
     public class BinaryTreeReader : ITreeReader
     {
         private BinaryReader _reader;
-        private TreeSerializationSettings _settings;
 
+        public TreeSerializationSettings Settings { get; }
         public TreeToken TokenType { get; private set; }
         public long Position => _reader.BaseStream.Position;
 
@@ -21,11 +21,9 @@ namespace BSOA.IO
 
         public BinaryTreeReader(Stream stream, TreeSerializationSettings settings = null)
         {
-            settings = settings ?? TreeSerializationSettings.DefaultSettings;
+            Settings = settings ?? TreeSerializationSettings.DefaultSettings;
 
-            _reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: settings.LeaveStreamOpen);
-            _settings = settings;
-
+            _reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: Settings.LeaveStreamOpen);
             _wasBlockArrayRead = true;
 
             // Readers are required to read the first token immediately, so reading single values directly works
@@ -35,16 +33,16 @@ namespace BSOA.IO
 
         public bool Read()
         {
-            if (_reader.BaseStream.Position == _reader.BaseStream.Length)
-            {
-                TokenType = TreeToken.None;
-                return false;
-            }
-
             if (_wasBlockArrayRead == false && TokenType == TreeToken.BlockArray)
             {
                 _reader.SkipBlockArray();
                 _wasBlockArrayRead = true;
+            }
+
+            if (_reader.BaseStream.Position == _reader.BaseStream.Length)
+            {
+                TokenType = TreeToken.None;
+                return false;
             }
 
             TokenType = (TreeToken)_reader.ReadByte();
@@ -101,7 +99,7 @@ namespace BSOA.IO
         public T[] ReadBlockArray<T>() where T : unmanaged
         {
             _wasBlockArrayRead = true;
-            return _reader.ReadBlockArray<T>(ref _settings.Buffer);
+            return _reader.ReadBlockArray<T>(ref Settings.Buffer);
         }
 
         public void Dispose()
@@ -111,7 +109,7 @@ namespace BSOA.IO
 
         protected virtual void Dispose(bool disposing)
         {
-            _settings.Buffer = null;
+            Settings.Buffer = null;
 
             _reader?.Dispose();
             _reader = null;

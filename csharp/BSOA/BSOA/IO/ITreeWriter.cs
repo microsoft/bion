@@ -21,6 +21,9 @@ namespace BSOA.IO
     /// </remarks>
     public interface ITreeWriter : IDisposable
     {
+        // Expose settings for writer, so specific serialization can use them
+        TreeSerializationSettings Settings { get; }
+
         // ITreeWriter has the same Start/End Object and Array as JSON and JsonWriter
         void WriteStartObject();
         void WriteEndObject();

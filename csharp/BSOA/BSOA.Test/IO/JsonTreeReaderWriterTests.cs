@@ -1,5 +1,4 @@
-﻿using BSOA.Json;
-using BSOA.Test.Components;
+﻿using BSOA.Test.Components;
 using Xunit;
 
 namespace BSOA.Test.IO

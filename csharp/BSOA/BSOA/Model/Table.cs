@@ -92,12 +92,14 @@ namespace BSOA.Model
         private static Dictionary<string, Setter<Table<T>>> setters = new Dictionary<string, Setter<Table<T>>>()
         {
             [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
-            [nameof(Columns)] = (r, me) => r.ReadDictionaryItems(me.Columns),
+            [nameof(Columns)] = (r, me) => r.ReadDictionaryItems(me.Columns, throwOnUnknown: r.Settings.Strict),
         };
 
         public void Read(ITreeReader reader)
         {
             Clear();
+
+            // Read Columns, skipping unknown columns if Settings.Strict == false
             reader.ReadObject(this, setters);
         }
 
