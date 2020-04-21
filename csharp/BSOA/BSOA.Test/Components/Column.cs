@@ -52,8 +52,8 @@ namespace BSOA.Test
 
             // Verify serialization round trip via all current serialization mechanisms
             ReadOnlyList.VerifySame(column, BinarySerializable.RoundTrip(column, builder));
-            ReadOnlyList.VerifySame(column, TreeSerializable.RoundTrip(column, builder, TreeFormat.Binary));
-            ReadOnlyList.VerifySame(column, TreeSerializable.RoundTrip(column, builder, TreeFormat.Json));
+            ReadOnlyList.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary));
+            ReadOnlyList.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Json));
 
             // Verify original values are still there post-serialization (ensure column not corrupted by serialization)
             for (int i = 0; i < column.Count; ++i)

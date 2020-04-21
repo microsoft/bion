@@ -9,7 +9,7 @@ namespace BSOA.Test.IO
         public void JsonTreeReaderWriter_Basics()
         {
             // Run ITreeSerializable suite on JsonTreeReader and JsonTreeWriter
-            TreeSerializable.Basics(TreeFormat.Json);
+            TreeSerializer.Basics(TreeFormat.Json);
         }
     }
 }

@@ -20,14 +20,14 @@ namespace BSOA.Test.IO
             samples.Add(sample);
             samples.Add(sample2);
 
-            samples.AssertEqual(TreeSerializable.RoundTrip(samples, TreeFormat.Json));
-            samples.AssertEqual(TreeSerializable.RoundTrip(samples, TreeFormat.Binary));
+            samples.AssertEqual(TreeSerializer.RoundTrip(samples, TreeFormat.Json));
+            samples.AssertEqual(TreeSerializer.RoundTrip(samples, TreeFormat.Binary));
 
 
             // Null List / Dictionary handling
             samples.SetCollectionsNull();
-            samples.AssertEqual(TreeSerializable.RoundTrip(samples, TreeFormat.Json));
-            samples.AssertEqual(TreeSerializable.RoundTrip(samples, TreeFormat.Binary));
+            samples.AssertEqual(TreeSerializer.RoundTrip(samples, TreeFormat.Json));
+            samples.AssertEqual(TreeSerializer.RoundTrip(samples, TreeFormat.Binary));
         }
     }
 }

@@ -14,7 +14,7 @@ namespace BSOA.Test
 
         public static void Save(this ITreeSerializable item, Stream stream, TreeFormat format, TreeSerializationSettings settings = null)
         {
-            using (ITreeWriter writer = TreeSerializable.Writer(format, stream, settings))
+            using (ITreeWriter writer = TreeSerializer.Writer(format, stream, settings))
             {
                 item.Write(writer);
             }
@@ -27,7 +27,7 @@ namespace BSOA.Test
 
         public static void Load(this ITreeSerializable item, Stream stream, TreeFormat format, TreeSerializationSettings settings = null)
         {
-            using (ITreeReader reader = TreeSerializable.Reader(format, stream, settings))
+            using (ITreeReader reader = TreeSerializer.Reader(format, stream, settings))
             {
                 item.Read(reader);
             }

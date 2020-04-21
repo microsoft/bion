@@ -1,9 +1,7 @@
 ﻿using BSOA.IO;
 using BSOA.Json;
-using BSOA.Test.Components;
 using System;
 using System.IO;
-using System.Text.Json;
 using Xunit;
 
 namespace BSOA.Test.Components
@@ -14,7 +12,7 @@ namespace BSOA.Test.Components
         Json = 1
     }
 
-    public class TreeSerializable
+    public class TreeSerializer
     {
         public static ITreeReader Reader(TreeFormat format, Stream stream, TreeSerializationSettings settings)
         {

@@ -16,7 +16,7 @@ namespace BSOA.Test.Model
             Person two = new Person(table) { Age = 36, Name = "Adam" };
 
             // Use ReadOnlyList.VerifySame to check count, enumerators, and indexer
-            PersonDatabase roundTripped = TreeSerializable.RoundTrip(database, TreeFormat.Binary);
+            PersonDatabase roundTripped = TreeSerializer.RoundTrip(database, TreeFormat.Binary);
             ReadOnlyList.VerifySame(table, roundTripped.People);
 
             // Verify Database.Clear works
