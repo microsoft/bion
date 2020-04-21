@@ -1,72 +1,103 @@
 ﻿using BSOA.IO;
 using BSOA.Json;
+using BSOA.Test.Components;
 using System;
 using System.IO;
 using Xunit;
 
 namespace BSOA.Test.Components
 {
+    public enum TreeFormat
+    {
+        Binary = 0,
+        Json = 1
+    }
+
     public class TreeSerializable
     {
-        public static void Basics(
-            Func<Stream, TreeSerializationSettings, ITreeWriter> buildWriter,
-            Func<Stream, TreeSerializationSettings, ITreeReader> buildReader)
+        public static ITreeReader Reader(TreeFormat format, Stream stream, TreeSerializationSettings settings)
+        {
+            switch(format)
+            {
+                case TreeFormat.Binary:
+                    return new BinaryTreeReader(stream, settings);
+                case TreeFormat.Json:
+                    return new JsonTreeReader(stream, settings);
+                default:
+                    throw new NotImplementedException($"Reader doesn't know how to build for '{format}'.");
+            }
+        }
+
+        public static ITreeWriter Writer(TreeFormat format, Stream stream, TreeSerializationSettings settings)
+        {
+            switch (format)
+            {
+                case TreeFormat.Binary:
+                    return new BinaryTreeWriter(stream, settings);
+                case TreeFormat.Json:
+                    return new JsonTreeWriter(stream, settings);
+                default:
+                    throw new NotImplementedException($"Writer doesn't know how to build for '{format}'.");
+            }
+        }
+
+        public static void Basics(TreeFormat format)
         {
             Random r = new Random();
 
             // Test serialization of each primitive value type (bool, string, long, double)
             Sample sample = new Sample(new Random());
-            sample.AssertEqual(RoundTrip<Sample>(sample, buildWriter, buildReader));
+            sample.AssertEqual(RoundTrip<Sample>(sample, format));
 
             // Test serialization of containers (read must leave last token of nested items so loop finds next property name properly)
             SingleContainer<Sample> container = new SingleContainer<Sample>(sample);
-            container.AssertEqual(RoundTrip<SingleContainer<Sample>>(container, buildWriter, buildReader));
+            container.AssertEqual(RoundTrip<SingleContainer<Sample>>(container, format));
 
             // Test serialization of all supported primitive array types
-            RoundTripArray(new byte[] { 0, 4, 16 }, buildWriter, buildReader);
-            RoundTripArray(new char[] { 'S', 'o', 'A' }, buildWriter, buildReader);
-            RoundTripArray(new sbyte[] { 0, 4, 16 }, buildWriter, buildReader);
-            RoundTripArray(new ushort[] { 0, 4, 16 }, buildWriter, buildReader);
-            RoundTripArray(new short[] { 0, 4, 16 }, buildWriter, buildReader);
-            RoundTripArray(new uint[] { 0, 4, 16 }, buildWriter, buildReader);
-            RoundTripArray(new int[] { 0, 4, 16 }, buildWriter, buildReader);
-            RoundTripArray(new ulong[] { 0, 4, 16 }, buildWriter, buildReader);
-            RoundTripArray(new long[] { 0, 4, 16 }, buildWriter, buildReader);
-            RoundTripArray(new float[] { 0.0f, 100.5f, -2.05f }, buildWriter, buildReader);
-            RoundTripArray(new double[] { 0.0f, 100.5f, -2.05f }, buildWriter, buildReader);
+            RoundTripArray(new byte[] { 0, 4, 16 }, format);
+            RoundTripArray(new char[] { 'S', 'o', 'A' }, format);
+            RoundTripArray(new sbyte[] { 0, 4, 16 }, format);
+            RoundTripArray(new ushort[] { 0, 4, 16 }, format);
+            RoundTripArray(new short[] { 0, 4, 16 }, format);
+            RoundTripArray(new uint[] { 0, 4, 16 }, format);
+            RoundTripArray(new int[] { 0, 4, 16 }, format);
+            RoundTripArray(new ulong[] { 0, 4, 16 }, format);
+            RoundTripArray(new long[] { 0, 4, 16 }, format);
+            RoundTripArray(new float[] { 0.0f, 100.5f, -2.05f }, format);
+            RoundTripArray(new double[] { 0.0f, 100.5f, -2.05f }, format);
 
             // Verify exception on (expected) unsupported type
-            Assert.Throws<NotSupportedException>(() => RoundTripArray(new decimal[] { 0.01M, 0.02M }, buildWriter, buildReader));
+            Assert.Throws<NotSupportedException>(() => RoundTripArray(new decimal[] { 0.01M, 0.02M }, format));
 
             // Null/Empty array handling (currently expected to come back as empty array)
-            RoundTripArray<byte>(null, buildWriter, buildReader);
-            RoundTripArray<byte>(new byte[] { }, buildWriter, buildReader);
+            RoundTripArray<byte>(null, format);
+            RoundTripArray<byte>(new byte[] { }, format);
 
             // Test double Dispose handled correctly, 'Compact == false' works, 'LeaveStreamOpen' respected
-            container.AssertEqual(RoundTrip(container, buildWriter, buildReader, testDoubleDispose: true));
-            container.AssertEqual(RoundTrip(container, buildWriter, buildReader, new TreeSerializationSettings() { LeaveStreamOpen = true }));
-            container.AssertEqual(RoundTrip(container, buildWriter, buildReader, new TreeSerializationSettings() { Compact = false }));
+            container.AssertEqual(RoundTrip(container, format, testDoubleDispose: true));
+            container.AssertEqual(RoundTrip(container, format, new TreeSerializationSettings() { LeaveStreamOpen = true }));
+            container.AssertEqual(RoundTrip(container, format, new TreeSerializationSettings() { Compact = false }));
 
             // Test null string handling
             sample.Name = null;
-            sample.AssertEqual(RoundTrip(sample, buildWriter, buildReader));
+            sample.AssertEqual(RoundTrip(sample, format));
 
             // Test settings defaulting
-            sample.AssertEqual(RoundTrip_NullSettings(sample, buildWriter, buildReader));
+            sample.AssertEqual(RoundTrip_NullSettings(sample, format));
 
             // Test serialization exceptions
             using (MemoryStream stream = new MemoryStream())
             {
                 TreeSerializationSettings settings = new TreeSerializationSettings() { LeaveStreamOpen = true };
 
-                using (ITreeWriter writer = buildWriter(stream, settings))
+                using (ITreeWriter writer = Writer(format, stream, settings))
                 {
                     sample.Write(writer);
                 }
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                using (ITreeReader reader = buildReader(stream, settings))
+                using (ITreeReader reader = Reader(format, stream, settings))
                 {
                     // Test Expect failure (should not be 'None' when file just opened
                     Assert.NotEqual(TreeToken.None, reader.TokenType);
@@ -78,7 +109,7 @@ namespace BSOA.Test.Components
 
                 // Read tokens individually and verify 'None' returned at end
                 stream.Seek(0, SeekOrigin.Begin);
-                using (ITreeReader reader = buildReader(stream, settings))
+                using (ITreeReader reader = Reader(format, stream, settings))
                 {
                     while (reader.Read()) { };
                     Assert.Equal(TreeToken.None, reader.TokenType);
@@ -86,67 +117,32 @@ namespace BSOA.Test.Components
             }
         }
 
-        public static void RoundTripArray<T>(
-            T[] sample,
-            Func<Stream, TreeSerializationSettings, ITreeWriter> buildWriter,
-            Func<Stream, TreeSerializationSettings, ITreeReader> buildReader) where T : unmanaged
+        public static void RoundTripArray<T>(T[] sample, TreeFormat format) where T : unmanaged
         {
             // Wrap primitive array in a contained implementing ITreeSerializable
             // and calling WriteBlockArray / ReadBlockArray
             ArrayContainer<T> arrayContainer = new ArrayContainer<T>(sample);
 
             // Verify roundtrip reconstructs array properly
-            ArrayContainer<T> roundTripped = RoundTrip<ArrayContainer<T>>(arrayContainer, () => new ArrayContainer<T>(), buildWriter, buildReader);
+            ArrayContainer<T> roundTripped = RoundTrip(arrayContainer, format);
             arrayContainer.AssertEqual(roundTripped);
         }
 
-        public static T RoundTripBinary<T>(T value) where T : ITreeSerializable, new()
-        {
-            return RoundTripBinary(value, () => new T());
-        }
-
-        public static T RoundTripBinary<T>(T value, Func<T> builder) where T : ITreeSerializable
-        {
-            return RoundTrip<T>(
-                value,
-                builder,
-                (stream, settings) => new BinaryTreeWriter(stream, settings),
-                (stream, settings) => new BinaryTreeReader(stream, settings)
-            );
-        }
-
-        public static T RoundTripJson<T>(T value) where T : ITreeSerializable, new()
-        {
-            return RoundTripJson(value, () => new T());
-        }
-
-        public static T RoundTripJson<T>(T value, Func<T> builder) where T : ITreeSerializable
-        {
-            return RoundTrip<T>(
-                value,
-                builder,
-                (stream, settings) => new JsonTreeWriter(stream, settings),
-                (stream, settings) => new JsonTreeReader(stream, settings)
-            );
-        }
-
         // Reference RoundTrip implementation - no extra verification
-        private static T RoundTrip_Basic<T>(T value, Func<T> buildT,
-            Func<Stream, TreeSerializationSettings, ITreeWriter> buildWriter,
-            Func<Stream, TreeSerializationSettings, ITreeReader> buildReader) where T : ITreeSerializable
+        private static T RoundTrip_Basic<T>(T value, Func<T> buildT, TreeFormat format) where T : ITreeSerializable
         {
             TreeSerializationSettings settings = new TreeSerializationSettings() { LeaveStreamOpen = true };
 
             using (MemoryStream stream = new MemoryStream())
             {
-                using (ITreeWriter writer = buildWriter(stream, settings))
+                using (ITreeWriter writer = Writer(format, stream, settings))
                 {
                     value.Write(writer);
                 }
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                using (ITreeReader reader = buildReader(stream, settings))
+                using (ITreeReader reader = Reader(format, stream, settings))
                 {
                     T roundTripped = buildT();
                     roundTripped.Read(reader);
@@ -156,20 +152,20 @@ namespace BSOA.Test.Components
         }
 
         // Use default constructor if available
-        public static T RoundTrip<T>(T value,
-            Func<Stream, TreeSerializationSettings, ITreeWriter> buildWriter,
-            Func<Stream, TreeSerializationSettings, ITreeReader> buildReader,
+        public static T RoundTrip<T>(
+            T value, 
+            TreeFormat format,
             TreeSerializationSettings settings = null,
             bool testDoubleDispose = false) where T : ITreeSerializable, new()
         {
-            return RoundTrip(value, () => new T(), buildWriter, buildReader, settings, testDoubleDispose);
+            return RoundTrip(value, () => new T(), format, settings, testDoubleDispose);
         }
 
         // RoundTrip with all verification
-        public static T RoundTrip<T>(T value,
+        public static T RoundTrip<T>(
+            T value,
             Func<T> buildT,
-            Func<Stream, TreeSerializationSettings, ITreeWriter> buildWriter,
-            Func<Stream, TreeSerializationSettings, ITreeReader> buildReader,
+            TreeFormat format,
             TreeSerializationSettings settings = null,
             bool testDoubleDispose = false) where T : ITreeSerializable
         {
@@ -182,7 +178,7 @@ namespace BSOA.Test.Components
 
             using (MemoryStream stream = new MemoryStream())
             {
-                using (ITreeWriter writer = buildWriter(stream, settings))
+                using (ITreeWriter writer = Writer(format, stream, settings))
                 {
                     value.Write(writer);
 
@@ -209,7 +205,7 @@ namespace BSOA.Test.Components
 
             using (MemoryStream stream = new MemoryStream(buffer))
             {
-                using (ITreeReader reader = buildReader(stream, settings))
+                using (ITreeReader reader = Reader(format, stream, settings))
                 {
                     // Ensure Readers pre-read first token by default
                     // Needed to allow single value reading to work without everything having to handle this case everywhere
@@ -239,17 +235,14 @@ namespace BSOA.Test.Components
         }
 
         // RoundTrip with all verification
-        public static T RoundTrip_NullSettings<T>(T value,
-            Func<Stream, TreeSerializationSettings, ITreeWriter> buildWriter,
-            Func<Stream, TreeSerializationSettings, ITreeReader> buildReader
-            ) where T : ITreeSerializable, new()
+        public static T RoundTrip_NullSettings<T>(T value, TreeFormat format) where T : ITreeSerializable, new()
         {
             T roundTripped = new T();
             byte[] buffer = null;
 
             using (MemoryStream stream = new MemoryStream())
             {
-                using (ITreeWriter writer = buildWriter(stream, null))
+                using (ITreeWriter writer = Writer(format, stream, null))
                 {
                     value.Write(writer);
                 }
@@ -260,7 +253,7 @@ namespace BSOA.Test.Components
 
             using (MemoryStream stream = new MemoryStream(buffer))
             {
-                using (ITreeReader reader = buildReader(stream, null))
+                using (ITreeReader reader = Reader(format, stream, null))
                 {
                     roundTripped.Read(reader);
 

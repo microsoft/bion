@@ -51,9 +51,9 @@ namespace BSOA.Test
             }
 
             // Verify serialization round trip via all current serialization mechanisms
-            VerifySame(column, BinarySerializable.RoundTrip(column, builder));
-            VerifySame(column, TreeSerializable.RoundTripBinary(column, builder));
-            VerifySame(column, TreeSerializable.RoundTripJson(column, builder));
+            ReadOnlyList.VerifySame(column, BinarySerializable.RoundTrip(column, builder));
+            ReadOnlyList.VerifySame(column, TreeSerializable.RoundTrip(column, builder, TreeFormat.Binary));
+            ReadOnlyList.VerifySame(column, TreeSerializable.RoundTrip(column, builder, TreeFormat.Json));
 
             // Verify original values are still there post-serialization (ensure column not corrupted by serialization)
             for (int i = 0; i < column.Count; ++i)
@@ -70,16 +70,6 @@ namespace BSOA.Test
 
             // Verify indexer range check (< 0 only; columns auto-size for bigger values)
             Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
-        }
-
-        private static void VerifySame<T>(IColumn<T> expected, IColumn<T> actual)
-        {
-            Assert.Equal(expected.Count, actual.Count);
-
-            for (int i = 0; i < expected.Count; ++i)
-            {
-                Assert.Equal(expected[i], actual[i]);
-            }
         }
     }
 }

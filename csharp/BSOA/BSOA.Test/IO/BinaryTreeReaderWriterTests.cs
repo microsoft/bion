@@ -10,9 +10,7 @@ namespace BSOA.Test.IO
         public void BinaryTreeReaderWriter_Basics()
         {
             // Run ITreeSerializable suite on BinaryTreeReader and BinaryTreeWriter
-            TreeSerializable.Basics(
-                (stream, settings) => new BinaryTreeWriter(stream, settings),
-                (stream, settings) => new BinaryTreeReader(stream, settings));
+            TreeSerializable.Basics(TreeFormat.Binary);
         }
     }
 }

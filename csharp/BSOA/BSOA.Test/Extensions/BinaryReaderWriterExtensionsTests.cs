@@ -38,6 +38,35 @@ namespace BSOA.Test.Extensions
         }
 
         [Fact]
+        public static void SkipArray()
+        {
+            byte[] buffer = null;
+            int[] array = new int[] { 1, 2, 3 };
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: true))
+                {
+                    writer.WriteBlockArray<int>(array, ref buffer);
+                    writer.Write(true);
+                }
+
+                long arrayLength = stream.Position - 1;
+                stream.Seek(0, SeekOrigin.Begin);
+                using (BinaryReader reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true))
+                {
+                    reader.SkipBlockArray();
+
+                    // Ensure all bytes *except* guard boolean read
+                    Assert.Equal(arrayLength, stream.Position);
+
+                    bool guardBoolean = reader.ReadBoolean();
+                    Assert.True(guardBoolean);
+                }
+            }
+        }
+
+        [Fact]
         public static void ReadAndWriteArray_BufferUse()
         {
             int[] sample = new int[] { 1, 2, 3 };
