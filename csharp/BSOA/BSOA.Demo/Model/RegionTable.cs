@@ -13,6 +13,8 @@ namespace BSOA.Demo.Model
     /// </remarks>
     public class RegionTable : Table<Region4>
     {
+        internal SarifLogBsoa Database;
+
         internal NumberColumn<int> StartLine;
         internal NumberColumn<int> StartColumn;
         internal NumberColumn<int> EndLine;
@@ -23,8 +25,10 @@ namespace BSOA.Demo.Model
         internal NumberColumn<int> CharOffset;
         internal NumberColumn<int> CharLength;
 
-        public RegionTable() : base()
+        public RegionTable(SarifLogBsoa database) : base()
         {
+            this.Database = database;
+
             this.StartLine = AddColumn(nameof(StartLine), new NumberColumn<int>(0));
             this.StartColumn = AddColumn(nameof(StartColumn), new NumberColumn<int>(0));
             this.EndLine = AddColumn(nameof(EndLine), new NumberColumn<int>(0));

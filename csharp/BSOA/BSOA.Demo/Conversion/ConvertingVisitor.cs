@@ -2,13 +2,13 @@
 
 namespace BSOA.Demo
 {
-    public class DemoConvertingVisitor : SarifRewritingVisitor
+    internal class ConvertingVisitor : SarifRewritingVisitor
     {
-        public DemoData Result { get; set; }
+        public SarifLogFiltered Result { get; set; }
 
-        public DemoConvertingVisitor()
+        public ConvertingVisitor()
         {
-            Result = new DemoData();
+            Result = new SarifLogFiltered();
         }
 
         public override Region VisitRegion(Region region)

@@ -1,14 +1,11 @@
-﻿using BSOA.Demo.Conversion;
-using BSOA.Demo.Model;
+﻿using BSOA.Demo.Model;
 using BSOA.IO;
 using BSOA.Json;
 using Microsoft.CodeAnalysis.Sarif;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 
 namespace BSOA.Demo
 {
@@ -40,10 +37,17 @@ namespace BSOA.Demo
             // Convert SarifLog to JSON, SoA JSON, and SoA Binary forms
             Convert();
 
+            SarifLogFiltered filtered = null;
+            SarifLogBsoa bsoa = null;
+
             // Compare loading times
-            Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft", Region);
-            Measure(LoadBsoaJson, BsoaJsonPath, "BSOA JSON, Newtonsoft", Region4);
-            Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary", Region4);
+            filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft");
+
+            bsoa = Measure(LoadBsoaJson, BsoaJsonPath, "BSOA JSON, Newtonsoft");
+            Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
+
+            bsoa = Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary");
+            Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
         }
 
         private void Convert()
@@ -55,23 +59,16 @@ namespace BSOA.Demo
 
             Time($"Loading {InputFilePath}...", () => log = SarifLog.Load(InputFilePath));
 
-            // Convert to 'DemoData' instance with scoped data
-            List<Region> regions = null;
-            RegionTable table = null;
+            // Extract a BSOA-supported SarifLog subset for apples-to-apples comparison with BSOA form
+            SarifLogFiltered filtered = null;
+            SarifLogBsoa bsoaLog = new SarifLogBsoa();
 
             Time($"Converting to demo form...", () =>
             {
-                DemoConvertingVisitor visitor = new DemoConvertingVisitor();
-                visitor.VisitSarifLog(log);
+                filtered = SarifLogFiltered.FromSarif(log);
+                bsoaLog = filtered.ToBsoa();
 
-                regions = visitor.Result.Regions;
-
-                // Convert to Bsoa RegionTable
-                table = new RegionTable();
-                foreach (Region region in regions)
-                {
-                    RegionConverter.Convert(region, table);
-                }
+                Console.WriteLine($" -> {filtered.ToString()}");
             });
 
             Time($"Writing as JSON to '{NormalJsonPath}'...", () =>
@@ -79,7 +76,7 @@ namespace BSOA.Demo
                 using (JsonTextWriter writer = new JsonTextWriter(File.CreateText(NormalJsonPath)))
                 {
                     //writer.Formatting = Formatting.Indented;
-                    _jsonSerializer.Serialize(writer, regions);
+                    _jsonSerializer.Serialize(writer, filtered);
                 }
             });
 
@@ -87,7 +84,7 @@ namespace BSOA.Demo
             {
                 using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Verbose = false }))
                 {
-                    table.Write(writer);
+                    bsoaLog.Write(writer);
                 }
             });
 
@@ -95,7 +92,7 @@ namespace BSOA.Demo
             {
                 using (BinaryTreeWriter writer = new BinaryTreeWriter(File.Create(BsoaBinPath)))
                 {
-                    table.Write(writer);
+                    bsoaLog.Write(writer);
                 }
             });
         }
@@ -112,12 +109,13 @@ namespace BSOA.Demo
             Console.WriteLine();
         }
 
-        static T Measure<T>(Func<string, T> loader, string path, string description, Func<T, string> check, int iterations = 4)
+        static T Measure<T>(Func<string, T> loader, string path, string description, int iterations = 4)
         {
             T result = default(T);
             double ramBeforeMB = GC.GetTotalMemory(true) / Megabyte;
             Stopwatch w = Stopwatch.StartNew();
-
+            
+            Console.WriteLine();
             Console.WriteLine(description);
 
             for (int iteration = 0; iteration < iterations; iteration++)
@@ -135,52 +133,40 @@ namespace BSOA.Demo
 
             Console.WriteLine();
             Console.WriteLine($" -> Read {fileSizeMB:n1} MB at {loadMegabytesPerSecond:n1} MB/s into {(ramAfterMB - ramBeforeMB):n1} MB RAM");
-            Console.WriteLine($" -> Check {check(result)}");
-            Console.WriteLine();
 
             return result;
         }
 
-        private List<Region> LoadNormalJson(string jsonPath)
+        private SarifLogFiltered LoadNormalJson(string jsonPath)
         {
             using (JsonReader reader = new JsonTextReader(File.OpenText(jsonPath)))
             {
-                return _jsonSerializer.Deserialize<List<Region>>(reader);
+                return _jsonSerializer.Deserialize<SarifLogFiltered>(reader);
             }
         }
 
-        private RegionTable LoadBsoaBinary(string bsoaBinaryPath)
+        private SarifLogBsoa LoadBsoaBinary(string bsoaBinaryPath)
         {
-            RegionTable table = new RegionTable();
+            SarifLogBsoa log = new SarifLogBsoa();
 
             using (BinaryTreeReader reader = new BinaryTreeReader(File.OpenRead(bsoaBinaryPath)))
             {
-                table.Read(reader);
+                log.Read(reader);
             }
 
-            return table;
+            return log;
         }
 
-        private RegionTable LoadBsoaJson(string bsoaJsonPath)
+        private SarifLogBsoa LoadBsoaJson(string bsoaJsonPath)
         {
-            RegionTable table = new RegionTable();
+            SarifLogBsoa log = new SarifLogBsoa();
 
             using (JsonTreeReader reader = new JsonTreeReader(File.OpenRead(bsoaJsonPath)))
             {
-                table.Read(reader);
+                log.Read(reader);
             }
 
-            return table;
-        }
-
-        static string Region(List<Region> list)
-        {
-            return $"{list.Sum(r => r.StartLine):n0}";
-        }
-
-        static string Region4(IReadOnlyList<Region4> list)
-        {
-            return $"{list.Sum(r => r.StartLine):n0}";
+            return log;
         }
     }
 }
