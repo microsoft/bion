@@ -4,11 +4,11 @@ namespace BSOA.Test.Model
 {
     public class PersonDatabase : Database
     {
-        public PersonTable People { get; }
+        public PersonTable Person { get; }
 
         public PersonDatabase()
         {
-            People = AddTable(nameof(People), new PersonTable(this));
+            Person = AddTable(nameof(Person), new PersonTable(this));
         }
     }
 }

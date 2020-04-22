@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BSOA
 {
-    public interface IColumn : IBinarySerializable, ITreeSerializable
+    public interface IColumn : ITreeSerializable
     {
         // Remove all items from column
         void Clear();

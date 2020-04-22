@@ -21,7 +21,6 @@ namespace BSOA.Demo
         private Region Scope(Region r)
         {
             r.Message = null;
-            r.Snippet = null;
             r.SourceLanguage = null;
 
             r.Tags.Clear();

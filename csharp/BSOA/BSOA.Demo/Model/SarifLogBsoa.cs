@@ -4,11 +4,13 @@ namespace BSOA.Demo.Model
 {
     public class SarifLogBsoa : Database
     {
-        public RegionTable Regions { get; }
+        public RegionTable Region { get; }
+        public ArtifactContentTable ArtifactContent { get; }
 
         public SarifLogBsoa() : base()
         {
-            Regions = AddTable(nameof(Regions), new RegionTable(this));
+            Region = AddTable(nameof(Region), new RegionTable(this));
+            ArtifactContent = AddTable(nameof(ArtifactContent), new ArtifactContentTable(this));
         }
     }
 }

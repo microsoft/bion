@@ -16,10 +16,10 @@ namespace BSOA
     public class NumberColumn<T> : IColumn<T> where T : unmanaged, IEquatable<T>
     {
         private const int MinimumSize = 32;
+        private const string Array = nameof(Array);
 
         private T _defaultValue;
         private T[] _array;
-        private int _count;
 
         /// <summary>
         ///  Build a NumberColumn with the given default value.
@@ -34,7 +34,7 @@ namespace BSOA
         ///  Return the current valid count for the column.
         ///  This is (index + 1) for the highest non-default value set.
         /// </summary>
-        public int Count => _count;
+        public int Count { get; private set; }
 
         /// <summary>
         ///  Get or Set the value at a given index
@@ -53,12 +53,17 @@ namespace BSOA
 
             set
             {
-                if (index >= _count)
+                if (index >= Count)
                 {
+                    Count = index + 1;
+
                     // Don't resize for default values; the defaulting will respond correctly for them
                     if (_defaultValue.Equals(value)) { return; }
+                }
 
-                    // Resize if required
+                // Resize if required
+                if (_array == null || _array.Length <= index)
+                {
                     ResizeTo(index + 1);
                 }
 
@@ -68,33 +73,27 @@ namespace BSOA
 
         public void Clear()
         {
-            _count = 0;
+            Count = 0;
             _array = null;
         }
 
         private void ResizeTo(int size)
         {
             int currentLength = _array?.Length ?? 0;
+            int newLength = Math.Max(MinimumSize, Math.Max(size, (currentLength + currentLength / 2)));
+            T[] newArray = new T[newLength];
 
-            if (size > currentLength)
+            if (currentLength > 0)
             {
-                int newLength = Math.Max(MinimumSize, Math.Max(size, (currentLength + currentLength / 2)));
-                T[] newArray = new T[newLength];
-
-                if (currentLength > 0)
-                {
-                    _array.CopyTo(newArray, 0);
-                }
-
-                for (int i = currentLength; i < newLength; ++i)
-                {
-                    newArray[i] = _defaultValue;
-                }
-
-                _array = newArray;
+                _array.CopyTo(newArray, 0);
             }
 
-            _count = size;
+            for (int i = currentLength; i < newLength; ++i)
+            {
+                newArray[i] = _defaultValue;
+            }
+
+            _array = newArray;
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -107,26 +106,23 @@ namespace BSOA
             return new ListEnumerator<T>(this);
         }
 
-        public void Read(BinaryReader reader, ref byte[] buffer)
+        private static Dictionary<string, Setter<NumberColumn<T>>> setters = new Dictionary<string, Setter<NumberColumn<T>>>()
         {
-            _array = reader.ReadBlockArray<T>(ref buffer);
-            _count = _array.Length;
-        }
-
-        public void Write(BinaryWriter writer, ref byte[] buffer)
-        {
-            writer.WriteBlockArray(_array, 0, _count, ref buffer);
-        }
+            [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
+            [Array] = (r, me) => me._array = r.ReadBlockArray<T>()
+        };
 
         public void Read(ITreeReader reader)
         {
-            _array = reader.ReadBlockArray<T>();
-            _count = _array.Length;
+            reader.ReadObject(this, setters);
         }
 
         public void Write(ITreeWriter writer)
         {
-            writer.WriteBlockArray(_array, 0, _count);
+            writer.WriteStartObject();
+            writer.Write(nameof(Count), Count);
+            writer.WriteBlockArray(Array, _array, 0, Math.Min(Count, _array.Length));
+            writer.WriteEndObject();
         }
     }
 }

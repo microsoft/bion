@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BSOA.Test.Components;
+using System.Collections.Generic;
 using Xunit;
 
 namespace BSOA.Test
@@ -10,7 +11,7 @@ namespace BSOA.Test
         {
             Column.Basics<string>(
                 () => new StringColumn(),
-                string.Empty,
+                null,
                 "AnotherValue",
                 (i) => i.ToString()
             );
@@ -25,6 +26,7 @@ namespace BSOA.Test
 
             // Test values just at and above LargeValue limit
             expected.Add(new string(' ', 2047));
+            expected.Add(null);
             expected.Add(string.Empty);
             expected.Add("Normal");
             expected.Add(new string(' ', 2048));
@@ -42,7 +44,7 @@ namespace BSOA.Test
             ReadOnlyList.VerifySame(expected, column);
 
             // Verify roundtripped column and column not corrupted by serialization
-            roundTripped = BinarySerializable.RoundTrip<StringColumn>(column, () => new StringColumn());
+            roundTripped = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
             ReadOnlyList.VerifySame(expected, roundTripped);
             ReadOnlyList.VerifySame(expected, column);
 
@@ -60,7 +62,7 @@ namespace BSOA.Test
             ReadOnlyList.VerifySame(expected, column);
 
             // Verify values re-roundtrip again properly (merging old and new immutable values)
-            roundTripped = BinarySerializable.RoundTrip<StringColumn>(column, () => new StringColumn());
+            roundTripped = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
             ReadOnlyList.VerifySame(expected, roundTripped);
             ReadOnlyList.VerifySame(expected, column);
 
@@ -69,7 +71,7 @@ namespace BSOA.Test
 
             Assert.Equal(101, column.Count);
             Assert.Equal("Centennial", column[100]);
-            Assert.Equal(string.Empty, column[99]);
+            Assert.Null(column[99]);
         }
     }
 }

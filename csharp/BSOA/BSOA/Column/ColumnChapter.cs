@@ -1,9 +1,6 @@
 ﻿using BSOA.Extensions;
 using BSOA.IO;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace BSOA
 {
@@ -141,48 +138,6 @@ namespace BSOA
             _valueEndInPage = newValueEndInPage;
 
             _requiresTrim = false;
-        }
-
-        public void Read(BinaryReader reader, ref byte[] buffer)
-        {
-            _pageStartInChapter = reader.ReadBlockArray<int>(ref buffer);
-            _valueEndInPage = reader.ReadBlockArray<ushort>(ref buffer);
-            _smallValueArray = reader.ReadBlockArray<T>(ref buffer);
-
-            Count = _valueEndInPage.Length;
-
-            _largeValueDictionary = new Dictionary<int, ArraySlice<T>>();
-
-            int[] largeValueIndices = reader.ReadBlockArray<int>(ref buffer);
-            if (largeValueIndices.Length > 0)
-            {
-                for (int i = 0; i < largeValueIndices.Length; ++i)
-                {
-                    T[] largeValue = reader.ReadBlockArray<T>(ref buffer);
-                    _largeValueDictionary[largeValueIndices[i]] = new ArraySlice<T>(largeValue);
-                }
-            }
-        }
-
-        public void Write(BinaryWriter writer, ref byte[] buffer)
-        {
-            // Merge changed small values under cutoff into SmallValueArray
-            Trim();
-
-            writer.WriteBlockArray(_pageStartInChapter, ref buffer);
-            writer.WriteBlockArray(_valueEndInPage, 0, Count, ref buffer);
-            writer.WriteBlockArray(_smallValueArray, ref buffer);
-
-            int[] largeValueKeys = _largeValueDictionary?.Keys.ToArray();
-            writer.WriteBlockArray(largeValueKeys, ref buffer);
-
-            if (largeValueKeys != null)
-            {
-                for (int i = 0; i < largeValueKeys.Length; ++i)
-                {
-                    _largeValueDictionary[largeValueKeys[i]].Write(writer, ref buffer);
-                }
-            }
         }
 
         private const string PageStart = nameof(PageStart);

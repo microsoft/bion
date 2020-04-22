@@ -60,7 +60,7 @@ namespace BSOA.Test
 
         internal static void VerifyRoundTrip<T>(ArraySlice<T> slice, T[] copyToTargetArray) where T : unmanaged
         {
-            ArraySlice<T> roundTripped = BinarySerializable.RoundTrip(slice);
+            ArraySlice<T> roundTripped = TreeSerializer.RoundTrip(slice, TreeFormat.Binary);
             ReadOnlyList.VerifySame<T>(slice, roundTripped);
             VerifyCopyTo<T>(roundTripped, copyToTargetArray);
         }

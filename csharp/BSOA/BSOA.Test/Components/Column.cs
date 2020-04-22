@@ -50,8 +50,12 @@ namespace BSOA.Test
                 Assert.Equal(value, column[i]);
             }
 
+            // Append a default value; verify the count tracks it correctly
+            column[1025] = defaultValue;
+            Assert.Equal(1026, column.Count);
+            Assert.Equal(defaultValue, column[1025]);
+
             // Verify serialization round trip via all current serialization mechanisms
-            ReadOnlyList.VerifySame(column, BinarySerializable.RoundTrip(column, builder));
             ReadOnlyList.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary));
             ReadOnlyList.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Json));
             

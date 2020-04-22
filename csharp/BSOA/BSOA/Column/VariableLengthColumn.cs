@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 
 namespace BSOA
 {
@@ -73,33 +72,6 @@ namespace BSOA
         IEnumerator IEnumerable.GetEnumerator()
         {
             return new ListEnumerator<ArraySlice<T>>(this);
-        }
-
-        public void Read(BinaryReader reader, ref byte[] buffer)
-        {
-            _chapters.Clear();
-
-            Count = reader.ReadInt32();
-
-            int chapterCount = reader.ReadInt32();
-            for (int i = 0; i < chapterCount; ++i)
-            {
-                ColumnChapter<T> chapter = new ColumnChapter<T>();
-                chapter.Read(reader, ref buffer);
-
-                _chapters.Add(chapter);
-            }
-        }
-
-        public void Write(BinaryWriter writer, ref byte[] buffer)
-        {
-            writer.Write(Count);
-            writer.Write(_chapters.Count);
-
-            foreach (ColumnChapter<T> chapter in _chapters)
-            {
-                chapter.Write(writer, ref buffer);
-            }
         }
 
         private const string Chapters = nameof(Chapters);

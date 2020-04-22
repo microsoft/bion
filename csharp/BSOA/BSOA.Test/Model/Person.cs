@@ -22,6 +22,9 @@
             table.Add();
         }
 
+        public Person(PersonDatabase database) : this(database.Person)
+        { }
+
         // Properties for each column get and set array entries in the columns
         public byte Age
         {

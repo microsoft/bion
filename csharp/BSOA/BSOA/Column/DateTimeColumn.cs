@@ -54,16 +54,6 @@ namespace BSOA
             return new ListEnumerator<DateTime>(this);
         }
 
-        public void Read(BinaryReader reader, ref byte[] buffer)
-        {
-            _innerColumn.Read(reader, ref buffer);
-        }
-
-        public void Write(BinaryWriter writer, ref byte[] buffer)
-        {
-            _innerColumn.Write(writer, ref buffer);
-        }
-
         public void Read(ITreeReader reader)
         {
             _innerColumn.Read(reader);

@@ -1,13 +1,12 @@
 ﻿using BSOA.Demo.Model;
-using Microsoft.CodeAnalysis.Sarif;
 
 namespace BSOA.Demo.Conversion
 {
     public class RegionConverter
     {
-        public static Region4 Convert(Region region, RegionTable toTable)
+        public static Model.Region Convert(Microsoft.CodeAnalysis.Sarif.Region region, SarifLogBsoa toDatabase)
         {
-            Region4 result = new Region4(toTable);
+            Model.Region result = new Model.Region(toDatabase);
 
             result.StartLine = region.StartLine;
             result.StartColumn = region.StartColumn;
@@ -18,10 +17,15 @@ namespace BSOA.Demo.Conversion
             result.CharOffset = region.CharOffset;
             result.CharLength = region.CharLength;
 
+            if (region.Snippet != null)
+            {
+                result.Snippet = ArtifactContentConverter.Convert(region.Snippet, toDatabase);
+            }
+
             return result;
         }
 
-        public static bool Compare(Region expected, Region4 actual)
+        public static bool Compare(Microsoft.CodeAnalysis.Sarif.Region expected, Model.Region actual)
         {
             if (expected.StartLine != actual.StartLine) { return false; }
             if (expected.StartColumn != actual.StartColumn) { return false; }

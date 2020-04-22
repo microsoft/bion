@@ -5,6 +5,12 @@ namespace BSOA.Test.Model
     /// <summary>
     ///  PersonTable is an example of a SoA table type.
     /// </summary>
+    /// <remarks>
+    ///  - Has strongly typed column properties for instant access by item struct properties.
+    ///  - Controls column construction (types and defaults).
+    ///  - Calls AddColumn on columns (so base class can manage serialization)
+    ///  - Provides indexer (controls construction of item instances).
+    /// </remarks>
     public class PersonTable : Table<Person>
     {
         // Tables need Database reference (so items with only table reference can refer to items in other tables)

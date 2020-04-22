@@ -7,11 +7,11 @@ namespace BSOA.Demo
 {
     public class SarifLogFiltered
     {
-        public List<Region> Regions { get; set; }
+        public List<Microsoft.CodeAnalysis.Sarif.Region> Regions { get; set; }
 
         public SarifLogFiltered()
         {
-            Regions = new List<Region>();
+            Regions = new List<Microsoft.CodeAnalysis.Sarif.Region>();
         }
 
         public static SarifLogFiltered FromSarif(SarifLog log)
@@ -26,9 +26,9 @@ namespace BSOA.Demo
             SarifLogBsoa log = new SarifLogBsoa();
 
             // Convert to Bsoa RegionTable
-            foreach (Region region in Regions)
+            foreach (Microsoft.CodeAnalysis.Sarif.Region region in Regions)
             {
-                RegionConverter.Convert(region, log.Regions);
+                RegionConverter.Convert(region, log);
             }
 
             return log;
@@ -36,15 +36,15 @@ namespace BSOA.Demo
 
         public bool Equals(SarifLogBsoa log)
         {
-            if (Regions.Count != log.Regions.Count)
+            if (Regions.Count != log.Region.Count)
             {
                 return false;
             }
 
             for (int i = 0; i < Regions.Count; ++i)
             {
-                Region left = Regions[i];
-                Region4 right = log.Regions[i];
+                Microsoft.CodeAnalysis.Sarif.Region left = Regions[i];
+                Model.Region right = log.Region[i];
 
                 if (!RegionConverter.Compare(left, right))
                 {

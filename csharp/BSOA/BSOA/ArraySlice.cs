@@ -1,13 +1,11 @@
-﻿using BSOA.Extensions;
-using BSOA.IO;
+﻿using BSOA.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 
 namespace BSOA
 {
-    public struct ArraySlice<T> : IReadOnlyList<T>, IBinarySerializable, ITreeSerializable where T : unmanaged
+    public struct ArraySlice<T> : IReadOnlyList<T>, ITreeSerializable where T : unmanaged
     {
         internal T[] _array;
         internal int _index;
@@ -46,18 +44,6 @@ namespace BSOA
             {
                 Array.Copy(_array, _index, other, toIndex, _length);
             }
-        }
-
-        public void Read(BinaryReader reader, ref byte[] buffer)
-        {
-            _array = reader.ReadBlockArray<T>(ref buffer);
-            _index = 0;
-            _length = _array.Length;
-        }
-
-        public void Write(BinaryWriter writer, ref byte[] buffer)
-        {
-            writer.WriteBlockArray<T>(_array, _index, _length, ref buffer);
         }
 
         public void Read(ITreeReader reader)
