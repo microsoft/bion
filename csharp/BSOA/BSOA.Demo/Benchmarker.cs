@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace BSOA.Demo
 {
@@ -32,10 +33,10 @@ namespace BSOA.Demo
             BsoaBinPath = Path.Combine(WorkingFolderPath, Path.ChangeExtension(fileName, ".bsoa.bin"));
         }
 
-        public void Run()
+        public void Run(bool forceReconvert)
         {
             // Convert SarifLog to JSON, SoA JSON, and SoA Binary forms
-            Convert();
+            Convert(forceReconvert);
 
             SarifLogFiltered filtered = null;
             SarifLogBsoa bsoa = null;
@@ -48,11 +49,18 @@ namespace BSOA.Demo
 
             bsoa = Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary");
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
+
+            // Change something and verify difference detected
+            var snippet = bsoa.Region[bsoa.Region.Count / 2].Snippet;
+            snippet.Text = "Changed!";
+            Console.WriteLine();
+            Console.WriteLine($"Verify difference detected:");
+            Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
         }
 
-        private void Convert()
+        private void Convert(bool force)
         {
-            if (File.Exists(BsoaBinPath) && File.Exists(BsoaJsonPath) && File.Exists(NormalJsonPath)) { return; }
+            if (force == false && File.Exists(BsoaBinPath) && File.Exists(BsoaJsonPath) && File.Exists(NormalJsonPath)) { return; }
 
             // Load Sarif Log with current OM
             SarifLog log = null;
@@ -114,7 +122,7 @@ namespace BSOA.Demo
             T result = default(T);
             double ramBeforeMB = GC.GetTotalMemory(true) / Megabyte;
             Stopwatch w = Stopwatch.StartNew();
-            
+
             Console.WriteLine();
             Console.WriteLine(description);
 

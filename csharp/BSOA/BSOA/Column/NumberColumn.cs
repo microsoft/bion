@@ -121,7 +121,7 @@ namespace BSOA
         {
             writer.WriteStartObject();
             writer.Write(nameof(Count), Count);
-            writer.WriteBlockArray(Array, _array, 0, Math.Min(Count, _array.Length));
+            writer.WriteBlockArray(Array, _array, 0, Math.Min(Count, _array?.Length ?? 0));
             writer.WriteEndObject();
         }
     }

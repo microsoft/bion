@@ -6,12 +6,13 @@
         {
             string inputFilePath = (args.Length > 0 ? args[0] : @"C:\Download\Demo\V2\Inputs\CodeAsData.sarif");
             string workingFolderPath = @"C:\Download\Demo\V2";
+            bool forceReconvert = (args.Length > 1 ? bool.Parse(args[1]) : true);
 
             // Tiny demo file
-            inputFilePath = @"C:\Download\Demo\V2\Inputs\elfie-arriba.sarif";
+            //inputFilePath = @"C:\Download\Demo\V2\Inputs\elfie-arriba.sarif";
 
             Benchmarker benchmarker = new Benchmarker(inputFilePath, workingFolderPath);
-            benchmarker.Run();
+            benchmarker.Run(forceReconvert);
         }
     }
 }

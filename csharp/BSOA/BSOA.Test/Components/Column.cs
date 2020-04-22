@@ -18,6 +18,10 @@ namespace BSOA.Test
             Assert.Equal(defaultValue, column[10]);
             Assert.Equal(0, column.Count);
 
+            // Empty roundtrip works
+            ReadOnlyList.VerifySame(expected, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary));
+            ReadOnlyList.VerifySame(expected, TreeSerializer.RoundTrip(column, builder, TreeFormat.Json));
+
             // Append values
             for (int i = 0; i < 50; ++i)
             {

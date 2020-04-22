@@ -36,6 +36,8 @@ namespace BSOA.Demo.Conversion
             if (expected.CharOffset != actual.CharOffset) { return false; }
             if (expected.CharLength != actual.CharLength) { return false; }
 
+            if (!ArtifactContentConverter.Compare(expected.Snippet, actual.Snippet)) { return false; }
+
             return true;
         }
     }

@@ -24,6 +24,8 @@ namespace BSOA.Demo.Model
         public ArtifactContent(SarifLogBsoa database) : this(database.ArtifactContent)
         { }
 
+        public bool IsNull => (Table == null || Index < 0);
+
         public string Text
         {
             get => Table.Text[Index];
