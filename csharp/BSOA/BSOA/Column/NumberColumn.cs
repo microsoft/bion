@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 
 using BSOA.Extensions;
 using BSOA.IO;
 
-namespace BSOA
+namespace BSOA.Column
 {
     /// <summary>
     ///  NumberColumn implements IColumn for built-in numeric types - byte, sbyte,
@@ -75,6 +74,11 @@ namespace BSOA
         {
             Count = 0;
             _array = null;
+        }
+
+        public void Trim()
+        {
+            // Nothing to do
         }
 
         private void ResizeTo(int size)

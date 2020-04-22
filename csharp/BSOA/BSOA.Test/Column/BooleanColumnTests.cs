@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using BSOA.Column;
+using Xunit;
 
 namespace BSOA.Test
 {

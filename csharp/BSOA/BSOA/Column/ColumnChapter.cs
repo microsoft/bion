@@ -2,7 +2,7 @@
 using BSOA.IO;
 using System.Collections.Generic;
 
-namespace BSOA
+namespace BSOA.Column
 {
     /// <summary>
     ///  Contains one 'Chapter' (1,024 rows) of values for a VariableLengthColumn.

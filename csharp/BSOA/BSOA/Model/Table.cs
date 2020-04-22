@@ -1,4 +1,5 @@
-﻿using BSOA.IO;
+﻿using BSOA.Column;
+using BSOA.IO;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -58,6 +59,17 @@ namespace BSOA.Model
             foreach (IColumn column in Columns.Values)
             {
                 column.Clear();
+            }
+        }
+
+        /// <summary>
+        ///  Remove excess capacity and prepare for serialization
+        /// </summary>
+        public void Trim()
+        {
+            foreach (IColumn column in Columns.Values)
+            {
+                column.Trim();
             }
         }
 

@@ -22,6 +22,9 @@ namespace BSOA.Model
             return table;
         }
 
+        /// <summary>
+        ///  Remove all items from table.
+        /// </summary>
         public void Clear()
         {
             foreach (ITable table in Tables.Values)
@@ -29,7 +32,18 @@ namespace BSOA.Model
                 table.Clear();
             }
         }
-        
+
+        /// <summary>
+        ///  Remove excess capacity and prepare for serialization
+        /// </summary>
+        public void Trim()
+        {
+            foreach (ITable table in Tables.Values)
+            {
+                table.Trim();
+            }
+        }
+
         public void Read(ITreeReader reader)
         {
             Clear();

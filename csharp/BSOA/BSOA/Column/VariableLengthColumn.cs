@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BSOA
+namespace BSOA.Column
 {
     /// <summary>
     ///  VariableLengthColumn is a column for all types of varying lengths (strings, references, binary).

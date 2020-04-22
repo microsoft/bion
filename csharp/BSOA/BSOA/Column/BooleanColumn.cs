@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BSOA
+namespace BSOA.Column
 {
     /// <summary>
     ///  BooleanColumn implements IColumn for bool on top of a NumberColumn&lt;uint&gt;
@@ -57,6 +57,11 @@ namespace BSOA
         {
             Count = 0;
             _innerColumn.Clear();
+        }
+
+        public void Trim()
+        {
+            // Nothing to do
         }
 
         public IEnumerator<bool> GetEnumerator()

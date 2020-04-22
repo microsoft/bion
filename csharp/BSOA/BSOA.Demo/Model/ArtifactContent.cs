@@ -1,4 +1,5 @@
-﻿using BSOA.Model;
+﻿using BSOA.Column;
+using BSOA.Model;
 
 namespace BSOA.Demo.Model
 {

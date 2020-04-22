@@ -1,4 +1,5 @@
-﻿using BSOA.Test.Components;
+﻿using BSOA.Column;
+using BSOA.Test.Components;
 using System.Collections.Generic;
 using Xunit;
 

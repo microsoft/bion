@@ -2,9 +2,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 
-namespace BSOA
+namespace BSOA.Column
 {
     /// <summary>
     ///  DateTimeColumn implements IColumn for DateTime on top of a NumberColumn&lt;long&gt;
@@ -42,6 +41,11 @@ namespace BSOA
         public void Clear()
         {
             _innerColumn.Clear();
+        }
+
+        public void Trim()
+        {
+            _innerColumn.Trim();
         }
 
         public IEnumerator<DateTime> GetEnumerator()

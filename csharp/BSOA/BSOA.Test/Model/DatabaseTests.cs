@@ -18,6 +18,10 @@ namespace BSOA.Test.Model
             PersonDatabase roundTripped = TreeSerializer.RoundTrip(database, TreeFormat.Binary);
             ReadOnlyList.VerifySame(database.Person, roundTripped.Person);
 
+            // Verify Trim doesn't throw (results not visible)
+            database.Trim();
+            ReadOnlyList.VerifySame(database.Person, roundTripped.Person);
+
             // Verify Database.Clear works
             database.Clear();
             Assert.Empty(database.Person);

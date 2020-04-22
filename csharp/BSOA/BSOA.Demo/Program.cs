@@ -6,7 +6,7 @@
         {
             string inputFilePath = (args.Length > 0 ? args[0] : @"C:\Download\Demo\V2\Inputs\CodeAsData.sarif");
             string workingFolderPath = @"C:\Download\Demo\V2";
-            bool forceReconvert = (args.Length > 1 ? bool.Parse(args[1]) : true);
+            bool forceReconvert = (args.Length > 1 ? bool.Parse(args[1]) : false);
 
             // Tiny demo file
             //inputFilePath = @"C:\Download\Demo\V2\Inputs\elfie-arriba.sarif";

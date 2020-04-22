@@ -1,20 +1,24 @@
 ﻿using BSOA.IO;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace BSOA.Column
 {
-    public class StringColumn : IColumn<string>
+    /// <summary>
+    ///  Discouraged: Use StringColumn instead.
+    ///  String16Column stores strings as UTF-16 chars, like .NET.
+    ///  It uses twice the memory, and is kept to compare conversion speed with the normal UTF-8-based form.
+    /// </summary>
+    public class String16Column : IColumn<string>
     {
         private BooleanColumn _isNull;
-        private VariableLengthColumn<byte> _inner;
+        private VariableLengthColumn<char> _inner;
 
-        public StringColumn()
+        public String16Column()
         {
             // Default is Null
             _isNull = new BooleanColumn(true);
-            _inner = new VariableLengthColumn<byte>();
+            _inner = new VariableLengthColumn<char>();
         }
 
         public int Count => _inner.Count;
@@ -25,8 +29,8 @@ namespace BSOA.Column
             {
                 if (_isNull[index]) { return null; }
 
-                ArraySlice<byte> value = _inner[index];
-                return (value.Count == 0 ? string.Empty : Encoding.UTF8.GetString(value._array, value._index, value.Count));
+                ArraySlice<char> value = _inner[index];
+                return (value.Count == 0 ? string.Empty : new string(value._array, value._index, value.Count));
             }
 
             set
@@ -34,12 +38,12 @@ namespace BSOA.Column
                 if (value == null)
                 {
                     _isNull[index] = true;
-                    _inner[index] = ArraySlice<byte>.Empty;
+                    _inner[index] = ArraySlice<char>.Empty;
                 }
                 else
                 {
                     _isNull[index] = false;
-                    _inner[index] = (value.Length == 0 ? ArraySlice<byte>.Empty : new ArraySlice<byte>(Encoding.UTF8.GetBytes(value)));
+                    _inner[index] = new ArraySlice<char>(value.ToCharArray());
                 }
             }
         }
@@ -68,7 +72,7 @@ namespace BSOA.Column
         private const string Inner = nameof(Inner);
         private const string IsNull = nameof(IsNull);
 
-        private static Dictionary<string, Setter<StringColumn>> setters = new Dictionary<string, Setter<StringColumn>>()
+        private static Dictionary<string, Setter<String16Column>> setters = new Dictionary<string, Setter<String16Column>>()
         {
             [IsNull] = (r, me) => me._isNull.Read(r),
             [Inner] = (r, me) => me._inner.Read(r)

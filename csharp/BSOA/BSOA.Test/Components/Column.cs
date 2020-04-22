@@ -1,4 +1,5 @@
-﻿using BSOA.Test.Components;
+﻿using BSOA.Column;
+using BSOA.Test.Components;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -21,6 +22,9 @@ namespace BSOA.Test
             // Empty roundtrip works
             ReadOnlyList.VerifySame(expected, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary));
             ReadOnlyList.VerifySame(expected, TreeSerializer.RoundTrip(column, builder, TreeFormat.Json));
+
+            // Empty trim works
+            column.Trim();
 
             // Append values
             for (int i = 0; i < 50; ++i)
@@ -73,6 +77,9 @@ namespace BSOA.Test
                 T value = (i < 50 || i == 1024 ? valueProvider(i) : defaultValue);
                 Assert.Equal(value, column[i]);
             }
+
+            // Verify Trim doesn't throw
+            column.Trim();
 
             // Verify clear resets count and that previously set values are back to default if accessed
             column.Clear();

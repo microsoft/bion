@@ -1,12 +1,15 @@
 ﻿using BSOA.IO;
 using System.Collections.Generic;
 
-namespace BSOA
+namespace BSOA.Column
 {
     public interface IColumn : ITreeSerializable
     {
         // Remove all items from column
         void Clear();
+
+        // Remove excess capacity and prepare to serialize
+        void Trim();
     }
 
     public interface IColumn<T> : IReadOnlyList<T>, IColumn
