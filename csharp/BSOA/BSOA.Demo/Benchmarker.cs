@@ -191,7 +191,7 @@ namespace BSOA.Demo
                 if (diagnostics)
                 {
                     TreeDiagnostics tree = ((TreeDiagnosticsReader)reader).Tree;
-                    tree.Write(Console.Out, 3);
+                    tree.Write(Console.Out, -1);
                 }
             }
 
