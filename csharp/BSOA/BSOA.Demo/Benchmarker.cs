@@ -56,6 +56,9 @@ namespace BSOA.Demo
             Console.WriteLine();
             Console.WriteLine($"Verify difference detected:");
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
+
+            // Load with diagnostics (see column sizes)
+            LoadBsoaBinary(BsoaBinPath, diagnostics: true);
         }
 
         private void Convert(bool force)
@@ -88,17 +91,22 @@ namespace BSOA.Demo
                 }
             });
 
-            Time($"Writing as BSOA JSON to '{BsoaJsonPath}'...", () =>
+            Time($"Trimming (BSOA pre-serialization cost, not specific to JSON or Binary)...", () =>
             {
-                using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Verbose = false }))
-                {
-                    bsoaLog.Write(writer);
-                }
+                bsoaLog.Trim();
             });
 
             Time($"Writing as BSOA Binary to '{BsoaBinPath}'...", () =>
             {
                 using (BinaryTreeWriter writer = new BinaryTreeWriter(File.Create(BsoaBinPath)))
+                {
+                    bsoaLog.Write(writer);
+                }
+            });
+
+            Time($"Writing as BSOA JSON to '{BsoaJsonPath}'...", () =>
+            {
+                using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Verbose = false }))
                 {
                     bsoaLog.Write(writer);
                 }
@@ -155,9 +163,15 @@ namespace BSOA.Demo
 
         private SarifLogBsoa LoadBsoaBinary(string bsoaBinaryPath)
         {
+            return LoadBsoaBinary(bsoaBinaryPath, false);
+        }
+
+        private SarifLogBsoa LoadBsoaBinary(string bsoaBinaryPath, bool diagnostics)
+        {
             SarifLogBsoa log = new SarifLogBsoa();
 
-            using (BinaryTreeReader reader = new BinaryTreeReader(File.OpenRead(bsoaBinaryPath)))
+            TreeSerializationSettings settings = new TreeSerializationSettings() { Diagnostics = (diagnostics ? Console.Out : null) };
+            using (BinaryTreeReader reader = new BinaryTreeReader(File.OpenRead(bsoaBinaryPath), settings))
             {
                 log.Read(reader);
             }

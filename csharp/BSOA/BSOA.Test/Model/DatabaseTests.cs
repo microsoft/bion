@@ -18,6 +18,9 @@ namespace BSOA.Test.Model
             PersonDatabase roundTripped = TreeSerializer.RoundTrip(database, TreeFormat.Binary);
             ReadOnlyList.VerifySame(database.Person, roundTripped.Person);
 
+            // Try loading database with size diagnostics
+            TreeSerializer.RoundTrip(database, TreeFormat.Binary, new BSOA.IO.TreeSerializationSettings() { Diagnostics = Console.Out });
+
             // Verify Trim doesn't throw (results not visible)
             database.Trim();
             ReadOnlyList.VerifySame(database.Person, roundTripped.Person);

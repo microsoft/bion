@@ -180,7 +180,7 @@ namespace BSOA.IO
         /// <param name="reader">ITreeReader to read from</param>
         /// <param name="dictionary">Dictionary containing items to read</param>
         /// <param name="throwOnUnknown">True to throw for property name not in Dictionary, false to quietly skip over it</param>
-        public static void ReadDictionaryItems<T>(this ITreeReader reader, Dictionary<string, T> dictionary, bool throwOnUnknown = true) where T : ITreeSerializable
+        public static void ReadDictionaryItems<T>(this ITreeReader reader, Dictionary<string, T> dictionary, bool throwOnUnknown = true, int diagnosticsDepth = -1) where T : ITreeSerializable
         {
             if (reader.TokenType == TreeToken.Null) { return; }
 
@@ -194,8 +194,14 @@ namespace BSOA.IO
 
                 if (dictionary.TryGetValue(itemName, out T item))
                 {
+                    if (diagnosticsDepth >= 0) { reader.Settings.Diagnostics?.WriteLine($"{new string('\t', diagnosticsDepth)}{itemName}"); }
+                    long positionBefore = reader.Position;
+
                     item.Read(reader);
                     reader.Read();
+
+                    long length = reader.Position - positionBefore;
+                    if (diagnosticsDepth >= 0) { reader.Settings.Diagnostics?.WriteLine($"{new string('\t', diagnosticsDepth)}=> {length:n0} bytes"); }
                 }
                 else
                 {
