@@ -49,7 +49,7 @@ namespace BSOA.Model
             Clear();
 
             // Read Tables, skipping unknown tables if Settings.Strict == false
-            reader.ReadDictionaryItems(Tables, throwOnUnknown: reader.Settings.Strict, diagnosticsDepth: 1);
+            reader.ReadDictionaryItems(Tables, throwOnUnknown: reader.Settings.Strict);
         }
 
         public void Write(ITreeWriter writer)

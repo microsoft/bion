@@ -56,9 +56,9 @@ namespace BSOA.Demo
             Console.WriteLine($"Verify difference detected:");
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
 
-            //// Load with diagnostics (see column sizes)
-            //Console.WriteLine();
-            //LoadBsoaBinary(BsoaBinPath, diagnostics: true);
+            // Load with diagnostics (see column sizes)
+            Console.WriteLine();
+            LoadBsoaBinary(BsoaBinPath, diagnostics: true);
         }
 
         private void Convert(bool force)
@@ -142,7 +142,7 @@ namespace BSOA.Demo
                 w.Stop();
 
                 Console.Write($"{(iteration > 0 ? " | " : "")}{w.Elapsed.TotalSeconds:n2}s");
-                if(iteration > 0) { elapsedAfterFirst += w.Elapsed; }
+                if (iteration > 0) { elapsedAfterFirst += w.Elapsed; }
             }
 
             double ramAfterMB = GC.GetTotalMemory(true) / Megabyte;
@@ -163,6 +163,18 @@ namespace BSOA.Demo
             }
         }
 
+        private SarifLogBsoa LoadBsoaJson(string bsoaJsonPath)
+        {
+            SarifLogBsoa log = new SarifLogBsoa();
+
+            using (ITreeReader reader = new JsonTreeReader(File.OpenRead(bsoaJsonPath)))
+            {
+                log.Read(reader);
+            }
+
+            return log;
+        }
+
         private SarifLogBsoa LoadBsoaBinary(string bsoaBinaryPath)
         {
             return LoadBsoaBinary(bsoaBinaryPath, false);
@@ -172,25 +184,25 @@ namespace BSOA.Demo
         {
             SarifLogBsoa log = new SarifLogBsoa();
 
-            TreeSerializationSettings settings = new TreeSerializationSettings() { Diagnostics = (diagnostics ? Console.Out : null) };
-            using (BinaryTreeReader reader = new BinaryTreeReader(File.OpenRead(bsoaBinaryPath), settings))
+            using (ITreeReader reader = Build(bsoaBinaryPath, diagnostics))
             {
                 log.Read(reader);
+
+                if (diagnostics)
+                {
+                    TreeDiagnostics tree = ((TreeDiagnosticsReader)reader).Tree;
+                    tree.Write(Console.Out, 3);
+                }
             }
 
             return log;
         }
 
-        private SarifLogBsoa LoadBsoaJson(string bsoaJsonPath)
+        private ITreeReader Build(string bsoaBinaryPath, bool diagnostics)
         {
-            SarifLogBsoa log = new SarifLogBsoa();
-
-            using (JsonTreeReader reader = new JsonTreeReader(File.OpenRead(bsoaJsonPath)))
-            {
-                log.Read(reader);
-            }
-
-            return log;
+            ITreeReader reader = new BinaryTreeReader(File.OpenRead(bsoaBinaryPath));
+            if (diagnostics) { reader = new TreeDiagnosticsReader(reader); }
+            return reader;
         }
     }
 }

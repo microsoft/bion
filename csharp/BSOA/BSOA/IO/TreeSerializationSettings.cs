@@ -8,7 +8,6 @@ namespace BSOA.IO
         public bool LeaveStreamOpen { get; set; }
         public bool Verbose { get; set; }
         public bool Strict { get; set; }
-        public TextWriter Diagnostics { get; set; }
 
         public static TreeSerializationSettings DefaultSettings = new TreeSerializationSettings();
 

@@ -104,7 +104,7 @@ namespace BSOA.Model
         private static Dictionary<string, Setter<Table<T>>> setters = new Dictionary<string, Setter<Table<T>>>()
         {
             [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
-            [nameof(Columns)] = (r, me) => r.ReadDictionaryItems(me.Columns, throwOnUnknown: r.Settings.Strict, diagnosticsDepth: 2),
+            [nameof(Columns)] = (r, me) => r.ReadDictionaryItems(me.Columns, throwOnUnknown: r.Settings.Strict),
         };
 
         public void Read(ITreeReader reader)

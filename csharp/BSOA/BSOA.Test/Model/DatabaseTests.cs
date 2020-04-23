@@ -1,4 +1,5 @@
-﻿using BSOA.Test.Components;
+﻿using BSOA.IO;
+using BSOA.Test.Components;
 using System;
 using System.IO;
 using Xunit;
@@ -19,7 +20,14 @@ namespace BSOA.Test.Model
             ReadOnlyList.VerifySame(database.Person, roundTripped.Person);
 
             // Try loading database with size diagnostics
-            TreeSerializer.RoundTrip(database, TreeFormat.Binary, new BSOA.IO.TreeSerializationSettings() { Diagnostics = Console.Out });
+            TreeDiagnostics diagnostics = TreeSerializer.Diagnostics(database, TreeFormat.Binary);
+
+            // Verify one table, two columns, Write doesn't throw
+            Assert.Single(diagnostics.Children);
+            Assert.Equal(nameof(database.Person), diagnostics.Children[0].Name);
+            Assert.Equal("Columns", diagnostics.Children[0].Children[0].Name);
+            Assert.Equal(2, diagnostics.Children[0].Children[0].Children.Count);
+            diagnostics.Write(Console.Out, 3);
 
             // Verify Trim doesn't throw (results not visible)
             database.Trim();
