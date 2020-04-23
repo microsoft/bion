@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
 
 namespace BSOA.Demo
 {
@@ -44,8 +43,8 @@ namespace BSOA.Demo
             // Compare loading times
             filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft");
 
-            bsoa = Measure(LoadBsoaJson, BsoaJsonPath, "BSOA JSON, Newtonsoft");
-            Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
+            //bsoa = Measure(LoadBsoaJson, BsoaJsonPath, "BSOA JSON, Newtonsoft");
+            //Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
 
             bsoa = Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary");
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
@@ -57,8 +56,9 @@ namespace BSOA.Demo
             Console.WriteLine($"Verify difference detected:");
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
 
-            // Load with diagnostics (see column sizes)
-            LoadBsoaBinary(BsoaBinPath, diagnostics: true);
+            //// Load with diagnostics (see column sizes)
+            //Console.WriteLine();
+            //LoadBsoaBinary(BsoaBinPath, diagnostics: true);
         }
 
         private void Convert(bool force)
@@ -125,11 +125,12 @@ namespace BSOA.Demo
             Console.WriteLine();
         }
 
-        static T Measure<T>(Func<string, T> loader, string path, string description, int iterations = 4)
+        static T Measure<T>(Func<string, T> loader, string path, string description, int iterations = 5)
         {
             T result = default(T);
             double ramBeforeMB = GC.GetTotalMemory(true) / Megabyte;
             Stopwatch w = Stopwatch.StartNew();
+            TimeSpan elapsedAfterFirst = TimeSpan.Zero;
 
             Console.WriteLine();
             Console.WriteLine(description);
@@ -141,11 +142,12 @@ namespace BSOA.Demo
                 w.Stop();
 
                 Console.Write($"{(iteration > 0 ? " | " : "")}{w.Elapsed.TotalSeconds:n2}s");
+                if(iteration > 0) { elapsedAfterFirst += w.Elapsed; }
             }
 
             double ramAfterMB = GC.GetTotalMemory(true) / Megabyte;
             double fileSizeMB = new FileInfo(path).Length / Megabyte;
-            double loadMegabytesPerSecond = fileSizeMB / w.Elapsed.TotalSeconds;
+            double loadMegabytesPerSecond = fileSizeMB / (elapsedAfterFirst.TotalSeconds / (iterations - 1));
 
             Console.WriteLine();
             Console.WriteLine($" -> Read {fileSizeMB:n1} MB at {loadMegabytesPerSecond:n1} MB/s into {(ramAfterMB - ramBeforeMB):n1} MB RAM");
