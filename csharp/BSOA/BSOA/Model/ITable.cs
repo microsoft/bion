@@ -5,6 +5,7 @@ namespace BSOA.Model
 {
     public interface ITable : ITreeSerializable
     {
+        bool Empty { get; }
         void Clear();
         void Trim();
     }

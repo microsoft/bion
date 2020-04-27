@@ -5,6 +5,9 @@ namespace BSOA.Column
 {
     public interface IColumn : ITreeSerializable
     {
+        // Return if unused (Count == 0)
+        bool Empty { get; }
+
         // Remove all items from column
         void Clear();
 

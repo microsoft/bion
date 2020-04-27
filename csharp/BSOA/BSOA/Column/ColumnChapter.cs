@@ -1,7 +1,6 @@
 ﻿using BSOA.Extensions;
 using BSOA.IO;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BSOA.Column
 {

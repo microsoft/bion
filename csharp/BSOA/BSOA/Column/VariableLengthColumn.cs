@@ -15,6 +15,7 @@ namespace BSOA.Column
         private List<ColumnChapter<T>> _chapters;
 
         public int Count { get; private set; }
+        public bool Empty => Count == 0;
 
         public VariableLengthColumn()
         {

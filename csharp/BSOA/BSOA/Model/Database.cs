@@ -54,7 +54,19 @@ namespace BSOA.Model
 
         public void Write(ITreeWriter writer)
         {
-            writer.WriteDictionary(Tables);
+            // Write non-empty tables only
+            writer.WriteStartObject();
+
+            foreach (var pair in Tables)
+            {
+                if (!pair.Value.Empty)
+                {
+                    writer.WritePropertyName(pair.Key);
+                    pair.Value.Write(writer);
+                }
+            }
+
+            writer.WriteEndObject();
         }
     }
 }

@@ -18,6 +18,7 @@ namespace BSOA.Column
         }
 
         public int Count => _inner.Count;
+        public bool Empty => Count == 0;
 
         public string this[int index]
         {

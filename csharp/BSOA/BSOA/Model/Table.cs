@@ -31,6 +31,7 @@ namespace BSOA.Model
         ///  Column counts may differ, because they are only increased when each property is set to a non-default value.
         /// </summary>
         public int Count { get; protected set; }
+        public bool Empty => Count == 0;
 
         /// <summary>
         ///  Get the item at a given index in this table.
@@ -121,9 +122,21 @@ namespace BSOA.Model
 
             writer.Write(nameof(Count), Count);
 
+            // Write non-empty columns only
             writer.WritePropertyName(nameof(Columns));
-            writer.WriteDictionary(Columns);
-            
+            writer.WriteStartObject();
+
+            foreach (var pair in Columns)
+            {
+                if (!pair.Value.Empty)
+                {
+                    writer.WritePropertyName(pair.Key);
+                    pair.Value.Write(writer);
+                }
+            }
+
+            writer.WriteEndObject();
+
             writer.WriteEndObject();
         }
     }

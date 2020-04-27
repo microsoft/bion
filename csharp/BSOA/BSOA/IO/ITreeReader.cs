@@ -230,6 +230,8 @@ namespace BSOA.IO
         /// <param name="throwOnUnknown">Throw if property name not in setters found</param>
         public static void ReadObject<T>(this ITreeReader reader, T instance, Dictionary<string, Setter<T>> setters, bool throwOnUnknown = true)
         {
+            if (reader.TokenType == TreeToken.Null) { return; }
+
             reader.Expect(TreeToken.StartObject);
             reader.Read();
 

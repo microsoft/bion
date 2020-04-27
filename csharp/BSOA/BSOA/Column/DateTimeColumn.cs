@@ -26,6 +26,7 @@ namespace BSOA.Column
         ///  This is (index + 1) for the highest non-default value set.
         /// </summary>
         public int Count => _innerColumn.Count;
+        public bool Empty => Count == 0;
 
         /// <summary>
         ///  Get or Set the value at a given index
