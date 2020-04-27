@@ -9,6 +9,9 @@ namespace BSOA.Test.Components
     {
         private static Dictionary<string, Setter<Empty>> setters = new Dictionary<string, Setter<Empty>>();
 
+        public void Clear()
+        { }
+
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters, throwOnUnknown: false);
@@ -52,6 +55,18 @@ namespace BSOA.Test.Components
             Count = r.Next();
             When = DateTime.UtcNow;
             Guid = Guid.NewGuid();
+        }
+
+        public void Clear()
+        {
+            IsActive = false;
+            Name = null;
+            Position = 0;
+            Age = 0;
+            Type = 0;
+            Count = 0;
+            When = default(DateTime);
+            Guid = default(Guid);
         }
 
         public void Write(ITreeWriter writer)
@@ -147,6 +162,11 @@ namespace BSOA.Test.Components
             Assert.Equal(Array ?? new T[0], other.Array);
         }
 
+        public void Clear()
+        {
+            Array = null;
+        }
+
         public void Read(ITreeReader reader)
         {
             // Verify classes can serialize a single item directly
@@ -178,6 +198,11 @@ namespace BSOA.Test.Components
         public void AssertEqual(SingleContainer<T> other)
         {
             Assert.Equal(this.Item, other.Item);
+        }
+
+        public void Clear()
+        {
+            Item = default(T);
         }
 
         public void Write(ITreeWriter writer)
@@ -253,7 +278,6 @@ namespace BSOA.Test.Components
 
         public void Read(ITreeReader reader)
         {
-            Clear();
             reader.ReadObject(this, setters);
         }
 

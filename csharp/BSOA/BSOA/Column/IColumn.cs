@@ -8,9 +8,6 @@ namespace BSOA.Column
         // Return if unused (Count == 0)
         bool Empty { get; }
 
-        // Remove all items from column
-        void Clear();
-
         // Remove excess capacity and prepare to serialize
         void Trim();
     }

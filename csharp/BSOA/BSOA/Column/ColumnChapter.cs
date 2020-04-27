@@ -82,6 +82,19 @@ namespace BSOA.Column
             }
         }
 
+
+        public void Clear()
+        {
+            _pageStartInChapter = null;
+            _valueEndInPage = null;
+
+            _smallValueArray = null;
+            _largeValueDictionary = null;
+
+            _lastNonEmptyIndex = -1;
+            Count = 0;
+        }
+
         public void Trim()
         {
             if (_requiresTrim == false) { return; }

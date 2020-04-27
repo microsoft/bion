@@ -46,6 +46,13 @@ namespace BSOA
             }
         }
 
+        public void Clear()
+        {
+            _array = null;
+            _index = 0;
+            _length = 0;
+        }
+
         public void Read(ITreeReader reader)
         {
             _array = reader.ReadBlockArray<T>();

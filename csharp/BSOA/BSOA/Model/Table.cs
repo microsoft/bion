@@ -110,8 +110,6 @@ namespace BSOA.Model
 
         public void Read(ITreeReader reader)
         {
-            Clear();
-
             // Read Columns, skipping unknown columns if Settings.Strict == false
             reader.ReadObject(this, setters);
         }

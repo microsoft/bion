@@ -42,6 +42,15 @@ namespace BSOA.Test.Components
             writer.WriteEndObject();
         }
 
+        public void Clear()
+        {
+            IsActive = false;
+            Age = 0;
+            Count = 0;
+            Position = 0;
+            Data = null;
+        }
+
         public void Read(ITreeReader reader)
         {
             reader.ReadObject<Sample>(this, setters);
