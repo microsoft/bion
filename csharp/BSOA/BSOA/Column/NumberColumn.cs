@@ -52,17 +52,15 @@ namespace BSOA.Column
 
             set
             {
-                if (index >= Count)
-                {
-                    Count = index + 1;
-
-                    // Don't resize for default values; the defaulting will respond correctly for them
-                    if (_defaultValue.Equals(value)) { return; }
-                }
+                // Track logical count
+                if (index >= Count) { Count = index + 1; }
 
                 // Resize if required
                 if (_array == null || _array.Length <= index)
                 {
+                    // Don't resize for default values; the defaulting will respond correctly for them
+                    if (_defaultValue.Equals(value)) { return; }
+
                     ResizeTo(index + 1);
                 }
 

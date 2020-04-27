@@ -47,6 +47,8 @@ namespace BSOA.Column
 
                 if (index >= Count) { Count = index + 1; }
 
+                if (value.Count == 0 && chapterIndex >= _chapters.Count) { return; }
+
                 while (chapterIndex >= _chapters.Count)
                 {
                     _chapters.Add(new ColumnChapter<T>());
@@ -80,7 +82,7 @@ namespace BSOA.Column
             [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
             [nameof(Chapters)] = (r, me) => me._chapters = r.ReadList<ColumnChapter<T>>(() => new ColumnChapter<T>())
         };
-        
+
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters);

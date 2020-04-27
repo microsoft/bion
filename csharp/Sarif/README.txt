@@ -1,0 +1,1 @@
+Private SARIF SDK build with DeferredList setter fix to allow Deferred OM use with SarifRewritingVisitor.

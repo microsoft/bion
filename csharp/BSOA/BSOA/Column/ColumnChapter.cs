@@ -1,6 +1,7 @@
 ﻿using BSOA.Extensions;
 using BSOA.IO;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BSOA.Column
 {
@@ -14,14 +15,14 @@ namespace BSOA.Column
     ///  
     ///  With a 2 KB short value limit,
     ///   a 32 row page is under 64 KB, and page-relative row positions can be a ushort.
-    ///   a 1,024 row chapter is under 2,048 KB, and chapter-relative positions fit in an int.
+    ///   a 32,768 row chapter is under 64 MB, and chapter-relative positions fit in an int.
     ///   
     ///  The overall column uses longs for large values and chapter positions, allowing the column to be over 4 GB.
     /// </remarks>
     /// <typeparam name="T">Type of each part of Values (if each value is a string, this type is char)</typeparam>
     internal class ColumnChapter<T> : ITreeSerializable where T : unmanaged
     {
-        public const int ChapterRowCount = 1024;
+        public const int ChapterRowCount = 32768;
         public const int PageRowCount = 32;
         public const int MaximumSmallValueLength = 2047;
 
@@ -32,6 +33,7 @@ namespace BSOA.Column
         private Dictionary<int, ArraySlice<T>> _largeValueDictionary;
 
         private bool _requiresTrim;
+        private int _lastNonEmptyIndex;
 
         public int Count { get; set; }
 
@@ -106,6 +108,7 @@ namespace BSOA.Column
             ushort[] newValueEndInPage = new ushort[Count];
 
             // Copy every small-enough value to the new array and remove from LargeValueDictionary
+            int lastNonEmptyIndex = -1;
             int currentPageStart = 0;
             int nextIndex = 0;
             for (int i = 0; i < Count; ++i)
@@ -126,6 +129,8 @@ namespace BSOA.Column
                     value.CopyTo(newSmallValueArray, nextIndex);
                     nextIndex += value.Count;
                     _largeValueDictionary.Remove(i);
+
+                    if (value.Count > 0) { lastNonEmptyIndex = i; }
                 }
 
                 // Set new valueEnd
@@ -138,6 +143,7 @@ namespace BSOA.Column
             _valueEndInPage = newValueEndInPage;
 
             _requiresTrim = false;
+            _lastNonEmptyIndex = lastNonEmptyIndex;
         }
 
         private const string PageStart = nameof(PageStart);
@@ -147,6 +153,7 @@ namespace BSOA.Column
 
         private static Dictionary<string, Setter<ColumnChapter<T>>> setters = new Dictionary<string, Setter<ColumnChapter<T>>>()
         {
+            [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
             [PageStart] = (r, me) => me._pageStartInChapter = r.ReadBlockArray<int>(),
             [ValueEnd] = (r, me) => me._valueEndInPage = r.ReadBlockArray<ushort>(),
             [SmallValues] = (r, me) => me._smallValueArray = r.ReadBlockArray<T>(),
@@ -156,7 +163,7 @@ namespace BSOA.Column
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters);
-            Count = _valueEndInPage.Length;
+            _lastNonEmptyIndex = (_valueEndInPage?.Length ?? 0) - 1;
         }
 
         public void Write(ITreeWriter writer)
@@ -166,8 +173,9 @@ namespace BSOA.Column
 
             writer.WriteStartObject();
 
-            writer.WriteBlockArray(PageStart, _pageStartInChapter);
-            writer.WriteBlockArray(ValueEnd, _valueEndInPage, 0, Count);
+            writer.Write(nameof(Count), Count);
+            writer.WriteBlockArray(PageStart, _pageStartInChapter, 0, ((_lastNonEmptyIndex + 1) / PageRowCount) + 1);
+            writer.WriteBlockArray(ValueEnd, _valueEndInPage, 0, _lastNonEmptyIndex + 1);
             writer.WriteBlockArray(SmallValues, _smallValueArray);
 
             writer.WritePropertyName(LargeValues);

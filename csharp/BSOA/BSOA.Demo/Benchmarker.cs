@@ -46,7 +46,7 @@ namespace BSOA.Demo
             //bsoa = Measure(LoadBsoaJson, BsoaJsonPath, "BSOA JSON, Newtonsoft");
             //Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
 
-            bsoa = Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary");
+            bsoa = Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary", iterations: 10);
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
 
             // Change something and verify difference detected
@@ -56,9 +56,9 @@ namespace BSOA.Demo
             Console.WriteLine($"Verify difference detected:");
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
 
-            // Load with diagnostics (see column sizes)
-            Console.WriteLine();
-            LoadBsoaBinary(BsoaBinPath, diagnostics: true);
+            //// Load with diagnostics (see column sizes)
+            //Console.WriteLine();
+            //LoadBsoaBinary(BsoaBinPath, diagnostics: true);
         }
 
         private void Convert(bool force)
@@ -68,7 +68,7 @@ namespace BSOA.Demo
             // Load Sarif Log with current OM
             SarifLog log = null;
 
-            Time($"Loading {InputFilePath}...", () => log = SarifLog.Load(InputFilePath));
+            Time($"Loading {InputFilePath}...", () => log = SarifLog.LoadDeferred(InputFilePath));
 
             // Extract a BSOA-supported SarifLog subset for apples-to-apples comparison with BSOA form
             SarifLogFiltered filtered = null;
