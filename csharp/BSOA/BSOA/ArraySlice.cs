@@ -7,6 +7,7 @@ namespace BSOA
 {
     public struct ArraySlice<T> : IReadOnlyList<T>, ITreeSerializable where T : unmanaged
     {
+        internal bool _isExpandable;
         internal T[] _array;
         internal int _index;
         private int _length;
@@ -16,7 +17,7 @@ namespace BSOA
 
         public static ArraySlice<T> Empty = default;
 
-        public ArraySlice(T[] array, int index = 0, int length = -1)
+        public ArraySlice(T[] array, int index = 0, int length = -1, bool isExpandable = false)
         {
             if (array == null) { throw new ArgumentNullException("array"); }
             if (length < 0) { length = array.Length - index; }
@@ -26,6 +27,7 @@ namespace BSOA
             _array = array;
             _index = index;
             _length = length;
+            _isExpandable = isExpandable;
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -51,6 +53,7 @@ namespace BSOA
             _array = null;
             _index = 0;
             _length = 0;
+            _isExpandable = false;
         }
 
         public void Read(ITreeReader reader)
@@ -58,6 +61,7 @@ namespace BSOA
             _array = reader.ReadBlockArray<T>();
             _index = 0;
             _length = _array.Length;
+            _isExpandable = false;
         }
 
         public void Write(ITreeWriter writer)

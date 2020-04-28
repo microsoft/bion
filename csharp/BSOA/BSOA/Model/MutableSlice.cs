@@ -1,0 +1,172 @@
+﻿using BSOA.Column;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Net.Http;
+
+namespace BSOA.Model
+{
+    /// <summary>
+    ///  MutableSlice adds changeability on top of ArraySlices in a VariableLengthColumn.
+    /// </summary>
+    /// <remarks>
+    ///  MutableSlice is a struct to avoid allocations when reading from a VariableLengthColumn.
+    ///  It therefore must update the ArraySlice in the VariableLengthColumn whenever the Count changes.
+    ///  It must retrieve the ArraySlice from the VariableLengthColumn on access to ensure it reflects changes another instance has made.
+    /// </remarks>
+    public struct MutableSlice<T> : IList<T>, IReadOnlyList<T> where T : unmanaged
+    {
+        private const int MinimumSize = 16;
+
+        // Store a reference to the column and index containing the real ArraySlice value.
+        private VariableLengthColumn<T> _column;
+        private int _index;
+
+        public static MutableSlice<T> Empty = new MutableSlice<T>();
+
+        public MutableSlice(VariableLengthColumn<T> column, int index)
+        {
+            if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
+            _column = column;
+            _index = index;
+        }
+
+        public ArraySlice<T> Slice => _column?[_index] ?? ArraySlice<T>.Empty;
+
+        // Retrieve values from the current ArraySlice; allow updating values in-place (if the array size doesn't change, updates can be made inline)
+        public T this[int index]
+        {
+            get => Slice[index];
+            set
+            {
+                ArraySlice<T> slice = Slice;
+                slice._array[slice._index + index] = value;
+            }
+        }
+
+        public int Count => Slice.Count;
+        public bool IsReadOnly => false;
+
+        public void Add(T item)
+        {
+            ArraySlice<T> slice = Slice;
+            int nextIndex = slice._index + slice.Count;
+
+            if (slice._isExpandable && nextIndex < slice._array.Length)
+            {
+                // If array can be added to and isn't full, append in place
+                slice._array[nextIndex] = item;
+
+                // Record new length
+                _column[_index] = new ArraySlice<T>(slice._array, slice._index, slice.Count + 1, slice._isExpandable);
+            }
+            else
+            {
+                // Otherwise, allocate a new array and copy items
+                int newSize = Math.Max(MinimumSize, slice.Count + slice.Count / 2);
+                T[] newArray = new T[newSize];
+
+                if (slice.Count > 0)
+                {
+                    Array.Copy(slice._array, slice._index, newArray, 0, slice.Count);
+                }
+
+                // Add new item
+                newArray[slice.Count] = item;
+
+                // Record new expandable slice with new array and length
+                _column[_index] = new ArraySlice<T>(newArray, 0, slice.Count + 1, isExpandable: true);
+            }
+        }
+
+        public void Clear()
+        {
+            _column[_index] = ArraySlice<T>.Empty;
+        }
+
+        public bool Contains(T item)
+        {
+            return IndexOf(item) != -1;
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            Slice.CopyTo(array, arrayIndex);
+        }
+
+        public int IndexOf(T item)
+        {
+            ArraySlice<T> slice = Slice;
+            T[] array = slice._array;
+            int end = slice._index + slice.Count;
+
+            for (int i = slice._index; i < end; ++i)
+            {
+                if (array[i].Equals(item)) { return i - slice._index; }
+            }
+
+            return -1;
+        }
+
+        public void Insert(int index, T item)
+        {
+            ArraySlice<T> slice = Slice;
+            if (index < 0 || index >= slice.Count) { throw new IndexOutOfRangeException(nameof(index)); }
+
+            // Use add to resize array (inserting to-be-overwritten value)
+            Add(item);
+            slice = Slice;
+
+            // Shift items from index forward one
+            T[] array = slice._array;
+            int realIndex = slice._index + index;
+            int countFromIndex = slice.Count - index;
+            Array.Copy(array, realIndex, array, realIndex + 1, countFromIndex);
+
+            // Insert item at desired index
+            array[realIndex] = item;
+
+            // New slice length already recorded by Add()
+        }
+
+        public bool Remove(T item)
+        {
+            int index = IndexOf(item);
+            if (index == -1)
+            {
+                return false;
+            }
+            else
+            {
+                RemoveAt(index);
+                return true;
+            }
+        }
+
+        public void RemoveAt(int index)
+        {
+            ArraySlice<T> slice = Slice;
+            if (index < 0 || index >= slice.Count) { throw new IndexOutOfRangeException(nameof(index)); }
+
+            T[] array = slice._array;
+            int realIndex = slice._index + index;
+            int countAfterIndex = slice.Count - 1 - index;
+
+            // Shift items after index back one
+            Array.Copy(slice._array, realIndex + 1, slice._array, realIndex, countAfterIndex);
+
+            // Record shortened length
+            _column[_index] = new ArraySlice<T>(slice._array, slice._index, slice.Count - 1, slice._isExpandable);
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return Slice.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return Slice.GetEnumerator();
+        }
+    }
+}
