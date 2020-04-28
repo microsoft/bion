@@ -171,6 +171,9 @@ namespace BSOA.Test.Components
                     T roundTripped = buildT();
                     roundTripped.Read(reader);
 
+                    // Test double dispose
+                    reader.Dispose();
+
                     return reader.Tree;
                 }
             }

@@ -27,7 +27,7 @@ namespace BSOA.Column
                 if (_isNull[index]) { return null; }
 
                 ArraySlice<byte> value = _inner[index];
-                return (value.Count == 0 ? string.Empty : Encoding.UTF8.GetString(value._array, value._index, value.Count));
+                return (value.Count == 0 ? string.Empty : Encoding.UTF8.GetString(value.Array, value.Index, value.Count));
             }
 
             set

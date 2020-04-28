@@ -7,13 +7,12 @@ namespace BSOA
 {
     public struct ArraySlice<T> : IReadOnlyList<T>, ITreeSerializable where T : unmanaged
     {
-        internal bool _isExpandable;
-        internal T[] _array;
-        internal int _index;
-        private int _length;
+        public T[] Array { get; private set; }
+        public int Index { get; private set; }
+        public int Count { get; set; }
+        public bool IsExpandable { get; private set; }
 
-        public T this[int index] => _array[_index + index];
-        public int Count => _length;
+        public T this[int index] => Array[Index + index];
 
         public static ArraySlice<T> Empty = default;
 
@@ -24,10 +23,10 @@ namespace BSOA
             if (index < 0 || index > array.Length) { throw new ArgumentOutOfRangeException("index"); }
             if (index + length > array.Length) { throw new ArgumentOutOfRangeException("length"); }
             
-            _array = array;
-            _index = index;
-            _length = length;
-            _isExpandable = isExpandable;
+            Array = array;
+            Index = index;
+            Count = length;
+            IsExpandable = isExpandable;
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -42,31 +41,31 @@ namespace BSOA
         
         public void CopyTo(T[] other, int toIndex)
         {
-            if (_length > 0)
+            if (Count > 0)
             {
-                Array.Copy(_array, _index, other, toIndex, _length);
+                System.Array.Copy(Array, Index, other, toIndex, Count);
             }
         }
 
         public void Clear()
         {
-            _array = null;
-            _index = 0;
-            _length = 0;
-            _isExpandable = false;
+            Array = null;
+            Index = 0;
+            Count = 0;
+            IsExpandable = false;
         }
 
         public void Read(ITreeReader reader)
         {
-            _array = reader.ReadBlockArray<T>();
-            _index = 0;
-            _length = _array.Length;
-            _isExpandable = false;
+            Array = reader.ReadBlockArray<T>();
+            Index = 0;
+            Count = Array.Length;
+            IsExpandable = false;
         }
 
         public void Write(ITreeWriter writer)
         {
-            writer.WriteBlockArray(_array, _index, _length);
+            writer.WriteBlockArray(Array, Index, Count);
         }
     }
 }

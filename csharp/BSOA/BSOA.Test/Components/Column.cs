@@ -14,6 +14,7 @@ namespace BSOA.Test
             List<T> expected = new List<T>();
 
             // Empty behavior
+            Assert.True(column.Empty);
             Assert.Equal(0, column.Count);
             Assert.Equal(defaultValue, column[0]);
             Assert.Equal(defaultValue, column[10]);
@@ -82,7 +83,9 @@ namespace BSOA.Test
             column.Trim();
 
             // Verify clear resets count and that previously set values are back to default if accessed
+            Assert.False(column.Empty);
             column.Clear();
+            Assert.True(column.Empty);
             Assert.Equal(0, column.Count);
             Assert.Equal(defaultValue, column[0]);
             Assert.Equal(defaultValue, column[1]);

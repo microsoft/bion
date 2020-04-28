@@ -56,6 +56,10 @@ namespace BSOA.Test
             Assert.Throws<ArgumentOutOfRangeException>(() => new ArraySlice<int>(sample, sample.Length + 1, 0));    // index > array.Length
             Assert.Throws<ArgumentOutOfRangeException>(() => new ArraySlice<int>(sample, 0, sample.Length + 1));    // length too long
             Assert.Throws<ArgumentOutOfRangeException>(() => new ArraySlice<int>(sample, 2, sample.Length + 3));
+
+            // Clear
+            slice.Clear();
+            Assert.Empty(slice);
         }
 
         internal static void VerifyRoundTrip<T>(ArraySlice<T> slice, T[] copyToTargetArray) where T : unmanaged

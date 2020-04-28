@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Net.Http;
 
 namespace BSOA.Model
 {
@@ -40,25 +39,31 @@ namespace BSOA.Model
             set
             {
                 ArraySlice<T> slice = Slice;
-                slice._array[slice._index + index] = value;
+                slice.Array[slice.Index + index] = value;
             }
         }
 
         public int Count => Slice.Count;
         public bool IsReadOnly => false;
 
+        // Take another ArraySlice directly
+        public void SetTo(ArraySlice<T> other)
+        {
+            _column[_index] = other;
+        }
+
         public void Add(T item)
         {
             ArraySlice<T> slice = Slice;
-            int nextIndex = slice._index + slice.Count;
+            int nextIndex = slice.Index + slice.Count;
 
-            if (slice._isExpandable && nextIndex < slice._array.Length)
+            if (slice.IsExpandable && nextIndex < slice.Array.Length)
             {
                 // If array can be added to and isn't full, append in place
-                slice._array[nextIndex] = item;
+                slice.Array[nextIndex] = item;
 
                 // Record new length
-                _column[_index] = new ArraySlice<T>(slice._array, slice._index, slice.Count + 1, slice._isExpandable);
+                _column[_index] = new ArraySlice<T>(slice.Array, slice.Index, slice.Count + 1, slice.IsExpandable);
             }
             else
             {
@@ -68,7 +73,7 @@ namespace BSOA.Model
 
                 if (slice.Count > 0)
                 {
-                    Array.Copy(slice._array, slice._index, newArray, 0, slice.Count);
+                    Array.Copy(slice.Array, slice.Index, newArray, 0, slice.Count);
                 }
 
                 // Add new item
@@ -97,12 +102,12 @@ namespace BSOA.Model
         public int IndexOf(T item)
         {
             ArraySlice<T> slice = Slice;
-            T[] array = slice._array;
-            int end = slice._index + slice.Count;
+            T[] array = slice.Array;
+            int end = slice.Index + slice.Count;
 
-            for (int i = slice._index; i < end; ++i)
+            for (int i = slice.Index; i < end; ++i)
             {
-                if (array[i].Equals(item)) { return i - slice._index; }
+                if (array[i].Equals(item)) { return i - slice.Index; }
             }
 
             return -1;
@@ -118,8 +123,8 @@ namespace BSOA.Model
             slice = Slice;
 
             // Shift items from index forward one
-            T[] array = slice._array;
-            int realIndex = slice._index + index;
+            T[] array = slice.Array;
+            int realIndex = slice.Index + index;
             int countFromIndex = slice.Count - index;
             Array.Copy(array, realIndex, array, realIndex + 1, countFromIndex);
 
@@ -148,15 +153,15 @@ namespace BSOA.Model
             ArraySlice<T> slice = Slice;
             if (index < 0 || index >= slice.Count) { throw new IndexOutOfRangeException(nameof(index)); }
 
-            T[] array = slice._array;
-            int realIndex = slice._index + index;
+            T[] array = slice.Array;
+            int realIndex = slice.Index + index;
             int countAfterIndex = slice.Count - 1 - index;
 
             // Shift items after index back one
-            Array.Copy(slice._array, realIndex + 1, slice._array, realIndex, countAfterIndex);
+            Array.Copy(slice.Array, realIndex + 1, slice.Array, realIndex, countAfterIndex);
 
             // Record shortened length
-            _column[_index] = new ArraySlice<T>(slice._array, slice._index, slice.Count - 1, slice._isExpandable);
+            _column[_index] = new ArraySlice<T>(slice.Array, slice.Index, slice.Count - 1, slice.IsExpandable);
         }
 
         public IEnumerator<T> GetEnumerator()

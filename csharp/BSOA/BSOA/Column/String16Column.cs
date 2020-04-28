@@ -31,7 +31,7 @@ namespace BSOA.Column
                 if (_isNull[index]) { return null; }
 
                 ArraySlice<char> value = _inner[index];
-                return (value.Count == 0 ? string.Empty : new string(value._array, value._index, value.Count));
+                return (value.Count == 0 ? string.Empty : new string(value.Array, value.Index, value.Count));
             }
 
             set

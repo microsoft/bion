@@ -2,6 +2,7 @@
 using BSOA.Test.Components;
 using System;
 using System.IO;
+using System.Text;
 using Xunit;
 
 namespace BSOA.Test.Model
@@ -21,6 +22,14 @@ namespace BSOA.Test.Model
 
             // Try loading database with size diagnostics
             TreeDiagnostics diagnostics = TreeSerializer.Diagnostics(database, TreeFormat.Binary);
+            
+            // Verify table and column names in diagnostics
+            StringBuilder textBuilder = new StringBuilder();
+            diagnostics.Write(new StringWriter(textBuilder), -1);
+            string text = textBuilder.ToString();
+            Assert.Contains("Person", text);
+            Assert.Contains("Age", text);
+            Assert.Contains("Name", text);
 
             // Verify one table, two columns, Write doesn't throw
             Assert.Single(diagnostics.Children);
