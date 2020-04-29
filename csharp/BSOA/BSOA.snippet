@@ -132,7 +132,7 @@
       </Declarations>
     </Snippet>
   </CodeSnippet>
-    <CodeSnippet Format="1.0.0">
+  <CodeSnippet Format="1.0.0">
     <Header>
       <Title>BSOA Reference Property</Title>
       <Shortcut>bref</Shortcut>
@@ -155,10 +155,39 @@
         </Literal>
         <Literal>
         <ID>Entity</ID>
-        <ToolTip>Table/Type name of the Entity referenced (ex: Message)</ToolTip>
+        <ToolTip>Type name of the Entity referenced (ex: Message)</ToolTip>
         <Default>Message</Default>
         </Literal>
       </Declarations>
     </Snippet>
-    </CodeSnippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>BSOA Reference List Property</Title>
+      <Shortcut>breflist</Shortcut>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[
+        public IList<$Entity$> $Name$
+        {
+            get => new MutableSliceWrapper<$Entity$, $Entity$Table>(_table.$Name$[_index], _table.Database.$Entity$, (table, index) => new $Entity$(table, index), (item) => item._index);
+            set => new MutableSliceWrapper<$Entity$, $Entity$Table>(_table.$Name$[_index], _table.Database.$Entity$, (table, index) => new $Entity$(table, index), (item) => item._index).SetTo(value);
+        }
+        ]]>
+      </Code>
+      <Declarations>
+        <Literal>
+        <ID>Name</ID>
+        <ToolTip>Name of the Property to generate (ex: Description)</ToolTip>
+        <Default>Description</Default>
+        </Literal>
+        <Literal>
+        <ID>Entity</ID>
+        <ToolTip>Type name of the Entity referenced (ex: Message)</ToolTip>
+        <Default>Message</Default>
+        </Literal>
+      </Declarations>
+    </Snippet>
+  </CodeSnippet>
 </CodeSnippets>

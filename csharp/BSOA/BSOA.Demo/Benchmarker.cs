@@ -50,15 +50,23 @@ namespace BSOA.Demo
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
 
             // Change something and verify difference detected
-            var snippet = bsoa.Region[bsoa.Region.Count / 2].Snippet;
-            snippet.Text = "Changed!";
+            ChangeSomething(bsoa);
             Console.WriteLine();
             Console.WriteLine($"Verify difference detected:");
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
 
             // Load with diagnostics (see column sizes)
             Console.WriteLine();
-            LoadBsoaBinary(BsoaBinPath, diagnostics: true);
+            LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: -1);
+        }
+
+        private void ChangeSomething(SarifLogBsoa log)
+        {
+            //var artifactLocation = log.Location[log.Location.Count / 2].PhysicalLocation.ArtifactLocation;
+            //artifactLocation.Index = 45;
+
+            var snippet = log.Location[log.Location.Count / 2].PhysicalLocation.Region.Snippet;
+            snippet.Text = "Changed!";
         }
 
         private void Convert(bool force)
@@ -150,7 +158,7 @@ namespace BSOA.Demo
             double loadMegabytesPerSecond = fileSizeMB / (elapsedAfterFirst.TotalSeconds / (iterations - 1));
 
             Console.WriteLine();
-            Console.WriteLine($" -> Read {fileSizeMB:n1} MB at {loadMegabytesPerSecond:n1} MB/s into {(ramAfterMB - ramBeforeMB):n1} MB RAM");
+            Console.WriteLine($" -> Read {result} in {fileSizeMB:n1} MB at {loadMegabytesPerSecond:n1} MB/s into {(ramAfterMB - ramBeforeMB):n1} MB RAM");
 
             return result;
         }
@@ -180,7 +188,7 @@ namespace BSOA.Demo
             return LoadBsoaBinary(bsoaBinaryPath, false);
         }
 
-        private SarifLogBsoa LoadBsoaBinary(string bsoaBinaryPath, bool diagnostics)
+        private SarifLogBsoa LoadBsoaBinary(string bsoaBinaryPath, bool diagnostics, int diagnosticsDepth = -1)
         {
             SarifLogBsoa log = new SarifLogBsoa();
 
@@ -191,7 +199,7 @@ namespace BSOA.Demo
                 if (diagnostics)
                 {
                     TreeDiagnostics tree = ((TreeDiagnosticsReader)reader).Tree;
-                    tree.Write(Console.Out, -1);
+                    tree.Write(Console.Out, diagnosticsDepth);
                 }
             }
 

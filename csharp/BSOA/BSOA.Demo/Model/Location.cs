@@ -34,19 +34,28 @@ namespace BSOA.Demo.Model
             set => _table.Id[_index] = value;
         }
 
-
         public PhysicalLocation PhysicalLocation
         {
             get => _table.Database.PhysicalLocation[_table.PhysicalLocation[_index]];
             set => _table.PhysicalLocation[_index] = value._index;
         }
 
-        // TODO: RefListColumn properties - how?
+        public IList<LogicalLocation> LogicalLocations
+        {
+            get => new MutableSliceWrapper<LogicalLocation, LogicalLocationTable>(_table.LogicalLocations[_index], _table.Database.LogicalLocation, (table, index) => new LogicalLocation(table, index), (item) => item._index);
+            set => new MutableSliceWrapper<LogicalLocation, LogicalLocationTable>(_table.LogicalLocations[_index], _table.Database.LogicalLocation, (table, index) => new LogicalLocation(table, index), (item) => item._index).SetTo(value);
+        }
 
         public Message Message
         {
             get => _table.Database.Message[_table.Message[_index]];
             set => _table.Message[_index] = value._index;
+        }
+
+        public IList<Region> Annotations
+        {
+            get => new MutableSliceWrapper<Region, RegionTable>(_table.Annotations[_index], _table.Database.Region, (table, index) => new Region(table, index), (item) => item._index);
+            set => new MutableSliceWrapper<Region, RegionTable>(_table.Annotations[_index], _table.Database.Region, (table, index) => new Region(table, index), (item) => item._index).SetTo(value);
         }
     }
 

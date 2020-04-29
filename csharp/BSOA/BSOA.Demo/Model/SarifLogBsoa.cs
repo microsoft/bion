@@ -22,5 +22,10 @@ namespace BSOA.Demo.Model
             PhysicalLocation = AddTable(nameof(PhysicalLocation), new PhysicalLocationTable(this));
             Region = AddTable(nameof(Region), new RegionTable(this));
         }
+
+        public override string ToString()
+        {
+            return $"{Location.Count:n0} {nameof(Location)}s";
+        }
     }
 }

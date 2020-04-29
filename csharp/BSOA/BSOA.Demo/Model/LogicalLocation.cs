@@ -5,8 +5,8 @@ namespace BSOA.Demo.Model
 {
     public struct LogicalLocation
     {
-        private LogicalLocationTable _table;
-        private int _index;
+        internal LogicalLocationTable _table;
+        internal int _index;
 
         public LogicalLocation(LogicalLocationTable table, int index)
         {

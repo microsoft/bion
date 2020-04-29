@@ -1,6 +1,6 @@
 ﻿using BSOA.Column;
-using BSOA.Model;
 using BSOA.Test.Components;
+using BSOA.Test.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,8 +27,7 @@ namespace BSOA.Test
             Assert.Equal(referencedTable, TreeSerializer.RoundTrip(new RefListColumn(referencedTable), () => new RefListColumn(referencedTable), TreeFormat.Binary).ReferencedTableName);
         }
 
-        [Fact]
-        public void RefListColumn_MutableSlice_Basics()
+        private RefListColumn BuildSampleColumn()
         {
             string referencedTable = "ReferencedTable";
 
@@ -50,7 +49,7 @@ namespace BSOA.Test
             {
                 ReadOnlyList.VerifySame(expected[i], column[i]);
             }
-            
+
             // Round trip and verify they deserialize correctly (note, these will be in a shared array now
             roundTripped = TreeSerializer.RoundTrip(column, () => new RefListColumn(referencedTable), TreeFormat.Binary);
             for (int i = 0; i < expected.Count; ++i)
@@ -58,12 +57,84 @@ namespace BSOA.Test
                 ReadOnlyList.VerifySame(expected[i], column[i]);
             }
 
+            return roundTripped;
+        }
+
+        [Fact]
+        public void RefListColumn_MutableSlice_Basics()
+        {
+            // Set up column with sample values, roundtrip, re-verify
+            RefListColumn column = BuildSampleColumn();
+
             // Verify second value is in a shared array, not at index zero, not expandable (yet), not ReadOnly
-            MutableSlice<int> slice = roundTripped[1];
+            MutableSlice<int> slice = column[1];
+            Assert.Equal(4, slice.Count);
             Assert.True(slice.Slice.Index > 0);
-            Assert.Equal(4, slice.Slice.Count);
             Assert.False(slice.Slice.IsExpandable);
+
+            // Test second sample row slice IList members
+            TestIListMembers(slice);
+
+            // Verify expandable after test
+            Assert.Equal(50, slice.Count);
+            Assert.Equal(0, slice.Slice.Index);
+            Assert.True(slice.Slice.IsExpandable);
+
+            // Verify values are re-merged and re-loaded properly
+            string values = string.Join(", ", slice);
+            column = TreeSerializer.RoundTrip(column, () => new RefListColumn("TableName"), TreeFormat.Binary);
+            Assert.Equal(values, string.Join(", ", column[1]));
+
+            // Column range check
+            Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
+        }
+
+        [Fact]
+        public void RefListColumn_MutableSliceWrapper_Basics()
+        {
+            // Set up column with sample values, roundtrip, re-verify
+            RefListColumn column = BuildSampleColumn();
+
+            // Verify second value is in a shared array, not at index zero, not expandable (yet), not ReadOnly
+            MutableSlice<int> innerSlice = column[1];
+            MutableSliceWrapper<int, PersonTable> slice = new MutableSliceWrapper<int, PersonTable>(innerSlice, null, (table, index) => index, (index) => index);
+
+            // Test second sample row slice IList members on MutableSlice*Wrapper*
+            TestIListMembers(slice);
+
+            // Verify values are re-merged and re-loaded properly
+            string values = string.Join(", ", innerSlice);
+            column = TreeSerializer.RoundTrip(column, () => new RefListColumn("TableName"), TreeFormat.Binary);
+            Assert.Equal(values, string.Join(", ", column[1]));
+
+            // SetTo(MutableSliceWrapper)
+            MutableSliceWrapper<int, PersonTable> firstRow = new MutableSliceWrapper<int, PersonTable>(column[0], null, (table, index) => index, (index) => index);
+            slice.SetTo(firstRow);
+            Assert.Equal(string.Join(", ", firstRow), string.Join(", ", slice));
+
+            // SetTo(null)
+            slice.SetTo(null);
+            Assert.Empty(slice);
+
+            // SetTo(IList)
+            slice.SetTo(new int[] { 2, 3, 4, 5 });
+            Assert.Equal("2, 3, 4, 5", string.Join(", ", slice));
+
+            // SetTo(empty)
+            slice.SetTo(Array.Empty<int>());
+            Assert.Empty(slice);
+        }
+
+        private void TestIListMembers(IList<int> slice)
+        {
+            // NOTE: Designed for second row sample data
+            Assert.Equal("2, 3, 4, 5", string.Join(", ", slice));
+
+            // Lists should not report ReadOnly
             Assert.False(slice.IsReadOnly);
+
+            // Verify second value is in a shared array, not at index zero, not expandable (yet), not ReadOnly
+            Assert.Equal(4, slice.Count);
 
             // Test MutableSlice.Contains ('==' to avoid XUnit warning to use XUnit contains, which doesn't use IList.Contains)
             Assert.True(slice.Contains(2) == true);
@@ -80,23 +151,27 @@ namespace BSOA.Test
             slice.CopyTo(other, 1);
             Assert.Equal("0, " + string.Join(", ", slice), string.Join(", ", other));
 
+            // CopyTo bounds
+            Assert.Throws<ArgumentNullException>(() => slice.CopyTo(null, 0));
+            Assert.Throws<ArgumentException>(() => slice.CopyTo(other, 2));
+            Assert.Throws<ArgumentOutOfRangeException>(() => slice.CopyTo(other, -1));
+
             // Change an item inline; verify changed, array not moved, not expandable
             slice[0] = 1;
             Assert.Equal("1, 3, 4, 5", string.Join(", ", slice));
             Assert.Equal(1, slice[0]);
-            Assert.True(slice.Slice.Index > 0);
-            Assert.False(slice.Slice.IsExpandable);
 
             // Append an item; verify appended, count changed, inner array is now a separate, writeable array
             slice.Add(10);
             Assert.Equal("1, 3, 4, 5, 10", string.Join(", ", slice));
-            Assert.Equal(0, slice.Slice.Index);
-            Assert.True(slice.Slice.IsExpandable);
 
             // Test Remove, RemoveAt
             Assert.False(slice.Remove(9));
             Assert.True(slice.Remove(3));
             Assert.Equal("1, 4, 5, 10", string.Join(", ", slice));
+            slice.RemoveAt(3);
+            Assert.Equal("1, 4, 5", string.Join(", ", slice));
+            slice.Add(10);
 
             // Test RemoveAt bounds checks
             Assert.Throws<IndexOutOfRangeException>(() => slice.RemoveAt(-1));
@@ -115,7 +190,6 @@ namespace BSOA.Test
             // Clear; verify empty, read-only static instance
             slice.Clear();
             Assert.Empty(slice);
-            Assert.False(slice.Slice.IsExpandable);
 
             // Test Add until resize required; verify old elements copied to larger array properly
             for (int i = 0; i < 50; ++i)
@@ -127,17 +201,6 @@ namespace BSOA.Test
             {
                 Assert.Equal(i, slice[i]);
             }
-
-            // Verify 'slice' instance is being persisted back to column
-            Assert.Equal(string.Join(", ", slice), string.Join(", ", roundTripped[1]));
-
-            // Verify values are re-merged and re-loaded properly
-            string values = string.Join(", ", slice);
-            roundTripped = TreeSerializer.RoundTrip(roundTripped, () => new RefListColumn(referencedTable), TreeFormat.Binary);
-            Assert.Equal(values, string.Join(", ", roundTripped[1]));
-
-            // Column range check
-            Assert.Throws<IndexOutOfRangeException>(() => roundTripped[-1]);
         }
     }
 }
