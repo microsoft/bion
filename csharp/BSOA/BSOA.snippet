@@ -10,13 +10,13 @@
         <![CDATA[
     public struct $EntityName$
     {
-        private $EntityName$Table Table { get; }
-        private int Index { get; }
+        internal $EntityName$Table _table;
+        internal int _index;
 
         public $EntityName$($EntityName$Table table, int index)
         {
-            this.Table = table;
-            this.Index = index;
+            _table = table;
+            _index = index;
         }
 
         public $EntityName$($EntityName$Table table) : this(table, table.Count)
@@ -27,10 +27,13 @@
         public $EntityName$($DatabaseName$ database) : this(database.$EntityName$)
         { }
 
+        public bool IsNull => (_table == null || _index < 0);
+
+        // Add via 'bprop' snippet
         public string Text
         {
-            get => Table.Text[Index];
-            set => Table.Text[Index] = value;
+            get => _table.Text[_index];
+            set => _table.Text[_index] = value;
         }
     }
 
@@ -38,6 +41,7 @@
     {
         internal $DatabaseName$ Database;
 
+        // Add via 'bcolumn' snippet
         internal StringColumn Text;
 
         public $EntityName$Table($DatabaseName$ database) : base()
@@ -67,6 +71,9 @@
         <Import>
           <Namespace>BSOA.Model</Namespace>
         </Import>
+        <Import>
+          <Namespace>BSOA.Column</Namespace>
+        </Import>
       </Imports>
     </Snippet>
   </CodeSnippet>
@@ -91,7 +98,7 @@
         <Literal>
         <ID>BsoaType</ID>
         <ToolTip>BSOA Column class used for column (ex: StringColumn)</ToolTip>
-        <Default>string</Default>
+        <Default>NumberColumn&lt;int&gt;</Default>
         </Literal>
       </Declarations>
     </Snippet>
@@ -106,8 +113,8 @@
         <![CDATA[
         public $Type$ $Name$
         {
-            get => Table.$Name$[Index];
-            set => Table.$Name$[Index] = value;
+            get => _table.$Name$[_index];
+            set => _table.$Name$[_index] = value;
         }
         ]]>
       </Code>
@@ -125,4 +132,33 @@
       </Declarations>
     </Snippet>
   </CodeSnippet>
+    <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>BSOA Reference Property</Title>
+      <Shortcut>bref</Shortcut>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[
+        public $Entity$ $Name$
+        {
+            get => _table.Database.$Entity$[_table.$Name$[_index]];
+            set => _table.$Name$[_index] = value._index;
+        }
+        ]]>
+      </Code>
+      <Declarations>
+        <Literal>
+        <ID>Name</ID>
+        <ToolTip>Name of the Property to generate (ex: Description)</ToolTip>
+        <Default>Description</Default>
+        </Literal>
+        <Literal>
+        <ID>Entity</ID>
+        <ToolTip>Table/Type name of the Entity referenced (ex: Message)</ToolTip>
+        <Default>Message</Default>
+        </Literal>
+      </Declarations>
+    </Snippet>
+    </CodeSnippet>
 </CodeSnippets>

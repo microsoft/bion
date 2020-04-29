@@ -6,25 +6,30 @@ using System.Collections.Generic;
 namespace BSOA.Column
 {
     /// <summary>
-    ///  DateTimeColumn implements IColumn for DateTime on top of a NumberColumn&lt;long&gt;
+    ///  UriColumn implements IColumn for Uri on top of a StringColumn
     /// </summary>
-    public class DateTimeColumn : IColumn<DateTime>
+    public class UriColumn : IColumn<Uri>
     {
-        private NumberColumn<long> _inner;
+        private StringColumn _inner;
 
-        public DateTimeColumn(DateTime defaultValue)
+        public UriColumn()
         {
-            _inner = new NumberColumn<long>(defaultValue.ToUniversalTime().Ticks);
+            _inner = new StringColumn();
         }
 
         public int Count => _inner.Count;
-        
+
         public bool Empty => Count == 0;
-        
-        public DateTime this[int index]
+
+        public Uri this[int index]
         {
-            get { return new DateTime(_inner[index], DateTimeKind.Utc); }
-            set { _inner[index] = value.ToUniversalTime().Ticks; }
+            get
+            {
+                string uriText = _inner[index];
+                return (uriText == null ? null : new Uri(uriText, UriKind.RelativeOrAbsolute));
+            }
+
+            set { _inner[index] = value?.OriginalString; }
         }
 
         public void Clear()
@@ -37,14 +42,14 @@ namespace BSOA.Column
             _inner.Trim();
         }
 
-        public IEnumerator<DateTime> GetEnumerator()
+        public IEnumerator<Uri> GetEnumerator()
         {
-            return new ListEnumerator<DateTime>(this);
+            return new ListEnumerator<Uri>(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new ListEnumerator<DateTime>(this);
+            return new ListEnumerator<Uri>(this);
         }
 
         public void Read(ITreeReader reader)

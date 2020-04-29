@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BSOA.Model
+namespace BSOA
 {
     /// <summary>
     ///  MutableSlice adds changeability on top of ArraySlices in a VariableLengthColumn.
