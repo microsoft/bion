@@ -9,6 +9,7 @@ namespace BSOA.Demo.Conversion
         {
             Model.Result result = new Model.Result(toDatabase.Result);
 
+            result.BaselineState = source.BaselineState;
             result.RuleId = source.RuleId;
             result.RuleIndex = source.RuleIndex;
 
@@ -27,6 +28,7 @@ namespace BSOA.Demo.Conversion
         {
             if (expected == null) { return actual.IsNull; }
 
+            if (expected.BaselineState != actual.BaselineState) { return false; }
             if (expected.RuleId != actual.RuleId) { return false; }
             if (expected.RuleIndex != actual.RuleIndex) { return false; }
 

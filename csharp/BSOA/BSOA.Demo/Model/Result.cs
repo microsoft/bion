@@ -1,5 +1,6 @@
 ﻿using BSOA.Column;
 using BSOA.Model;
+using Microsoft.CodeAnalysis.Sarif;
 using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
@@ -25,6 +26,11 @@ namespace BSOA.Demo.Model
 
         public bool IsNull => (_table == null || _index < 0);
 
+        public BaselineState BaselineState
+        {
+            get => _table.BaselineState[_index];
+            set => _table.BaselineState[_index] = value;
+        }
 
         public string RuleId
         {
@@ -62,6 +68,7 @@ namespace BSOA.Demo.Model
         internal SarifLogBsoa Database;
 
         // Add via 'bcolumn' snippet
+        internal EnumColumn<BaselineState, int> BaselineState;
         internal StringColumn RuleId;
         internal NumberColumn<int> RuleIndex;
         internal RefColumn Message;
@@ -74,6 +81,7 @@ namespace BSOA.Demo.Model
         public ResultTable(SarifLogBsoa database) : base()
         {
             this.Database = database;
+            this.BaselineState = AddColumn(nameof(BaselineState), new EnumColumn<BaselineState, int>(Microsoft.CodeAnalysis.Sarif.BaselineState.None));
             this.RuleId = AddColumn(nameof(RuleId), new StringColumn());
             this.RuleIndex = AddColumn(nameof(RuleIndex), new NumberColumn<int>(-1));
             this.Message = AddColumn(nameof(Message), new RefColumn(nameof(database.Message)));
