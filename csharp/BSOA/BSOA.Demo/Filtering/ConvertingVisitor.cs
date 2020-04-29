@@ -13,7 +13,7 @@ namespace BSOA.Demo
 
         public override Run VisitRun(Run node)
         {
-            Result.Runs.Add(node.DeepClone());
+            Result.Runs.Add(node);
             return base.VisitRun(node);
         }
 

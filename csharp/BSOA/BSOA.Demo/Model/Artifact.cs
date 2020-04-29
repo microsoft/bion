@@ -1,8 +1,6 @@
 ﻿using BSOA.Column;
 using BSOA.Model;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BSOA.Demo.Model
 {

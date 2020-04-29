@@ -42,17 +42,13 @@ namespace BSOA.Demo
 
             // Compare loading times
             filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft", iterations: 2);
-
-            //bsoa = Measure(LoadBsoaJson, BsoaJsonPath, "BSOA JSON, Newtonsoft");
-            //Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
-
             bsoa = Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary", iterations: 10);
-            Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
 
-            // Change something and verify difference detected
+            // Verify logs match; change something to test verification logic
+            Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
             ChangeSomething(bsoa);
             Console.WriteLine();
-            Console.WriteLine($"Verify difference detected:");
+            Console.WriteLine($"Test difference detected:");
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
 
             // Load with diagnostics (see column sizes)
