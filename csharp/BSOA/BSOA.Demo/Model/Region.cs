@@ -8,13 +8,13 @@ namespace BSOA.Demo.Model
     /// </summary>
     public struct Region
     {
-        internal RegionTable Table { get; }
-        internal int Index { get; }
+        internal RegionTable _table;
+        internal int _index;
 
         internal Region(RegionTable table, int index)
         {
-            this.Table = table;
-            this.Index = index;
+            _table = table;
+            _index = index;
         }
 
         public Region(RegionTable table) : this(table, table.Count)
@@ -25,59 +25,74 @@ namespace BSOA.Demo.Model
         public Region(SarifLogBsoa database) : this(database.Region)
         { }
 
+        public bool IsNull => (_table == null || _index < 0);
+
         public int StartLine
         {
-            get => Table.StartLine[Index];
-            set => Table.StartLine[Index] = value;
+            get => _table.StartLine[_index];
+            set => _table.StartLine[_index] = value;
         }
 
         public int StartColumn
         {
-            get => Table.StartColumn[Index];
-            set => Table.StartColumn[Index] = value;
+            get => _table.StartColumn[_index];
+            set => _table.StartColumn[_index] = value;
         }
 
         public int EndLine
         {
-            get => Table.EndLine[Index];
-            set => Table.EndLine[Index] = value;
+            get => _table.EndLine[_index];
+            set => _table.EndLine[_index] = value;
         }
 
         public int EndColumn
         {
-            get => Table.EndColumn[Index];
-            set => Table.EndColumn[Index] = value;
+            get => _table.EndColumn[_index];
+            set => _table.EndColumn[_index] = value;
         }
 
         public int ByteOffset
         {
-            get => Table.ByteOffset[Index];
-            set => Table.ByteOffset[Index] = value;
+            get => _table.ByteOffset[_index];
+            set => _table.ByteOffset[_index] = value;
         }
 
         public int ByteLength
         {
-            get => Table.ByteLength[Index];
-            set => Table.ByteLength[Index] = value;
+            get => _table.ByteLength[_index];
+            set => _table.ByteLength[_index] = value;
         }
 
         public int CharOffset
         {
-            get => Table.CharOffset[Index];
-            set => Table.CharOffset[Index] = value;
+            get => _table.CharOffset[_index];
+            set => _table.CharOffset[_index] = value;
         }
 
         public int CharLength
         {
-            get => Table.CharLength[Index];
-            set => Table.CharLength[Index] = value;
+            get => _table.CharLength[_index];
+            set => _table.CharLength[_index] = value;
         }
 
         public ArtifactContent Snippet
         {
-            get => Table.Database.ArtifactContent[Table.Snippet[Index]];
-            set => Table.Snippet[Index] = value.Index;
+            get => _table.Database.ArtifactContent[_table.Snippet[_index]];
+            set => _table.Snippet[_index] = value._index;
         }
+
+        public Message Message
+        {
+            get => _table.Database.Message[_table.Message[_index]];
+            set => _table.Message[_index] = value._index;
+        }
+
+        public string SourceLanguage
+        {
+            get => _table.SourceLanguage[_index];
+            set => _table.SourceLanguage[_index] = value;
+        }
+
     }
 
     /// <summary>
@@ -98,10 +113,10 @@ namespace BSOA.Demo.Model
         internal NumberColumn<int> CharLength;
 
         internal RefColumn Snippet;
+        internal RefColumn Message;
 
-        // Message Message
-        // ArtifactContent Snippet
-        // string SourceLanguage
+        internal StringColumn SourceLanguage;
+
         // Properties
 
         public RegionTable(SarifLogBsoa database) : base()
@@ -119,6 +134,9 @@ namespace BSOA.Demo.Model
             this.CharLength = AddColumn(nameof(CharLength), new NumberColumn<int>(0));
 
             this.Snippet = AddColumn(nameof(Snippet), new RefColumn(nameof(SarifLogBsoa.ArtifactContent)));
+            this.Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogBsoa.Message)));
+
+            this.SourceLanguage = AddColumn(nameof(SourceLanguage), new StringColumn());
         }
 
         public override Region this[int index] => new Region(this, index);

@@ -1,25 +1,26 @@
 ﻿using BSOA.Demo.Model;
+using Microsoft.CodeAnalysis.Sarif;
 
 namespace BSOA.Demo.Conversion
 {
     public class RegionConverter
     {
-        public static Model.Region Convert(Microsoft.CodeAnalysis.Sarif.Region region, SarifLogBsoa toDatabase)
+        public static Model.Region Convert(Microsoft.CodeAnalysis.Sarif.Region source, SarifLogBsoa toDatabase)
         {
             Model.Region result = new Model.Region(toDatabase);
 
-            result.StartLine = region.StartLine;
-            result.StartColumn = region.StartColumn;
-            result.EndLine = region.EndLine;
-            result.EndColumn = region.EndColumn;
-            result.ByteOffset = region.ByteOffset;
-            result.ByteLength = region.ByteLength;
-            result.CharOffset = region.CharOffset;
-            result.CharLength = region.CharLength;
+            result.StartLine = source.StartLine;
+            result.StartColumn = source.StartColumn;
+            result.EndLine = source.EndLine;
+            result.EndColumn = source.EndColumn;
+            result.ByteOffset = source.ByteOffset;
+            result.ByteLength = source.ByteLength;
+            result.CharOffset = source.CharOffset;
+            result.CharLength = source.CharLength;
 
-            if (region.Snippet != null)
+            if (source.Snippet != null)
             {
-                result.Snippet = ArtifactContentConverter.Convert(region.Snippet, toDatabase);
+                result.Snippet = ArtifactContentConverter.Convert(source.Snippet, toDatabase);
             }
 
             return result;
@@ -27,6 +28,8 @@ namespace BSOA.Demo.Conversion
 
         public static bool Compare(Microsoft.CodeAnalysis.Sarif.Region expected, Model.Region actual)
         {
+            if(expected == null) { return actual.IsNull; }
+
             if (expected.StartLine != actual.StartLine) { return false; }
             if (expected.StartColumn != actual.StartColumn) { return false; }
             if (expected.EndLine != actual.EndLine) { return false; }

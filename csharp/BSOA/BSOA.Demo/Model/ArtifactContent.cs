@@ -8,13 +8,13 @@ namespace BSOA.Demo.Model
     /// </summary>
     public struct ArtifactContent
     {
-        internal ArtifactContentTable Table { get; }
-        internal int Index { get; }
+        internal ArtifactContentTable _table;
+        internal int _index;
 
         internal ArtifactContent(ArtifactContentTable table, int index)
         {
-            this.Table = table;
-            this.Index = index;
+            _table = table;
+            _index = index;
         }
 
         public ArtifactContent(ArtifactContentTable table) : this(table, table.Count)
@@ -25,18 +25,18 @@ namespace BSOA.Demo.Model
         public ArtifactContent(SarifLogBsoa database) : this(database.ArtifactContent)
         { }
 
-        public bool IsNull => (Table == null || Index < 0);
+        public bool IsNull => (_table == null || _index < 0);
 
         public string Text
         {
-            get => Table.Text[Index];
-            set => Table.Text[Index] = value;
+            get => _table.Text[_index];
+            set => _table.Text[_index] = value;
         }
 
         public string Binary
         {
-            get => Table.Binary[Index];
-            set => Table.Binary[Index] = value;
+            get => _table.Binary[_index];
+            set => _table.Binary[_index] = value;
         }
     }
 

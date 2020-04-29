@@ -7,11 +7,11 @@ namespace BSOA.Demo
 {
     public class SarifLogFiltered
     {
-        public List<Microsoft.CodeAnalysis.Sarif.Region> Regions { get; set; }
+        public List<Microsoft.CodeAnalysis.Sarif.Location> Locations { get; set; }
 
         public SarifLogFiltered()
         {
-            Regions = new List<Microsoft.CodeAnalysis.Sarif.Region>();
+            Locations = new List<Microsoft.CodeAnalysis.Sarif.Location>();
         }
 
         public static SarifLogFiltered FromSarif(SarifLog log)
@@ -26,9 +26,9 @@ namespace BSOA.Demo
             SarifLogBsoa log = new SarifLogBsoa();
 
             // Convert to Bsoa RegionTable
-            foreach (Microsoft.CodeAnalysis.Sarif.Region region in Regions)
+            foreach (Microsoft.CodeAnalysis.Sarif.Location region in Locations)
             {
-                RegionConverter.Convert(region, log);
+                LocationConverter.Convert(region, log);
             }
 
             return log;
@@ -36,17 +36,17 @@ namespace BSOA.Demo
 
         public bool Equals(SarifLogBsoa log)
         {
-            if (Regions.Count != log.Region.Count)
+            if (Locations.Count != log.Location.Count)
             {
                 return false;
             }
 
-            for (int i = 0; i < Regions.Count; ++i)
+            for (int i = 0; i < Locations.Count; ++i)
             {
-                Microsoft.CodeAnalysis.Sarif.Region left = Regions[i];
-                Model.Region right = log.Region[i];
+                Microsoft.CodeAnalysis.Sarif.Location left = Locations[i];
+                Model.Location right = log.Location[i];
 
-                if (!RegionConverter.Compare(left, right))
+                if (!LocationConverter.Compare(left, right))
                 {
                     return false;
                 }
@@ -57,7 +57,7 @@ namespace BSOA.Demo
 
         public override string ToString()
         {
-            return $"{Regions.Count:n0} Regions";
+            return $"{Locations.Count:n0} {nameof(Locations)}";
         }
     }
 }

@@ -56,9 +56,9 @@ namespace BSOA.Demo
             Console.WriteLine($"Verify difference detected:");
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
 
-            //// Load with diagnostics (see column sizes)
-            //Console.WriteLine();
-            //LoadBsoaBinary(BsoaBinPath, diagnostics: true);
+            // Load with diagnostics (see column sizes)
+            Console.WriteLine();
+            LoadBsoaBinary(BsoaBinPath, diagnostics: true);
         }
 
         private void Convert(bool force)

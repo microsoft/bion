@@ -4,12 +4,12 @@ namespace BSOA.Demo.Conversion
 {
     public class ArtifactContentConverter
     {
-        public static Model.ArtifactContent Convert(Microsoft.CodeAnalysis.Sarif.ArtifactContent artifactContent, SarifLogBsoa toDatabase)
+        public static Model.ArtifactContent Convert(Microsoft.CodeAnalysis.Sarif.ArtifactContent source, SarifLogBsoa toDatabase)
         {
             Model.ArtifactContent result = new Model.ArtifactContent(toDatabase.ArtifactContent);
 
-            result.Text = artifactContent.Text;
-            result.Binary = artifactContent.Binary;
+            result.Text = source.Text;
+            result.Binary = source.Binary;
 
             return result;
         }
