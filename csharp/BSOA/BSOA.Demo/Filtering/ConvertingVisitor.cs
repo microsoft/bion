@@ -11,10 +11,22 @@ namespace BSOA.Demo
             Result = new SarifLogFiltered();
         }
 
-        public override Location VisitLocation(Location node)
+        public override Run VisitRun(Run node)
         {
-            Result.Locations.Add(node.DeepClone());
-            return base.VisitLocation(node);
+            Result.Runs.Add(node.DeepClone());
+            return base.VisitRun(node);
+        }
+
+        public override Result VisitResult(Result node)
+        {
+            node.PartialFingerprints = null;
+
+            foreach(string name in node.PropertyNames)
+            {
+                node.RemoveProperty(name);
+            }
+
+            return base.VisitResult(node);
         }
     }
 }

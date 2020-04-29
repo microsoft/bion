@@ -1,16 +1,13 @@
 ﻿using BSOA.Column;
 using BSOA.Model;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace BSOA.Demo.Model
 {
-
     public struct Location
     {
-        private LocationTable _table;
-        private int _index;
+        internal LocationTable _table;
+        internal int _index;
 
         public Location(LocationTable table, int index)
         {

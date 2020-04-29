@@ -3,7 +3,6 @@ using BSOA.Model;
 
 namespace BSOA.Demo.Model
 {
-
     public struct PhysicalLocation
     {
         internal PhysicalLocationTable _table;

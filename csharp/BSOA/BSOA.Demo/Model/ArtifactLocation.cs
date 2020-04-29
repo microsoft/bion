@@ -1,7 +1,6 @@
 ﻿using BSOA.Column;
 using BSOA.Model;
 using System;
-using System.Security.Cryptography;
 
 namespace BSOA.Demo.Model
 {

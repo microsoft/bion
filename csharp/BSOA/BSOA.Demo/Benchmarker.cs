@@ -41,7 +41,7 @@ namespace BSOA.Demo
             SarifLogBsoa bsoa = null;
 
             // Compare loading times
-            filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft");
+            filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft", iterations: 2);
 
             //bsoa = Measure(LoadBsoaJson, BsoaJsonPath, "BSOA JSON, Newtonsoft");
             //Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
@@ -57,7 +57,7 @@ namespace BSOA.Demo
 
             // Load with diagnostics (see column sizes)
             Console.WriteLine();
-            LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: -1);
+            LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: 3);
         }
 
         private void ChangeSomething(SarifLogBsoa log)
@@ -76,7 +76,7 @@ namespace BSOA.Demo
             // Load Sarif Log with current OM
             SarifLog log = null;
 
-            Time($"Loading {InputFilePath}...", () => log = SarifLog.LoadDeferred(InputFilePath));
+            Time($"Loading {InputFilePath}...", () => log = SarifLog.Load(InputFilePath));
 
             // Extract a BSOA-supported SarifLog subset for apples-to-apples comparison with BSOA form
             SarifLogFiltered filtered = null;
@@ -145,6 +145,8 @@ namespace BSOA.Demo
 
             for (int iteration = 0; iteration < iterations; iteration++)
             {
+                GC.Collect();
+
                 w.Restart();
                 result = loader(path);
                 w.Stop();

@@ -2,16 +2,17 @@
 using BSOA.Demo.Model;
 using Microsoft.CodeAnalysis.Sarif;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BSOA.Demo
 {
     public class SarifLogFiltered
     {
-        public List<Microsoft.CodeAnalysis.Sarif.Location> Locations { get; set; }
+        public List<Microsoft.CodeAnalysis.Sarif.Run> Runs { get; set; }
 
         public SarifLogFiltered()
         {
-            Locations = new List<Microsoft.CodeAnalysis.Sarif.Location>();
+            Runs = new List<Microsoft.CodeAnalysis.Sarif.Run>();
         }
 
         public static SarifLogFiltered FromSarif(SarifLog log)
@@ -26,9 +27,9 @@ namespace BSOA.Demo
             SarifLogBsoa log = new SarifLogBsoa();
 
             // Convert to Bsoa RegionTable
-            foreach (Microsoft.CodeAnalysis.Sarif.Location region in Locations)
+            foreach (Microsoft.CodeAnalysis.Sarif.Run run in Runs)
             {
-                LocationConverter.Convert(region, log);
+                RunConverter.Convert(run, log);
             }
 
             return log;
@@ -36,17 +37,17 @@ namespace BSOA.Demo
 
         public bool Equals(SarifLogBsoa log)
         {
-            if (Locations.Count != log.Location.Count)
+            if (Runs.Count != log.Run.Count)
             {
                 return false;
             }
 
-            for (int i = 0; i < Locations.Count; ++i)
+            for (int i = 0; i < Runs.Count; ++i)
             {
-                Microsoft.CodeAnalysis.Sarif.Location left = Locations[i];
-                Model.Location right = log.Location[i];
+                Microsoft.CodeAnalysis.Sarif.Run left = Runs[i];
+                Model.Run right = log.Run[i];
 
-                if (!LocationConverter.Compare(left, right))
+                if (!RunConverter.Compare(left, right))
                 {
                     return false;
                 }
@@ -57,7 +58,7 @@ namespace BSOA.Demo
 
         public override string ToString()
         {
-            return $"{Locations.Count:n0} {nameof(Locations)}";
+            return $"{Runs.Count:n0} {nameof(Runs)}; {Runs.Sum((run) => run.Results.Count):n0} Results";
         }
     }
 }
