@@ -17,9 +17,9 @@ namespace BSOA
         private MutableSlice<int> _inner;
         private TTable _table;
         private Func<TTable, int, TItem> _toInstance;
-        private Func<TItem, int> _toIndex;
+        private Func<TTable, TItem, int> _toIndex;
 
-        public MutableSliceWrapper(MutableSlice<int> indices, TTable table, Func<TTable, int, TItem> toInstance, Func<TItem, int> toIndex)
+        public MutableSliceWrapper(MutableSlice<int> indices, TTable table, Func<TTable, int, TItem> toInstance, Func<TTable, TItem, int> toIndex)
         {
             _inner = indices;
             _table = table;
@@ -30,7 +30,7 @@ namespace BSOA
         public TItem this[int index]
         {
             get => _toInstance(_table, _inner[index]);
-            set => _inner[index] = _toIndex(value);
+            set => _inner[index] = _toIndex(_table, value);
         }
 
         public MutableSlice<int> Indices => _inner;
@@ -54,7 +54,7 @@ namespace BSOA
                 {
                     for (int i = 0; i < list.Count; ++i)
                     {
-                        _inner.Add(_toIndex(list[i]));
+                        _inner.Add(_toIndex(_table, list[i]));
                     }
                 }
             }
@@ -62,7 +62,7 @@ namespace BSOA
 
         public void Add(TItem item)
         {
-            _inner.Add(_toIndex(item));
+            _inner.Add(_toIndex(_table, item));
         }
 
         public void Clear()
@@ -72,7 +72,7 @@ namespace BSOA
 
         public bool Contains(TItem item)
         {
-            return _inner.Contains(_toIndex(item));
+            return _inner.Contains(_toIndex(_table, item));
         }
 
         public void CopyTo(TItem[] array, int arrayIndex)
@@ -89,17 +89,17 @@ namespace BSOA
 
         public int IndexOf(TItem item)
         {
-            return _inner.IndexOf(_toIndex(item));
+            return _inner.IndexOf(_toIndex(_table, item));
         }
 
         public void Insert(int index, TItem item)
         {
-            _inner.Insert(index, _toIndex(item));
+            _inner.Insert(index, _toIndex(_table, item));
         }
 
         public bool Remove(TItem item)
         {
-            return _inner.Remove(_toIndex(item));
+            return _inner.Remove(_toIndex(_table, item));
         }
 
         public void RemoveAt(int index)

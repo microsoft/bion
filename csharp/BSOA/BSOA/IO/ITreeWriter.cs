@@ -72,6 +72,12 @@ namespace BSOA.IO
         #endregion
 
         #region Write methods write a PropertyName and Value in one call
+        public static void Write(this ITreeWriter writer, string name, ITreeSerializable value)
+        {
+            writer.WritePropertyName(name);
+            value.Write(writer);
+        }
+
         public static void Write(this ITreeWriter writer, string name, bool value)
         {
             writer.WritePropertyName(name);

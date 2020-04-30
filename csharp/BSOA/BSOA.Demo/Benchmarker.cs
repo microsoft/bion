@@ -4,8 +4,10 @@ using BSOA.Json;
 using Microsoft.CodeAnalysis.Sarif;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace BSOA.Demo
 {
@@ -40,6 +42,10 @@ namespace BSOA.Demo
             SarifLogFiltered filtered = null;
             SarifLogBsoa bsoa = null;
 
+            // Load with diagnostics (see column sizes)
+            Console.WriteLine();
+            LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: 3);
+
             // Compare loading times
             filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft", iterations: 2);
             bsoa = Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary", iterations: 10);
@@ -50,10 +56,6 @@ namespace BSOA.Demo
             Console.WriteLine();
             Console.WriteLine($"Test difference detected:");
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
-
-            // Load with diagnostics (see column sizes)
-            Console.WriteLine();
-            LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: 3);
         }
 
         private void ChangeSomething(SarifLogBsoa log)
@@ -61,8 +63,12 @@ namespace BSOA.Demo
             //var artifactLocation = log.Location[log.Location.Count / 2].PhysicalLocation.ArtifactLocation;
             //artifactLocation.Index = 45;
 
-            var snippet = log.Location[log.Location.Count / 2].PhysicalLocation.Region.Snippet;
-            snippet.Text = "Changed!";
+            //var snippet = log.Location[log.Location.Count / 2].PhysicalLocation.Region.Snippet;
+            //snippet.Text = "Changed!";
+
+            var results = log.Run[0].Results;
+            var message = results[results.Count / 2].Message;
+            message.Text = "Different";
         }
 
         private void Convert(bool force)

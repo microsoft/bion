@@ -52,8 +52,8 @@ namespace BSOA.Demo.Model
 
         public IList<Location> Locations
         {
-            get => new MutableSliceWrapper<Location, LocationTable>(_table.Locations[_index], _table.Database.Location, (table, index) => new Location(table, index), (item) => item._index);
-            set => new MutableSliceWrapper<Location, LocationTable>(_table.Locations[_index], _table.Database.Location, (table, index) => new Location(table, index), (item) => item._index).SetTo(value);
+            get => new MutableSliceWrapper<Location, LocationTable>(_table.Locations[_index], _table.Database.Location, (table, index) => new Location(table, index), (table, item) => item._index);
+            set => new MutableSliceWrapper<Location, LocationTable>(_table.Locations[_index], _table.Database.Location, (table, index) => new Location(table, index), (table, item) => item._index).SetTo(value);
         }
 
         public string Guid

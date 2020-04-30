@@ -87,13 +87,8 @@ namespace BSOA.Column
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-
-            writer.WritePropertyName(IsNull);
-            _isNull.Write(writer);
-
-            writer.WritePropertyName(Inner);
-            _inner.Write(writer);
-
+            writer.Write(IsNull, _isNull);
+            writer.Write(Inner, _inner);
             writer.WriteEndObject();
         }
     }

@@ -128,8 +128,7 @@ namespace BSOA.Model
             {
                 if (!pair.Value.Empty)
                 {
-                    writer.WritePropertyName(pair.Key);
-                    pair.Value.Write(writer);
+                    writer.Write(pair.Key, pair.Value);
                 }
             }
 

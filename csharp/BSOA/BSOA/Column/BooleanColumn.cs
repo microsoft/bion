@@ -89,12 +89,8 @@ namespace BSOA.Column
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-
             writer.Write(nameof(Count), Count);
-
-            writer.WritePropertyName(Inner);
-            _innerColumn.Write(writer);
-
+            writer.Write(Inner, _innerColumn);
             writer.WriteEndObject();
         }
     }

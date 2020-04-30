@@ -97,7 +97,7 @@ namespace BSOA.Test
 
             // Verify second value is in a shared array, not at index zero, not expandable (yet), not ReadOnly
             MutableSlice<int> innerSlice = column[1];
-            MutableSliceWrapper<int, PersonTable> slice = new MutableSliceWrapper<int, PersonTable>(innerSlice, null, (table, index) => index, (index) => index);
+            MutableSliceWrapper<int, PersonTable> slice = new MutableSliceWrapper<int, PersonTable>(innerSlice, null, (table, index) => index, (table, index) => index);
 
             // Test second sample row slice IList members on MutableSlice*Wrapper*
             TestIListMembers(slice);
@@ -108,7 +108,7 @@ namespace BSOA.Test
             Assert.Equal(values, string.Join(", ", column[1]));
 
             // SetTo(MutableSliceWrapper)
-            MutableSliceWrapper<int, PersonTable> firstRow = new MutableSliceWrapper<int, PersonTable>(column[0], null, (table, index) => index, (index) => index);
+            MutableSliceWrapper<int, PersonTable> firstRow = new MutableSliceWrapper<int, PersonTable>(column[0], null, (table, index) => index, (table, index) => index);
             slice.SetTo(firstRow);
             Assert.Equal(string.Join(", ", firstRow), string.Join(", ", slice));
 
