@@ -64,6 +64,23 @@ namespace BSOA.Test
             column.Clear();
             Assert.Empty(TreeSerializer.RoundTrip(column, TreeFormat.Binary));
 
+            // Make a multi-chapter column, then verify RemoveFromEnd cleans up whole chapters
+            for(int i = 0; i < 100; ++i)
+            {
+                column[1024 * i] = "A";
+            }
+
+            column.RemoveFromEnd(column.Count - 2049);
+            Assert.Equal(2049, column.Count);
+            Assert.Equal("A", column[0]);
+            Assert.Equal("A", column[1024]);
+            Assert.Equal("A", column[2048]);
+
+            for (int i = 3; i < 100; ++i)
+            {
+                Assert.Null(column[1024 * i]);
+            }
+
             // Bounds check for VariableLengthColumn
             Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
         }

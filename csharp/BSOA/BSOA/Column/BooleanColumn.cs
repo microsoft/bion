@@ -12,6 +12,7 @@ namespace BSOA.Column
         private const uint FirstBit = 0x1U << 31;
         private const string Inner = nameof(Inner);
         private NumberColumn<uint> _innerColumn;
+        private bool _defaultValue;
 
         /// <summary>
         ///  Build a BooleanColumn with the given default value.
@@ -21,6 +22,7 @@ namespace BSOA.Column
         {
             uint defaultNumber = (defaultValue ? ~0U : 0U);
             _innerColumn = new NumberColumn<uint>(defaultNumber);
+            _defaultValue = defaultValue;
         }
 
         /// <summary>
@@ -54,15 +56,37 @@ namespace BSOA.Column
             }
         }
 
+        public void Trim()
+        {
+            // Nothing to do
+        }
+
         public void Clear()
         {
             Count = 0;
             _innerColumn.Clear();
         }
 
-        public void Trim()
+        public void RemoveFromEnd(int count)
         {
-            // Nothing to do
+            int newLastIndex = ((Count - 1) - count);
+            int firstRemovedBlock = (newLastIndex >> 5) + 1;
+
+            // Remove whole 32-bit chunks now out of range
+            if (_innerColumn.Count > firstRemovedBlock) 
+            { 
+                _innerColumn.RemoveFromEnd(_innerColumn.Count - firstRemovedBlock); 
+            }
+
+            // Reset values over new count in last block
+            int firstInvalidIndex = (firstRemovedBlock << 5);
+            for (int i = newLastIndex + 1; i < firstInvalidIndex; ++i)
+            {
+                this[i] = _defaultValue;
+            }
+
+            // Track reduced size
+            Count -= count;
         }
 
         public void Swap(int index1, int index2)

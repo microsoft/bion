@@ -11,11 +11,11 @@ namespace BSOA.Column
         // Remove excess capacity and prepare to serialize
         void Trim();
 
-        // Swap two values within column
-        void Swap(int index1, int index2);
+        // Remove last rows from column
+        void RemoveFromEnd(int count);
 
-        //// Remove last items from column
-        //void RemoveFromEnd(int length);
+        // Swap two values efficiently within column
+        void Swap(int index1, int index2);
     }
 
     public interface IColumn<T> : IReadOnlyList<T>, IColumn

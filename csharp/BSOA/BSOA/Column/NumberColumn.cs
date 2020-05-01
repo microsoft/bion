@@ -80,6 +80,18 @@ namespace BSOA.Column
             // Nothing to do
         }
 
+        public void RemoveFromEnd(int count)
+        {
+            // Clear last 'count' values
+            for (int i = Count - count; i < Math.Min(_array?.Length ?? 0, Count); ++i)
+            {
+                _array[i] = _defaultValue;
+            }
+
+            // Track reduced size
+            Count -= count;
+        }
+
         public void Swap(int index1, int index2)
         {
             T item = this[index1];

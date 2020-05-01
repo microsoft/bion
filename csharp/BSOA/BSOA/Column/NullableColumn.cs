@@ -56,6 +56,12 @@ namespace BSOA.Column
             _inner.Swap(index1, index2);
         }
 
+        public void RemoveFromEnd(int count)
+        {
+            _isNull.RemoveFromEnd(count);
+            _inner.RemoveFromEnd(count);
+        }
+
         private const string Inner = nameof(Inner);
         private const string IsNull = nameof(IsNull);
 

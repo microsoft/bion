@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace BSOA.Column
 {
@@ -75,6 +76,34 @@ namespace BSOA.Column
             {
                 chapter.Trim();
             }
+        }
+
+        public void RemoveFromEnd(int count)
+        {
+            // Clear last 'count' values
+            for (int i = Count - count; i < Count; ++i)
+            {
+                this[i] = ArraySlice<T>.Empty;
+            }
+
+            int newLastIndex = ((Count - 1) - count);
+            int newLastChapter = newLastIndex / NumberListChapter<T>.ChapterRowCount;
+            int newLastIndexInChapter = newLastIndex % NumberListChapter<T>.ChapterRowCount;
+
+            // Cut length of last chapter
+            if (_chapters.Count > newLastChapter)
+            {
+                _chapters[newLastChapter].Count = newLastIndexInChapter + 1;
+            }
+
+            // Remove any now-empty chapters
+            if (_chapters.Count > newLastChapter + 1)
+            {
+                _chapters.RemoveRange(newLastChapter + 1, _chapters.Count - (newLastChapter + 1));
+            }
+
+            // Track reduced size
+            Count -= count;
         }
 
         public void Swap(int index1, int index2)

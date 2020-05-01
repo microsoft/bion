@@ -48,6 +48,11 @@ namespace BSOA.Column
             _inner.Clear();
         }
 
+        public void RemoveFromEnd(int count)
+        {
+            _inner.RemoveFromEnd(count);
+        }
+
         public void Swap(int index1, int index2)
         {
             // Swapping slices directly is efficient, making each row 

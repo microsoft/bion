@@ -49,6 +49,11 @@ namespace BSOA.Column
             _inner.Trim();
         }
 
+        public void RemoveFromEnd(int count)
+        {
+            _inner.RemoveFromEnd(count);
+        }
+
         public void Swap(int index1, int index2)
         {
             // Swap inner values directly, saving converting back and forth

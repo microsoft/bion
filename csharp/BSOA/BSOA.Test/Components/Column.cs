@@ -95,6 +95,21 @@ namespace BSOA.Test
             Assert.Equal(valueProvider(30), column[30]);
             Assert.Equal(defaultValue, column[60]);
 
+            // Verify RemoveFromEnd for only default values works
+            column.RemoveFromEnd(column.Count - 100);
+            Assert.Equal(100, column.Count);
+            Assert.Equal(defaultValue, column[100]);
+
+            // Verify RemoveFromEnd down to non-default values works
+            column.RemoveFromEnd(100 - 10);
+            Assert.Equal(10, column.Count);
+
+            for (int i = 0; i < 100; ++i)
+            {
+                T value = (i < 10 ? valueProvider(i) : defaultValue);
+                Assert.Equal(value, column[i]);
+            }
+
             // Verify Trim doesn't throw
             column.Trim();
 
@@ -105,6 +120,11 @@ namespace BSOA.Test
             Assert.Equal(0, column.Count);
             Assert.Equal(defaultValue, column[0]);
             Assert.Equal(defaultValue, column[1]);
+
+            // Add one default value (inner array may still not be allocated), then try RemoveFromEnd
+            column[0] = defaultValue;
+            column.RemoveFromEnd(1);
+            Assert.Equal(0, column.Count);
 
             // Verify indexer range check (< 0 only; columns auto-size for bigger values)
             Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
