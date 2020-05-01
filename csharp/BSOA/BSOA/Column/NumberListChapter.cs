@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace BSOA.Column
 {
     /// <summary>
-    ///  Contains one 'Chapter' (1,024 rows) of values for a VariableLengthColumn.
+    ///  Contains one 'Chapter' of values for a NumberListColumn.
     /// </summary>
     /// <remarks>
     ///  Values with length &lt; 2,048 are stored back-to-back together in a SmallValueArray.
@@ -19,7 +19,7 @@ namespace BSOA.Column
     ///  The overall column uses longs for large values and chapter positions, allowing the column to be over 4 GB.
     /// </remarks>
     /// <typeparam name="T">Type of each part of Values (if each value is a string, this type is char)</typeparam>
-    internal class ColumnChapter<T> : ITreeSerializable where T : unmanaged
+    internal class NumberListChapter<T> : ITreeSerializable where T : unmanaged
     {
         public const int ChapterRowCount = 32768;
         public const int PageRowCount = 32;
@@ -36,7 +36,7 @@ namespace BSOA.Column
 
         public int Count { get; set; }
 
-        public ColumnChapter()
+        public NumberListChapter()
         {
             Count = 0;
         }
@@ -163,7 +163,7 @@ namespace BSOA.Column
         private const string SmallValues = nameof(SmallValues);
         private const string LargeValues = nameof(LargeValues);
 
-        private static Dictionary<string, Setter<ColumnChapter<T>>> setters = new Dictionary<string, Setter<ColumnChapter<T>>>()
+        private static Dictionary<string, Setter<NumberListChapter<T>>> setters = new Dictionary<string, Setter<NumberListChapter<T>>>()
         {
             [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
             [PageStart] = (r, me) => me._pageStartInChapter = r.ReadBlockArray<int>(),

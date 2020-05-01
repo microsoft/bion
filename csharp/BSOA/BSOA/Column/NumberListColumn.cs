@@ -22,7 +22,7 @@ namespace BSOA.Column
     /// <typeparam name="T">Type of each element of Values (for StringColumn, T is char)</typeparam>
     public class NumberListColumn<T> : IColumn<ArraySlice<T>> where T : unmanaged
     {
-        private List<ColumnChapter<T>> _chapters;
+        private List<NumberListChapter<T>> _chapters;
 
         public int Count { get; private set; }
         public bool Empty => Count == 0;
@@ -35,7 +35,7 @@ namespace BSOA.Column
         public void Clear()
         {
             Count = 0;
-            _chapters = new List<ColumnChapter<T>>();
+            _chapters = new List<NumberListChapter<T>>();
         }
 
         public ArraySlice<T> this[int index]
@@ -45,16 +45,16 @@ namespace BSOA.Column
                 if (index < 0) { throw new IndexOutOfRangeException(); }
                 if (index >= Count) { return ArraySlice<T>.Empty; }
 
-                int chapterIndex = index / ColumnChapter<T>.ChapterRowCount;
-                int indexInChapter = index % ColumnChapter<T>.ChapterRowCount;
+                int chapterIndex = index / NumberListChapter<T>.ChapterRowCount;
+                int indexInChapter = index % NumberListChapter<T>.ChapterRowCount;
 
                 return _chapters[chapterIndex][indexInChapter];
             }
 
             set
             {
-                int chapterIndex = index / ColumnChapter<T>.ChapterRowCount;
-                int indexInChapter = index % ColumnChapter<T>.ChapterRowCount;
+                int chapterIndex = index / NumberListChapter<T>.ChapterRowCount;
+                int indexInChapter = index % NumberListChapter<T>.ChapterRowCount;
 
                 if (index >= Count) { Count = index + 1; }
 
@@ -62,7 +62,7 @@ namespace BSOA.Column
 
                 while (chapterIndex >= _chapters.Count)
                 {
-                    _chapters.Add(new ColumnChapter<T>());
+                    _chapters.Add(new NumberListChapter<T>());
                 }
 
                 _chapters[chapterIndex][indexInChapter] = value;
@@ -71,7 +71,7 @@ namespace BSOA.Column
 
         public void Trim()
         {
-            foreach (ColumnChapter<T> chapter in _chapters)
+            foreach (NumberListChapter<T> chapter in _chapters)
             {
                 chapter.Trim();
             }
@@ -91,7 +91,7 @@ namespace BSOA.Column
         private static Dictionary<string, Setter<NumberListColumn<T>>> setters = new Dictionary<string, Setter<NumberListColumn<T>>>()
         {
             [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
-            [nameof(Chapters)] = (r, me) => me._chapters = r.ReadList<ColumnChapter<T>>(() => new ColumnChapter<T>())
+            [nameof(Chapters)] = (r, me) => me._chapters = r.ReadList<NumberListChapter<T>>(() => new NumberListChapter<T>())
         };
 
         public void Read(ITreeReader reader)
