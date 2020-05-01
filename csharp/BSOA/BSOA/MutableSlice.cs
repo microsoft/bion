@@ -18,12 +18,12 @@ namespace BSOA
         private const int MinimumSize = 16;
 
         // Store a reference to the column and index containing the real ArraySlice value.
-        private VariableLengthColumn<T> _column;
+        private NumberListColumn<T> _column;
         private int _index;
 
         public static MutableSlice<T> Empty = new MutableSlice<T>();
 
-        public MutableSlice(VariableLengthColumn<T> column, int index)
+        public MutableSlice(NumberListColumn<T> column, int index)
         {
             if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
             _column = column;

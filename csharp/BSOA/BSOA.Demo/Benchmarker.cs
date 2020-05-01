@@ -116,7 +116,7 @@ namespace BSOA.Demo
 
             Time($"Writing as BSOA JSON to '{BsoaJsonPath}'...", () =>
             {
-                using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Verbose = false }))
+                using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Verbose = true }))
                 {
                     bsoaLog.Write(writer);
                 }

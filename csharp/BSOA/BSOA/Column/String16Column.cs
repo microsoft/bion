@@ -12,13 +12,13 @@ namespace BSOA.Column
     public class String16Column : IColumn<string>
     {
         private BooleanColumn _isNull;
-        private VariableLengthColumn<char> _inner;
+        private NumberListColumn<char> _inner;
 
         public String16Column()
         {
             // Default is Null
             _isNull = new BooleanColumn(true);
-            _inner = new VariableLengthColumn<char>();
+            _inner = new NumberListColumn<char>();
         }
 
         public int Count => _inner.Count;

@@ -8,13 +8,13 @@ namespace BSOA.Column
     public class StringColumn : IColumn<string>
     {
         private BooleanColumn _isNull;
-        private VariableLengthColumn<byte> _inner;
+        private NumberListColumn<byte> _inner;
 
         public StringColumn()
         {
             // Default is Null
             _isNull = new BooleanColumn(true);
-            _inner = new VariableLengthColumn<byte>();
+            _inner = new NumberListColumn<byte>();
         }
 
         public int Count => _inner.Count;

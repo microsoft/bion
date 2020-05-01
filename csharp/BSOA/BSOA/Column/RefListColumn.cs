@@ -10,7 +10,7 @@ namespace BSOA.Column
     /// </summary>
     public class RefListColumn : IColumn<MutableSlice<int>>
     {
-        private VariableLengthColumn<int> _inner;
+        private NumberListColumn<int> _inner;
         public string ReferencedTableName { get; }
 
         public int Count => _inner.Count;
@@ -18,7 +18,7 @@ namespace BSOA.Column
 
         public RefListColumn(string referencedTableName)
         {
-            _inner = new VariableLengthColumn<int>();
+            _inner = new NumberListColumn<int>();
             ReferencedTableName = referencedTableName;
         }
 
