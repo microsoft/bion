@@ -5,11 +5,11 @@ namespace BSOA.Converter
     /// <summary>
     ///  StringConverter provides conversion between string and byte[]
     /// </summary>
-    public class Utf8StringConverter : IConverter<ArraySlice<byte>, string>, IConverter<string, ArraySlice<byte>>
+    public class StringConverter : IConverter<ArraySlice<byte>, string>, IConverter<string, ArraySlice<byte>>
     {
-        public static Utf8StringConverter Instance = new Utf8StringConverter();
+        public static StringConverter Instance = new StringConverter();
 
-        private Utf8StringConverter()
+        private StringConverter()
         { }
 
         public string Convert(ArraySlice<byte> value)
