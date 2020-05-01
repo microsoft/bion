@@ -48,6 +48,13 @@ namespace BSOA.Column
             _inner.Clear();
         }
 
+        public void Swap(int index1, int index2)
+        {
+            // Swapping slices directly is efficient, making each row 
+            // refer to the existing ArraySlice from the other.
+            _inner.Swap(index1, index2);
+        }
+
         public void Write(ITreeWriter writer)
         {
             _inner.Write(writer);

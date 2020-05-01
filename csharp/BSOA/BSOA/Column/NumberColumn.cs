@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using BSOA.Converter;
 using BSOA.Extensions;
 using BSOA.IO;
 
@@ -78,6 +78,13 @@ namespace BSOA.Column
         public void Trim()
         {
             // Nothing to do
+        }
+
+        public void Swap(int index1, int index2)
+        {
+            T item = this[index1];
+            this[index1] = this[index2];
+            this[index2] = item;
         }
 
         private void ResizeTo(int size)

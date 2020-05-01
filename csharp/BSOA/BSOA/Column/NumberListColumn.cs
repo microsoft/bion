@@ -77,6 +77,15 @@ namespace BSOA.Column
             }
         }
 
+        public void Swap(int index1, int index2)
+        {
+            // Swapping slices avoids copies by just having the rows refer to 
+            // the array slices one another were already using. 
+            ArraySlice<T> item = this[index1];
+            this[index1] = this[index2];
+            this[index2] = item;
+        }
+
         public IEnumerator<ArraySlice<T>> GetEnumerator()
         {
             return new ListEnumerator<ArraySlice<T>>(this);

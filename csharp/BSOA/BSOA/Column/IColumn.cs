@@ -11,8 +11,8 @@ namespace BSOA.Column
         // Remove excess capacity and prepare to serialize
         void Trim();
 
-        //// Swap two values within column
-        //void Swap(int index1, int index2);
+        // Swap two values within column
+        void Swap(int index1, int index2);
 
         //// Remove last items from column
         //void RemoveFromEnd(int length);

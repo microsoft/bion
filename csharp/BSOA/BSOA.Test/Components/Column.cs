@@ -79,6 +79,22 @@ namespace BSOA.Test
                 Assert.Equal(value, column[i]);
             }
 
+            // Swap two non-default values, verify swapped, swap back
+            column.Swap(10, 20);
+            Assert.Equal(valueProvider(10), column[20]);
+            Assert.Equal(valueProvider(20), column[10]);
+            column.Swap(10, 20);
+            Assert.Equal(valueProvider(10), column[10]);
+            Assert.Equal(valueProvider(20), column[20]);
+
+            // Swap a default with a non-default value, verify swapped, swap back
+            column.Swap(30, 60);
+            Assert.Equal(valueProvider(30), column[60]);
+            Assert.Equal(defaultValue, column[30]);
+            column.Swap(30, 60);
+            Assert.Equal(valueProvider(30), column[30]);
+            Assert.Equal(defaultValue, column[60]);
+
             // Verify Trim doesn't throw
             column.Trim();
 

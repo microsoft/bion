@@ -50,6 +50,12 @@ namespace BSOA.Column
             _inner.Trim();
         }
 
+        public void Swap(int index1, int index2)
+        {
+            _isNull.Swap(index1, index2);
+            _inner.Swap(index1, index2);
+        }
+
         private const string Inner = nameof(Inner);
         private const string IsNull = nameof(IsNull);
 

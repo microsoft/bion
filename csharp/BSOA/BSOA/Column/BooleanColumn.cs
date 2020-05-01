@@ -65,6 +65,13 @@ namespace BSOA.Column
             // Nothing to do
         }
 
+        public void Swap(int index1, int index2)
+        {
+            bool item = this[index1];
+            this[index1] = this[index2];
+            this[index2] = item;
+        }
+
         public IEnumerator<bool> GetEnumerator()
         {
             return new ListEnumerator<bool>(this);

@@ -49,6 +49,12 @@ namespace BSOA.Column
             _inner.Trim();
         }
 
+        public void Swap(int index1, int index2)
+        {
+            // Swap inner values directly, saving converting back and forth
+            _inner.Swap(index1, index2);
+        }
+
         public void Read(ITreeReader reader)
         {
             _inner.Read(reader);
