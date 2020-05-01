@@ -9,10 +9,11 @@ namespace BSOA.Column
     public class DateTimeColumn : ConvertingColumn<DateTime, long>
     {
         public DateTimeColumn(DateTime defaultValue)
-            : base(
-                  new NumberColumn<long>(DateTimeConverter.Instance.Convert(defaultValue)),
-                  DateTimeConverter.Instance, 
-                  DateTimeConverter.Instance)
+            : this(DateTimeConverter.Instance.Convert(defaultValue))
+        { }
+
+        private DateTimeColumn(long defaultValue) 
+            : base(new NumberColumn<long>(defaultValue), DateTimeConverter.Instance, DateTimeConverter.Instance)
         { }
     }
 }

@@ -12,7 +12,7 @@ namespace BSOA.Test
         {
             // Normal Enum
             Column.Basics<DayOfWeek>(
-                () => new EnumColumn<DayOfWeek, int>(DayOfWeek.Sunday),
+                () => new EnumColumn<DayOfWeek, int>(DayOfWeek.Sunday, (v) => (int)v, (v) => (DayOfWeek)v),
                 DayOfWeek.Sunday,
                 DayOfWeek.Wednesday,
                 (i) => ((DayOfWeek)(i % 7))
@@ -31,7 +31,7 @@ namespace BSOA.Test
             };
 
             Column.Basics<FileAttributes>(
-                () => new EnumColumn<FileAttributes, int>(default(FileAttributes)),
+                () => new EnumColumn<FileAttributes, int>(default(FileAttributes), (v) => (int)v, (v) => (FileAttributes)v),
                 default(FileAttributes),
                 FileAttributes.ReadOnly | FileAttributes.System,
                 (i) => samples[i % samples.Length]

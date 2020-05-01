@@ -1,5 +1,6 @@
 ﻿using BSOA.Converter;
 using BSOA.IO;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -14,10 +15,14 @@ namespace BSOA.Column
     public class ConvertingColumn<T, U> : IColumn<T>
     {
         private IColumn<U> _inner;
-        private IConverter<T, U> _toInner;
-        private IConverter<U, T> _toOuter;
+        private Func<T, U> _toInner;
+        private Func<U, T> _toOuter;
 
         public ConvertingColumn(IColumn<U> inner, IConverter<T, U> toInner, IConverter<U, T> toOuter)
+            : this(inner, toInner.Convert, toOuter.Convert)
+        { }
+
+        public ConvertingColumn(IColumn<U> inner, Func<T, U> toInner, Func<U, T> toOuter)
         {
             _inner = inner;
             _toInner = toInner;
@@ -26,8 +31,8 @@ namespace BSOA.Column
 
         public T this[int index] 
         {
-            get => _toOuter.Convert(_inner[index]);
-            set => _inner[index] = _toInner.Convert(value);
+            get => _toOuter(_inner[index]);
+            set => _inner[index] = _toInner(value);
         }
 
         public int Count => _inner.Count;

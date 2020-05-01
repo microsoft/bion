@@ -1,61 +1,19 @@
-﻿using BSOA.IO;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 
 namespace BSOA.Column
 {
     /// <summary>
     ///  EnumColumn implements IColumn for enums on top of a NumberColumn&lt;U&gt;
-    ///  Callers must specify the underlying enum storage type
+    ///  Constructors must identify underlying type and provide cast funcs.
     /// </summary>
-    public class EnumColumn<T, U> : IColumn<T> where U : unmanaged, IEquatable<U>
+    /// <example>
+    ///  For: public enum DayOfWeek : byte { ... }
+    ///  Use: new EnumColumn&lt;DayOfWeek, byte&gt;(DayOfWeek.Sunday, (v) => (byte)v, (v) => (DayOfWeek)v);
+    /// </example>
+    public class EnumColumn<T, U> : ConvertingColumn<T, U> where U : unmanaged, IEquatable<U>
     {
-        private NumberColumn<U> _inner;
-
-        public EnumColumn(T defaultValue)
-        {
-            _inner = new NumberColumn<U>((U)(object)defaultValue);
-        }
-
-        public int Count => _inner.Count;
-        
-        public bool Empty => Count == 0;
-        
-        public T this[int index]
-        {
-            get { return (T)(object)_inner[index]; }
-            set { _inner[index] = (U)(object)value; }
-        }
-
-        public void Clear()
-        {
-            _inner.Clear();
-        }
-
-        public void Trim()
-        {
-            _inner.Trim();
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
-        }
-
-        public void Read(ITreeReader reader)
-        {
-            _inner.Read(reader);
-        }
-
-        public void Write(ITreeWriter writer)
-        {
-            _inner.Write(writer);
-        }
+        public EnumColumn(T defaultValue, Func<T, U> toNumber, Func<U, T> toEnum)
+            : base(new NumberColumn<U>(toNumber(defaultValue)), toNumber, toEnum)
+        { }
     }
 }

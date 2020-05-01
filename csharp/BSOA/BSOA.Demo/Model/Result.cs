@@ -81,7 +81,7 @@ namespace BSOA.Demo.Model
         public ResultTable(SarifLogBsoa database) : base()
         {
             this.Database = database;
-            this.BaselineState = AddColumn(nameof(BaselineState), new EnumColumn<BaselineState, int>(Microsoft.CodeAnalysis.Sarif.BaselineState.None));
+            this.BaselineState = AddColumn(nameof(BaselineState), new EnumColumn<BaselineState, int>(Microsoft.CodeAnalysis.Sarif.BaselineState.None, (v) => (int)v, (v) => (BaselineState)v));
             this.RuleId = AddColumn(nameof(RuleId), new StringColumn());
             this.RuleIndex = AddColumn(nameof(RuleIndex), new NumberColumn<int>(-1));
             this.Message = AddColumn(nameof(Message), new RefColumn(nameof(database.Message)));
