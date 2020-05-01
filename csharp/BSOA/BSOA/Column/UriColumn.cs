@@ -8,7 +8,7 @@ namespace BSOA.Column
     /// </summary>
     public class UriColumn : ConvertingColumn<Uri, string>
     {
-        public UriColumn() : base(new StringColumn(), UriConverter.Instance, UriConverter.Instance)
+        public UriColumn() : base(new StringColumn(), UriConverter.Instance)
         { }
     }
 }

@@ -18,8 +18,8 @@ namespace BSOA.Column
         private Func<T, U> _toInner;
         private Func<U, T> _toOuter;
 
-        public ConvertingColumn(IColumn<U> inner, IConverter<T, U> toInner, IConverter<U, T> toOuter)
-            : this(inner, toInner.Convert, toOuter.Convert)
+        public ConvertingColumn(IColumn<U> inner, IConverter<T, U> converter)
+            : this(inner, converter.Convert, converter.Convert)
         { }
 
         public ConvertingColumn(IColumn<U> inner, Func<T, U> toInner, Func<U, T> toOuter)

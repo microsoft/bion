@@ -12,7 +12,7 @@ namespace BSOA.Column
         //  - ConvertingColumn, to convert strings to and from byte[], over a
         //  - NumberListColumn<byte>, to store the UTF-8 bytes per row
         public StringColumn() : base(
-            new ConvertingColumn<string, ArraySlice<byte>>(new NumberListColumn<byte>(), StringConverter.Instance, StringConverter.Instance))
+            new ConvertingColumn<string, ArraySlice<byte>>(new NumberListColumn<byte>(), StringConverter.Instance))
         { }
     }
 }

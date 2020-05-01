@@ -13,7 +13,7 @@ namespace BSOA.Column
         { }
 
         private DateTimeColumn(long defaultValue) 
-            : base(new NumberColumn<long>(defaultValue), DateTimeConverter.Instance, DateTimeConverter.Instance)
+            : base(new NumberColumn<long>(defaultValue), DateTimeConverter.Instance)
         { }
     }
 }
