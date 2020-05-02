@@ -25,7 +25,7 @@ namespace BSOA.Test
             NumberColumnTest<double>(-5.5f, 124.5f, (i) => 0.5f * i);
         }
 
-        private void NumberColumnTest<T>(T defaultValue, T otherValue, Func<int, T> valueProvider) where T : unmanaged, IEquatable<T>
+        private void NumberColumnTest<T>(T defaultValue, T otherValue, Func<int, T> valueProvider) where T : unmanaged, IEquatable<T>, IComparable<T>
         {
             Column.Basics<T>(() => new NumberColumn<T>(defaultValue), defaultValue, otherValue, valueProvider);
         }

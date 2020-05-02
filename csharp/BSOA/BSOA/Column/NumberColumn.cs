@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using BSOA.Converter;
 using BSOA.Extensions;
 using BSOA.IO;
 
@@ -12,13 +11,14 @@ namespace BSOA.Column
     ///  ushort, short, uint, int, ulong, long, float, double.
     /// </summary>
     /// <typeparam name="T">Numeric Type of column values</typeparam>
-    public class NumberColumn<T> : IColumn<T> where T : unmanaged, IEquatable<T>
+    public class NumberColumn<T> : IColumn<T> where T : unmanaged, IEquatable<T>, IComparable<T>
     {
         private const int MinimumSize = 32;
         private const string Array = nameof(Array);
 
         private T _defaultValue;
         private T[] _array;
+        private int UsedArrayLength => Math.Min(_array?.Length ?? 0, Count);
 
         /// <summary>
         ///  Build a NumberColumn with the given default value.
@@ -69,6 +69,8 @@ namespace BSOA.Column
             }
         }
 
+        public ArraySlice<T> Slice => (UsedArrayLength == 0 ? ArraySlice<T>.Empty : new ArraySlice<T>(_array, index: 0, length: UsedArrayLength));
+
         public void Clear()
         {
             Count = 0;
@@ -83,7 +85,8 @@ namespace BSOA.Column
         public void RemoveFromEnd(int count)
         {
             // Clear last 'count' values
-            for (int i = Count - count; i < Math.Min(_array?.Length ?? 0, Count); ++i)
+            int length = UsedArrayLength;
+            for (int i = Count - count; i < length; ++i)
             {
                 _array[i] = _defaultValue;
             }
@@ -101,7 +104,7 @@ namespace BSOA.Column
 
         private void ResizeTo(int size)
         {
-            int currentLength = _array?.Length ?? 0;
+            int currentLength = UsedArrayLength;
             int newLength = Math.Max(MinimumSize, Math.Max(size, (currentLength + currentLength / 2)));
             T[] newArray = new T[newLength];
 
@@ -143,7 +146,7 @@ namespace BSOA.Column
         {
             writer.WriteStartObject();
             writer.Write(nameof(Count), Count);
-            writer.WriteBlockArray(Array, _array, 0, Math.Min(Count, _array?.Length ?? 0));
+            writer.WriteBlockArray(Array, _array, 0, UsedArrayLength);
             writer.WriteEndObject();
         }
     }

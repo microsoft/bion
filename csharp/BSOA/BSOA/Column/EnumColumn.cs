@@ -10,7 +10,7 @@ namespace BSOA.Column
     ///  For: public enum DayOfWeek : byte { ... }
     ///  Use: new EnumColumn&lt;DayOfWeek, byte&gt;(DayOfWeek.Sunday, (v) => (byte)v, (v) => (DayOfWeek)v);
     /// </example>
-    public class EnumColumn<T, U> : ConvertingColumn<T, U> where U : unmanaged, IEquatable<U>
+    public class EnumColumn<T, U> : ConvertingColumn<T, U> where U : unmanaged, IEquatable<U>, IComparable<U>
     {
         public EnumColumn(T defaultValue, Func<T, U> toNumber, Func<U, T> toEnum)
             : base(new NumberColumn<U>(toNumber(defaultValue)), toNumber, toEnum)

@@ -80,17 +80,21 @@ namespace BSOA.Demo
 
             Time($"Loading {InputFilePath}...", () => log = SarifLog.Load(InputFilePath));
 
-            // Extract a BSOA-supported SarifLog subset for apples-to-apples comparison with BSOA form
             SarifLogFiltered filtered = null;
-            SarifLogBsoa bsoaLog = new SarifLogBsoa();
-
-            Time($"Converting to demo form...", () =>
+            Time($"Extracting supported subset...", () =>
             {
                 filtered = SarifLogFiltered.FromSarif(log);
-                bsoaLog = filtered.ToBsoa();
-
-                Console.WriteLine($" -> {filtered.ToString()}");
             });
+
+            // Extract a BSOA-supported SarifLog subset for apples-to-apples comparison with BSOA form
+            SarifLogBsoa bsoaLog = new SarifLogBsoa();
+
+            Time($"Converting to BSOA model...", () =>
+            {
+                bsoaLog = filtered.ToBsoa();
+            }, iterations: 10);
+
+            Console.WriteLine($" -> {bsoaLog.ToString()}");
 
             Time($"Writing as JSON to '{NormalJsonPath}'...", () =>
             {
@@ -123,45 +127,42 @@ namespace BSOA.Demo
             });
         }
 
-        public static void Time(string description, Action method)
+        public static TimeSpan Time(string description, Action method, int iterations = 1)
         {
+            Console.WriteLine();
             Console.WriteLine(description);
 
-            Stopwatch w = Stopwatch.StartNew();
-            method();
-            w.Stop();
-
-            Console.WriteLine($" -> {w.Elapsed.TotalSeconds:n2} sec.");
-            Console.WriteLine();
-        }
-
-        static T Measure<T>(Func<string, T> loader, string path, string description, int iterations = 5)
-        {
-            T result = default(T);
-            double ramBeforeMB = GC.GetTotalMemory(true) / Megabyte;
             Stopwatch w = Stopwatch.StartNew();
             TimeSpan elapsedAfterFirst = TimeSpan.Zero;
-
-            Console.WriteLine();
-            Console.WriteLine(description);
 
             for (int iteration = 0; iteration < iterations; iteration++)
             {
                 GC.Collect();
 
                 w.Restart();
-                result = loader(path);
+                method();
                 w.Stop();
 
                 Console.Write($"{(iteration > 0 ? " | " : "")}{w.Elapsed.TotalSeconds:n2}s");
                 if (iteration > 0) { elapsedAfterFirst += w.Elapsed; }
             }
 
+            Console.WriteLine();
+            return (iterations == 1 ? w.Elapsed : (elapsedAfterFirst / (iterations - 1)));
+        }
+
+        static T Measure<T>(Func<string, T> loader, string path, string description, int iterations = 5)
+        {
+            T result = default(T);
+            double ramBeforeMB = GC.GetTotalMemory(true) / Megabyte;
+
+            // Run and time the method
+            TimeSpan averageRuntime = Time(description, () => result = loader(path), iterations);
+
             double ramAfterMB = GC.GetTotalMemory(true) / Megabyte;
             double fileSizeMB = new FileInfo(path).Length / Megabyte;
-            double loadMegabytesPerSecond = fileSizeMB / (elapsedAfterFirst.TotalSeconds / (iterations - 1));
+            double loadMegabytesPerSecond = fileSizeMB / averageRuntime.TotalSeconds;
 
-            Console.WriteLine();
             Console.WriteLine($" -> Read {result} in {fileSizeMB:n1} MB at {loadMegabytesPerSecond:n1} MB/s into {(ramAfterMB - ramBeforeMB):n1} MB RAM");
 
             return result;
