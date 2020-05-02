@@ -68,12 +68,12 @@ namespace BSOA.Demo.Model
         internal SarifLogBsoa Database;
 
         // Add via 'bcolumn' snippet
-        internal EnumColumn<BaselineState, int> BaselineState;
-        internal StringColumn RuleId;
-        internal NumberColumn<int> RuleIndex;
+        internal IColumn<BaselineState> BaselineState;
+        internal IColumn<string> RuleId;
+        internal IColumn<int> RuleIndex;
         internal RefColumn Message;
         internal RefListColumn Locations;
-        internal StringColumn Guid;
+        internal IColumn<string> Guid;
         
         // *Many* other Result properties not used in Spam Results
         // Used but missing: PartialFingerprints, Properties
@@ -81,9 +81,9 @@ namespace BSOA.Demo.Model
         public ResultTable(SarifLogBsoa database) : base()
         {
             this.Database = database;
-            this.BaselineState = AddColumn(nameof(BaselineState), new EnumColumn<BaselineState, int>(Microsoft.CodeAnalysis.Sarif.BaselineState.None, (v) => (int)v, (v) => (BaselineState)v));
-            this.RuleId = AddColumn(nameof(RuleId), new StringColumn());
-            this.RuleIndex = AddColumn(nameof(RuleIndex), new NumberColumn<int>(-1));
+            this.BaselineState = AddColumn(nameof(BaselineState), new DistinctColumn<BaselineState>(new EnumColumn<BaselineState, int>(Microsoft.CodeAnalysis.Sarif.BaselineState.None, (v) => (int)v, (v) => (BaselineState)v), Microsoft.CodeAnalysis.Sarif.BaselineState.None));
+            this.RuleId = AddColumn(nameof(RuleId), new DistinctColumn<string>(new StringColumn(), null));
+            this.RuleIndex = AddColumn(nameof(RuleIndex), new DistinctColumn<int>(new NumberColumn<int>(-1), -1));
             this.Message = AddColumn(nameof(Message), new RefColumn(nameof(database.Message)));
             this.Locations = AddColumn(nameof(Locations), new RefListColumn(nameof(database.Location)));
             this.Guid = AddColumn(nameof(Guid), new StringColumn());

@@ -31,7 +31,7 @@ namespace BSOA.Demo.Model
 
         public override string ToString()
         {
-            return $"{Result.Count:n0} {nameof(Results)}s";
+            return $"{Result.Count:n0} {nameof(Result)}s";
         }
     }
 }

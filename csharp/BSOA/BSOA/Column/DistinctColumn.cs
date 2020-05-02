@@ -17,7 +17,7 @@ namespace BSOA.Column
         private Dictionary<T, byte> _distinct;
         private IColumn<T> _values;
         private NumberColumn<byte> _indices;
-        
+
         public DistinctColumn(IColumn<T> values, T defaultValue)
         {
             _defaultValue = defaultValue;
@@ -26,7 +26,7 @@ namespace BSOA.Column
         }
 
         public bool IsMappingValues => (_distinct != null);
-        public int DistinctCount => (IsMappingValues ? _distinct.Count : -1);
+        public int DistinctCount => (IsMappingValues ? _distinct.Count + 1 : -1);
         public int Count => (IsMappingValues ? _indices.Count : _values.Count);
         public bool Empty => (Count == 0);
 
@@ -50,16 +50,18 @@ namespace BSOA.Column
         private bool TryGetDistinctIndex(T value, out byte index)
         {
             index = 0;
+            if (value == null) { return _defaultValue == null; }
+            if (_defaultValue != null && value.Equals(_defaultValue)) { return true; }
 
             if (_distinct.TryGetValue(value, out index))
             {
                 // Existing value - return current index
                 return true;
             }
-            else if (_distinct.Count <= 256)
+            else if (DistinctCount <= 256)
             {
                 // New value, count still ok - add and return new index
-                index = (byte)(_distinct.Count);
+                index = (byte)(_distinct.Count + 1);
                 _distinct[value] = index;
                 _values[index] = value;
                 return true;
@@ -87,7 +89,6 @@ namespace BSOA.Column
 
             // One distinct value; the default
             _distinct = new Dictionary<T, byte>();
-            _distinct[_defaultValue] = 0;
             _values.Clear();
             _values[0] = _defaultValue;
         }
@@ -119,15 +120,14 @@ namespace BSOA.Column
                 HashSet<byte> unusedValues = new HashSet<byte>();
                 unusedValues.UnionWith(_distinct.Values);
 
-                // Remove default, and all values used in indices
-                unusedValues.Remove(0);
+                // Remove all values used in indices
                 Remapper.ExceptWith(unusedValues, _indices.Slice);
 
                 // If there are unused values, ...
                 if (unusedValues.Count > 0)
                 {
                     byte[] remapped = unusedValues.ToArray();
-                    byte remapFrom = (byte)(_distinct.Count - remapped.Length);
+                    byte remapFrom = (byte)(DistinctCount - remapped.Length);
 
                     // Swap the *values* to the end of the values array
                     for (int i = 0; i < remapped.Length; ++i)
@@ -176,9 +176,8 @@ namespace BSOA.Column
         private void RebuildDistinctDictionary()
         {
             _distinct.Clear();
-            _distinct[_defaultValue] = 0;
 
-            for (int i = 0; i < _values.Count; ++i)
+            for (int i = 1; i < _values.Count; ++i)
             {
                 _distinct[_values[i]] = (byte)i;
             }
