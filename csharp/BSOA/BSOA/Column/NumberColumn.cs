@@ -13,9 +13,7 @@ namespace BSOA.Column
     /// <typeparam name="T">Numeric Type of column values</typeparam>
     public class NumberColumn<T> : IColumn<T> where T : unmanaged, IEquatable<T>, IComparable<T>
     {
-        private const int MinimumSize = 32;
         private const string Array = nameof(Array);
-
         private T _defaultValue;
         private T[] _array;
         private int UsedArrayLength => Math.Min(_array?.Length ?? 0, Count);
@@ -62,7 +60,7 @@ namespace BSOA.Column
                     // Don't resize for default values; the defaulting will respond correctly for them
                     if (_defaultValue.Equals(value)) { return; }
 
-                    ResizeTo(index + 1);
+                    ArrayExtensions.ResizeTo(ref _array, index + 1, _defaultValue);
                 }
 
                 _array[index] = value;
@@ -100,25 +98,6 @@ namespace BSOA.Column
             T item = this[index1];
             this[index1] = this[index2];
             this[index2] = item;
-        }
-
-        private void ResizeTo(int size)
-        {
-            int currentLength = UsedArrayLength;
-            int newLength = Math.Max(MinimumSize, Math.Max(size, (currentLength + currentLength / 2)));
-            T[] newArray = new T[newLength];
-
-            if (currentLength > 0)
-            {
-                _array.CopyTo(newArray, 0);
-            }
-
-            for (int i = currentLength; i < newLength; ++i)
-            {
-                newArray[i] = _defaultValue;
-            }
-
-            _array = newArray;
         }
 
         public IEnumerator<T> GetEnumerator()
