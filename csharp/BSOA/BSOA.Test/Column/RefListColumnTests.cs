@@ -17,7 +17,7 @@ namespace BSOA.Test
             RefListColumn column = new RefListColumn(referencedTable);
             column[0].SetTo(new ArraySlice<int>(new int[] { 0, 1, 2 }));
 
-            Column.Basics(() => new RefListColumn(referencedTable), MutableSlice<int>.Empty, column[0], (index) =>
+            Column.Basics(() => new RefListColumn(referencedTable), NumberList<int>.Empty, column[0], (index) =>
             {
                 column[index].SetTo(new ArraySlice<int>(new int[] { index, index + 1, index + 2 }));
                 return column[index];
@@ -67,7 +67,7 @@ namespace BSOA.Test
             RefListColumn column = BuildSampleColumn();
 
             // Verify second value is in a shared array, not at index zero, not expandable (yet), not ReadOnly
-            MutableSlice<int> slice = column[1];
+            NumberList<int> slice = column[1];
             Assert.Equal(4, slice.Count);
             Assert.True(slice.Slice.Index > 0);
             Assert.False(slice.Slice.IsExpandable);
@@ -96,8 +96,8 @@ namespace BSOA.Test
             RefListColumn column = BuildSampleColumn();
 
             // Verify second value is in a shared array, not at index zero, not expandable (yet), not ReadOnly
-            MutableSlice<int> innerSlice = column[1];
-            MutableSliceWrapper<int, PersonTable> slice = new MutableSliceWrapper<int, PersonTable>(innerSlice, null, (table, index) => index, (table, index) => index);
+            NumberList<int> innerSlice = column[1];
+            NumberListConverter<int, PersonTable> slice = new NumberListConverter<int, PersonTable>(innerSlice, null, (table, index) => index, (table, index) => index);
 
             // Test second sample row slice IList members on MutableSlice*Wrapper*
             TestIListMembers(slice);
@@ -108,7 +108,7 @@ namespace BSOA.Test
             Assert.Equal(values, string.Join(", ", column[1]));
 
             // SetTo(MutableSliceWrapper)
-            MutableSliceWrapper<int, PersonTable> firstRow = new MutableSliceWrapper<int, PersonTable>(column[0], null, (table, index) => index, (table, index) => index);
+            NumberListConverter<int, PersonTable> firstRow = new NumberListConverter<int, PersonTable>(column[0], null, (table, index) => index, (table, index) => index);
             slice.SetTo(firstRow);
             Assert.Equal(string.Join(", ", firstRow), string.Join(", ", slice));
 

@@ -27,14 +27,14 @@ namespace BSOA.Demo.Model
 
         public IList<Result> Results
         {
-            get => new MutableSliceWrapper<Result, ResultTable>(_table.Results[_index], _table.Database.Result, (table, index) => new Result(table, index), (table, item) => item._index);
-            set => new MutableSliceWrapper<Result, ResultTable>(_table.Results[_index], _table.Database.Result, (table, index) => new Result(table, index), (table, item) => item._index).SetTo(value);
+            get => new NumberListConverter<Result, ResultTable>(_table.Results[_index], _table.Database.Result, (table, index) => new Result(table, index), (table, item) => item._index);
+            set => new NumberListConverter<Result, ResultTable>(_table.Results[_index], _table.Database.Result, (table, index) => new Result(table, index), (table, item) => item._index).SetTo(value);
         }
 
         public IList<Artifact> Artifacts
         {
-            get => new MutableSliceWrapper<Artifact, ArtifactTable>(_table.Artifacts[_index], _table.Database.Artifact, (table, index) => new Artifact(table, index), (table, item) => item._index);
-            set => new MutableSliceWrapper<Artifact, ArtifactTable>(_table.Artifacts[_index], _table.Database.Artifact, (table, index) => new Artifact(table, index), (table, item) => item._index).SetTo(value);
+            get => new NumberListConverter<Artifact, ArtifactTable>(_table.Artifacts[_index], _table.Database.Artifact, (table, index) => new Artifact(table, index), (table, item) => item._index);
+            set => new NumberListConverter<Artifact, ArtifactTable>(_table.Artifacts[_index], _table.Database.Artifact, (table, index) => new Artifact(table, index), (table, item) => item._index).SetTo(value);
         }
     }
 

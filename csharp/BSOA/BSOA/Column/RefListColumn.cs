@@ -8,7 +8,7 @@ namespace BSOA.Column
     ///  RefListColumn provides a reference from an item in one table to a set
     ///  of items in another table. It stores the integer indices of the references.
     /// </summary>
-    public class RefListColumn : IColumn<MutableSlice<int>>
+    public class RefListColumn : IColumn<NumberList<int>>
     {
         private NumberListColumn<int> _inner;
         public string ReferencedTableName { get; }
@@ -22,20 +22,20 @@ namespace BSOA.Column
             ReferencedTableName = referencedTableName;
         }
 
-        public MutableSlice<int> this[int index] 
+        public NumberList<int> this[int index] 
         {
-            get => new MutableSlice<int>(_inner, index);
+            get => new NumberList<int>(_inner, index);
             set => _inner[index] = value.Slice;
         }
 
-        public IEnumerator<MutableSlice<int>> GetEnumerator()
+        public IEnumerator<NumberList<int>> GetEnumerator()
         {
-            return new ListEnumerator<MutableSlice<int>>(this);
+            return new ListEnumerator<NumberList<int>>(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new ListEnumerator<MutableSlice<int>>(this);
+            return new ListEnumerator<NumberList<int>>(this);
         }
 
         public void Trim()

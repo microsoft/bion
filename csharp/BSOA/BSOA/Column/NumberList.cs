@@ -6,14 +6,14 @@ using System.Collections.Generic;
 namespace BSOA
 {
     /// <summary>
-    ///  MutableSlice adds changeability on top of ArraySlices in a VariableLengthColumn.
+    ///  NumberList exposes a mutable IList on top of ArraySlices from NumberListColumn.
     /// </summary>
     /// <remarks>
-    ///  MutableSlice is a struct to avoid allocations when reading from a VariableLengthColumn.
-    ///  It therefore must update the ArraySlice in the VariableLengthColumn whenever the Count changes.
-    ///  It must retrieve the ArraySlice from the VariableLengthColumn on access to ensure it reflects changes another instance has made.
+    ///  NumberList is a struct to avoid allocations when reading values.
+    ///  NumberList therefore "points" to a row index in the column and retrieves the current slice on use.
+    ///  NumberList persists each Count change back to the column immediately.
     /// </remarks>
-    public struct MutableSlice<T> : IList<T>, IReadOnlyList<T> where T : unmanaged
+    public struct NumberList<T> : IList<T>, IReadOnlyList<T> where T : unmanaged
     {
         private const int MinimumSize = 16;
 
@@ -21,9 +21,9 @@ namespace BSOA
         private NumberListColumn<T> _column;
         private int _index;
 
-        public static MutableSlice<T> Empty = new MutableSlice<T>();
+        public static NumberList<T> Empty = new NumberList<T>();
 
-        public MutableSlice(NumberListColumn<T> column, int index)
+        public NumberList(NumberListColumn<T> column, int index)
         {
             if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
             _column = column;

@@ -5,21 +5,17 @@ using System.Collections.Generic;
 namespace BSOA
 {
     /// <summary>
-    ///  MutableSliceWrapper converts a MutableSlice&lt;int&rt; into an entity type.
+    ///  NumberListConverter wraps a NumberList and converts it from the internal int (an index of some entity)
+    ///  to instances of the entity type for external use.
     /// </summary>
-    /// <remarks>
-    ///  References from one table to another in BSOA are stored as the integer index of the referenced row.
-    ///  MutableSlice provides all IList operations on the integers themselves.
-    ///  MutableSliceWrapper provides IList&lt;Entity&gt;>, given a MutableList and converters from index to entity and back.
-    /// </remarks>
-    public struct MutableSliceWrapper<TItem, TTable> : IList<TItem>, IReadOnlyList<TItem>
+    public struct NumberListConverter<TItem, TTable> : IList<TItem>, IReadOnlyList<TItem>
     {
-        private MutableSlice<int> _inner;
+        private NumberList<int> _inner;
         private TTable _table;
         private Func<TTable, int, TItem> _toInstance;
         private Func<TTable, TItem, int> _toIndex;
 
-        public MutableSliceWrapper(MutableSlice<int> indices, TTable table, Func<TTable, int, TItem> toInstance, Func<TTable, TItem, int> toIndex)
+        public NumberListConverter(NumberList<int> indices, TTable table, Func<TTable, int, TItem> toInstance, Func<TTable, TItem, int> toIndex)
         {
             _inner = indices;
             _table = table;
@@ -33,7 +29,7 @@ namespace BSOA
             set => _inner[index] = _toIndex(_table, value);
         }
 
-        public MutableSlice<int> Indices => _inner;
+        public NumberList<int> Indices => _inner;
 
         public int Count => _inner.Count;
         public bool IsReadOnly => false;
@@ -41,9 +37,9 @@ namespace BSOA
         public void SetTo(IList<TItem> list)
         {
             // TODO: Cross-database copying. Can ITable do it via per-column copy?
-            if (list is MutableSliceWrapper<TItem, TTable>)
+            if (list is NumberListConverter<TItem, TTable>)
             {
-                MutableSliceWrapper<TItem, TTable> other = (MutableSliceWrapper<TItem, TTable>)list;
+                NumberListConverter<TItem, TTable> other = (NumberListConverter<TItem, TTable>)list;
                 _inner.SetTo(other.Indices.Slice);
             }
             else

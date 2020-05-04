@@ -39,8 +39,8 @@ namespace BSOA.Demo.Model
 
         public IList<LogicalLocation> LogicalLocations
         {
-            get => new MutableSliceWrapper<LogicalLocation, LogicalLocationTable>(_table.LogicalLocations[_index], _table.Database.LogicalLocation, (table, index) => new LogicalLocation(table, index), (table, item) => item._index);
-            set => new MutableSliceWrapper<LogicalLocation, LogicalLocationTable>(_table.LogicalLocations[_index], _table.Database.LogicalLocation, (table, index) => new LogicalLocation(table, index), (table, item) => item._index).SetTo(value);
+            get => new NumberListConverter<LogicalLocation, LogicalLocationTable>(_table.LogicalLocations[_index], _table.Database.LogicalLocation, (table, index) => new LogicalLocation(table, index), (table, item) => item._index);
+            set => new NumberListConverter<LogicalLocation, LogicalLocationTable>(_table.LogicalLocations[_index], _table.Database.LogicalLocation, (table, index) => new LogicalLocation(table, index), (table, item) => item._index).SetTo(value);
         }
 
         public Message Message
@@ -51,8 +51,8 @@ namespace BSOA.Demo.Model
 
         public IList<Region> Annotations
         {
-            get => new MutableSliceWrapper<Region, RegionTable>(_table.Annotations[_index], _table.Database.Region, (table, index) => new Region(table, index), (table, item) => item._index);
-            set => new MutableSliceWrapper<Region, RegionTable>(_table.Annotations[_index], _table.Database.Region, (table, index) => new Region(table, index), (table, item) => item._index).SetTo(value);
+            get => new NumberListConverter<Region, RegionTable>(_table.Annotations[_index], _table.Database.Region, (table, index) => new Region(table, index), (table, item) => item._index);
+            set => new NumberListConverter<Region, RegionTable>(_table.Annotations[_index], _table.Database.Region, (table, index) => new Region(table, index), (table, item) => item._index).SetTo(value);
         }
     }
 
