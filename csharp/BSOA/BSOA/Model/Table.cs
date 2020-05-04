@@ -104,8 +104,8 @@ namespace BSOA.Model
 
         private static Dictionary<string, Setter<Table<T>>> setters = new Dictionary<string, Setter<Table<T>>>()
         {
-            [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
-            [nameof(Columns)] = (r, me) => r.ReadDictionaryItems(me.Columns, throwOnUnknown: r.Settings.Strict),
+            [Names.Count] = (r, me) => me.Count = r.ReadAsInt32(),
+            [Names.Columns] = (r, me) => r.ReadDictionaryItems(me.Columns, throwOnUnknown: r.Settings.Strict),
         };
 
         public void Read(ITreeReader reader)
@@ -118,10 +118,10 @@ namespace BSOA.Model
         {
             writer.WriteStartObject();
 
-            writer.Write(nameof(Count), Count);
+            writer.Write(Names.Count, Count);
 
             // Write non-empty columns only
-            writer.WritePropertyName(nameof(Columns));
+            writer.WritePropertyName(Names.Columns);
             writer.WriteStartObject();
 
             foreach (var pair in Columns)

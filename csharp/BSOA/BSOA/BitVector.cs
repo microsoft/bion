@@ -3,7 +3,6 @@ using BSOA.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace BSOA
 {
@@ -15,25 +14,25 @@ namespace BSOA
     {
         private const uint FirstBit = 0x1U << 31;
         private bool _defaultValue;
-        private uint[] _vector;
+        private uint[] _array;
 
         public BitVector(bool defaultValue, int capacity)
         {
             _defaultValue = defaultValue;
-            _vector = null;
+            _array = null;
             Capacity = capacity;
         }
 
         public int Capacity { get; private set; }
-        public uint[] Vector => _vector;
+        public uint[] Array => _array;
 
         public bool this[int index]
         {
             get
             {
                 if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
-                if (_vector == null || _vector.Length <= (index >> 5)) { return _defaultValue; }
-                return (_vector[index >> 5] & (FirstBit >> (index & 31))) != 0UL;
+                if (_array == null || _array.Length <= (index >> 5)) { return _defaultValue; }
+                return (_array[index >> 5] & (FirstBit >> (index & 31))) != 0UL;
             }
             set
             {
@@ -42,19 +41,19 @@ namespace BSOA
                     Capacity = index + 1;
                 }
 
-                if (_vector == null || _vector.Length <= (index >> 5))
+                if (_array == null || _array.Length <= (index >> 5))
                 {
                     if (value == _defaultValue) { return; }
-                    ArrayExtensions.ResizeTo(ref _vector, ((Capacity + 31) >> 5), (_defaultValue ? ~0U : 0U));
+                    ArrayExtensions.ResizeTo(ref _array, ((Capacity + 31) >> 5), (_defaultValue ? ~0U : 0U));
                 }
 
                 if (value)
                 {
-                    _vector[index >> 5] |= (FirstBit >> (index & 31));
+                    _array[index >> 5] |= (FirstBit >> (index & 31));
                 }
                 else
                 {
-                    _vector[index >> 5] &= ~(FirstBit >> (index & 31));
+                    _array[index >> 5] &= ~(FirstBit >> (index & 31));
                 }
             }
         }
@@ -62,7 +61,7 @@ namespace BSOA
         public void Clear()
         {
             Capacity = 0;
-            _vector = null;
+            _array = null;
         }
 
         public void RemoveFromEnd(int count)
@@ -72,11 +71,11 @@ namespace BSOA
             uint defaultInt = (_defaultValue ? ~0U : 0U);
 
             // Remove whole 32-bit chunks now out of range
-            if (_vector != null)
+            if (_array != null)
             {
-                for (int i = firstRemovedBlock; i < _vector.Length; ++i)
+                for (int i = firstRemovedBlock; i < _array.Length; ++i)
                 {
-                    _vector[i] = defaultInt;
+                    _array[i] = defaultInt;
                 }
             }
 
@@ -139,16 +138,16 @@ namespace BSOA
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-            writer.Write(nameof(Capacity), Capacity);
-            writer.WritePropertyName(nameof(Vector));
-            writer.WriteBlockArray(Vector);
+            writer.Write(Names.Capacity, Capacity);
+            writer.WritePropertyName(Names.Array);
+            writer.WriteBlockArray(Array);
             writer.WriteEndObject();
         }
 
         private static Dictionary<string, Setter<BitVector>> setters = new Dictionary<string, Setter<BitVector>>()
         {
-            [nameof(Capacity)] = (r, me) => me.Capacity = r.ReadAsInt32(),
-            [nameof(Vector)] = (r, me) => me._vector = r.ReadBlockArray<uint>()
+            [Names.Capacity] = (r, me) => me.Capacity = r.ReadAsInt32(),
+            [Names.Array] = (r, me) => me._array = r.ReadBlockArray<uint>()
 
         };
 

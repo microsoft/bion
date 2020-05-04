@@ -17,7 +17,7 @@ namespace BSOA.Test
 
             // Empty vector
             VerifySame(expected, vector);
-            Assert.Null(vector.Vector);
+            Assert.Null(vector.Array);
 
             // Add every third item
             for(int i = 0; i < vector.Capacity; i += 3)
@@ -71,7 +71,7 @@ namespace BSOA.Test
             vector.Add(4000);
             expected.Add(4000);
             Assert.Equal(4001, vector.Capacity);
-            Assert.Equal(((4001 + 31) / 32), vector.Vector?.Length ?? 0);
+            Assert.Equal(((4001 + 31) / 32), vector.Array?.Length ?? 0);
             VerifySame(expected, vector);
 
             // Clear

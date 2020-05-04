@@ -124,11 +124,10 @@ namespace BSOA.Column
             return new ListEnumerator<ArraySlice<T>>(this);
         }
 
-        private const string Chapters = nameof(Chapters);
         private static Dictionary<string, Setter<NumberListColumn<T>>> setters = new Dictionary<string, Setter<NumberListColumn<T>>>()
         {
-            [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
-            [nameof(Chapters)] = (r, me) => me._chapters = r.ReadList<NumberListChapter<T>>(() => new NumberListChapter<T>())
+            [Names.Count] = (r, me) => me.Count = r.ReadAsInt32(),
+            [Names.Chapters] = (r, me) => me._chapters = r.ReadList<NumberListChapter<T>>(() => new NumberListChapter<T>())
         };
 
         public void Read(ITreeReader reader)
@@ -139,9 +138,9 @@ namespace BSOA.Column
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-            writer.Write(nameof(Count), Count);
+            writer.Write(Names.Count, Count);
 
-            writer.WritePropertyName(nameof(Chapters));
+            writer.WritePropertyName(Names.Chapters);
             writer.WriteList(_chapters);
 
             writer.WriteEndObject();

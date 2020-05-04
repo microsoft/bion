@@ -153,8 +153,8 @@ namespace BSOA.Column
 
         private static Dictionary<string, Setter<DistinctColumn<T>>> setters = new Dictionary<string, Setter<DistinctColumn<T>>>()
         {
-            [Indices] = (r, me) => me._indices.Read(r),
-            [Values] = (r, me) => me._values.Read(r)
+            [Names.Indices] = (r, me) => me._indices.Read(r),
+            [Names.Values] = (r, me) => me._values.Read(r)
         };
 
         public void Read(ITreeReader reader)
@@ -184,14 +184,11 @@ namespace BSOA.Column
             }
         }
 
-        private const string Indices = nameof(Indices);
-        private const string Values = nameof(Values);
-
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-            writer.Write(Indices, _indices);
-            writer.Write(Values, _values);
+            writer.Write(Names.Indices, _indices);
+            writer.Write(Names.Values, _values);
             writer.WriteEndObject();
         }
 

@@ -13,7 +13,6 @@ namespace BSOA.Column
     /// <typeparam name="T">Numeric Type of column values</typeparam>
     public class NumberColumn<T> : IColumn<T> where T : unmanaged, IEquatable<T>, IComparable<T>
     {
-        private const string Array = nameof(Array);
         private T _defaultValue;
         private T[] _array;
         private int UsedArrayLength => Math.Min(_array?.Length ?? 0, Count);
@@ -112,8 +111,8 @@ namespace BSOA.Column
 
         private static Dictionary<string, Setter<NumberColumn<T>>> setters = new Dictionary<string, Setter<NumberColumn<T>>>()
         {
-            [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
-            [Array] = (r, me) => me._array = r.ReadBlockArray<T>()
+            [Names.Count] = (r, me) => me.Count = r.ReadAsInt32(),
+            [Names.Array] = (r, me) => me._array = r.ReadBlockArray<T>()
         };
 
         public void Read(ITreeReader reader)
@@ -124,8 +123,8 @@ namespace BSOA.Column
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-            writer.Write(nameof(Count), Count);
-            writer.WriteBlockArray(Array, _array, 0, UsedArrayLength);
+            writer.Write(Names.Count, Count);
+            writer.WriteBlockArray(Names.Array, _array, 0, UsedArrayLength);
             writer.WriteEndObject();
         }
     }

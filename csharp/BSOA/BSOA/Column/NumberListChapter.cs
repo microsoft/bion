@@ -158,18 +158,13 @@ namespace BSOA.Column
             _lastNonEmptyIndex = lastNonEmptyIndex;
         }
 
-        private const string PageStart = nameof(PageStart);
-        private const string ValueEnd = nameof(ValueEnd);
-        private const string SmallValues = nameof(SmallValues);
-        private const string LargeValues = nameof(LargeValues);
-
         private static Dictionary<string, Setter<NumberListChapter<T>>> setters = new Dictionary<string, Setter<NumberListChapter<T>>>()
         {
-            [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
-            [PageStart] = (r, me) => me._pageStartInChapter = r.ReadBlockArray<int>(),
-            [ValueEnd] = (r, me) => me._valueEndInPage = r.ReadBlockArray<ushort>(),
-            [SmallValues] = (r, me) => me._smallValueArray = r.ReadBlockArray<T>(),
-            [LargeValues] = (r, me) => me._largeValueDictionary = r.ReadIntDictionary<ArraySlice<T>>()
+            [Names.Count] = (r, me) => me.Count = r.ReadAsInt32(),
+            [Names.PageStart] = (r, me) => me._pageStartInChapter = r.ReadBlockArray<int>(),
+            [Names.ValueEnd] = (r, me) => me._valueEndInPage = r.ReadBlockArray<ushort>(),
+            [Names.SmallValues] = (r, me) => me._smallValueArray = r.ReadBlockArray<T>(),
+            [Names.LargeValues] = (r, me) => me._largeValueDictionary = r.ReadIntDictionary<ArraySlice<T>>()
         };
 
         public void Read(ITreeReader reader)
@@ -185,12 +180,12 @@ namespace BSOA.Column
 
             writer.WriteStartObject();
 
-            writer.Write(nameof(Count), Count);
-            writer.WriteBlockArray(PageStart, _pageStartInChapter, 0, ((_lastNonEmptyIndex + 1) / PageRowCount) + 1);
-            writer.WriteBlockArray(ValueEnd, _valueEndInPage, 0, _lastNonEmptyIndex + 1);
-            writer.WriteBlockArray(SmallValues, _smallValueArray);
+            writer.Write(Names.Count, Count);
+            writer.WriteBlockArray(Names.PageStart, _pageStartInChapter, 0, ((_lastNonEmptyIndex + 1) / PageRowCount) + 1);
+            writer.WriteBlockArray(Names.ValueEnd, _valueEndInPage, 0, _lastNonEmptyIndex + 1);
+            writer.WriteBlockArray(Names.SmallValues, _smallValueArray);
 
-            writer.WritePropertyName(LargeValues);
+            writer.WritePropertyName(Names.LargeValues);
             writer.WriteDictionary(_largeValueDictionary);
 
             writer.WriteEndObject();

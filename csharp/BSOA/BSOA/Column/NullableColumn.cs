@@ -13,62 +13,59 @@ namespace BSOA.Column
     public class NullableColumn<T> : IColumn<T> where T : class
     {
         private BooleanColumn _isNull;
-        private IColumn<T> _inner;
+        private IColumn<T> _values;
 
-        public NullableColumn(IColumn<T> inner)
+        public NullableColumn(IColumn<T> values)
         {
             // Default is Null
             _isNull = new BooleanColumn(true);
-            _inner = inner;
+            _values = values;
         }
 
-        public int Count => _inner.Count;
+        public int Count => _values.Count;
         public bool Empty => Count == 0;
 
         public T this[int index]
         {
             get
             {
-                return (_isNull[index] ? null : _inner[index]);
+                return (_isNull[index] ? null : _values[index]);
             }
 
             set
             {
                 _isNull[index] = (value == null);
-                _inner[index] = value;
+                _values[index] = value;
             }
         }
 
         public void Clear()
         {
             _isNull.Clear();
-            _inner.Clear();
+            _values.Clear();
         }
 
         public void Trim()
         {
-            _inner.Trim();
+            _values.Trim();
         }
 
         public void Swap(int index1, int index2)
         {
             _isNull.Swap(index1, index2);
-            _inner.Swap(index1, index2);
+            _values.Swap(index1, index2);
         }
 
         public void RemoveFromEnd(int count)
         {
             _isNull.RemoveFromEnd(count);
-            _inner.RemoveFromEnd(count);
+            _values.RemoveFromEnd(count);
         }
-
-        private const string Inner = nameof(Inner);
-        private const string IsNull = nameof(IsNull);
 
         private static Dictionary<string, Setter<NullableColumn<T>>> setters = new Dictionary<string, Setter<NullableColumn<T>>>()
         {
-            [IsNull] = (r, me) => me._isNull.Read(r),
-            [Inner] = (r, me) => me._inner.Read(r)
+            [Names.IsNull] = (r, me) => me._isNull.Read(r),
+            [Names.Values] = (r, me) => me._values.Read(r)
         };
 
         public void Read(ITreeReader reader)
@@ -79,8 +76,8 @@ namespace BSOA.Column
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-            writer.Write(IsNull, _isNull);
-            writer.Write(Inner, _inner);
+            writer.Write(Names.IsNull, _isNull);
+            writer.Write(Names.Values, _values);
             writer.WriteEndObject();
         }
 
