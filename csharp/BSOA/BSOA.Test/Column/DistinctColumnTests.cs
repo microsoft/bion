@@ -64,10 +64,16 @@ namespace BSOA.Test
             }
 
             Assert.False(column.IsMappingValues);
+            Assert.Equal(-1, column.DistinctCount);
             ReadOnlyList.VerifySame(expected, column);
 
             // Round-trip; verify individual values column rehydrates properly
             column = TreeSerializer.RoundTrip(column, ctor, TreeFormat.Binary);
+            ReadOnlyList.VerifySame(expected, column);
+
+            // Test RemoveFromEnd on unmapped form of column
+            column.RemoveFromEnd(100);
+            expected.RemoveRange(expected.Count - 100, 100);
             ReadOnlyList.VerifySame(expected, column);
         }
 

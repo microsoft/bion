@@ -144,10 +144,11 @@ namespace BSOA.Column
                     // Rebuild Distinct Dictionary
                     RebuildDistinctDictionary();
                 }
+
+                _indices.Trim();
             }
 
             _values.Trim();
-            _indices?.Trim();
         }
 
         private static Dictionary<string, Setter<DistinctColumn<T>>> setters = new Dictionary<string, Setter<DistinctColumn<T>>>()
