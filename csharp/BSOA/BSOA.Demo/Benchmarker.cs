@@ -47,8 +47,8 @@ namespace BSOA.Demo
             LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: 3);
 
             // Compare loading times
-            filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft", iterations: 2);
-            bsoa = Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary", iterations: 10);
+            filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft to Normal classes", iterations: 2);
+            bsoa = Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary to SoA model", iterations: 10);
 
             // Verify logs match; change something to test verification logic
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
