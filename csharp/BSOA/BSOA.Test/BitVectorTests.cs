@@ -1,0 +1,122 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
+
+namespace BSOA.Test
+{
+    public class BitVectorTests
+    {
+        [Fact]
+        public void BitVectorTests_Basics()
+        {
+            BitVector vector = new BitVector(false, 256);
+            HashSet<int> expected = new HashSet<int>();
+
+            Assert.Equal(256, vector.Capacity);
+
+            // Empty vector
+            VerifySame(expected, vector);
+            Assert.NotNull(vector.Vector);
+
+            // Add every third item
+            for(int i = 0; i < vector.Capacity; i += 3)
+            {
+                // True the first time
+                Assert.Equal(expected.Add(i), vector.Add(i));
+
+                // False when already present
+                Assert.Equal(expected.Add(i), vector.Add(i));
+            }
+
+            VerifySame(expected, vector);
+
+            // Remove every sixth item
+            for (int i = 0; i < vector.Capacity; i += 6)
+            {
+                // True the first time
+                Assert.Equal(expected.Remove(i), vector.Remove(i));
+
+                // False when already present
+                Assert.Equal(expected.Remove(i), vector.Remove(i));
+            }
+
+            VerifySame(expected, vector);
+
+            // Contains
+            for (int i = 0; i < vector.Capacity; ++i)
+            {
+                Assert.Equal(expected.Contains(i), vector.Contains(i));
+            }
+
+            // Verify untyped enumerator, Reset()
+            List<int> expectedList = new List<int>(expected);
+            IEnumerator untyped = ((IEnumerable)vector).GetEnumerator();
+            int index = 0;
+            while (untyped.MoveNext())
+            {
+                Assert.Equal(expectedList[index], untyped.Current);
+                index++;
+            }
+
+            untyped.Reset();
+            index = 0;
+            while (untyped.MoveNext())
+            {
+                Assert.Equal(expectedList[index], untyped.Current);
+                index++;
+            }
+
+            // Automatic growth w/default
+            vector.Add(500);
+            expected.Add(500);
+            Assert.Equal(501, vector.Capacity);
+            VerifySame(expected, vector);
+
+            // Clear
+            vector.Clear();
+            Assert.Empty(vector);
+
+            // UnionWith
+            vector.UnionWith(expected);
+            VerifySame(expected, vector);
+
+            // ExceptWith
+            vector.ExceptWith(expected);
+            Assert.Empty(vector);
+        }
+
+        [Fact]
+        public void BitVector_DefaultTrue()
+        {
+            // Default = true vector
+            BitVector vector = new BitVector(true, 32);
+            HashSet<int> expected = new HashSet<int>(Enumerable.Range(0, 32));
+            
+            VerifySame(expected, vector);
+
+            // Clear every 4th value
+            for(int i = 0; i < vector.Capacity; i += 4)
+            {
+                Assert.Equal(expected.Remove(i), vector.Remove(i));
+            }
+
+            VerifySame(expected, vector);
+
+            // Automatic growth with default
+            vector.Remove(100);
+            Assert.Equal(101, vector.Capacity);
+            Assert.False(vector[100]);
+
+            expected.UnionWith(Enumerable.Range(32, 100 - 32));
+            VerifySame(expected, vector);
+        }
+
+        private void VerifySame(HashSet<int> expected, BitVector actual)
+        {
+            HashSet<int> scratch = new HashSet<int>(expected);
+            scratch.SymmetricExceptWith(actual);
+            Assert.Empty(scratch);
+        }
+    }
+}
