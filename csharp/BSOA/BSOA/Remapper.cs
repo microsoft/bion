@@ -1,18 +1,16 @@
-﻿using System.Collections.Generic;
-
-namespace BSOA
+﻿namespace BSOA
 {
     public class Remapper
     {
-        // Remove each distinct value in values from remaining. Stop early if it becomes empty.
-        public static void ExceptWith(HashSet<byte> remaining, ArraySlice<byte> values)
+        // Remove each distinct value in values from remaining.
+        public static void ExceptWith(BitVector remaining, ArraySlice<byte> values)
         {
             byte[] array = values.Array;
             int end = values.Index + values.Count;
 
-            for (int i = values.Index; i < end && remaining.Count > 0; ++i)
+            for (int i = values.Index; i < end; ++i)
             {
-                remaining.Remove(array[i]);
+                remaining[array[i]] = false;
             }
         }
 

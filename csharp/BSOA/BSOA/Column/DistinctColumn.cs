@@ -117,16 +117,16 @@ namespace BSOA.Column
             if (IsMappingValues)
             {
                 // Find all distinct indices used
-                HashSet<byte> unusedValues = new HashSet<byte>();
-                unusedValues.UnionWith(_distinct.Values);
+                BitVector unusedValues = new BitVector(true, DistinctCount);
 
-                // Remove all values used in indices
+                // Remove default (always kept) and all values used in indices
+                unusedValues[0] = false;
                 Remapper.ExceptWith(unusedValues, _indices.Slice);
 
                 // If there are unused values, ...
-                if (unusedValues.Count > 0)
+                byte[] remapped = unusedValues.Select((value) => (byte)value).ToArray();
+                if (remapped.Length > 0)
                 {
-                    byte[] remapped = unusedValues.ToArray();
                     byte remapFrom = (byte)(DistinctCount - remapped.Length);
 
                     // Swap the *values* to the end of the values array

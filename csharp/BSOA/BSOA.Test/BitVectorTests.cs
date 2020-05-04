@@ -17,7 +17,7 @@ namespace BSOA.Test
 
             // Empty vector
             VerifySame(expected, vector);
-            Assert.NotNull(vector.Vector);
+            Assert.Null(vector.Vector);
 
             // Add every third item
             for(int i = 0; i < vector.Capacity; i += 3)
@@ -67,10 +67,11 @@ namespace BSOA.Test
                 index++;
             }
 
-            // Automatic growth w/default
-            vector.Add(500);
-            expected.Add(500);
-            Assert.Equal(501, vector.Capacity);
+            // Automatic growth w/default (need 126 ints = 4,001 / 32 rounded up)
+            vector.Add(4000);
+            expected.Add(4000);
+            Assert.Equal(4001, vector.Capacity);
+            Assert.Equal(((4001 + 31) / 32), vector.Vector?.Length ?? 0);
             VerifySame(expected, vector);
 
             // Clear

@@ -1,6 +1,9 @@
 ﻿using BSOA.Extensions;
+using BSOA.IO;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace BSOA
 {
@@ -8,7 +11,7 @@ namespace BSOA
     ///  BitVector provides set operations, tracking whether each item is included with a bit in an int[].
     ///  BitVector is an extremely compact way to represent a set from [0, Count).
     /// </summary>
-    public class BitVector : IEnumerable<int>
+    public class BitVector : IEnumerable<int>, ITreeSerializable
     {
         private const uint FirstBit = 0x1U << 31;
         private bool _defaultValue;
@@ -18,7 +21,6 @@ namespace BSOA
         {
             _defaultValue = defaultValue;
             _vector = null;
-            ArrayExtensions.ResizeTo(ref _vector, capacity, (_defaultValue ? ~0U : 0U));
             Capacity = capacity;
         }
 
@@ -29,7 +31,8 @@ namespace BSOA
         {
             get
             {
-                if (index >= Capacity) { return _defaultValue; }
+                if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
+                if (_vector == null || _vector.Length <= (index >> 5)) { return _defaultValue; }
                 return (_vector[index >> 5] & (FirstBit >> (index & 31))) != 0UL;
             }
             set
@@ -37,11 +40,12 @@ namespace BSOA
                 if (index >= Capacity)
                 {
                     Capacity = index + 1;
+                }
 
-                    if (_vector == null || _vector.Length <= index)
-                    {
-                        ArrayExtensions.ResizeTo(ref _vector, (Capacity / 32), (_defaultValue ? ~0U : 0U));
-                    }
+                if (_vector == null || _vector.Length <= (index >> 5))
+                {
+                    if (value == _defaultValue) { return; }
+                    ArrayExtensions.ResizeTo(ref _vector, ((Capacity + 31) >> 5), (_defaultValue ? ~0U : 0U));
                 }
 
                 if (value)
@@ -59,6 +63,32 @@ namespace BSOA
         {
             Capacity = 0;
             _vector = null;
+        }
+
+        public void RemoveFromEnd(int count)
+        {
+            int newLastIndex = ((Capacity - 1) - count);
+            int firstRemovedBlock = (newLastIndex >> 5) + 1;
+            uint defaultInt = (_defaultValue ? ~0U : 0U);
+
+            // Remove whole 32-bit chunks now out of range
+            if (_vector != null)
+            {
+                for (int i = firstRemovedBlock; i < _vector.Length; ++i)
+                {
+                    _vector[i] = defaultInt;
+                }
+            }
+
+            // Reset values over new count in last block
+            int firstInvalidIndex = (firstRemovedBlock << 5);
+            for (int i = newLastIndex + 1; i < firstInvalidIndex; ++i)
+            {
+                this[i] = _defaultValue;
+            }
+
+            // Track reduced size
+            Capacity -= count;
         }
 
         public IEnumerator<int> GetEnumerator()
@@ -104,6 +134,27 @@ namespace BSOA
             {
                 this[item] = false;
             }
+        }
+
+        public void Write(ITreeWriter writer)
+        {
+            writer.WriteStartObject();
+            writer.Write(nameof(Capacity), Capacity);
+            writer.WritePropertyName(nameof(Vector));
+            writer.WriteBlockArray(Vector);
+            writer.WriteEndObject();
+        }
+
+        private static Dictionary<string, Setter<BitVector>> setters = new Dictionary<string, Setter<BitVector>>()
+        {
+            [nameof(Capacity)] = (r, me) => me.Capacity = r.ReadAsInt32(),
+            [nameof(Vector)] = (r, me) => me._vector = r.ReadBlockArray<uint>()
+
+        };
+
+        public void Read(ITreeReader reader)
+        {
+            reader.ReadObject(this, setters);
         }
     }
 

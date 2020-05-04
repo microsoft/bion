@@ -1,6 +1,7 @@
 ﻿using BSOA.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BSOA.Column
 {
@@ -9,10 +10,7 @@ namespace BSOA.Column
     /// </summary>
     public class BooleanColumn : IColumn<bool>
     {
-        private const uint FirstBit = 0x1U << 31;
-        private const string Inner = nameof(Inner);
-        private NumberColumn<uint> _innerColumn;
-        private bool _defaultValue;
+        private BitVector _vector;
 
         /// <summary>
         ///  Build a BooleanColumn with the given default value.
@@ -20,16 +18,14 @@ namespace BSOA.Column
         /// <param name="defaultValue">Value unset rows should return</param>
         public BooleanColumn(bool defaultValue)
         {
-            uint defaultNumber = (defaultValue ? ~0U : 0U);
-            _innerColumn = new NumberColumn<uint>(defaultNumber);
-            _defaultValue = defaultValue;
+            _vector = new BitVector(defaultValue, 0);
         }
 
         /// <summary>
         ///  Return the current valid count for the column.
         ///  This is (index + 1) for the highest non-default value set.
         /// </summary>
-        public int Count { get; private set; }
+        public int Count => _vector.Capacity;
         public bool Empty => Count == 0;
 
         /// <summary>
@@ -40,20 +36,8 @@ namespace BSOA.Column
         public bool this[int index]
         {
             // Check or set the bit in the right uint (each one holds 32 bits)
-            get { return (_innerColumn[index >> 5] & (FirstBit >> (index & 31))) != 0UL; }
-            set
-            {
-                if (index >= Count) { Count = index + 1; }
-
-                if (value)
-                {
-                    _innerColumn[index >> 5] |= (FirstBit >> (index & 31));
-                }
-                else
-                {
-                    _innerColumn[index >> 5] &= ~(FirstBit >> (index & 31));
-                }
-            }
+            get { return _vector[index]; }
+            set { _vector[index] = value; }
         }
 
         public void Trim()
@@ -63,30 +47,12 @@ namespace BSOA.Column
 
         public void Clear()
         {
-            Count = 0;
-            _innerColumn.Clear();
+            _vector.Clear();
         }
 
         public void RemoveFromEnd(int count)
         {
-            int newLastIndex = ((Count - 1) - count);
-            int firstRemovedBlock = (newLastIndex >> 5) + 1;
-
-            // Remove whole 32-bit chunks now out of range
-            if (_innerColumn.Count > firstRemovedBlock) 
-            { 
-                _innerColumn.RemoveFromEnd(_innerColumn.Count - firstRemovedBlock); 
-            }
-
-            // Reset values over new count in last block
-            int firstInvalidIndex = (firstRemovedBlock << 5);
-            for (int i = newLastIndex + 1; i < firstInvalidIndex; ++i)
-            {
-                this[i] = _defaultValue;
-            }
-
-            // Track reduced size
-            Count -= count;
+            _vector.RemoveFromEnd(count);
         }
 
         public void Swap(int index1, int index2)
@@ -106,23 +72,14 @@ namespace BSOA.Column
             return new ListEnumerator<bool>(this);
         }
 
-        private static Dictionary<string, Setter<BooleanColumn>> setters = new Dictionary<string, Setter<BooleanColumn>>()
-        {
-            [nameof(Count)] = (r, me) => me.Count = r.ReadAsInt32(),
-            [Inner] = (r, me) => me._innerColumn.Read(r)
-        };
-
         public void Read(ITreeReader reader)
         {
-            reader.ReadObject(this, setters);
+            _vector.Read(reader);
         }
 
         public void Write(ITreeWriter writer)
         {
-            writer.WriteStartObject();
-            writer.Write(nameof(Count), Count);
-            writer.Write(Inner, _innerColumn);
-            writer.WriteEndObject();
+            _vector.Write(writer);
         }
     }
 }
