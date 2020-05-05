@@ -28,8 +28,8 @@ namespace BSOA
             _indexOfList = index;
         }
 
-        internal ArraySlice<int> Indices => _column._indices[_indexOfList];
-        internal IColumn<T> Values => _column._values;
+        internal ArraySlice<int> Indices => _column?._indices[_indexOfList] ?? ArraySlice<int>.Empty;
+        internal IColumn<T> Values => _column?._values;
 
         public T this[int indexWithinList]
         {
@@ -114,12 +114,13 @@ namespace BSOA
             IColumn<T> values = Values;
 
             ArraySlice<int> indices = Indices;
-            int[] array = indices.Array;
+            int[] indicesArray = indices.Array;
             int end = indices.Index + indices.Count;
 
             for (int i = indices.Index; i < end; ++i)
             {
-                if (values[i].Equals(item)) { return i - indices.Index; }
+                int indexOfValue = indicesArray[i];
+                if (values[indexOfValue].Equals(item)) { return i - indices.Index; }
             }
 
             return -1;

@@ -1,7 +1,6 @@
 ﻿using BSOA.IO;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BSOA.Column
 {
@@ -85,9 +84,15 @@ namespace BSOA.Column
             writer.WriteEndObject();
         }
 
+        private static Dictionary<string, Setter<ListColumn<T>>> setters = new Dictionary<string, Setter<ListColumn<T>>>()
+        {
+            [Names.Indices] = (r, me) => me._indices.Read(r),
+            [Names.Values] = (r, me) => me._values.Read(r)
+        };
+
         public void Read(ITreeReader reader)
         {
-            _indices.Read(reader);
+            reader.ReadObject(this, setters);
         }
     }
 }

@@ -58,8 +58,6 @@ namespace BSOA.Column
 
                 if (index >= Count) { Count = index + 1; }
 
-                if (value.Count == 0 && chapterIndex >= _chapters.Count) { return; }
-
                 while (chapterIndex >= _chapters.Count)
                 {
                     _chapters.Add(new NumberListChapter<T>());
