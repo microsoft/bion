@@ -11,7 +11,7 @@ namespace BSOA.Column
     ///  ushort, short, uint, int, ulong, long, float, double.
     /// </summary>
     /// <typeparam name="T">Numeric Type of column values</typeparam>
-    public class NumberColumn<T> : IColumn<T> where T : unmanaged, IEquatable<T>, IComparable<T>
+    public class NumberColumn<T> : IColumn<T>, INumberColumn<T> where T : unmanaged
     {
         private T _defaultValue;
         private T[] _array;
@@ -67,6 +67,11 @@ namespace BSOA.Column
         }
 
         public ArraySlice<T> Slice => (UsedArrayLength == 0 ? ArraySlice<T>.Empty : new ArraySlice<T>(_array, index: 0, length: UsedArrayLength));
+
+        public void ForEach(Action<ArraySlice<T>> action)
+        {
+            action(Slice);
+        }
 
         public void Clear()
         {

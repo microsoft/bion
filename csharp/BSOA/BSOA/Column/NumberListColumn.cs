@@ -20,7 +20,7 @@ namespace BSOA.Column
     ///  Each row records the page-relative start position of the value only.
     /// </remarks>
     /// <typeparam name="T">Type of each element of Values (for StringColumn, T is char)</typeparam>
-    public class NumberListColumn<T> : IColumn<ArraySlice<T>> where T : unmanaged
+    public class NumberListColumn<T> : IColumn<ArraySlice<T>>, INumberColumn<T> where T : unmanaged
     {
         private List<NumberListChapter<T>> _chapters;
 
@@ -66,6 +66,14 @@ namespace BSOA.Column
                 }
 
                 _chapters[chapterIndex][indexInChapter] = value;
+            }
+        }
+
+        public void ForEach(Action<ArraySlice<T>> action)
+        { 
+            foreach (NumberListChapter<T> chapter in _chapters)
+            {
+                chapter.ForEach(action);
             }
         }
 

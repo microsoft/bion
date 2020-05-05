@@ -1,5 +1,6 @@
 ﻿using BSOA.Extensions;
 using BSOA.IO;
+using System;
 using System.Collections.Generic;
 
 namespace BSOA.Column
@@ -82,6 +83,20 @@ namespace BSOA.Column
             }
         }
 
+        public void ForEach(Action<ArraySlice<T>> action)
+        {
+            // Ensure updated values re-merged first
+            Trim();
+
+            // Run over all consolidated small values
+            action(new ArraySlice<T>(_smallValueArray));
+
+            // Run over each large value array
+            foreach (ArraySlice<T> largeValueArray in _largeValueDictionary.Values)
+            {
+                action(largeValueArray);
+            }
+        }
 
         public void Clear()
         {

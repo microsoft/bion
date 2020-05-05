@@ -116,39 +116,20 @@ namespace BSOA.Column
         {
             if (IsMappingValues)
             {
-                // Find all distinct indices used
+                // Remove unused values *except the default*, which must stay as '0' so new rows in indices have the default value
                 BitVector unusedValues = new BitVector(true, DistinctCount);
+                unusedValues.Remove(0);
 
-                // Remove default (always kept) and all values used in indices
-                unusedValues[0] = false;
-                Remapper.ExceptWith(unusedValues, _indices.Slice);
-
-                // If there are unused values, ...
-                byte[] remapped = unusedValues.Select((value) => (byte)value).ToArray();
-                if (remapped.Length > 0)
+                bool wasRemapped = GarbageCollector.Collect<byte, T>(_indices, _values, unusedValues);
+                if (wasRemapped)
                 {
-                    byte remapFrom = (byte)(DistinctCount - remapped.Length);
-
-                    // Swap the *values* to the end of the values array
-                    for (int i = 0; i < remapped.Length; ++i)
-                    {
-                        _values.Swap(remapFrom + i, remapped[i]);
-                    }
-
-                    // Swap indices using those values to use the new ones
-                    Remapper.RemapAbove(_indices.Slice, remapFrom, remapped);
-
-                    // Remove the unused values that are now at the end of the array
-                    _values.RemoveFromEnd(remapped.Length);
-
-                    // Rebuild Distinct Dictionary
                     RebuildDistinctDictionary();
                 }
-
-                _indices.Trim();
             }
-
-            _values.Trim();
+            else
+            {
+                _values.Trim();
+            }
         }
 
         private static Dictionary<string, Setter<DistinctColumn<T>>> setters = new Dictionary<string, Setter<DistinctColumn<T>>>()
