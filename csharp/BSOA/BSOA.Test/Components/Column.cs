@@ -38,7 +38,7 @@ namespace BSOA.Test
             // Verify count, values, indexer, enumerators
             Assert.Equal(expected.Count, column.Count);
             ReadOnlyList.VerifySame<T>(expected, column);
-            
+
             // Change existing value
             column[1] = otherValue;
             Assert.Equal(otherValue, column[1]);
@@ -67,7 +67,7 @@ namespace BSOA.Test
             // Verify serialization round trip via all current serialization mechanisms
             ReadOnlyList.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary));
             ReadOnlyList.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Json));
-            
+
             // Verify column is properly skippable (required to allow flexible file format schema)
             TreeSerializer.VerifySkip(column, TreeFormat.Binary);
             TreeSerializer.VerifySkip(column, TreeFormat.Json);

@@ -89,12 +89,18 @@ namespace BSOA.Column
             Trim();
 
             // Run over all consolidated small values
-            action(new ArraySlice<T>(_smallValueArray));
+            if (_smallValueArray != null)
+            {
+                action(new ArraySlice<T>(_smallValueArray));
+            }
 
             // Run over each large value array
-            foreach (ArraySlice<T> largeValueArray in _largeValueDictionary.Values)
+            if (_largeValueDictionary != null)
             {
-                action(largeValueArray);
+                foreach (ArraySlice<T> largeValueArray in _largeValueDictionary.Values)
+                {
+                    action(largeValueArray);
+                }
             }
         }
 
