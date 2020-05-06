@@ -3,10 +3,10 @@ using BSOA.Model;
 
 namespace BSOA.Demo.Model
 {
-    public struct PhysicalLocation
+    public readonly struct PhysicalLocation
     {
-        internal PhysicalLocationTable _table;
-        internal int _index;
+        internal readonly PhysicalLocationTable _table;
+        internal readonly int _index;
 
         public PhysicalLocation(PhysicalLocationTable table, int index)
         {

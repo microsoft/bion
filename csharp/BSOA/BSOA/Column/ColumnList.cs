@@ -13,11 +13,11 @@ namespace BSOA
     ///  List therefore "points" to a row index in the column and retrieves the current slice on use.
     ///  List persists each Count change back to the column immediately.
     /// </remarks>
-    public struct ColumnList<T> : IList<T>, IReadOnlyList<T>
+    public readonly struct ColumnList<T> : IList<T>, IReadOnlyList<T>
     {
         private const int MinimumSize = 16;
-        private ListColumn<T> _column;
-        private int _indexOfList;
+        private readonly ListColumn<T> _column;
+        private readonly int _indexOfList;
 
         public static ColumnList<T> Empty = new ColumnList<T>();
 

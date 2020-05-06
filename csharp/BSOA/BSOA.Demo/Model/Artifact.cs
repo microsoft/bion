@@ -4,10 +4,10 @@ using System;
 
 namespace BSOA.Demo.Model
 {
-    public struct Artifact
+    public readonly struct Artifact
     {
-        internal ArtifactTable _table;
-        internal int _index;
+        internal readonly ArtifactTable _table;
+        internal readonly int _index;
 
         public Artifact(ArtifactTable table, int index)
         {

@@ -6,10 +6,10 @@ namespace BSOA.Demo.Model
     /// <summary>
     ///  SoA Item for 'Region' type.
     /// </summary>
-    public struct Region
+    public readonly struct Region
     {
-        internal RegionTable _table;
-        internal int _index;
+        internal readonly RegionTable _table;
+        internal readonly int _index;
 
         internal Region(RegionTable table, int index)
         {

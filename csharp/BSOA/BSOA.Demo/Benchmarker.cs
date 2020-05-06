@@ -4,10 +4,8 @@ using BSOA.Json;
 using Microsoft.CodeAnalysis.Sarif;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 
 namespace BSOA.Demo
 {
@@ -42,9 +40,9 @@ namespace BSOA.Demo
             SarifLogFiltered filtered = null;
             SarifLogBsoa bsoa = null;
 
-            // Load with diagnostics (see column sizes)
-            Console.WriteLine();
-            LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: 3);
+            //// Load with diagnostics (see column sizes)
+            //Console.WriteLine();
+            //LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: 3);
 
             // Compare loading times
             filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft to Normal classes", iterations: 3);
@@ -120,7 +118,7 @@ namespace BSOA.Demo
 
             Time($"Writing as BSOA JSON to '{BsoaJsonPath}'...", () =>
             {
-                using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Verbose = true }))
+                using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Verbose = false }))
                 {
                     bsoaLog.Write(writer);
                 }

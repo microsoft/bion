@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    public struct Result
+    public readonly struct Result
     {
-        internal ResultTable _table;
-        internal int _index;
+        internal readonly ResultTable _table;
+        internal readonly int _index;
 
         public Result(ResultTable table, int index)
         {

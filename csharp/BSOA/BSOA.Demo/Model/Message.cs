@@ -3,10 +3,10 @@ using BSOA.Model;
 
 namespace BSOA.Demo.Model
 {
-    public struct Message
+    public readonly struct Message
     {
-        internal MessageTable _table;
-        internal int _index;
+        internal readonly MessageTable _table;
+        internal readonly int _index;
 
         public Message(MessageTable table, int index)
         {

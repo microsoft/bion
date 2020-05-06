@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    public struct Run
+    public readonly struct Run
     {
-        internal RunTable _table;
-        internal int _index;
+        internal readonly RunTable _table;
+        internal readonly int _index;
 
         public Run(RunTable table, int index)
         {

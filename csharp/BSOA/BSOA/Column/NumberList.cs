@@ -13,13 +13,13 @@ namespace BSOA
     ///  NumberList therefore "points" to a row index in the column and retrieves the current slice on use.
     ///  NumberList persists each Count change back to the column immediately.
     /// </remarks>
-    public struct NumberList<T> : IList<T>, IReadOnlyList<T> where T : unmanaged
+    public readonly struct NumberList<T> : IList<T>, IReadOnlyList<T> where T : unmanaged
     {
         private const int MinimumSize = 16;
 
         // Store a reference to the column and index containing the real ArraySlice value.
-        private NumberListColumn<T> _column;
-        private int _index;
+        private readonly NumberListColumn<T> _column;
+        private readonly int _index;
 
         public static NumberList<T> Empty = new NumberList<T>();
 

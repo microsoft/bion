@@ -8,10 +8,10 @@
     <Snippet>
       <Code Language="CSharp">
         <![CDATA[
-    public struct $EntityName$
+    public readonly struct $EntityName$
     {
-        internal $EntityName$Table _table;
-        internal int _index;
+        internal readonly $EntityName$Table _table;
+        internal readonly int _index;
 
         public $EntityName$($EntityName$Table table, int index)
         {

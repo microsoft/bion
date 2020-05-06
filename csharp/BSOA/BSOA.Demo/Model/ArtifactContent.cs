@@ -6,10 +6,10 @@ namespace BSOA.Demo.Model
     /// <summary>
     ///  SoA Item for 'ArtifactContent' type.
     /// </summary>
-    public struct ArtifactContent
+    public readonly struct ArtifactContent
     {
-        internal ArtifactContentTable _table;
-        internal int _index;
+        internal readonly ArtifactContentTable _table;
+        internal readonly int _index;
 
         internal ArtifactContent(ArtifactContentTable table, int index)
         {

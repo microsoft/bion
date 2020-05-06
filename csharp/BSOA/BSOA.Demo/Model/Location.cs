@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    public struct Location
+    public readonly struct Location
     {
-        internal LocationTable _table;
-        internal int _index;
+        internal readonly LocationTable _table;
+        internal readonly int _index;
 
         public Location(LocationTable table, int index)
         {
