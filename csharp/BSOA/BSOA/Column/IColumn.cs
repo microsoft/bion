@@ -28,11 +28,6 @@ namespace BSOA.Column
         // T this[int index] { get; }
         // IEnumerator<T> GetEnumerator();
 
-        // IBinarySerializable
-        // -------------------
-        // void Read(BinaryReader reader, ref byte[] buffer);
-        // void Write(BinaryWriter writer, ref byte[] buffer);
-
         // ITreeSerializable
         // -----------------
         // void Write(ITreeWriter writer);

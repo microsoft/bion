@@ -13,14 +13,13 @@ namespace BSOA.Test
             BitVector vector = new BitVector(false, 256);
             HashSet<int> expected = new HashSet<int>();
 
-            Assert.Equal(256, vector.Capacity);
-
             // Empty vector
             VerifySame(expected, vector);
             Assert.Null(vector.Array);
+            Assert.Equal(256, vector.Capacity);
 
             // Add every third item
-            for(int i = 0; i < vector.Capacity; i += 3)
+            for (int i = 0; i < vector.Capacity; i += 3)
             {
                 // True the first time
                 Assert.Equal(expected.Add(i), vector.Add(i));
@@ -77,6 +76,8 @@ namespace BSOA.Test
             // Clear
             vector.Clear();
             Assert.Empty(vector);
+            Assert.Equal(0, vector.Count);
+            Assert.Equal(0, vector.Capacity);
 
             // UnionWith
             vector.UnionWith(expected);
@@ -85,6 +86,7 @@ namespace BSOA.Test
             // ExceptWith
             vector.ExceptWith(expected);
             Assert.Empty(vector);
+            Assert.Equal(0, vector.Count);
         }
 
         [Fact]
@@ -93,7 +95,8 @@ namespace BSOA.Test
             // Default = true vector
             BitVector vector = new BitVector(true, 32);
             HashSet<int> expected = new HashSet<int>(Enumerable.Range(0, 32));
-            
+
+            Assert.Equal(32, vector.Count);
             VerifySame(expected, vector);
 
             // Clear every 4th value
@@ -115,6 +118,8 @@ namespace BSOA.Test
 
         private void VerifySame(HashSet<int> expected, BitVector actual)
         {
+            Assert.Equal(expected.Count, actual.Count);
+
             HashSet<int> scratch = new HashSet<int>(expected);
             scratch.SymmetricExceptWith(actual);
             Assert.Empty(scratch);

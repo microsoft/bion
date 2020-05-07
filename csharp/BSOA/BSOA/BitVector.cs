@@ -21,8 +21,10 @@ namespace BSOA
             _defaultValue = defaultValue;
             _array = null;
             Capacity = capacity;
+            Count = (_defaultValue ? capacity : 0);
         }
 
+        public int Count { get; private set; }
         public int Capacity { get; private set; }
         public uint[] Array => _array;
 
@@ -38,6 +40,7 @@ namespace BSOA
             {
                 if (index >= Capacity)
                 {
+                    if (_defaultValue) { Count += (index + 1 - Capacity); }
                     Capacity = index + 1;
                 }
 
@@ -49,10 +52,12 @@ namespace BSOA
 
                 if (value)
                 {
+                    Count += (int)(~_array[index >> 5] >> (31 - (index & 31)) & 1);
                     _array[index >> 5] |= (FirstBit >> (index & 31));
                 }
                 else
                 {
+                    Count -= (int)(_array[index >> 5] >> (31 - (index & 31)) & 1);
                     _array[index >> 5] &= ~(FirstBit >> (index & 31));
                 }
             }
@@ -60,6 +65,7 @@ namespace BSOA
 
         public void Clear()
         {
+            Count = 0;
             Capacity = 0;
             _array = null;
         }
@@ -88,6 +94,14 @@ namespace BSOA
 
             // Track reduced size
             Capacity -= count;
+
+            // Recalculate Count
+            int newCount = 0;
+            for (int i = 0; i < Capacity; ++i)
+            {
+                if (this[i]) { newCount++; }
+            }
+            Count = newCount;
         }
 
         public IEnumerator<int> GetEnumerator()

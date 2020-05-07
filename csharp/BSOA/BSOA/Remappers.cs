@@ -20,8 +20,8 @@ namespace BSOA
     {
         public static IRemapper<T> Build<T>() where T : unmanaged
         {
-            if(typeof(T) == typeof(int)) { return (IRemapper<T>)IntRemapper.Instance; }
-            if(typeof(T) == typeof(byte)) { return (IRemapper<T>)ByteRemapper.Instance; }
+            if (typeof(T) == typeof(int)) { return (IRemapper<T>)IntRemapper.Instance; }
+            if (typeof(T) == typeof(byte)) { return (IRemapper<T>)ByteRemapper.Instance; }
             throw new NotImplementedException($"IRemapper is not implemented for {typeof(T).Name}.");
         }
     }
@@ -35,6 +35,8 @@ namespace BSOA
 
         public void RemoveValues(ArraySlice<int> values, BitVector vector)
         {
+            if (vector.Count == 0) { return; }
+
             int[] array = values.Array;
             int end = values.Index + values.Count;
 
