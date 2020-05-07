@@ -1,5 +1,6 @@
 ﻿using BSOA.Column;
 using BSOA.Converter;
+using BSOA.Model;
 using System;
 using Xunit;
 

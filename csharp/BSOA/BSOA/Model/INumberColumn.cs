@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BSOA.Column
+namespace BSOA.Model
 {
     public interface INumberColumn<T> : IColumn where T : unmanaged
     {

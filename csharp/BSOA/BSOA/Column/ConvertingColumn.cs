@@ -1,8 +1,7 @@
 ﻿using BSOA.Converter;
 using BSOA.IO;
+using BSOA.Model;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace BSOA.Column
 {
@@ -12,9 +11,8 @@ namespace BSOA.Column
     /// </summary>
     /// <typeparam name="T">Outer type exposed by the column (DateTime)</typeparam>
     /// <typeparam name="U">Inner type actually stored (long)</typeparam>
-    public class ConvertingColumn<T, U> : IColumn<T>
+    public class ConvertingColumn<T, U> : WrappingColumn<T, U>
     {
-        private IColumn<U> _inner;
         private Func<T, U> _toInner;
         private Func<U, T> _toOuter;
 
@@ -22,62 +20,16 @@ namespace BSOA.Column
             : this(inner, converter.Convert, converter.Convert)
         { }
 
-        public ConvertingColumn(IColumn<U> inner, Func<T, U> toInner, Func<U, T> toOuter)
+        public ConvertingColumn(IColumn<U> inner, Func<T, U> toInner, Func<U, T> toOuter) : base(inner)
         {
-            _inner = inner;
             _toInner = toInner;
             _toOuter = toOuter;
         }
 
-        public T this[int index] 
+        public override T this[int index] 
         {
-            get => _toOuter(_inner[index]);
-            set => _inner[index] = _toInner(value);
-        }
-
-        public int Count => _inner.Count;
-
-        public bool Empty => (Count == 0);
-
-        public void Clear()
-        {
-            _inner.Clear();
-        }
-
-        public void Trim()
-        {
-            _inner.Trim();
-        }
-
-        public void RemoveFromEnd(int count)
-        {
-            _inner.RemoveFromEnd(count);
-        }
-
-        public void Swap(int index1, int index2)
-        {
-            // Swap inner values directly, saving converting back and forth
-            _inner.Swap(index1, index2);
-        }
-
-        public void Read(ITreeReader reader)
-        {
-            _inner.Read(reader);
-        }
-
-        public void Write(ITreeWriter writer)
-        {
-            _inner.Write(writer);
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
+            get => _toOuter(Inner[index]);
+            set => Inner[index] = _toInner(value);
         }
     }
 }

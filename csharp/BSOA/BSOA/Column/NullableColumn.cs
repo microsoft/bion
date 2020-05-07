@@ -1,5 +1,5 @@
 ﻿using BSOA.IO;
-using System.Collections;
+using BSOA.Model;
 using System.Collections.Generic;
 
 namespace BSOA.Column
@@ -10,7 +10,7 @@ namespace BSOA.Column
     ///  a separate null representation and so won't round-trip null.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class NullableColumn<T> : IColumn<T> where T : class
+    public class NullableColumn<T> : LimitedList<T>, IColumn<T> where T : class
     {
         private BooleanColumn _isNull;
         private IColumn<T> _values;
@@ -22,10 +22,9 @@ namespace BSOA.Column
             _values = values;
         }
 
-        public int Count => _values.Count;
-        public bool Empty => Count == 0;
+        public override int Count => _values.Count;
 
-        public T this[int index]
+        public override T this[int index]
         {
             get
             {
@@ -39,27 +38,27 @@ namespace BSOA.Column
             }
         }
 
-        public void Clear()
+        public override void Clear()
         {
             _isNull.Clear();
             _values.Clear();
         }
 
-        public void Trim()
-        {
-            _values.Trim();
-        }
-
-        public void Swap(int index1, int index2)
+        public override void Swap(int index1, int index2)
         {
             _isNull.Swap(index1, index2);
             _values.Swap(index1, index2);
         }
 
-        public void RemoveFromEnd(int count)
+        public override void RemoveFromEnd(int count)
         {
             _isNull.RemoveFromEnd(count);
             _values.RemoveFromEnd(count);
+        }
+
+        public void Trim()
+        {
+            _values.Trim();
         }
 
         private static Dictionary<string, Setter<NullableColumn<T>>> setters = new Dictionary<string, Setter<NullableColumn<T>>>()
@@ -79,16 +78,6 @@ namespace BSOA.Column
             writer.Write(Names.IsNull, _isNull);
             writer.Write(Names.Values, _values);
             writer.WriteEndObject();
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
         }
     }
 }

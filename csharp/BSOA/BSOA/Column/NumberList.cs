@@ -1,4 +1,5 @@
 ﻿using BSOA.Column;
+using BSOA.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,12 +19,12 @@ namespace BSOA
         private const int MinimumSize = 16;
 
         // Store a reference to the column and index containing the real ArraySlice value.
-        private readonly NumberListColumn<T> _column;
+        private readonly IColumn<ArraySlice<T>> _column;
         private readonly int _index;
 
         public static NumberList<T> Empty = new NumberList<T>();
 
-        public NumberList(NumberListColumn<T> column, int index)
+        public NumberList(IColumn<ArraySlice<T>> column, int index)
         {
             if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
             _column = column;

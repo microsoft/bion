@@ -1,5 +1,5 @@
 ﻿using BSOA.IO;
-using System.Collections;
+using BSOA.Model;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,7 +11,7 @@ namespace BSOA.Column
     ///  distinct values.
     /// </summary>
     /// <typeparam name="T">Type of values in column</typeparam>
-    public class DistinctColumn<T> : IColumn<T>
+    public class DistinctColumn<T> : LimitedList<T>, IColumn<T>
     {
         private T _defaultValue;
         private Dictionary<T, byte> _distinct;
@@ -27,10 +27,9 @@ namespace BSOA.Column
 
         public bool IsMappingValues => (_distinct != null);
         public int DistinctCount => (IsMappingValues ? _distinct.Count + 1 : -1);
-        public int Count => (IsMappingValues ? _indices.Count : _values.Count);
-        public bool Empty => (Count == 0);
+        public override int Count => (IsMappingValues ? _indices.Count : _values.Count);
 
-        public T this[int index]
+        public override T this[int index]
         {
             get => (IsMappingValues ? _values[_indices[index]] : _values[index]);
 
@@ -82,7 +81,7 @@ namespace BSOA.Column
             }
         }
 
-        public void Clear()
+        public override void Clear()
         {
             // Indices empty but non-null
             _indices = new NumberColumn<byte>(0);
@@ -93,7 +92,7 @@ namespace BSOA.Column
             _values[0] = _defaultValue;
         }
 
-        public void RemoveFromEnd(int count)
+        public override void RemoveFromEnd(int count)
         {
             if (IsMappingValues)
             {
@@ -103,13 +102,6 @@ namespace BSOA.Column
             {
                 _values.RemoveFromEnd(count);
             }
-        }
-
-        public void Swap(int index1, int index2)
-        {
-            T item = this[index1];
-            this[index1] = this[index2];
-            this[index2] = item;
         }
 
         public void Trim()
@@ -129,6 +121,16 @@ namespace BSOA.Column
             else
             {
                 _values.Trim();
+            }
+        }
+
+        private void RebuildDistinctDictionary()
+        {
+            _distinct.Clear();
+
+            for (int i = 1; i < _values.Count; ++i)
+            {
+                _distinct[_values[i]] = (byte)i;
             }
         }
 
@@ -155,32 +157,12 @@ namespace BSOA.Column
             }
         }
 
-        private void RebuildDistinctDictionary()
-        {
-            _distinct.Clear();
-
-            for (int i = 1; i < _values.Count; ++i)
-            {
-                _distinct[_values[i]] = (byte)i;
-            }
-        }
-
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
             writer.Write(Names.Indices, _indices);
             writer.Write(Names.Values, _values);
             writer.WriteEndObject();
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
         }
     }
 }

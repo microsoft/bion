@@ -1,5 +1,4 @@
-﻿using BSOA.Column;
-using BSOA.IO;
+﻿using BSOA.IO;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -126,7 +125,7 @@ namespace BSOA.Model
 
             foreach (var pair in Columns)
             {
-                if (!pair.Value.Empty)
+                if (pair.Value.Count > 0)
                 {
                     writer.Write(pair.Key, pair.Value);
                 }

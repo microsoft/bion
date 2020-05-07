@@ -1,5 +1,5 @@
 ﻿using BSOA.IO;
-using System.Collections;
+using BSOA.Model;
 using System.Collections.Generic;
 
 namespace BSOA.Column
@@ -8,13 +8,12 @@ namespace BSOA.Column
     ///  RefListColumn provides a reference from an item in one table to a set
     ///  of items in another table. It stores the integer indices of the references.
     /// </summary>
-    public class ListColumn<T> : IColumn<ColumnList<T>>
+    public class ListColumn<T> : LimitedList<ColumnList<T>>, IColumn<ColumnList<T>>
     {
         internal NumberListColumn<int> _indices;
         internal IColumn<T> _values;
 
-        public int Count => _indices.Count;
-        public bool Empty => Count == 0;
+        public override int Count => _indices.Count;
 
         public ListColumn(IColumn<T> values)
         {
@@ -22,7 +21,7 @@ namespace BSOA.Column
             _values = values;
         }
 
-        public ColumnList<T> this[int index]
+        public override ColumnList<T> this[int index]
         {
             get => new ColumnList<T>(this, index);
 
@@ -38,14 +37,20 @@ namespace BSOA.Column
             }
         }
 
-        public IEnumerator<ColumnList<T>> GetEnumerator()
+        public override void Swap(int index1, int index2)
         {
-            return new ListEnumerator<ColumnList<T>>(this);
+            _indices.Swap(index1, index2);
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public override void RemoveFromEnd(int count)
         {
-            return new ListEnumerator<ColumnList<T>>(this);
+            _indices.RemoveFromEnd(count);
+        }
+
+        public override void Clear()
+        {
+            _indices.Clear();
+            _values.Clear();
         }
 
         public void Trim()
@@ -58,22 +63,6 @@ namespace BSOA.Column
 
             // Trim values afterward to clean up any newly unused space
             _values.Trim();
-        }
-
-        public void Clear()
-        {
-            _indices.Clear();
-            _values.Clear();
-        }
-
-        public void RemoveFromEnd(int count)
-        {
-            _indices.RemoveFromEnd(count);
-        }
-
-        public void Swap(int index1, int index2)
-        {
-            _indices.Swap(index1, index2);
         }
 
         public void Write(ITreeWriter writer)

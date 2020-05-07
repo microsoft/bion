@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using BSOA.Extensions;
 using BSOA.IO;
+using BSOA.Model;
 
 namespace BSOA.Column
 {
@@ -11,34 +11,21 @@ namespace BSOA.Column
     ///  ushort, short, uint, int, ulong, long, float, double.
     /// </summary>
     /// <typeparam name="T">Numeric Type of column values</typeparam>
-    public class NumberColumn<T> : IColumn<T>, INumberColumn<T> where T : unmanaged
+    public class NumberColumn<T> : LimitedList<T>, IColumn<T>, INumberColumn<T> where T : unmanaged
     {
         private T _defaultValue;
         private T[] _array;
+        private int _count;
         private int UsedArrayLength => Math.Min(_array?.Length ?? 0, Count);
 
-        /// <summary>
-        ///  Build a NumberColumn with the given default value.
-        /// </summary>
-        /// <param name="defaultValue">Value unset rows should return</param>
         public NumberColumn(T defaultValue)
         {
             _defaultValue = defaultValue;
         }
 
-        /// <summary>
-        ///  Return the current valid count for the column.
-        ///  This is (index + 1) for the highest non-default value set.
-        /// </summary>
-        public int Count { get; private set; }
-        public bool Empty => Count == 0;
+        public override int Count => _count;
 
-        /// <summary>
-        ///  Get or Set the value at a given index
-        /// </summary>
-        /// <param name="index">Index of value to set</param>
-        /// <returns>Value at index</returns>
-        public T this[int index]
+        public override T this[int index]
         {
             get
             {
@@ -51,7 +38,7 @@ namespace BSOA.Column
             set
             {
                 // Track logical count
-                if (index >= Count) { Count = index + 1; }
+                if (index >= Count) { _count = index + 1; }
 
                 // Resize if required
                 if (_array == null || _array.Length <= index)
@@ -73,18 +60,13 @@ namespace BSOA.Column
             action(Slice);
         }
 
-        public void Clear()
+        public override void Clear()
         {
-            Count = 0;
+            _count = 0;
             _array = null;
         }
 
-        public void Trim()
-        {
-            // Nothing to do
-        }
-
-        public void RemoveFromEnd(int count)
+        public override void RemoveFromEnd(int count)
         {
             // Clear last 'count' values
             int length = UsedArrayLength;
@@ -94,29 +76,17 @@ namespace BSOA.Column
             }
 
             // Track reduced size
-            Count -= count;
+            _count -= count;
         }
 
-        public void Swap(int index1, int index2)
+        public void Trim()
         {
-            T item = this[index1];
-            this[index1] = this[index2];
-            this[index2] = item;
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
+            // Nothing to do
         }
 
         private static Dictionary<string, Setter<NumberColumn<T>>> setters = new Dictionary<string, Setter<NumberColumn<T>>>()
         {
-            [Names.Count] = (r, me) => me.Count = r.ReadAsInt32(),
+            [Names.Count] = (r, me) => me._count = r.ReadAsInt32(),
             [Names.Array] = (r, me) => me._array = r.ReadBlockArray<T>()
         };
 

@@ -1,6 +1,6 @@
 ﻿using BSOA.IO;
+using BSOA.Model;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace BSOA.Column
@@ -20,25 +20,19 @@ namespace BSOA.Column
     ///  Each row records the page-relative start position of the value only.
     /// </remarks>
     /// <typeparam name="T">Type of each element of Values (for StringColumn, T is char)</typeparam>
-    public class NumberListColumn<T> : IColumn<ArraySlice<T>>, INumberColumn<T> where T : unmanaged
+    public class NumberListColumn<T> : LimitedList<ArraySlice<T>>, IColumn<ArraySlice<T>>, INumberColumn<T> where T : unmanaged
     {
+        private int _count;
         private List<NumberListChapter<T>> _chapters;
 
-        public int Count { get; private set; }
-        public bool Empty => Count == 0;
+        public override int Count => _count;
 
         public NumberListColumn()
         {
             Clear();
         }
 
-        public void Clear()
-        {
-            Count = 0;
-            _chapters = new List<NumberListChapter<T>>();
-        }
-
-        public ArraySlice<T> this[int index]
+        public override ArraySlice<T> this[int index]
         {
             get
             {
@@ -56,7 +50,7 @@ namespace BSOA.Column
                 int chapterIndex = index / NumberListChapter<T>.ChapterRowCount;
                 int indexInChapter = index % NumberListChapter<T>.ChapterRowCount;
 
-                if (index >= Count) { Count = index + 1; }
+                if (index >= Count) { _count = index + 1; }
 
                 while (chapterIndex >= _chapters.Count)
                 {
@@ -67,23 +61,13 @@ namespace BSOA.Column
             }
         }
 
-        public void ForEach(Action<ArraySlice<T>> action)
-        { 
-            foreach (NumberListChapter<T> chapter in _chapters)
-            {
-                chapter.ForEach(action);
-            }
-        }
-
-        public void Trim()
+        public override void Clear()
         {
-            foreach (NumberListChapter<T> chapter in _chapters)
-            {
-                chapter.Trim();
-            }
+            _count = 0;
+            _chapters = new List<NumberListChapter<T>>();
         }
 
-        public void RemoveFromEnd(int count)
+        public override void RemoveFromEnd(int count)
         {
             // Clear last 'count' values
             for (int i = Count - count; i < Count; ++i)
@@ -108,31 +92,28 @@ namespace BSOA.Column
             }
 
             // Track reduced size
-            Count -= count;
+            _count -= count;
         }
 
-        public void Swap(int index1, int index2)
+        public void ForEach(Action<ArraySlice<T>> action)
         {
-            // Swapping slices avoids copies by just having the rows refer to 
-            // the array slices one another were already using. 
-            ArraySlice<T> item = this[index1];
-            this[index1] = this[index2];
-            this[index2] = item;
+            foreach (NumberListChapter<T> chapter in _chapters)
+            {
+                chapter.ForEach(action);
+            }
         }
 
-        public IEnumerator<ArraySlice<T>> GetEnumerator()
+        public void Trim()
         {
-            return new ListEnumerator<ArraySlice<T>>(this);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new ListEnumerator<ArraySlice<T>>(this);
+            foreach (NumberListChapter<T> chapter in _chapters)
+            {
+                chapter.Trim();
+            }
         }
 
         private static Dictionary<string, Setter<NumberListColumn<T>>> setters = new Dictionary<string, Setter<NumberListColumn<T>>>()
         {
-            [Names.Count] = (r, me) => me.Count = r.ReadAsInt32(),
+            [Names.Count] = (r, me) => me._count = r.ReadAsInt32(),
             [Names.Chapters] = (r, me) => me._chapters = r.ReadList<NumberListChapter<T>>(() => new NumberListChapter<T>())
         };
 
