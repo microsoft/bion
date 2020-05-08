@@ -1,4 +1,5 @@
-﻿using BSOA.Model;
+﻿using BSOA.Extensions;
+using BSOA.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -176,28 +177,12 @@ namespace BSOA
 
         public override int GetHashCode()
         {
-            int hashCode = 0;
-
-            for (int i = 0; i < Count; ++i)
-            {
-                hashCode = unchecked(hashCode * 17) + this[i].GetHashCode();
-            }
-
-            return hashCode;
+            return ReadOnlyListExtensions.GetHashCode(this);
         }
 
         public override bool Equals(object obj)
         {
-            IReadOnlyList<T> other = obj as IReadOnlyList<T>;
-            if (other == null) { return false; }
-
-            if (other.Count != this.Count) { return false; }
-            for (int i = 0; i < this.Count; ++i)
-            {
-                if (!other[i].Equals(this[i])) { return false; }
-            }
-
-            return true;
+            return ReadOnlyListExtensions.AreEqual(this, obj as IReadOnlyList<T>);
         }
 
         public static bool operator ==(NumberList<T> left, NumberList<T> right)
