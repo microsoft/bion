@@ -174,5 +174,41 @@ namespace BSOA
         {
             return Slice.GetEnumerator();
         }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 0;
+
+            for (int i = 0; i < Count; ++i)
+            {
+                hashCode = unchecked(hashCode * 17) + this[i].GetHashCode();
+            }
+
+            return hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            IReadOnlyList<T> other = obj as IReadOnlyList<T>;
+            if (other == null) { return false; }
+
+            if (other.Count != this.Count) { return false; }
+            for (int i = 0; i < this.Count; ++i)
+            {
+                if (!other[i].Equals(this[i])) { return false; }
+            }
+
+            return true;
+        }
+
+        public static bool operator ==(NumberList<T> left, NumberList<T> right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(NumberList<T> left, NumberList<T> right)
+        {
+            return !(left == right);
+        }
     }
 }

@@ -46,7 +46,7 @@ namespace BSOA.Test.Model
             // Verify Database.Clear works
             database.Clear();
             Assert.Empty(database.Person);
-            Assert.Equal(0, database.Person[0].Age);
+            Assert.Null(database.Person[0]);
         }
 
         [Fact]
@@ -119,6 +119,10 @@ namespace BSOA.Test.Model
             AsJson.Save(serializeToPath, v1);
 
             V1.PersonDatabase roundTrip = AsJson.Load<V1.PersonDatabase>(serializeToPath);
+            ReadOnlyList.VerifySame(v1.Person, roundTrip.Person);
+
+            AsJson.Save(serializeToPath, v1, verbose: true);
+            roundTrip = AsJson.Load<V1.PersonDatabase>(serializeToPath);
             ReadOnlyList.VerifySame(v1.Person, roundTrip.Person);
         }
     }

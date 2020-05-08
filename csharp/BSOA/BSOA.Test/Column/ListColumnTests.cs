@@ -1,4 +1,5 @@
 ﻿using BSOA.Column;
+using System.Security.Cryptography;
 using Xunit;
 
 namespace BSOA.Test
@@ -35,6 +36,28 @@ namespace BSOA.Test
             Assert.True(empty.Count == 0);
             Assert.True(empty.Contains(7) == false);
             Assert.Equal(-1, empty.IndexOf(3));
+
+            Assert.True(empty == ColumnList<int>.Empty);
+            Assert.False(empty != ColumnList<int>.Empty);
+
+            // ColumnList.GetHashCode and Equals w/nulls
+            ListColumn<string> stringColumn = new ListColumn<string>(new StringColumn());
+            
+            ColumnList<string> first = stringColumn[0];
+            first.Add("One");
+            first.Add(null);
+            first.Add("Two");
+
+            ColumnList<string> second = stringColumn[1];
+            second.Add("One");
+            second.Add(null);
+            second.Add("Two");
+
+            Assert.True(second == first);
+
+            second[1] = "NotNull";
+            Assert.NotEqual(second.GetHashCode(), first.GetHashCode());
+            Assert.False(second == first);
         }
     }
 }

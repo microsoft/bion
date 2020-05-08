@@ -52,15 +52,16 @@ namespace BSOA.Test.Model.V1
         // Not required; these overrides facilitate unit tests
         public override bool Equals(object obj)
         {
+            if (object.ReferenceEquals(this, obj)) { return true; }
             if (obj == null || !(obj is Person)) { return false; }
 
             Person other = obj as Person;
-            return this.Age.Equals(other.Age) && this.Name.Equals(other.Name);
+            return this.Age.Equals(other.Age) && string.Equals(this.Name, other.Name);
         }
 
         public override int GetHashCode()
         {
-            return this.Age.GetHashCode() ^ this.Name.GetHashCode();
+            return this.Age.GetHashCode() ^ (this.Name?.GetHashCode() ?? 0);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace BSOA.Test
                 () => new UriColumn(),
                 null,
                 new Uri("http://github.com/Microsoft/sarif-sdk/src/Program.cs"),
-                (i) => new Uri($"src/{1}.cs", UriKind.Relative)
+                (i) => new Uri($"src/{i}.cs", UriKind.Relative)
             );
         }
     }

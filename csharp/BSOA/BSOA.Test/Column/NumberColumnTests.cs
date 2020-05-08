@@ -27,15 +27,19 @@ namespace BSOA.Test
 
             NumberColumn<int> column = new NumberColumn<int>(0);
             int sum = 0;
+            column.ForEach((slice) => sum += slice.Sum());
+            Assert.Equal(0, sum);
+
+            int expectedSum = 0;
             for(int i = 0; i < 100; ++i)
             {
                 column[i] = 2 * i;
-                sum += 2 * i;
+                expectedSum += 2 * i;
             }
 
-            int actual = 0;
-            column.ForEach((slice) => actual += slice.Sum());
-            Assert.Equal(sum, actual);
+            sum = 0;
+            column.ForEach((slice) => sum += slice.Sum());
+            Assert.Equal(expectedSum, sum);
         }
 
         private void NumberColumnTest<T>(T defaultValue, T otherValue, Func<int, T> valueProvider) where T : unmanaged, IEquatable<T>, IComparable<T>

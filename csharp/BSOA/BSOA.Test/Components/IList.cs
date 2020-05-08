@@ -11,6 +11,9 @@ namespace BSOA.Test
             List<T> expected = new List<T>();
             row.Clear();
 
+            // Lists should not report ReadOnly
+            Assert.False(row.IsReadOnly);
+
             // Set up 5 values each
             for (int i = 0; i < 5; ++i)
             {
@@ -29,9 +32,6 @@ namespace BSOA.Test
                 notInExpected = valueProvider(i);
                 if (!expected.Contains(notInExpected)) { break; }
             }
-
-            // Lists should not report ReadOnly
-            Assert.False(row.IsReadOnly);
 
             // Verify count correct
             Assert.Equal(expected.Count, row.Count);

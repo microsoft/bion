@@ -1,4 +1,5 @@
 ﻿using BSOA.IO;
+using System;
 using System.Collections.Generic;
 
 namespace BSOA.Model
@@ -26,14 +27,19 @@ namespace BSOA.Model
 
         protected abstract T Get(int index);
 
-        public override T this[int index] 
+        public override T this[int index]
         {
-            get => Get(index);
+            get
+            {
+                return (index < 0 || index >= Count ? default(T) : Get(index));
+            }
 
             set
             {
+                if (index >= Count) { _count = index + 1; }
+
                 IRow row = (IRow)value;
-                if(object.ReferenceEquals(this, row.Table))
+                if (object.ReferenceEquals(this, row?.Table))
                 {
                     // Already here
                     return;
@@ -41,7 +47,7 @@ namespace BSOA.Model
                 else
                 {
                     // Copy from other table
-                    CopyItem(Count, row.Table, row.Index);
+                    CopyItem(index, row.Table, row.Index);
                 }
             }
         }
@@ -52,7 +58,21 @@ namespace BSOA.Model
         /// <returns>New SoA item instance</returns>
         public override T Add()
         {
-            return this[_count++];
+            _count++;
+            return this[Count - 1];
+        }
+
+        public override void Add(T item)
+        {
+            IRow row = (IRow)item;
+            if (object.ReferenceEquals(this, row?.Table))
+            {
+                return;
+            }
+            else
+            {
+                this[Count] = item;
+            }
         }
 
         /// <summary>
@@ -73,11 +93,16 @@ namespace BSOA.Model
             return column;
         }
 
-        private static Dictionary<string, Setter<Table<T>>> setters = new Dictionary<string, Setter<Table<T>>>()
+        public override void CopyItem(int toIndex, ILimitedList fromList, int fromIndex)
         {
-            [Names.Count] = (r, me) => me._count = r.ReadAsInt32(),
-            [Names.Columns] = (r, me) => r.ReadDictionaryItems(me.Columns, throwOnUnknown: r.Settings.Strict),
-        };
+            Table<T> other = fromList as Table<T>;
+            if (other == null) { throw new ArgumentException(nameof(fromList)); }
+
+            foreach (var pair in Columns)
+            {
+                pair.Value.CopyItem(toIndex, other.Columns[pair.Key], fromIndex);
+            }
+        }
 
         public override void Swap(int index1, int index2)
         {
@@ -124,6 +149,12 @@ namespace BSOA.Model
                 column.Trim();
             }
         }
+
+        private static Dictionary<string, Setter<Table<T>>> setters = new Dictionary<string, Setter<Table<T>>>()
+        {
+            [Names.Count] = (r, me) => me._count = r.ReadAsInt32(),
+            [Names.Columns] = (r, me) => r.ReadDictionaryItems(me.Columns, throwOnUnknown: r.Settings.Strict),
+        };
 
         public void Read(ITreeReader reader)
         {

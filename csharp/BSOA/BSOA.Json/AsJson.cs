@@ -9,7 +9,7 @@ namespace BSOA.Json
 
         public static void Save<T>(string filePath, T item, bool verbose = false)
         {
-            if (_jsonSerializer == null) { BuildSerializer(); }
+            BuildSerializer();
 
             using (JsonTextWriter writer = new JsonTextWriter(System.IO.File.CreateText(filePath)))
             {
@@ -20,7 +20,7 @@ namespace BSOA.Json
 
         public static T Load<T>(string filePath)
         {
-            if (_jsonSerializer == null) { BuildSerializer(); }
+            BuildSerializer();
 
             using (JsonTextReader writer = new JsonTextReader(System.IO.File.OpenText(filePath)))
             {
@@ -30,6 +30,8 @@ namespace BSOA.Json
 
         private static void BuildSerializer()
         {
+            if (_jsonSerializer != null) { return; }
+
             _jsonSerializer = new JsonSerializer();
 
             _jsonSerializer.ContractResolver = new DefaultContractResolver()

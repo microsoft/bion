@@ -17,6 +17,7 @@ namespace BSOA.Column
         private Dictionary<T, byte> _distinct;
         private IColumn<T> _values;
         private NumberColumn<byte> _indices;
+        private bool _requiresTrim;
 
         public DistinctColumn(IColumn<T> values, T defaultValue)
         {
@@ -37,6 +38,7 @@ namespace BSOA.Column
             {
                 if (IsMappingValues && TryGetDistinctIndex(value, out byte valueIndex))
                 {
+                    _requiresTrim = true;
                     _indices[index] = valueIndex;
                 }
                 else
@@ -77,6 +79,7 @@ namespace BSOA.Column
 
                 _indices = null;
                 _distinct = null;
+                _requiresTrim = false;
                 return false;
             }
         }
@@ -90,6 +93,8 @@ namespace BSOA.Column
             _distinct = new Dictionary<T, byte>();
             _values.Clear();
             _values[0] = _defaultValue;
+
+            _requiresTrim = false;
         }
 
         public override void RemoveFromEnd(int count)
@@ -102,12 +107,17 @@ namespace BSOA.Column
             {
                 _values.RemoveFromEnd(count);
             }
+
+            _requiresTrim = true;
         }
 
         public void Trim()
         {
             if (IsMappingValues)
             {
+                if (_requiresTrim == false) { return; }
+                _requiresTrim = false;
+
                 // Remove unused values *except the default*, which must stay as '0' so new rows in indices have the default value
                 BitVector unusedValues = new BitVector(true, DistinctCount);
                 unusedValues.Remove(0);
@@ -159,6 +169,8 @@ namespace BSOA.Column
 
         public void Write(ITreeWriter writer)
         {
+            Trim();
+
             writer.WriteStartObject();
             writer.Write(Names.Indices, _indices);
             writer.Write(Names.Values, _values);

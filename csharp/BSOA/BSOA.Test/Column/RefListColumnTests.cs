@@ -1,6 +1,5 @@
 ﻿using BSOA.Column;
 using BSOA.Test.Components;
-using BSOA.Test.Model;
 using BSOA.Test.Model.V1;
 using System;
 using System.Collections.Generic;
@@ -26,6 +25,16 @@ namespace BSOA.Test
 
             // Verify ReferencedTableName stored and correctly kept after deserialize
             Assert.Equal(referencedTable, TreeSerializer.RoundTrip(new RefListColumn(referencedTable), () => new RefListColumn(referencedTable), TreeFormat.Binary).ReferencedTableName);
+
+            // NumberList Equals, GetHashCode
+            int[] asArray = new int[] { 0, 1, 3 };
+            column[1].SetTo(new ArraySlice<int>(asArray));
+            Assert.False(column[0] == column[1]);
+            Assert.True(column[0] != column[1]);
+            Assert.NotEqual(column[0].GetHashCode(), column[1].GetHashCode());
+
+            // Compare to array
+            Assert.True(column[1].Equals(asArray));
         }
 
         private RefListColumn BuildSampleColumn()

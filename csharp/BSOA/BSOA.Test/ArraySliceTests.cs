@@ -16,7 +16,11 @@ namespace BSOA.Test
 
             // Empty ArraySlice
             slice = ArraySlice<int>.Empty;
+            slice.Trim();
             Assert.Empty(slice);
+            Assert.True(slice == ArraySlice<int>.Empty);
+            Assert.False(slice != ArraySlice<int>.Empty);
+            
             VerifyCopyTo<int>(slice, copyToTarget);
             VerifyRoundTrip<int>(slice, copyToTarget);
             ReadOnlyList.VerifySame(slice, TreeSerializer.RoundTrip(slice, TreeFormat.Binary));
@@ -36,6 +40,7 @@ namespace BSOA.Test
             slice = new ArraySlice<int>(sample, index: 10);
             Assert.Equal(sample.Length - 10, slice.Count);
             Assert.Equal(sample[20], slice[10]);
+            Assert.False(slice.Equals(sample));
             VerifyCopyTo<int>(slice, copyToTarget);
             VerifyRoundTrip<int>(slice, copyToTarget);
             ReadOnlyList.VerifySame(slice, TreeSerializer.RoundTrip(slice, TreeFormat.Binary));

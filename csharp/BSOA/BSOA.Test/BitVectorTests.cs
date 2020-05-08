@@ -14,6 +14,7 @@ namespace BSOA.Test
             HashSet<int> expected = new HashSet<int>();
 
             // Empty vector
+            vector.Trim();
             VerifySame(expected, vector);
             Assert.Null(vector.Array);
             Assert.Equal(256, vector.Capacity);

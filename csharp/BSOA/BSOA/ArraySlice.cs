@@ -28,16 +28,6 @@ namespace BSOA
             Count = length;
             IsExpandable = isExpandable;
         }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new ListEnumerator<T>(this);
-        }
         
         public void CopyTo(T[] other, int toIndex)
         {
@@ -69,6 +59,52 @@ namespace BSOA
         public void Write(ITreeWriter writer)
         {
             writer.WriteBlockArray(Array, Index, Count);
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return new ListEnumerator<T>(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new ListEnumerator<T>(this);
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 0;
+
+            for (int i = 0; i < Count; ++i)
+            {
+                hashCode = unchecked(hashCode * 17) + this[i].GetHashCode();
+            }
+
+            return hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            IReadOnlyList<T> other = obj as IReadOnlyList<T>;
+            if (other == null) { return false; }
+
+            if (other.Count != this.Count) { return false; }
+            for (int i = 0; i < this.Count; ++i)
+            {
+                if (!other[i].Equals(this[i])) { return false; }
+            }
+
+            return true;
+        }
+
+        public static bool operator ==(ArraySlice<T> left, ArraySlice<T> right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ArraySlice<T> left, ArraySlice<T> right)
+        {
+            return !(left == right);
         }
     }
 }
