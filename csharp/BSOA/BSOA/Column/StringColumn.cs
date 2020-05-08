@@ -10,9 +10,9 @@ namespace BSOA.Column
         // StringColumn is a:
         //  - NullableColumn, to track and return nulls, over a
         //  - ConvertingColumn, to convert strings to and from byte[], over a
-        //  - NumberListColumn<byte>, to store the UTF-8 bytes per row
+        //  - ArraySliceColumn<byte>, to store the UTF-8 bytes per row
         public StringColumn() : base(
-            new ConvertingColumn<string, ArraySlice<byte>>(new NumberListColumn<byte>(), StringConverter.Instance))
+            new ConvertingColumn<string, ArraySlice<byte>>(new ArraySliceColumn<byte>(), StringConverter.Instance))
         { }
     }
 }

@@ -5,19 +5,20 @@ using System.Collections.Generic;
 namespace BSOA.Column
 {
     /// <summary>
-    ///  RefListColumn provides a reference from an item in one table to a set
-    ///  of items in another table. It stores the integer indices of the references.
+    ///  ListColumn provides a full IList&lt;T&gt; for each row.
+    ///  It wraps a values column which contains the individual values
+    ///  and an ArraySliceColumn which identifies which values each row-list has.
     /// </summary>
     public class ListColumn<T> : LimitedList<ColumnList<T>>, IColumn<ColumnList<T>>
     {
-        internal NumberListColumn<int> _indices;
+        internal ArraySliceColumn<int> _indices;
         internal IColumn<T> _values;
 
         public override int Count => _indices.Count;
 
         public ListColumn(IColumn<T> values)
         {
-            _indices = new NumberListColumn<int>();
+            _indices = new ArraySliceColumn<int>();
             _values = values;
         }
 

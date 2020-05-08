@@ -1,136 +1,18 @@
-﻿using BSOA.IO;
-using BSOA.Model;
-using System;
-using System.Collections.Generic;
-
-namespace BSOA.Column
+﻿namespace BSOA.Column
 {
     /// <summary>
-    ///  NumberListColumn stores an array of numbers for each row value.
-    ///  Columns which are lists of primitive types should use NumberListColumn directly.
-    ///  Other Lists should use ListColumn.
-    ///  Values under length 2,048 are packed together to avoid per row overhead.
+    ///  RefListColumn provides a reference from an item in one table to a set
+    ///  of items in another table. It stores the integer indices of the references.
     /// </summary>
-    /// <remarks>
-    ///  NumberListColumn is broken into 'Chapters' which are broken into 'Pages'.
-    ///  Short values are written back to back in a shared array.
-    ///  Long values are stored individually and loaded into a dictionary.
-    ///  Each 'Chapter' has a separate shared array, so that the array doesn't get too large.
-    ///  Each 'Page' has a tracked starting position in the shared array.
-    ///  Each row records the page-relative start position of the value only.
-    /// </remarks>
-    /// <typeparam name="T">Type of each element of Values (for StringColumn, T is char)</typeparam>
-    public class NumberListColumn<T> : LimitedList<ArraySlice<T>>, IColumn<ArraySlice<T>>, INumberColumn<T> where T : unmanaged
+    public class NumberListColumn<T> : WrappingColumn<NumberList<T>, ArraySlice<T>> where T : unmanaged
     {
-        private int _count;
-        private List<NumberListChapter<T>> _chapters;
+        public NumberListColumn() : base(new ArraySliceColumn<T>())
+        { }
 
-        public override int Count => _count;
-
-        public NumberListColumn()
+        public override NumberList<T> this[int index] 
         {
-            Clear();
-        }
-
-        public override ArraySlice<T> this[int index]
-        {
-            get
-            {
-                if (index < 0) { throw new IndexOutOfRangeException(); }
-                if (index >= Count) { return ArraySlice<T>.Empty; }
-
-                int chapterIndex = index / NumberListChapter<T>.ChapterRowCount;
-                int indexInChapter = index % NumberListChapter<T>.ChapterRowCount;
-
-                return _chapters[chapterIndex][indexInChapter];
-            }
-
-            set
-            {
-                int chapterIndex = index / NumberListChapter<T>.ChapterRowCount;
-                int indexInChapter = index % NumberListChapter<T>.ChapterRowCount;
-
-                if (index >= Count) { _count = index + 1; }
-
-                while (chapterIndex >= _chapters.Count)
-                {
-                    _chapters.Add(new NumberListChapter<T>());
-                }
-
-                _chapters[chapterIndex][indexInChapter] = value;
-            }
-        }
-
-        public override void Clear()
-        {
-            _count = 0;
-            _chapters = new List<NumberListChapter<T>>();
-        }
-
-        public override void RemoveFromEnd(int count)
-        {
-            // Clear last 'count' values
-            for (int i = Count - count; i < Count; ++i)
-            {
-                this[i] = ArraySlice<T>.Empty;
-            }
-
-            int newLastIndex = ((Count - 1) - count);
-            int newLastChapter = newLastIndex / NumberListChapter<T>.ChapterRowCount;
-            int newLastIndexInChapter = newLastIndex % NumberListChapter<T>.ChapterRowCount;
-
-            // Cut length of last chapter
-            if (_chapters.Count > newLastChapter)
-            {
-                _chapters[newLastChapter].Count = newLastIndexInChapter + 1;
-            }
-
-            // Remove any now-empty chapters
-            if (_chapters.Count > newLastChapter + 1)
-            {
-                _chapters.RemoveRange(newLastChapter + 1, _chapters.Count - (newLastChapter + 1));
-            }
-
-            // Track reduced size
-            _count -= count;
-        }
-
-        public void ForEach(Action<ArraySlice<T>> action)
-        {
-            foreach (NumberListChapter<T> chapter in _chapters)
-            {
-                chapter.ForEach(action);
-            }
-        }
-
-        public void Trim()
-        {
-            foreach (NumberListChapter<T> chapter in _chapters)
-            {
-                chapter.Trim();
-            }
-        }
-
-        private static Dictionary<string, Setter<NumberListColumn<T>>> setters = new Dictionary<string, Setter<NumberListColumn<T>>>()
-        {
-            [Names.Count] = (r, me) => me._count = r.ReadAsInt32(),
-            [Names.Chapters] = (r, me) => me._chapters = r.ReadList<NumberListChapter<T>>(() => new NumberListChapter<T>())
-        };
-
-        public void Read(ITreeReader reader)
-        {
-            reader.ReadObject(this, setters);
-        }
-
-        public void Write(ITreeWriter writer)
-        {
-            writer.WriteStartObject();
-            writer.Write(Names.Count, Count);
-
-            writer.WritePropertyName(Names.Chapters);
-            writer.WriteList(_chapters);
-
-            writer.WriteEndObject();
+            get => new NumberList<T>(Inner, index);
+            set => Inner[index] = value.Slice;
         }
     }
 }
