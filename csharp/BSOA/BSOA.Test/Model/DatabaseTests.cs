@@ -46,7 +46,7 @@ namespace BSOA.Test.Model
             // Verify Database.Clear works
             database.Clear();
             Assert.Empty(database.Person);
-            Assert.Null(database.Person[0]);
+            Assert.Equal(database.Person[0], database.Person.Add());
         }
 
         [Fact]

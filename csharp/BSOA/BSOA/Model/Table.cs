@@ -31,7 +31,8 @@ namespace BSOA.Model
         {
             get
             {
-                return (index < 0 || index >= Count ? default(T) : Get(index));
+                if (index < 0) { throw new IndexOutOfRangeException(); }
+                return Get(index);
             }
 
             set
@@ -39,7 +40,7 @@ namespace BSOA.Model
                 if (index >= Count) { _count = index + 1; }
 
                 IRow row = (IRow)value;
-                if (object.ReferenceEquals(this, row?.Table))
+                if (object.ReferenceEquals(this, row.Table))
                 {
                     // Already here
                     return;
@@ -65,7 +66,7 @@ namespace BSOA.Model
         public override void Add(T item)
         {
             IRow row = (IRow)item;
-            if (object.ReferenceEquals(this, row?.Table))
+            if (object.ReferenceEquals(this, row.Table))
             {
                 return;
             }
