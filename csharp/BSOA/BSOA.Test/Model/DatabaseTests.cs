@@ -1,4 +1,5 @@
 ﻿using BSOA.IO;
+using BSOA.Json;
 using BSOA.Test.Components;
 using System;
 using System.IO;
@@ -12,17 +13,17 @@ namespace BSOA.Test.Model
         [Fact]
         public void Database_Basics()
         {
-            PersonDatabase database = new PersonDatabase();
-            database.Person.Add(new Person() { Age = 39, Name = "Scott" });
-            database.Person.Add(new Person() { Age = 36, Name = "Adam" });
+            V1.PersonDatabase database = new V1.PersonDatabase();
+            database.Person.Add(new V1.Person() { Age = 39, Name = "Scott" });
+            database.Person.Add(new V1.Person() { Age = 36, Name = "Adam" });
 
             // Use ReadOnlyList.VerifySame to check count, enumerators, and indexer
-            PersonDatabase roundTripped = TreeSerializer.RoundTrip(database, TreeFormat.Binary);
+            V1.PersonDatabase roundTripped = TreeSerializer.RoundTrip(database, TreeFormat.Binary);
             ReadOnlyList.VerifySame(database.Person, roundTripped.Person);
 
             // Try loading database with size diagnostics
             TreeDiagnostics diagnostics = TreeSerializer.Diagnostics(database, TreeFormat.Binary);
-            
+
             // Verify table and column names in diagnostics
             StringBuilder textBuilder = new StringBuilder();
             diagnostics.Write(new StringWriter(textBuilder), -1);
@@ -51,9 +52,11 @@ namespace BSOA.Test.Model
         [Fact]
         public void Database_ReplaceColumn()
         {
-            PersonDatabase v1 = new PersonDatabase();
-            v1.Person.Add(new Person() { Age = 39, Name = "Scott" });
-            v1.Person.Add(new Person() { Age = 36, Name = "Adam" });
+            // Test saving a database and then loading it into a different object model with added and removed columns.
+
+            V1.PersonDatabase v1 = new V1.PersonDatabase();
+            v1.Person.Add(new V1.Person() { Age = 39, Name = "Scott" });
+            v1.Person.Add(new V1.Person() { Age = 36, Name = "Adam" });
 
             string filePath = "People.bsoa.bin";
 
@@ -81,7 +84,7 @@ namespace BSOA.Test.Model
             ReadOnlyList.VerifySame(v2.Person, v2RoundTrip.Person);
 
             // Load *new format* into V1 object model
-            PersonDatabase v1RoundTrip = new PersonDatabase();
+            V1.PersonDatabase v1RoundTrip = new V1.PersonDatabase();
             v1RoundTrip.Load(filePath, TreeFormat.Binary);
 
             // Verify unchanged columns come back
@@ -93,6 +96,30 @@ namespace BSOA.Test.Model
 
             // Read with TreeSerializationSettings.Strict and verify error
             Assert.Throws<IOException>(() => v1RoundTrip.Load(filePath, TreeFormat.Binary, new BSOA.IO.TreeSerializationSettings() { Strict = true }));
+        }
+
+        [Fact]
+        public void Database_NewtonsoftCompatibility()
+        {
+            // Test that basic Database, Table, and Row types can successfully roundtrip via Newtonsoft.Json serialization by default.
+            
+            // This requires:
+            //  - Tables exposed by Database (or collections which represent them are exposed)
+            //  - Table pre-constructed by Database constructor.
+            //  - Table has Add(T item).
+            //  - Item has an empty constructor.
+            //  - Item empty constructor chooses the right Database/Table or cross-table copy works correctly.
+            //  - Item properties are settable and types are understandable to Newtonsoft.Json.
+
+            V1.PersonDatabase v1 = new V1.PersonDatabase();
+            v1.Person.Add(new V1.Person() { Age = 39, Name = "Scott" });
+            v1.Person.Add(new V1.Person() { Age = 36, Name = "Adam" });
+
+            string serializeToPath = "PersonDatabase.V1.json";
+            AsJson.Save(serializeToPath, v1);
+
+            V1.PersonDatabase roundTrip = AsJson.Load<V1.PersonDatabase>(serializeToPath);
+            ReadOnlyList.VerifySame(v1.Person, roundTrip.Person);
         }
     }
 }

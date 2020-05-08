@@ -1,6 +1,7 @@
 ﻿using BSOA.Column;
 using BSOA.Test.Components;
 using BSOA.Test.Model;
+using BSOA.Test.Model.V1;
 using System;
 using System.Collections.Generic;
 using System.Linq;

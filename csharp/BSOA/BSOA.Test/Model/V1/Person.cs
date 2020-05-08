@@ -1,6 +1,6 @@
 ﻿using BSOA.Model;
 
-namespace BSOA.Test.Model
+namespace BSOA.Test.Model.V1
 {
     /// <summary>
     ///  Person is an example of an SoA item type.

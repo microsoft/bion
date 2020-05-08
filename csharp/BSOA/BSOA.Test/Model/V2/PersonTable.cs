@@ -11,9 +11,9 @@ namespace BSOA.Test.Model.V2
     {
         internal PersonDatabase Database;
 
-        //internal NumberColumn<byte> Age;
-        internal DateTimeColumn Birthdate;
-        internal StringColumn Name;
+        //internal IColumn<byte> Age;
+        internal IColumn<DateTime> Birthdate;
+        internal IColumn<string> Name;
 
         public PersonTable(PersonDatabase database) : base()
         {

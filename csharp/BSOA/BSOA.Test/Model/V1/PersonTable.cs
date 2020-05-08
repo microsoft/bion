@@ -1,7 +1,7 @@
 ﻿using BSOA.Column;
 using BSOA.Model;
 
-namespace BSOA.Test.Model
+namespace BSOA.Test.Model.V1
 {
     /// <summary>
     ///  PersonTable is an example of a SoA table type.
@@ -18,8 +18,8 @@ namespace BSOA.Test.Model
         internal PersonDatabase Database;
 
         // Table needs hardcoded properties for each column
-        internal NumberColumn<byte> Age;
-        internal StringColumn Name;
+        internal IColumn<byte> Age;
+        internal IColumn<string> Name;
 
         // Table constructor creates columns with the desired types and defaults.
         // Column names will be serialized and must be kept stable to maintain file compatibility.

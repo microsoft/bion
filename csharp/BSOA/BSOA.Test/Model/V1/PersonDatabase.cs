@@ -1,6 +1,6 @@
 ﻿using BSOA.Model;
 
-namespace BSOA.Test.Model
+namespace BSOA.Test.Model.V1
 {
     public class PersonDatabase : Database
     {
