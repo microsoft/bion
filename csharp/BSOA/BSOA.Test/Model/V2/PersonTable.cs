@@ -24,6 +24,9 @@ namespace BSOA.Test.Model.V2
             Name = AddColumn(nameof(Name), new StringColumn());
         }
 
-        public override Person this[int index] => new Person(this, index);
+        protected override Person Get(int index)
+        {
+            return new Person(this, index);
+        }
     }
 }

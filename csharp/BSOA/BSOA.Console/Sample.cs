@@ -31,16 +31,8 @@ namespace BSOA.Test.Components
             return this.IsActive.GetHashCode() ^ this.Age.GetHashCode() ^ this.Count.GetHashCode() ^ this.Position.GetHashCode() ^ this.Data.GetHashCode();
         }
 
-        public void Write(ITreeWriter writer)
-        {
-            writer.WriteStartObject();
-            writer.Write(nameof(IsActive), IsActive);
-            writer.Write(nameof(Age), Age);
-            writer.Write(nameof(Count), Count);
-            writer.Write(nameof(Position), Position);
-            writer.WriteBlockArray(nameof(Data), Data);
-            writer.WriteEndObject();
-        }
+        public void Trim()
+        { }
 
         public void Clear()
         {
@@ -51,11 +43,6 @@ namespace BSOA.Test.Components
             Data = null;
         }
 
-        public void Read(ITreeReader reader)
-        {
-            reader.ReadObject<Sample>(this, setters);
-        }
-
         private static Dictionary<string, Setter<Sample>> setters => new Dictionary<string, Setter<Sample>>()
         {
             [nameof(IsActive)] = (r, me) => me.IsActive = r.ReadAsBoolean(),
@@ -64,6 +51,22 @@ namespace BSOA.Test.Components
             [nameof(Position)] = (r, me) => me.Position = r.ReadAsInt64(),
             [nameof(Data)] = (r, me) => me.Data = r.ReadBlockArray<byte>()
         };
+
+        public void Read(ITreeReader reader)
+        {
+            reader.ReadObject<Sample>(this, setters);
+        }
+
+        public void Write(ITreeWriter writer)
+        {
+            writer.WriteStartObject();
+            writer.Write(nameof(IsActive), IsActive);
+            writer.Write(nameof(Age), Age);
+            writer.Write(nameof(Count), Count);
+            writer.Write(nameof(Position), Position);
+            writer.WriteBlockArray(nameof(Data), Data);
+            writer.WriteEndObject();
+        }
     }
 
     public class SampleConverter : JsonConverter

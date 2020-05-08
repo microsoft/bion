@@ -59,7 +59,7 @@ namespace BSOA.Model
 
             foreach (var pair in Tables)
             {
-                if (!pair.Value.Empty)
+                if (pair.Value.Count > 0)
                 {
                     writer.WritePropertyName(pair.Key);
                     pair.Value.Write(writer);

@@ -1,17 +1,11 @@
-﻿using BSOA.IO;
-using System.Collections.Generic;
-
-namespace BSOA.Model
+﻿namespace BSOA.Model
 {
-    public interface ITable : ITreeSerializable
-    {
-        bool Empty { get; }
+    public interface ITable<T> : IColumn<T>, ITable where T : IRow
+    { }
 
-        void Trim();
-    }
-
-    public interface ITable<T> : ITable, IReadOnlyList<T>
+    public interface ITable : IColumn
     {
-        T Add();
+        // Do I need this? If only copying from identical table type, no.
+        // Dictionary<string, IColumn> Columns { get; }
     }
 }

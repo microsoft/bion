@@ -63,13 +63,6 @@ namespace BSOA
             }
         }
 
-        public void Clear()
-        {
-            Count = 0;
-            Capacity = 0;
-            _array = null;
-        }
-
         public void RemoveFromEnd(int count)
         {
             int newLastIndex = ((Capacity - 1) - count);
@@ -149,14 +142,15 @@ namespace BSOA
             }
         }
 
-        public void Write(ITreeWriter writer)
+        public void Clear()
         {
-            writer.WriteStartObject();
-            writer.Write(Names.Capacity, Capacity);
-            writer.WritePropertyName(Names.Array);
-            writer.WriteBlockArray(Array);
-            writer.WriteEndObject();
+            Count = 0;
+            Capacity = 0;
+            _array = null;
         }
+
+        public void Trim()
+        { }
 
         private static Dictionary<string, Setter<BitVector>> setters = new Dictionary<string, Setter<BitVector>>()
         {
@@ -168,6 +162,15 @@ namespace BSOA
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters);
+        }
+
+        public void Write(ITreeWriter writer)
+        {
+            writer.WriteStartObject();
+            writer.Write(Names.Capacity, Capacity);
+            writer.WritePropertyName(Names.Array);
+            writer.WriteBlockArray(Array);
+            writer.WriteEndObject();
         }
     }
 

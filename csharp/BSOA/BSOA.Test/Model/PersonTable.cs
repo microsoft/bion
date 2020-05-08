@@ -32,7 +32,9 @@ namespace BSOA.Test.Model
             Name = AddColumn(nameof(Name), new StringColumn());
         }
 
-        // Table provides indexer calling correct item constructor
-        public override Person this[int index] => new Person(this, index);
+        protected override Person Get(int index)
+        {
+            return new Person(this, index);
+        }
     }
 }

@@ -1,31 +1,44 @@
-﻿using System;
+﻿using BSOA.Model;
+using System;
 
 namespace BSOA.Test.Model.V2
 {
     /// <summary>
     ///  Person (V2) shows a change to Person - replacing 'Age' with 'Birthdate'
     /// </summary>
-    public class Person
+    public class Person : IRow
     {
-        private PersonTable Table { get; }
-        private int Index { get; }
+        private PersonTable Table { get; set; }
+        private int Index { get; set; }
 
-        public Person(PersonTable table, int index)
-        {
-            this.Table = table;
-            this.Index = index;
-        }
+        public Person() : this(PersonDatabase.Current)
+        { }
+
+        public Person(PersonDatabase database) : this(database.Person)
+        { }
 
         public Person(PersonTable table) : this(table, table.Count)
         {
             table.Add();
         }
 
-        public Person(PersonDatabase database) : this(database.Person)
-        { }
+        internal Person(PersonTable table, int index)
+        {
+            this.Table = table;
+            this.Index = index;
+        }
+
+        ITable IRow.Table => Table;
+        int IRow.Index => Index;
+
+        void IRow.Reset(ITable table, int index)
+        {
+            Table = (PersonTable)table;
+            Index = index;
+        }
 
         // Properties for each column get and set array entries in the columns
-        
+
         //public byte Age
         //{
         //    get => Table.Age[Index];

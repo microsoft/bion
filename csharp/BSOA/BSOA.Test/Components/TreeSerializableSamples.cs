@@ -12,6 +12,9 @@ namespace BSOA.Test.Components
         public void Clear()
         { }
 
+        public void Trim()
+        { }
+
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters, throwOnUnknown: false);
@@ -68,6 +71,9 @@ namespace BSOA.Test.Components
             When = default(DateTime);
             Guid = default(Guid);
         }
+
+        public void Trim()
+        { }
 
         public void Write(ITreeWriter writer)
         {
@@ -167,6 +173,9 @@ namespace BSOA.Test.Components
             Array = null;
         }
 
+        public void Trim()
+        { }
+
         public void Read(ITreeReader reader)
         {
             // Verify classes can serialize a single item directly
@@ -205,6 +214,9 @@ namespace BSOA.Test.Components
             Item = default(T);
         }
 
+        public void Trim()
+        { }
+
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
@@ -239,13 +251,6 @@ namespace BSOA.Test.Components
             Clear();
         }
 
-        public void Clear()
-        {
-            List = new List<T>();
-            StringDictionary = new Dictionary<string, T>();
-            IntDictionary = new Dictionary<int, T>();
-        }
-
         public void SetCollectionsNull()
         {
             List = null;
@@ -268,6 +273,16 @@ namespace BSOA.Test.Components
             Assert.Equal(this.StringDictionary, other.StringDictionary);
             Assert.Equal(this.IntDictionary, other.IntDictionary);
         }
+
+        public void Clear()
+        {
+            List = new List<T>();
+            StringDictionary = new Dictionary<string, T>();
+            IntDictionary = new Dictionary<int, T>();
+        }
+
+        public void Trim()
+        { }
 
         private static Dictionary<string, Setter<CollectionContainer<T>>> setters = new Dictionary<string, Setter<CollectionContainer<T>>>()
         {

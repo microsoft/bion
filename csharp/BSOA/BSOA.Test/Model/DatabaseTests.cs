@@ -13,8 +13,8 @@ namespace BSOA.Test.Model
         public void Database_Basics()
         {
             PersonDatabase database = new PersonDatabase();
-            new Person(database) { Age = 39, Name = "Scott" };
-            new Person(database) { Age = 36, Name = "Adam" };
+            database.Person.Add(new Person() { Age = 39, Name = "Scott" });
+            database.Person.Add(new Person() { Age = 36, Name = "Adam" });
 
             // Use ReadOnlyList.VerifySame to check count, enumerators, and indexer
             PersonDatabase roundTripped = TreeSerializer.RoundTrip(database, TreeFormat.Binary);
@@ -52,8 +52,8 @@ namespace BSOA.Test.Model
         public void Database_ReplaceColumn()
         {
             PersonDatabase v1 = new PersonDatabase();
-            new Person(v1) { Age = 39, Name = "Scott" };
-            new Person(v1) { Age = 36, Name = "Adam" };
+            v1.Person.Add(new Person() { Age = 39, Name = "Scott" });
+            v1.Person.Add(new Person() { Age = 36, Name = "Adam" });
 
             string filePath = "People.bsoa.bin";
 

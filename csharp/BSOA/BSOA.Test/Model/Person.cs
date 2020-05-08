@@ -1,29 +1,40 @@
-﻿namespace BSOA.Test.Model
+﻿using BSOA.Model;
+
+namespace BSOA.Test.Model
 {
     /// <summary>
     ///  Person is an example of an SoA item type.
     /// </summary>
-    public class Person
+    public class Person : IRow
     {
-        // Item fields are the containing table and index in the table
-        private PersonTable Table { get; }
-        private int Index { get; }
+        private PersonTable Table { get; set; }
+        private int Index { get; set; }
 
-        // Constructor to reference an existing item
-        public Person(PersonTable table, int index)
-        {
-            this.Table = table;
-            this.Index = index;
-        }
+        public Person() : this(PersonDatabase.Current)
+        { }
 
-        // Constructor to add a new item
+        public Person(PersonDatabase database) : this(database.Person)
+        { }
+
         public Person(PersonTable table) : this(table, table.Count)
         {
             table.Add();
         }
 
-        public Person(PersonDatabase database) : this(database.Person)
-        { }
+        internal Person(PersonTable table, int index)
+        {
+            this.Table = table;
+            this.Index = index;
+        }
+
+        ITable IRow.Table => Table;
+        int IRow.Index => Index;
+
+        void IRow.Reset(ITable table, int index)
+        {
+            Table = (PersonTable)table;
+            Index = index;
+        }
 
         // Properties for each column get and set array entries in the columns
         public byte Age

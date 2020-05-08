@@ -22,7 +22,7 @@ namespace BSOA.Model
         public abstract void Clear();
         public abstract void RemoveFromEnd(int count);
 
-        public T Add()
+        public virtual T Add()
         {
             return this[Count];
         }

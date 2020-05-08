@@ -47,6 +47,9 @@ namespace BSOA
             }
         }
 
+        public void Trim()
+        { }
+
         public void Clear()
         {
             Array = null;
