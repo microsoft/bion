@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BSOA.Column;
+using System;
+using System.Linq;
 using Xunit;
 
 namespace BSOA.Test
@@ -22,9 +24,25 @@ namespace BSOA.Test
 
             NumberColumnTest<float>(-5.5f, 124.5f, (i) => 0.5f * i);
             NumberColumnTest<double>(-5.5f, 124.5f, (i) => 0.5f * i);
+
+            NumberColumn<int> column = new NumberColumn<int>(0);
+            int sum = 0;
+            column.ForEach((slice) => sum += slice.Sum());
+            Assert.Equal(0, sum);
+
+            int expectedSum = 0;
+            for(int i = 0; i < 100; ++i)
+            {
+                column[i] = 2 * i;
+                expectedSum += 2 * i;
+            }
+
+            sum = 0;
+            column.ForEach((slice) => sum += slice.Sum());
+            Assert.Equal(expectedSum, sum);
         }
 
-        private void NumberColumnTest<T>(T defaultValue, T otherValue, Func<int, T> valueProvider) where T : unmanaged, IEquatable<T>
+        private void NumberColumnTest<T>(T defaultValue, T otherValue, Func<int, T> valueProvider) where T : unmanaged, IEquatable<T>, IComparable<T>
         {
             Column.Basics<T>(() => new NumberColumn<T>(defaultValue), defaultValue, otherValue, valueProvider);
         }

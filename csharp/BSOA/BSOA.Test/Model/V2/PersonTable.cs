@@ -1,4 +1,5 @@
-﻿using BSOA.Model;
+﻿using BSOA.Column;
+using BSOA.Model;
 using System;
 
 namespace BSOA.Test.Model.V2
@@ -10,9 +11,9 @@ namespace BSOA.Test.Model.V2
     {
         internal PersonDatabase Database;
 
-        //internal NumberColumn<byte> Age;
-        internal DateTimeColumn Birthdate;
-        internal StringColumn Name;
+        //internal IColumn<byte> Age;
+        internal IColumn<DateTime> Birthdate;
+        internal IColumn<string> Name;
 
         public PersonTable(PersonDatabase database) : base()
         {
@@ -23,6 +24,9 @@ namespace BSOA.Test.Model.V2
             Name = AddColumn(nameof(Name), new StringColumn());
         }
 
-        public override Person this[int index] => new Person(this, index);
+        protected override Person Get(int index)
+        {
+            return new Person(this, index);
+        }
     }
 }

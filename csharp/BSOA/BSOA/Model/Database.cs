@@ -22,6 +22,9 @@ namespace BSOA.Model
             return table;
         }
 
+        /// <summary>
+        ///  Remove all items from table.
+        /// </summary>
         public void Clear()
         {
             foreach (ITable table in Tables.Values)
@@ -29,7 +32,18 @@ namespace BSOA.Model
                 table.Clear();
             }
         }
-        
+
+        /// <summary>
+        ///  Remove excess capacity and prepare for serialization
+        /// </summary>
+        public void Trim()
+        {
+            foreach (ITable table in Tables.Values)
+            {
+                table.Trim();
+            }
+        }
+
         public void Read(ITreeReader reader)
         {
             Clear();
@@ -40,7 +54,19 @@ namespace BSOA.Model
 
         public void Write(ITreeWriter writer)
         {
-            writer.WriteDictionary(Tables);
+            // Write non-empty tables only
+            writer.WriteStartObject();
+
+            foreach (var pair in Tables)
+            {
+                if (pair.Value.Count > 0)
+                {
+                    writer.WritePropertyName(pair.Key);
+                    pair.Value.Write(writer);
+                }
+            }
+
+            writer.WriteEndObject();
         }
     }
 }

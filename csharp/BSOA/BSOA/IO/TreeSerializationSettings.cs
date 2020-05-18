@@ -1,4 +1,6 @@
-﻿namespace BSOA.IO
+﻿using System.IO;
+
+namespace BSOA.IO
 {
     public class TreeSerializationSettings
     {

@@ -9,6 +9,12 @@ namespace BSOA.Test.Components
     {
         private static Dictionary<string, Setter<Empty>> setters = new Dictionary<string, Setter<Empty>>();
 
+        public void Clear()
+        { }
+
+        public void Trim()
+        { }
+
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters, throwOnUnknown: false);
@@ -53,6 +59,21 @@ namespace BSOA.Test.Components
             When = DateTime.UtcNow;
             Guid = Guid.NewGuid();
         }
+
+        public void Clear()
+        {
+            IsActive = false;
+            Name = null;
+            Position = 0;
+            Age = 0;
+            Type = 0;
+            Count = 0;
+            When = default(DateTime);
+            Guid = default(Guid);
+        }
+
+        public void Trim()
+        { }
 
         public void Write(ITreeWriter writer)
         {
@@ -147,6 +168,14 @@ namespace BSOA.Test.Components
             Assert.Equal(Array ?? new T[0], other.Array);
         }
 
+        public void Clear()
+        {
+            Array = null;
+        }
+
+        public void Trim()
+        { }
+
         public void Read(ITreeReader reader)
         {
             // Verify classes can serialize a single item directly
@@ -179,6 +208,14 @@ namespace BSOA.Test.Components
         {
             Assert.Equal(this.Item, other.Item);
         }
+
+        public void Clear()
+        {
+            Item = default(T);
+        }
+
+        public void Trim()
+        { }
 
         public void Write(ITreeWriter writer)
         {
@@ -214,13 +251,6 @@ namespace BSOA.Test.Components
             Clear();
         }
 
-        public void Clear()
-        {
-            List = new List<T>();
-            StringDictionary = new Dictionary<string, T>();
-            IntDictionary = new Dictionary<int, T>();
-        }
-
         public void SetCollectionsNull()
         {
             List = null;
@@ -244,6 +274,16 @@ namespace BSOA.Test.Components
             Assert.Equal(this.IntDictionary, other.IntDictionary);
         }
 
+        public void Clear()
+        {
+            List = new List<T>();
+            StringDictionary = new Dictionary<string, T>();
+            IntDictionary = new Dictionary<int, T>();
+        }
+
+        public void Trim()
+        { }
+
         private static Dictionary<string, Setter<CollectionContainer<T>>> setters = new Dictionary<string, Setter<CollectionContainer<T>>>()
         {
             [nameof(List)] = (r, me) => me.List = r.ReadList(() => new T()),
@@ -253,7 +293,6 @@ namespace BSOA.Test.Components
 
         public void Read(ITreeReader reader)
         {
-            Clear();
             reader.ReadObject(this, setters);
         }
 

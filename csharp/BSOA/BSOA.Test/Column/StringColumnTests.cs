@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using BSOA.Column;
+using BSOA.IO;
+using BSOA.Test.Components;
+using System;
+using System.Collections.Generic;
+
 using Xunit;
 
 namespace BSOA.Test
@@ -10,21 +15,86 @@ namespace BSOA.Test
         {
             Column.Basics<string>(
                 () => new StringColumn(),
-                string.Empty,
+                null,
                 "AnotherValue",
                 (i) => i.ToString()
             );
         }
 
         [Fact]
+        public void StringColumn_BackToEmpty()
+        {
+            StringColumn column = new StringColumn();
+            int count = 512;
+            TreeDiagnostics diagnostics;
+
+            column[0] = "A";
+            diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
+            int fixedSizeCost = (int)diagnostics.Length;
+
+            // Set many non-empty values
+            string value = "0123456789";
+            for (int i = 0; i < count; ++i)
+            {
+                column[i] = value;
+            }
+
+            // Expect size: value bytes, 2 byte lengths, 4 byte page starts, 1 bit IsNull
+            int sizeEstimate = fixedSizeCost + count * value.Length + count * 2 + ((count * 4) / 32) + (count / 8);
+            column.Trim();
+            diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
+            Assert.True(diagnostics.Length < sizeEstimate);
+
+            // Reload column
+            column = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
+
+            // Set almost all values empty
+            for (int i = 10; i < count; ++i)
+            {
+                column[i] = string.Empty;
+            }
+
+            // Expect size: 10 values, 10 lengths, normal page starts and IsNull
+            sizeEstimate = fixedSizeCost + 10 * value.Length + 10 * 2 + ((count * 4) / 32) + (count / 8);
+            column.Trim();
+            diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
+            Assert.True(diagnostics.Length < sizeEstimate);
+
+            // Clear column and round trip (verify Chapters created and then emptied serialize and restore properly)
+            column.Clear();
+            Assert.Empty(TreeSerializer.RoundTrip(column, TreeFormat.Binary));
+
+            // Make a multi-chapter column, then verify RemoveFromEnd cleans up whole chapters
+            for(int i = 0; i < 100; ++i)
+            {
+                column[1024 * i] = "A";
+            }
+
+            column.RemoveFromEnd(column.Count - 2049);
+            Assert.Equal(2049, column.Count);
+            Assert.Equal("A", column[0]);
+            Assert.Equal("A", column[1024]);
+            Assert.Equal("A", column[2048]);
+
+            for (int i = 3; i < 100; ++i)
+            {
+                Assert.Null(column[1024 * i]);
+            }
+
+            // Bounds check for VariableLengthColumn
+            Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
+        }
+
+        [Fact]
         public void StringColumn_LongValuesAndMerging()
-        { 
+        {
             StringColumn column = new StringColumn();
             List<string> expected = new List<string>();
             StringColumn roundTripped;
 
             // Test values just at and above LargeValue limit
             expected.Add(new string(' ', 2047));
+            expected.Add(null);
             expected.Add(string.Empty);
             expected.Add("Normal");
             expected.Add(new string(' ', 2048));
@@ -42,7 +112,7 @@ namespace BSOA.Test
             ReadOnlyList.VerifySame(expected, column);
 
             // Verify roundtripped column and column not corrupted by serialization
-            roundTripped = BinarySerializable.RoundTrip<StringColumn>(column, () => new StringColumn());
+            roundTripped = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
             ReadOnlyList.VerifySame(expected, roundTripped);
             ReadOnlyList.VerifySame(expected, column);
 
@@ -60,7 +130,7 @@ namespace BSOA.Test
             ReadOnlyList.VerifySame(expected, column);
 
             // Verify values re-roundtrip again properly (merging old and new immutable values)
-            roundTripped = BinarySerializable.RoundTrip<StringColumn>(column, () => new StringColumn());
+            roundTripped = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
             ReadOnlyList.VerifySame(expected, roundTripped);
             ReadOnlyList.VerifySame(expected, column);
 
@@ -69,7 +139,7 @@ namespace BSOA.Test
 
             Assert.Equal(101, column.Count);
             Assert.Equal("Centennial", column[100]);
-            Assert.Equal(string.Empty, column[99]);
+            Assert.Null(column[99]);
         }
     }
 }

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>BSOA Entity</Title>
+      <Shortcut>bentity</Shortcut>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[
+    public readonly struct $EntityName$
+    {
+        internal readonly $EntityName$Table _table;
+        internal readonly int _index;
+
+        public $EntityName$($EntityName$Table table, int index)
+        {
+            _table = table;
+            _index = index;
+        }
+
+        public $EntityName$($EntityName$Table table) : this(table, table.Count)
+        {
+            table.Add();
+        }
+
+        public $EntityName$($DatabaseName$ database) : this(database.$EntityName$)
+        { }
+
+        public bool IsNull => (_table == null || _index < 0);
+
+        // Add via 'bprop' snippet
+        public string Text
+        {
+            get => _table.Text[_index];
+            set => _table.Text[_index] = value;
+        }
+    }
+
+    public class $EntityName$Table : Table<$EntityName$>
+    {
+        internal $DatabaseName$ Database;
+
+        // Add via 'bcolumn' snippet
+        internal StringColumn Text;
+
+        public $EntityName$Table($DatabaseName$ database) : base()
+        {
+            this.Database = database;
+
+            this.Text = AddColumn(nameof(Text), new StringColumn());
+        }
+
+        public override $EntityName$ this[int index] => new $EntityName$(this, index);
+    }
+        ]]>
+      </Code>
+      <Declarations>
+        <Literal>
+        <ID>EntityName</ID>
+        <ToolTip>Name of the Entity being added (ex: Region)</ToolTip>
+        <Default>Region</Default>
+        </Literal>
+        <Literal>
+        <ID>DatabaseName</ID>
+        <ToolTip>Name of the Database container class for the Table</ToolTip>
+        <Default>SarifLogBsoa</Default>
+        </Literal>
+      </Declarations>
+      <Imports>
+        <Import>
+          <Namespace>BSOA.Model</Namespace>
+        </Import>
+        <Import>
+          <Namespace>BSOA.Column</Namespace>
+        </Import>
+      </Imports>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>BSOA Column</Title>
+      <Shortcut>bcolumn</Shortcut>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[
+        internal $BsoaType$ $Name$;
+        this.$Name$ = AddColumn(nameof($Name$), new $BsoaType$());
+        ]]>
+      </Code>
+      <Declarations>
+        <Literal>
+        <ID>Name</ID>
+        <ToolTip>Name of the Column referenced (ex: Text)</ToolTip>
+        <Default>Text</Default>
+        </Literal>
+        <Literal>
+        <ID>BsoaType</ID>
+        <ToolTip>BSOA Column class used for column (ex: StringColumn)</ToolTip>
+        <Default>NumberColumn&lt;int&gt;</Default>
+        </Literal>
+      </Declarations>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>BSOA Property</Title>
+      <Shortcut>bprop</Shortcut>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[
+        public $Type$ $Name$
+        {
+            get => _table.$Name$[_index];
+            set => _table.$Name$[_index] = value;
+        }
+        ]]>
+      </Code>
+      <Declarations>
+        <Literal>
+        <ID>Name</ID>
+        <ToolTip>Name of the Column referenced (ex: Text)</ToolTip>
+        <Default>Text</Default>
+        </Literal>
+        <Literal>
+        <ID>Type</ID>
+        <ToolTip>.NET Type of the Column (ex: string)</ToolTip>
+        <Default>string</Default>
+        </Literal>
+      </Declarations>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>BSOA Reference Property</Title>
+      <Shortcut>bref</Shortcut>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[
+        public $Entity$ $Name$
+        {
+            get => _table.Database.$Entity$[_table.$Name$[_index]];
+            set => _table.$Name$[_index] = value._index;
+        }
+        ]]>
+      </Code>
+      <Declarations>
+        <Literal>
+        <ID>Name</ID>
+        <ToolTip>Name of the Property to generate (ex: Description)</ToolTip>
+        <Default>Description</Default>
+        </Literal>
+        <Literal>
+        <ID>Entity</ID>
+        <ToolTip>Type name of the Entity referenced (ex: Message)</ToolTip>
+        <Default>Message</Default>
+        </Literal>
+      </Declarations>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>BSOA Reference List Property</Title>
+      <Shortcut>breflist</Shortcut>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[
+        public IList<$Entity$> $Name$
+        {
+            get => new MutableSliceWrapper<$Entity$, $Entity$Table>(_table.$Name$[_index], _table.Database.$Entity$, (table, index) => new $Entity$(table, index), (item) => item._index);
+            set => new MutableSliceWrapper<$Entity$, $Entity$Table>(_table.$Name$[_index], _table.Database.$Entity$, (table, index) => new $Entity$(table, index), (item) => item._index).SetTo(value);
+        }
+        ]]>
+      </Code>
+      <Declarations>
+        <Literal>
+        <ID>Name</ID>
+        <ToolTip>Name of the Property to generate (ex: Description)</ToolTip>
+        <Default>Description</Default>
+        </Literal>
+        <Literal>
+        <ID>Entity</ID>
+        <ToolTip>Type name of the Entity referenced (ex: Message)</ToolTip>
+        <Default>Message</Default>
+        </Literal>
+      </Declarations>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

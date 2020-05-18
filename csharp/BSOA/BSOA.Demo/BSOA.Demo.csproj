@@ -6,12 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Sarif.Sdk" Version="2.2.3" />
+    <ProjectReference Include="..\BSOA.Json\BSOA.Json.csproj" />
+    <ProjectReference Include="..\BSOA\BSOA.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BSOA.Json\BSOA.Json.csproj" />
-    <ProjectReference Include="..\BSOA\BSOA.csproj" />
+    <Reference Include="Sarif">
+      <HintPath>..\..\Sarif\netstandard2.0\Sarif.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

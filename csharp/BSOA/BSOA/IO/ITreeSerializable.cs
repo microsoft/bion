@@ -12,7 +12,16 @@
     /// </summary>
     public interface ITreeSerializable
     {
+        // Reset state prior to Read
+        void Clear();
+
+        // Prepare for write, consolidating any pending values
+        void Trim();
+
+        // Serialize this instance
         void Write(ITreeWriter writer);
+
+        // Deserialize this instance
         void Read(ITreeReader reader);
     }
 }

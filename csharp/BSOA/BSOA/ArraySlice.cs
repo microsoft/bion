@@ -3,31 +3,63 @@ using BSOA.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 
 namespace BSOA
 {
-    public struct ArraySlice<T> : IReadOnlyList<T>, IBinarySerializable, ITreeSerializable where T : unmanaged
+    public struct ArraySlice<T> : IReadOnlyList<T>, ITreeSerializable where T : unmanaged
     {
-        internal T[] _array;
-        internal int _index;
-        private int _length;
+        public T[] Array { get; private set; }
+        public int Index { get; private set; }
+        public int Count { get; set; }
+        public bool IsExpandable { get; private set; }
 
-        public T this[int index] => _array[_index + index];
-        public int Count => _length;
+        public T this[int index] => Array[Index + index];
 
         public static ArraySlice<T> Empty = default;
 
-        public ArraySlice(T[] array, int index = 0, int length = -1)
+        public ArraySlice(T[] array, int index = 0, int length = -1, bool isExpandable = false)
         {
             if (array == null) { throw new ArgumentNullException("array"); }
             if (length < 0) { length = array.Length - index; }
             if (index < 0 || index > array.Length) { throw new ArgumentOutOfRangeException("index"); }
             if (index + length > array.Length) { throw new ArgumentOutOfRangeException("length"); }
             
-            _array = array;
-            _index = index;
-            _length = length;
+            Array = array;
+            Index = index;
+            Count = length;
+            IsExpandable = isExpandable;
+        }
+        
+        public void CopyTo(T[] other, int toIndex)
+        {
+            if (Count > 0)
+            {
+                System.Array.Copy(Array, Index, other, toIndex, Count);
+            }
+        }
+
+        public void Trim()
+        { }
+
+        public void Clear()
+        {
+            Array = null;
+            Index = 0;
+            Count = 0;
+            IsExpandable = false;
+        }
+
+        public void Read(ITreeReader reader)
+        {
+            Array = reader.ReadBlockArray<T>();
+            Index = 0;
+            Count = Array.Length;
+            IsExpandable = false;
+        }
+
+        public void Write(ITreeWriter writer)
+        {
+            writer.WriteBlockArray(Array, Index, Count);
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -39,37 +71,25 @@ namespace BSOA
         {
             return new ListEnumerator<T>(this);
         }
-        
-        public void CopyTo(T[] other, int toIndex)
+
+        public override int GetHashCode()
         {
-            if (_length > 0)
-            {
-                Array.Copy(_array, _index, other, toIndex, _length);
-            }
+            return ReadOnlyListExtensions.GetHashCode(this);
         }
 
-        public void Read(BinaryReader reader, ref byte[] buffer)
+        public override bool Equals(object obj)
         {
-            _array = reader.ReadBlockArray<T>(ref buffer);
-            _index = 0;
-            _length = _array.Length;
+            return ReadOnlyListExtensions.AreEqual(this, obj as IReadOnlyList<T>);
         }
 
-        public void Write(BinaryWriter writer, ref byte[] buffer)
+        public static bool operator ==(ArraySlice<T> left, ArraySlice<T> right)
         {
-            writer.WriteBlockArray<T>(_array, _index, _length, ref buffer);
+            return left.Equals(right);
         }
 
-        public void Read(ITreeReader reader)
+        public static bool operator !=(ArraySlice<T> left, ArraySlice<T> right)
         {
-            _array = reader.ReadBlockArray<T>();
-            _index = 0;
-            _length = _array.Length;
-        }
-
-        public void Write(ITreeWriter writer)
-        {
-            writer.WriteBlockArray(_array, _index, _length);
+            return !(left == right);
         }
     }
 }

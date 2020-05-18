@@ -16,7 +16,7 @@ namespace BSOA.Test.Components
     {
         public static ITreeReader Reader(TreeFormat format, Stream stream, TreeSerializationSettings settings)
         {
-            switch(format)
+            switch (format)
             {
                 case TreeFormat.Binary:
                     return new BinaryTreeReader(stream, settings);
@@ -51,6 +51,9 @@ namespace BSOA.Test.Components
             // Test serialization of containers (read must leave last token of nested items so loop finds next property name properly)
             SingleContainer<Sample> container = new SingleContainer<Sample>(sample);
             container.AssertEqual(RoundTrip<SingleContainer<Sample>>(container, format));
+
+            // Test diagnostics doesn't throw when over Reader
+            TreeDiagnostics diagnostics = Diagnostics(sample, format);
 
             // Test serialization of all supported primitive array types
             RoundTripArray(new byte[] { 0, 4, 16 }, format);
@@ -149,12 +152,44 @@ namespace BSOA.Test.Components
             }
         }
 
+        // Write item, then read back and return size diagnostics instead of round-tripped instance
+        public static TreeDiagnostics Diagnostics<T>(T value, Func<T> buildT, TreeFormat format) where T : ITreeSerializable
+        {
+            TreeSerializationSettings settings = new TreeSerializationSettings() { LeaveStreamOpen = true };
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                using (ITreeWriter writer = Writer(format, stream, settings))
+                {
+                    value.Write(writer);
+                }
+
+                stream.Seek(0, SeekOrigin.Begin);
+
+                using (TreeDiagnosticsReader reader = new TreeDiagnosticsReader(Reader(format, stream, settings)))
+                {
+                    T roundTripped = buildT();
+                    roundTripped.Read(reader);
+
+                    // Test double dispose
+                    reader.Dispose();
+
+                    return reader.Tree;
+                }
+            }
+        }
+
+        public static TreeDiagnostics Diagnostics<T>(T value, TreeFormat format) where T : ITreeSerializable, new()
+        {
+            return Diagnostics(value, () => new T(), format);
+        }
+
         // Use default constructor if available
         public static T RoundTrip<T>(
-            T value, 
-            TreeFormat format,
-            TreeSerializationSettings settings = null,
-            bool testDoubleDispose = false) where T : ITreeSerializable, new()
+        T value,
+        TreeFormat format,
+        TreeSerializationSettings settings = null,
+        bool testDoubleDispose = false) where T : ITreeSerializable, new()
         {
             return RoundTrip(value, () => new T(), format, settings, testDoubleDispose);
         }
@@ -210,10 +245,10 @@ namespace BSOA.Test.Components
                     Assert.NotEqual(TreeToken.None, reader.TokenType);
 
                     roundTripped.Read(reader);
-                    
+
                     // Verify everything read back
                     Assert.Equal(buffer.Length, stream.Position);
-                    
+
                     if (testDoubleDispose) { reader.Dispose(); }
                 }
 

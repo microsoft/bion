@@ -228,8 +228,14 @@ namespace BSOA.IO
         /// <param name="instance">T instance being initialized</param>
         /// <param name="setters">Dictionary of setter per field name</param>
         /// <param name="throwOnUnknown">Throw if property name not in setters found</param>
-        public static void ReadObject<T>(this ITreeReader reader, T instance, Dictionary<string, Setter<T>> setters, bool throwOnUnknown = true)
+        public static void ReadObject<T>(this ITreeReader reader, T instance, Dictionary<string, Setter<T>> setters, bool throwOnUnknown = true) where T : ITreeSerializable
         {
+            // Ensure object state reset before Read
+            instance.Clear();
+
+            // Null means default state
+            if (reader.TokenType == TreeToken.Null) { return; }
+
             reader.Expect(TreeToken.StartObject);
             reader.Read();
 
