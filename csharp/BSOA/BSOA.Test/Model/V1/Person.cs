@@ -7,8 +7,8 @@ namespace BSOA.Test.Model.V1
     /// </summary>
     public class Person : IRow
     {
-        private PersonTable Table { get; set; }
-        private int Index { get; set; }
+        private PersonTable _table;
+        private int _index;
 
         public Person() : this(PersonDatabase.Current)
         { }
@@ -23,30 +23,30 @@ namespace BSOA.Test.Model.V1
 
         internal Person(PersonTable table, int index)
         {
-            this.Table = table;
-            this.Index = index;
+            this._table = table;
+            this._index = index;
         }
 
-        ITable IRow.Table => Table;
-        int IRow.Index => Index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
         void IRow.Reset(ITable table, int index)
         {
-            Table = (PersonTable)table;
-            Index = index;
+            _table = (PersonTable)table;
+            _index = index;
         }
 
         // Properties for each column get and set array entries in the columns
         public byte Age
         {
-            get => Table.Age[Index];
-            set => Table.Age[Index] = value;
+            get => _table.Age[_index];
+            set => _table.Age[_index] = value;
         }
 
         public string Name
         {
-            get => Table.Name[Index];
-            set => Table.Name[Index] = value;
+            get => _table.Name[_index];
+            set => _table.Name[_index] = value;
         }
 
         // Not required; these overrides facilitate unit tests
