@@ -29,8 +29,9 @@ namespace BSOA.Test
             AssertBuild<char>((char)1);
 
             Assert.Throws<NotImplementedException>(() => ColumnFactory.Build(typeof(DayOfWeek), DayOfWeek.Sunday));
+            Assert.Throws<NotImplementedException>(() => ColumnFactory.Build<IList<int>>());
 
-            IColumn<ColumnList<string>> column = (IColumn<ColumnList<string>>)ColumnFactory.Build(typeof(IList<string>), null);
+            IColumn<ColumnList<string>> column = (IColumn<ColumnList<string>>)ColumnFactory.Build(typeof(ColumnList<string>), null);
             Assert.NotNull(column);
 
             Assert.NotNull(ColumnFactory.Build<ColumnList<string>>());
