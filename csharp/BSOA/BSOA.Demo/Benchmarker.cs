@@ -40,9 +40,9 @@ namespace BSOA.Demo
             SarifLogFiltered filtered = null;
             SarifLogBsoa bsoa = null;
 
-            //// Load with diagnostics (see column sizes)
-            //Console.WriteLine();
-            //LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: 3);
+            // Load with diagnostics (see column sizes)
+            Console.WriteLine();
+            LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: 3);
 
             // Compare loading times
             filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft to Normal classes", iterations: 3);
@@ -58,15 +58,12 @@ namespace BSOA.Demo
 
         private void ChangeSomething(SarifLogBsoa log)
         {
-            //var artifactLocation = log.Location[log.Location.Count / 2].PhysicalLocation.ArtifactLocation;
-            //artifactLocation.Index = 45;
+            //log.Location[log.Location.Count / 2].PhysicalLocation.ArtifactLocation.Index = 45;
 
-            //var snippet = log.Location[log.Location.Count / 2].PhysicalLocation.Region.Snippet;
-            //snippet.Text = "Changed!";
+            //log.Location[log.Location.Count / 2].PhysicalLocation.Region.Snippet.Text = "Changed!";
 
             var results = log.Run[0].Results;
-            var message = results[results.Count / 2].Message;
-            message.Text = "Different";
+            results[results.Count / 2].Message.Text = "Different";
         }
 
         private void Convert(bool force)

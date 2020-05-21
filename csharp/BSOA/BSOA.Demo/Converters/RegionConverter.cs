@@ -28,7 +28,7 @@ namespace BSOA.Demo.Conversion
 
         public static bool Compare(Microsoft.CodeAnalysis.Sarif.Region expected, Model.Region actual)
         {
-            if(expected == null) { return actual.IsNull; }
+            if(expected == null) { return actual == null; }
 
             if (expected.StartLine != actual.StartLine) { return false; }
             if (expected.StartColumn != actual.StartColumn) { return false; }

@@ -47,6 +47,7 @@ namespace BSOA.Generator.Generation
 
             resultCode = CodeSection.Replace(resultCode, "TableMembers", members.ToString());
             resultCode = CodeSection.Replace(resultCode, "TableConstructors", constructors.ToString());
+            resultCode = CodeSection.Replace(resultCode, "Properties", "");
 
             return resultCode;
         }

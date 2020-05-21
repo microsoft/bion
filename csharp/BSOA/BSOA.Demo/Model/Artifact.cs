@@ -1,18 +1,21 @@
-﻿using BSOA.Column;
 using BSOA.Model;
 using System;
+using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    public readonly struct Artifact
+    /// <summary>
+    ///  GENERATED: BSOA Entity for 'Artifact'
+    /// </summary>
+    public partial class Artifact : IRow
     {
-        internal readonly ArtifactTable _table;
-        internal readonly int _index;
+        private ArtifactTable _table;
+        private int _index;
 
-        public Artifact(ArtifactTable table, int index)
+        internal Artifact(ArtifactTable table, int index)
         {
-            _table = table;
-            _index = index;
+            this._table = table;
+            this._index = index;
         }
 
         public Artifact(ArtifactTable table) : this(table, table.Count)
@@ -23,18 +26,19 @@ namespace BSOA.Demo.Model
         public Artifact(SarifLogBsoa database) : this(database.Artifact)
         { }
 
-        public bool IsNull => (_table == null || _index < 0);
+        public Artifact() : this(SarifLogBsoa.Current)
+        { }
 
         public Message Description
         {
-            get => _table.Database.Message[_table.Description[_index]];
-            set => _table.Description[_index] = value._index;
+            get => _table.Database.Message.Get(_table.Description[_index]);
+            set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
         public ArtifactLocation Location
         {
-            get => _table.Database.ArtifactLocation[_table.Location[_index]];
-            set => _table.Location[_index] = value._index;
+            get => _table.Database.ArtifactLocation.Get(_table.Location[_index]);
+            set => _table.Location[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
         public int ParentIndex
@@ -63,8 +67,8 @@ namespace BSOA.Demo.Model
 
         public ArtifactContent Contents
         {
-            get => _table.Database.ArtifactContent[_table.Contents[_index]];
-            set => _table.Contents[_index] = value._index;
+            get => _table.Database.ArtifactContent.Get(_table.Contents[_index]);
+            set => _table.Contents[_index] = _table.Database.ArtifactContent.LocalIndex(value);
         }
 
         public string Encoding
@@ -84,42 +88,16 @@ namespace BSOA.Demo.Model
             get => _table.LastModifiedTimeUtc[_index];
             set => _table.LastModifiedTimeUtc[_index] = value;
         }
-    }
 
-    public class ArtifactTable : Table<Artifact>
-    {
-        internal SarifLogBsoa Database;
-        
-        internal RefColumn Description;
-        internal RefColumn Location;
-        internal NumberColumn<int> ParentIndex;
-        internal NumberColumn<int> Offset;
-        internal NumberColumn<int> Length;
-        internal StringColumn MimeType;
-        internal RefColumn Contents;
-        internal StringColumn Encoding;
-        internal StringColumn SourceLanguage;
-        internal DateTimeColumn LastModifiedTimeUtc;
+        #region IRow
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        // Missing: Roles, Hashes, Properties
-
-        public ArtifactTable(SarifLogBsoa database) : base()
+        void IRow.Reset(ITable table, int index)
         {
-            this.Database = database;
-
-            this.Description = AddColumn(nameof(Description), new RefColumn(nameof(database.Message)));
-            this.Location = AddColumn(nameof(Location), new RefColumn(nameof(database.ArtifactLocation)));
-            this.ParentIndex = AddColumn(nameof(ParentIndex), new NumberColumn<int>(-1));
-            this.Offset = AddColumn(nameof(Offset), new NumberColumn<int>(0));
-            this.Length = AddColumn(nameof(Length), new NumberColumn<int>(-1));
-            this.MimeType = AddColumn(nameof(MimeType), new StringColumn());
-            this.Contents = AddColumn(nameof(Contents), new RefColumn(nameof(database.ArtifactContent)));
-            this.Encoding = AddColumn(nameof(Encoding), new StringColumn());
-            this.SourceLanguage = AddColumn(nameof(SourceLanguage), new StringColumn());
-            this.LastModifiedTimeUtc = AddColumn(nameof(LastModifiedTimeUtc), new DateTimeColumn(DateTime.MinValue));
+            _table = (ArtifactTable)table;
+            _index = index;
         }
-
-        public override Artifact this[int index] => new Artifact(this, index);
+        #endregion
     }
-
 }

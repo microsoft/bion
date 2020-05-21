@@ -24,7 +24,7 @@ namespace BSOA.Demo.Conversion
 
         public static bool Compare(Microsoft.CodeAnalysis.Sarif.ArtifactLocation expected, Model.ArtifactLocation actual)
         {
-            if (expected == null) { return actual.IsNull; }
+            if (expected == null) { return actual == null; }
 
             if (expected.Uri != actual.Uri) { return false; }
             if (expected.UriBaseId != actual.UriBaseId) { return false; }

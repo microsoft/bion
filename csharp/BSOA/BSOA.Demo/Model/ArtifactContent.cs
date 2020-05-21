@@ -1,20 +1,21 @@
-﻿using BSOA.Column;
 using BSOA.Model;
+using System;
+using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
     /// <summary>
-    ///  SoA Item for 'ArtifactContent' type.
+    ///  GENERATED: BSOA Entity for 'ArtifactContent'
     /// </summary>
-    public readonly struct ArtifactContent
+    public partial class ArtifactContent : IRow
     {
-        internal readonly ArtifactContentTable _table;
-        internal readonly int _index;
+        private ArtifactContentTable _table;
+        private int _index;
 
         internal ArtifactContent(ArtifactContentTable table, int index)
         {
-            _table = table;
-            _index = index;
+            this._table = table;
+            this._index = index;
         }
 
         public ArtifactContent(ArtifactContentTable table) : this(table, table.Count)
@@ -25,7 +26,8 @@ namespace BSOA.Demo.Model
         public ArtifactContent(SarifLogBsoa database) : this(database.ArtifactContent)
         { }
 
-        public bool IsNull => (_table == null || _index < 0);
+        public ArtifactContent() : this(SarifLogBsoa.Current)
+        { }
 
         public string Text
         {
@@ -38,29 +40,16 @@ namespace BSOA.Demo.Model
             get => _table.Binary[_index];
             set => _table.Binary[_index] = value;
         }
-    }
 
-    /// <summary>
-    ///  SoA Table for 'ArtifactContent' type.
-    /// </summary>
-    public class ArtifactContentTable : Table<ArtifactContent>
-    {
-        internal SarifLogBsoa Database;
+        #region IRow
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        internal StringColumn Text;
-        internal StringColumn Binary;
-        
-        // MultiFormatMessageString Rendered
-        // Properties
-
-        public ArtifactContentTable(SarifLogBsoa database) : base()
+        void IRow.Reset(ITable table, int index)
         {
-            this.Database = database;
-
-            this.Text = AddColumn(nameof(Text), new StringColumn());
-            this.Binary = AddColumn(nameof(Binary), new StringColumn());
+            _table = (ArtifactContentTable)table;
+            _index = index;
         }
-
-        public override ArtifactContent this[int index] => new ArtifactContent(this, index);
+        #endregion
     }
 }

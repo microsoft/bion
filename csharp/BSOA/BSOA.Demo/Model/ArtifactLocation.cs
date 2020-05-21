@@ -1,15 +1,18 @@
-﻿using BSOA.Column;
 using BSOA.Model;
 using System;
+using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    public readonly struct ArtifactLocation
+    /// <summary>
+    ///  GENERATED: BSOA Entity for 'ArtifactLocation'
+    /// </summary>
+    public partial class ArtifactLocation : IRow
     {
-        internal readonly ArtifactLocationTable _table;
-        internal readonly int _index;
+        private ArtifactLocationTable _table;
+        private int _index;
 
-        public ArtifactLocation(ArtifactLocationTable table, int index)
+        internal ArtifactLocation(ArtifactLocationTable table, int index)
         {
             this._table = table;
             this._index = index;
@@ -23,7 +26,8 @@ namespace BSOA.Demo.Model
         public ArtifactLocation(SarifLogBsoa database) : this(database.ArtifactLocation)
         { }
 
-        public bool IsNull => (_table == null || _index < 0);
+        public ArtifactLocation() : this(SarifLogBsoa.Current)
+        { }
 
         public Uri Uri
         {
@@ -45,33 +49,19 @@ namespace BSOA.Demo.Model
 
         public Message Description
         {
-            get => _table.Database.Message[_table.Description[_index]];
-            set => _table.Description[_index] = value._index;
+            get => _table.Database.Message.Get(_table.Description[_index]);
+            set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
-    }
 
-    public class ArtifactLocationTable : Table<ArtifactLocation>
-    {
-        internal SarifLogBsoa Database;
+        #region IRow
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        internal UriColumn Uri;
-        internal StringColumn UriBaseId;
-        internal NumberColumn<int> Index;
-        internal RefColumn Description;
-
-        // Properties
-
-        public ArtifactLocationTable(SarifLogBsoa database) : base()
+        void IRow.Reset(ITable table, int index)
         {
-            this.Database = database;
-
-            this.UriBaseId = AddColumn(nameof(UriBaseId), new StringColumn());
-            this.Uri = AddColumn(nameof(Uri), new UriColumn());
-            this.Index = AddColumn(nameof(Index), new NumberColumn<int>(-1));
-            this.Description = AddColumn(nameof(Description), new RefColumn(nameof(database.Message)));
+            _table = (ArtifactLocationTable)table;
+            _index = index;
         }
-
-        public override ArtifactLocation this[int index] => new ArtifactLocation(this, index);
+        #endregion
     }
-
 }

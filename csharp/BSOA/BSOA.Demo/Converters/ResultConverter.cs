@@ -26,7 +26,7 @@ namespace BSOA.Demo.Conversion
 
         public static bool Compare(Microsoft.CodeAnalysis.Sarif.Result expected, Model.Result actual)
         {
-            if (expected == null) { return actual.IsNull; }
+            if (expected == null) { return actual == null; }
 
             if (expected.BaselineState != actual.BaselineState) { return false; }
             if (expected.RuleId != actual.RuleId) { return false; }

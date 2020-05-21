@@ -37,7 +37,7 @@ namespace BSOA.Demo.Conversion
 
         public static bool Compare(Microsoft.CodeAnalysis.Sarif.Artifact expected, Model.Artifact actual)
         {
-            if (expected == null) { return actual.IsNull; }
+            if (expected == null) { return actual == null; }
 
             if (!MessageConverter.Compare(expected.Description, actual.Description)) { return false; }
             if (!ArtifactLocationConverter.Compare(expected.Location, actual.Location)) { return false; }

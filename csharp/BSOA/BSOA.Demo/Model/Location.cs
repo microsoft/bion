@@ -1,18 +1,21 @@
-﻿using BSOA.Column;
 using BSOA.Model;
+using System;
 using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    public readonly struct Location
+    /// <summary>
+    ///  GENERATED: BSOA Entity for 'Location'
+    /// </summary>
+    public partial class Location : IRow
     {
-        internal readonly LocationTable _table;
-        internal readonly int _index;
+        private LocationTable _table;
+        private int _index;
 
-        public Location(LocationTable table, int index)
+        internal Location(LocationTable table, int index)
         {
-            _table = table;
-            _index = index;
+            this._table = table;
+            this._index = index;
         }
 
         public Location(LocationTable table) : this(table, table.Count)
@@ -23,7 +26,8 @@ namespace BSOA.Demo.Model
         public Location(SarifLogBsoa database) : this(database.Location)
         { }
 
-        public bool IsNull => (_table == null || _index < 0);
+        public Location() : this(SarifLogBsoa.Current)
+        { }
 
         public int Id
         {
@@ -33,54 +37,35 @@ namespace BSOA.Demo.Model
 
         public PhysicalLocation PhysicalLocation
         {
-            get => _table.Database.PhysicalLocation[_table.PhysicalLocation[_index]];
-            set => _table.PhysicalLocation[_index] = value._index;
+            get => _table.Database.PhysicalLocation.Get(_table.PhysicalLocation[_index]);
+            set => _table.PhysicalLocation[_index] = _table.Database.PhysicalLocation.LocalIndex(value);
         }
 
         public IList<LogicalLocation> LogicalLocations
         {
-            get => new NumberListConverter<LogicalLocation, LogicalLocationTable>(_table.LogicalLocations[_index], _table.Database.LogicalLocation, (table, index) => new LogicalLocation(table, index), (table, item) => item._index);
-            set => new NumberListConverter<LogicalLocation, LogicalLocationTable>(_table.LogicalLocations[_index], _table.Database.LogicalLocation, (table, index) => new LogicalLocation(table, index), (table, item) => item._index).SetTo(value);
+            get => _table.Database.LogicalLocation.List(_table.LogicalLocations[_index]);
         }
 
         public Message Message
         {
-            get => _table.Database.Message[_table.Message[_index]];
-            set => _table.Message[_index] = value._index;
+            get => _table.Database.Message.Get(_table.Message[_index]);
+            set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
         public IList<Region> Annotations
         {
-            get => new NumberListConverter<Region, RegionTable>(_table.Annotations[_index], _table.Database.Region, (table, index) => new Region(table, index), (table, item) => item._index);
-            set => new NumberListConverter<Region, RegionTable>(_table.Annotations[_index], _table.Database.Region, (table, index) => new Region(table, index), (table, item) => item._index).SetTo(value);
+            get => _table.Database.Region.List(_table.Annotations[_index]);
         }
-    }
 
-    public class LocationTable : Table<Location>
-    {
-        internal SarifLogBsoa Database;
+        #region IRow
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        internal NumberColumn<int> Id;
-        internal RefColumn PhysicalLocation;
-        internal RefListColumn LogicalLocations;
-        internal RefColumn Message;
-        internal RefListColumn Annotations;
-
-        // RefListColumn Relationships
-        // Properties
-
-        public LocationTable(SarifLogBsoa database) : base()
+        void IRow.Reset(ITable table, int index)
         {
-            this.Database = database;
-
-            this.Id = AddColumn(nameof(Id), new NumberColumn<int>(-1));
-            this.PhysicalLocation = AddColumn(nameof(PhysicalLocation), new RefColumn(nameof(database.PhysicalLocation)));
-            this.LogicalLocations = AddColumn(nameof(LogicalLocations), new RefListColumn(nameof(database.LogicalLocation)));
-            this.Message = AddColumn(nameof(Message), new RefColumn(nameof(database.Message)));
-            this.Annotations = AddColumn(nameof(Annotations), new RefListColumn(nameof(database.Region)));
+            _table = (LocationTable)table;
+            _index = index;
         }
-
-        public override Location this[int index] => new Location(this, index);
+        #endregion
     }
-
 }

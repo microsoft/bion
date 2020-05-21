@@ -17,7 +17,7 @@ namespace BSOA.Demo.Conversion
 
         public static bool Compare(Microsoft.CodeAnalysis.Sarif.Run expected, Model.Run actual)
         {
-            if (expected == null) { return actual.IsNull; }
+            if (expected == null) { return actual == null; }
 
             if (!expected.Artifacts.CompareList(actual.Artifacts, ArtifactConverter.Compare)) { return false; }
             if (!expected.Results.CompareList(actual.Results, ResultConverter.Compare)) { return false; }

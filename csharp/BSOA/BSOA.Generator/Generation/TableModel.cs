@@ -53,7 +53,7 @@ namespace BSOA.Generator.Generation
             foreach (Schema.Column column in table)
             {
                 members.Append(ColumnMember(column));
-                constructors.Append(ColumnConstructor(column));
+                constructors.Append(ColumnConstructor(column, database));
             }
 
             // Empty line between column properties and constructor
@@ -93,7 +93,7 @@ namespace BSOA.Generator.Generation
             }
         }
 
-        public static string ColumnConstructor(Schema.Column column)
+        public static string ColumnConstructor(Schema.Column column, Database database)
         {
             switch (column.Category)
             {
@@ -111,11 +111,13 @@ namespace BSOA.Generator.Generation
                 case ColumnTypeCategory.Ref:
                     return RefColumnConstructor
                         .Replace("Manager", column.Name)
-                        .Replace("Employee", column.Type);
+                        .Replace("Employee", column.Type)
+                        .Replace("CompanyDatabase", database.Name);
                 case ColumnTypeCategory.RefList:
                     return RefListColumnConstructor
                         .Replace("Members", column.Name)
-                        .Replace("Employee", column.Type);
+                        .Replace("Employee", column.Type)
+                        .Replace("CompanyDatabase", database.Name);
                 default:
                     throw new NotImplementedException($"{nameof(TableModel)} unable to generate ColumnConstructor of Category {column.Category} ({column.Name})");
             }

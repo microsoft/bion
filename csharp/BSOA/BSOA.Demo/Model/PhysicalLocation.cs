@@ -1,17 +1,21 @@
-﻿using BSOA.Column;
 using BSOA.Model;
+using System;
+using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    public readonly struct PhysicalLocation
+    /// <summary>
+    ///  GENERATED: BSOA Entity for 'PhysicalLocation'
+    /// </summary>
+    public partial class PhysicalLocation : IRow
     {
-        internal readonly PhysicalLocationTable _table;
-        internal readonly int _index;
+        private PhysicalLocationTable _table;
+        private int _index;
 
-        public PhysicalLocation(PhysicalLocationTable table, int index)
+        internal PhysicalLocation(PhysicalLocationTable table, int index)
         {
-            _table = table;
-            _index = index;
+            this._table = table;
+            this._index = index;
         }
 
         public PhysicalLocation(PhysicalLocationTable table) : this(table, table.Count)
@@ -22,48 +26,36 @@ namespace BSOA.Demo.Model
         public PhysicalLocation(SarifLogBsoa database) : this(database.PhysicalLocation)
         { }
 
-        public bool IsNull => (_table == null || _index < 0);
+        public PhysicalLocation() : this(SarifLogBsoa.Current)
+        { }
 
         public ArtifactLocation ArtifactLocation
         {
-            get => _table.Database.ArtifactLocation[_table.ArtifactLocation[_index]];
-            set => _table.ArtifactLocation[_index] = value._index;
+            get => _table.Database.ArtifactLocation.Get(_table.ArtifactLocation[_index]);
+            set => _table.ArtifactLocation[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
         public Region Region
         {
-            get => _table.Database.Region[_table.Region[_index]];
-            set => _table.Region[_index] = value._index;
+            get => _table.Database.Region.Get(_table.Region[_index]);
+            set => _table.Region[_index] = _table.Database.Region.LocalIndex(value);
         }
 
         public Region ContextRegion
         {
-            get => _table.Database.Region[_table.ContextRegion[_index]];
-            set => _table.ContextRegion[_index] = value._index;
+            get => _table.Database.Region.Get(_table.ContextRegion[_index]);
+            set => _table.ContextRegion[_index] = _table.Database.Region.LocalIndex(value);
         }
-    }
 
-    public class PhysicalLocationTable : Table<PhysicalLocation>
-    {
-        internal SarifLogBsoa Database;
+        #region IRow
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        internal RefColumn ArtifactLocation;
-        internal RefColumn Region;
-        internal RefColumn ContextRegion;
-
-        // Address Address
-        // Properties
-
-        public PhysicalLocationTable(SarifLogBsoa database) : base()
+        void IRow.Reset(ITable table, int index)
         {
-            this.Database = database;
-
-            this.ArtifactLocation = AddColumn(nameof(ArtifactLocation), new RefColumn(nameof(database.ArtifactLocation)));
-            this.Region = AddColumn(nameof(Region), new RefColumn(nameof(database.Region)));
-            this.ContextRegion = AddColumn(nameof(ContextRegion), new RefColumn(nameof(database.Region)));
+            _table = (PhysicalLocationTable)table;
+            _index = index;
         }
-
-        public override PhysicalLocation this[int index] => new PhysicalLocation(this, index);
+        #endregion
     }
-
 }

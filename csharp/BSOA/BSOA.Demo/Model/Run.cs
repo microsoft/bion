@@ -1,18 +1,21 @@
-﻿using BSOA.Column;
 using BSOA.Model;
+using System;
 using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    public readonly struct Run
+    /// <summary>
+    ///  GENERATED: BSOA Entity for 'Run'
+    /// </summary>
+    public partial class Run : IRow
     {
-        internal readonly RunTable _table;
-        internal readonly int _index;
+        private RunTable _table;
+        private int _index;
 
-        public Run(RunTable table, int index)
+        internal Run(RunTable table, int index)
         {
-            _table = table;
-            _index = index;
+            this._table = table;
+            this._index = index;
         }
 
         public Run(RunTable table) : this(table, table.Count)
@@ -23,39 +26,28 @@ namespace BSOA.Demo.Model
         public Run(SarifLogBsoa database) : this(database.Run)
         { }
 
-        public bool IsNull => (_table == null || _index < 0);
+        public Run() : this(SarifLogBsoa.Current)
+        { }
 
         public IList<Result> Results
         {
-            get => new NumberListConverter<Result, ResultTable>(_table.Results[_index], _table.Database.Result, (table, index) => new Result(table, index), (table, item) => item._index);
-            set => new NumberListConverter<Result, ResultTable>(_table.Results[_index], _table.Database.Result, (table, index) => new Result(table, index), (table, item) => item._index).SetTo(value);
+            get => _table.Database.Result.List(_table.Results[_index]);
         }
 
         public IList<Artifact> Artifacts
         {
-            get => new NumberListConverter<Artifact, ArtifactTable>(_table.Artifacts[_index], _table.Database.Artifact, (table, index) => new Artifact(table, index), (table, item) => item._index);
-            set => new NumberListConverter<Artifact, ArtifactTable>(_table.Artifacts[_index], _table.Database.Artifact, (table, index) => new Artifact(table, index), (table, item) => item._index).SetTo(value);
+            get => _table.Database.Artifact.List(_table.Artifacts[_index]);
         }
-    }
 
-    public class RunTable : Table<Run>
-    {
-        internal SarifLogBsoa Database;
+        #region IRow
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        internal RefListColumn Results;
-        internal RefListColumn Artifacts;
-        
-        // Missing many unused in Spam SARIF
-        // Used but missing: Invocations, 
-
-        public RunTable(SarifLogBsoa database) : base()
+        void IRow.Reset(ITable table, int index)
         {
-            this.Database = database;
-         
-            this.Results = AddColumn(nameof(Results), new RefListColumn(nameof(database.Result)));
-            this.Artifacts = AddColumn(nameof(Artifacts), new RefListColumn(nameof(database.Artifact)));
+            _table = (RunTable)table;
+            _index = index;
         }
-
-        public override Run this[int index] => new Run(this, index);
+        #endregion
     }
 }

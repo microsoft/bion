@@ -1,17 +1,21 @@
-﻿using BSOA.Column;
 using BSOA.Model;
+using System;
+using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    public readonly struct LogicalLocation
+    /// <summary>
+    ///  GENERATED: BSOA Entity for 'LogicalLocation'
+    /// </summary>
+    public partial class LogicalLocation : IRow
     {
-        internal readonly LogicalLocationTable _table;
-        internal readonly int _index;
+        private LogicalLocationTable _table;
+        private int _index;
 
-        public LogicalLocation(LogicalLocationTable table, int index)
+        internal LogicalLocation(LogicalLocationTable table, int index)
         {
-            _table = table;
-            _index = index;
+            this._table = table;
+            this._index = index;
         }
 
         public LogicalLocation(LogicalLocationTable table) : this(table, table.Count)
@@ -22,7 +26,8 @@ namespace BSOA.Demo.Model
         public LogicalLocation(SarifLogBsoa database) : this(database.LogicalLocation)
         { }
 
-        public bool IsNull => (_table == null || _index < 0);
+        public LogicalLocation() : this(SarifLogBsoa.Current)
+        { }
 
         public string Name
         {
@@ -59,34 +64,16 @@ namespace BSOA.Demo.Model
             get => _table.Kind[_index];
             set => _table.Kind[_index] = value;
         }
-    }
 
-    public class LogicalLocationTable : Table<LogicalLocation>
-    {
-        internal SarifLogBsoa Database;
+        #region IRow
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        internal StringColumn Name;
-        internal NumberColumn<int> Index;
-        internal StringColumn FullyQualifiedName;
-        internal StringColumn DecoratedName;
-        internal NumberColumn<int> ParentIndex;
-        internal StringColumn Kind;
-
-        // Properties
-
-        public LogicalLocationTable(SarifLogBsoa database) : base()
+        void IRow.Reset(ITable table, int index)
         {
-            this.Database = database;
-
-            this.Name = AddColumn(nameof(Name), new StringColumn());
-            this.Index = AddColumn(nameof(Index), new NumberColumn<int>(-1));
-            this.FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), new StringColumn());
-            this.DecoratedName = AddColumn(nameof(DecoratedName), new StringColumn());
-            this.ParentIndex = AddColumn(nameof(ParentIndex), new NumberColumn<int>(-1));
-            this.Kind = AddColumn(nameof(Kind), new StringColumn());
+            _table = (LogicalLocationTable)table;
+            _index = index;
         }
-
-        public override LogicalLocation this[int index] => new LogicalLocation(this, index);
+        #endregion
     }
-
 }

@@ -20,7 +20,7 @@ namespace BSOA.Demo.Conversion
 
         public static bool Compare(Microsoft.CodeAnalysis.Sarif.LogicalLocation expected, Model.LogicalLocation actual)
         {
-            if (expected == null) { return actual.IsNull; }
+            if (expected == null) { return actual == null; }
 
             if (expected.DecoratedName != actual.DecoratedName) { return false; }
             if (expected.FullyQualifiedName != actual.FullyQualifiedName) { return false; }

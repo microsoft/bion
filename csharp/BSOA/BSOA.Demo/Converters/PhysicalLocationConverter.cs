@@ -30,7 +30,7 @@ namespace BSOA.Demo.Conversion
 
         public static bool Compare(Microsoft.CodeAnalysis.Sarif.PhysicalLocation expected, Model.PhysicalLocation actual)
         {
-            if (expected == null) { return actual.IsNull; }
+            if (expected == null) { return actual == null; }
 
             if (!ArtifactLocationConverter.Compare(expected.ArtifactLocation, actual.ArtifactLocation)) { return false; }
             if (!RegionConverter.Compare(expected.Region, actual.Region)) { return false; }

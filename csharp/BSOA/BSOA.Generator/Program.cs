@@ -78,7 +78,7 @@ namespace BSOA.Generator
                 },
                 new Table("Result")
                 {
-                    Schema.Column.Enum("BaselineState", "BaselineState", "int", "BaselineState.None"),
+                    Schema.Column.Enum("BaselineState", "Microsoft.CodeAnalysis.Sarif.BaselineState", "int", "Microsoft.CodeAnalysis.Sarif.BaselineState.None"),
                     Schema.Column.Simple("RuleId", "string"),
                     Schema.Column.Simple("RuleIndex", "int", "-1"),
                     Schema.Column.Ref("Message", "Message"),
@@ -94,10 +94,10 @@ namespace BSOA.Generator
 
             CodeGenerator generator = new CodeGenerator()
             {
-                OutputFolder = "Model",
+                OutputFolder = @"..\..\..\..\BSOA.Demo\Model",
             };
 
             generator.Generate(db);
-        }
+          }
     }
 }

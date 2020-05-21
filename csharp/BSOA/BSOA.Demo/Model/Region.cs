@@ -1,20 +1,21 @@
-﻿using BSOA.Column;
 using BSOA.Model;
+using System;
+using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
     /// <summary>
-    ///  SoA Item for 'Region' type.
+    ///  GENERATED: BSOA Entity for 'Region'
     /// </summary>
-    public readonly struct Region
+    public partial class Region : IRow
     {
-        internal readonly RegionTable _table;
-        internal readonly int _index;
+        private RegionTable _table;
+        private int _index;
 
         internal Region(RegionTable table, int index)
         {
-            _table = table;
-            _index = index;
+            this._table = table;
+            this._index = index;
         }
 
         public Region(RegionTable table) : this(table, table.Count)
@@ -25,7 +26,8 @@ namespace BSOA.Demo.Model
         public Region(SarifLogBsoa database) : this(database.Region)
         { }
 
-        public bool IsNull => (_table == null || _index < 0);
+        public Region() : this(SarifLogBsoa.Current)
+        { }
 
         public int StartLine
         {
@@ -77,14 +79,14 @@ namespace BSOA.Demo.Model
 
         public ArtifactContent Snippet
         {
-            get => _table.Database.ArtifactContent[_table.Snippet[_index]];
-            set => _table.Snippet[_index] = value._index;
+            get => _table.Database.ArtifactContent.Get(_table.Snippet[_index]);
+            set => _table.Snippet[_index] = _table.Database.ArtifactContent.LocalIndex(value);
         }
 
         public Message Message
         {
-            get => _table.Database.Message[_table.Message[_index]];
-            set => _table.Message[_index] = value._index;
+            get => _table.Database.Message.Get(_table.Message[_index]);
+            set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
         public string SourceLanguage
@@ -93,52 +95,15 @@ namespace BSOA.Demo.Model
             set => _table.SourceLanguage[_index] = value;
         }
 
-    }
+        #region IRow
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-    /// <summary>
-    ///  SoA Table for 'Region' type.
-    /// </summary>
-    public class RegionTable : Table<Region>
-    {
-        internal SarifLogBsoa Database;
-
-        internal NumberColumn<int> StartLine;
-        internal NumberColumn<int> StartColumn;
-        internal NumberColumn<int> EndLine;
-        internal NumberColumn<int> EndColumn;
-
-        internal NumberColumn<int> ByteOffset;
-        internal NumberColumn<int> ByteLength;
-        internal NumberColumn<int> CharOffset;
-        internal NumberColumn<int> CharLength;
-
-        internal RefColumn Snippet;
-        internal RefColumn Message;
-
-        internal StringColumn SourceLanguage;
-
-        // Properties
-
-        public RegionTable(SarifLogBsoa database) : base()
+        void IRow.Reset(ITable table, int index)
         {
-            this.Database = database;
-
-            this.StartLine = AddColumn(nameof(StartLine), new NumberColumn<int>(0));
-            this.StartColumn = AddColumn(nameof(StartColumn), new NumberColumn<int>(0));
-            this.EndLine = AddColumn(nameof(EndLine), new NumberColumn<int>(0));
-            this.EndColumn = AddColumn(nameof(EndColumn), new NumberColumn<int>(0));
-
-            this.ByteOffset = AddColumn(nameof(ByteOffset), new NumberColumn<int>(-1));
-            this.ByteLength = AddColumn(nameof(ByteLength), new NumberColumn<int>(0));
-            this.CharOffset = AddColumn(nameof(CharOffset), new NumberColumn<int>(-1));
-            this.CharLength = AddColumn(nameof(CharLength), new NumberColumn<int>(0));
-
-            this.Snippet = AddColumn(nameof(Snippet), new RefColumn(nameof(SarifLogBsoa.ArtifactContent)));
-            this.Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogBsoa.Message)));
-
-            this.SourceLanguage = AddColumn(nameof(SourceLanguage), new StringColumn());
+            _table = (RegionTable)table;
+            _index = index;
         }
-
-        public override Region this[int index] => new Region(this, index);
+        #endregion
     }
 }

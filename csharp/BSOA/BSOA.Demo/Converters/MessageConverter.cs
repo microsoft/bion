@@ -19,7 +19,7 @@ namespace BSOA.Demo.Conversion
 
         public static bool Compare(Microsoft.CodeAnalysis.Sarif.Message expected, Model.Message actual)
         {
-            if (expected == null) { return actual.IsNull; }
+            if (expected == null) { return actual == null; }
 
             if (expected.Text != actual.Text) { return false; }
             if (expected.Markdown != actual.Markdown) { return false; }

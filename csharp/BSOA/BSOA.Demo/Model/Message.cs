@@ -1,17 +1,21 @@
-﻿using BSOA.Column;
 using BSOA.Model;
+using System;
+using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    public readonly struct Message
+    /// <summary>
+    ///  GENERATED: BSOA Entity for 'Message'
+    /// </summary>
+    public partial class Message : IRow
     {
-        internal readonly MessageTable _table;
-        internal readonly int _index;
+        private MessageTable _table;
+        private int _index;
 
-        public Message(MessageTable table, int index)
+        internal Message(MessageTable table, int index)
         {
-            _table = table;
-            _index = index;
+            this._table = table;
+            this._index = index;
         }
 
         public Message(MessageTable table) : this(table, table.Count)
@@ -22,9 +26,9 @@ namespace BSOA.Demo.Model
         public Message(SarifLogBsoa database) : this(database.Message)
         { }
 
-        public bool IsNull => (_table == null || _index < 0);
+        public Message() : this(SarifLogBsoa.Current)
+        { }
 
-        // Add via 'bprop' snippet
         public string Text
         {
             get => _table.Text[_index];
@@ -42,29 +46,16 @@ namespace BSOA.Demo.Model
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
-    }
 
-    public class MessageTable : Table<Message>
-    {
-        internal SarifLogBsoa Database;
-        
-        internal StringColumn Text;
-        internal StringColumn Markdown;
-        internal StringColumn Id;
+        #region IRow
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        // StringListColumn Arguments;
-        // Properties
-
-        public MessageTable(SarifLogBsoa database) : base()
+        void IRow.Reset(ITable table, int index)
         {
-            this.Database = database;
-
-            this.Text = AddColumn(nameof(Text), new StringColumn());
-            this.Markdown = AddColumn(nameof(Markdown), new StringColumn());
-            this.Id = AddColumn(nameof(Id), new StringColumn());
+            _table = (MessageTable)table;
+            _index = index;
         }
-
-        public override Message this[int index] => new Message(this, index);
+        #endregion
     }
-
 }
