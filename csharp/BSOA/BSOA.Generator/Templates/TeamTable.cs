@@ -12,9 +12,18 @@ namespace BSOA.Generator.Templates
         internal CompanyDatabase Database;
 
         // <ColumnMembers>
+        // <SimpleColumnMember>
         internal IColumn<DateTime> WhenFormed;
+        // </SimpleColumnMember>
+        // <EnumColumnMember>
+        internal IColumn<byte> JoinPolicy;
+        // </EnumColumnMember>
+        // <RefColumnMember>
         internal RefColumn Manager;
+        // </RefColumnMember>
+        // <RefListColumnMember>
         internal RefListColumn Members;
+        // </RefListColumnMember>
         // </ColumnMembers>
 
         public TeamTable(CompanyDatabase database) : base()
@@ -26,6 +35,10 @@ namespace BSOA.Generator.Templates
             // <SimpleColumnConstructor>
             WhenFormed = AddColumn(nameof(WhenFormed), ColumnFactory.Build<DateTime>(DateTime.MinValue));
             // </SimpleColumnConstructor>
+
+            // <EnumColumnConstructor>
+            JoinPolicy = AddColumn(nameof(JoinPolicy), ColumnFactory.Build<byte>((byte)SecurityPolicy.Open));
+            // </EnumColumnConstructor>
 
             // <RefColumnConstructor>
             Manager = AddColumn(nameof(Manager), new RefColumn(nameof(CompanyDatabase.Employee)));

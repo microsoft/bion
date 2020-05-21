@@ -27,9 +27,9 @@ namespace BSOA.Generator.Templates
             // <TableConstructors>
             //   <TableConstructor>
             Employee = AddTable(nameof(Employee), new EmployeeTable(this));
-            //   <TableConstructor>
+            //   </TableConstructor>
             Team = AddTable(nameof(Team), new TeamTable(this));
-            // <TableConstructors>
+            // </TableConstructors>
         }
     }
 }

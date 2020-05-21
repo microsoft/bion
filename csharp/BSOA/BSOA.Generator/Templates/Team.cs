@@ -38,6 +38,14 @@ namespace BSOA.Generator.Templates
         }
         //   </SimpleColumn>
 
+        //   <EnumColumn>
+        public SecurityPolicy JoinPolicy
+        {
+            get => (SecurityPolicy)_table.JoinPolicy[_index];
+            set => _table.JoinPolicy[_index] = (byte)value;
+        }
+        //   </EnumColumn>
+
         //   <RefColumn>
         public Employee Manager
         {

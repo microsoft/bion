@@ -13,6 +13,9 @@ namespace BSOA.Generator
             if (Directory.Exists(OutputFolder)) { Directory.Delete(OutputFolder, true); }
             Directory.CreateDirectory(OutputFolder);
 
+            // Database Class
+            File.WriteAllText(Path.Combine(OutputFolder, $"{database.Name}.cs"), DatabaseModel.Generate(database));
+
             foreach (Table table in database)
             {
                 Generate(table, database);
@@ -21,8 +24,11 @@ namespace BSOA.Generator
 
         public void Generate(Table table, Database database)
         {
-            string code = EntityModel.Generate(table, database);
-            File.WriteAllText(Path.Combine(OutputFolder, $"{table.Name}.cs"), code);
+            // Entity Class
+            File.WriteAllText(Path.Combine(OutputFolder, $"{table.Name}.cs"), EntityModel.Generate(table, database));
+
+            // Table Class
+            File.WriteAllText(Path.Combine(OutputFolder, $"{table.Name}Table.cs"), TableModel.Generate(table, database));
         }
     }
 }

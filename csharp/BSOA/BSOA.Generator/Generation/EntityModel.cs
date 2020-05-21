@@ -20,15 +20,17 @@ namespace BSOA.Generator.Generation
     {
         public static string Code;
         public static string SimpleColumn;
+        public static string EnumColumn;
         public static string RefColumn;
         public static string RefListColumn;
 
         static EntityModel()
         {
             Code = File.ReadAllText(@"Templates\\Team.cs");
-            SimpleColumn = CodeSection.Extract(Code, "SimpleColumn");
-            RefColumn = CodeSection.Extract(Code, "RefColumn");
-            RefListColumn = CodeSection.Extract(Code, "RefListColumn");
+            SimpleColumn = CodeSection.Extract(Code, nameof(SimpleColumn));
+            EnumColumn = CodeSection.Extract(Code, nameof(EnumColumn));
+            RefColumn = CodeSection.Extract(Code, nameof(RefColumn));
+            RefListColumn = CodeSection.Extract(Code, nameof(RefListColumn));
         }
 
         public static string Generate(Table table, Database database)
@@ -57,6 +59,11 @@ namespace BSOA.Generator.Generation
                     return SimpleColumn
                         .Replace("WhenFormed", column.Name)
                         .Replace("DateTime", column.Type);
+                case ColumnTypeCategory.Enum:
+                    return EnumColumn
+                        .Replace("JoinPolicy", column.Name)
+                        .Replace("SecurityPolicy", column.Type)
+                        .Replace("byte", column.UnderlyingType);
                 case ColumnTypeCategory.Ref:
                     return RefColumn
                         .Replace("Manager", column.Name)
