@@ -11,15 +11,17 @@ namespace BSOA.Demo.Model
     {
         internal SarifLogBsoa Database;
 
-        internal RefListColumn Results;
+        internal RefColumn Tool;
         internal RefListColumn Artifacts;
+        internal RefListColumn Results;
 
         public RunTable(SarifLogBsoa database) : base()
         {
             Database = database;
 
-            Results = AddColumn(nameof(Results), new RefListColumn(nameof(SarifLogBsoa.Result)));
+            Tool = AddColumn(nameof(Tool), new RefColumn(nameof(SarifLogBsoa.Tool)));
             Artifacts = AddColumn(nameof(Artifacts), new RefListColumn(nameof(SarifLogBsoa.Artifact)));
+            Results = AddColumn(nameof(Results), new RefListColumn(nameof(SarifLogBsoa.Result)));
         }
 
         public override Run Get(int index)

@@ -1,6 +1,10 @@
-using BSOA.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+
+using BSOA.Model;
+
+using Newtonsoft.Json;
 
 namespace BSOA.Demo.Model
 {
@@ -29,18 +33,21 @@ namespace BSOA.Demo.Model
         public PhysicalLocation() : this(SarifLogBsoa.Current)
         { }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public ArtifactLocation ArtifactLocation
         {
             get => _table.Database.ArtifactLocation.Get(_table.ArtifactLocation[_index]);
             set => _table.ArtifactLocation[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Region Region
         {
             get => _table.Database.Region.Get(_table.Region[_index]);
             set => _table.Region[_index] = _table.Database.Region.LocalIndex(value);
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Region ContextRegion
         {
             get => _table.Database.Region.Get(_table.ContextRegion[_index]);

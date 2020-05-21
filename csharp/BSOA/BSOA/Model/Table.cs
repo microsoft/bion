@@ -77,7 +77,7 @@ namespace BSOA.Model
             }
         }
 
-        public IList<T> List(NumberList<int> indices)
+        public NumberListConverter<T> List(NumberList<int> indices)
         {
             return new NumberListConverter<T>(indices, (index) => this.Get(index), (value) => this.LocalIndex(value));
         }

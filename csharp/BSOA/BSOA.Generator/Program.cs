@@ -87,8 +87,18 @@ namespace BSOA.Generator
                 },
                 new Table("Run")
                 {
-                    Schema.Column.RefList("Results", "Result"),
+                    Schema.Column.Ref("Tool", "Tool"),
                     Schema.Column.RefList("Artifacts", "Artifact"),
+                    Schema.Column.RefList("Results", "Result"),
+                },
+                new Table("Tool")
+                {
+                    Schema.Column.Ref("Driver", "ToolComponent"),
+                    Schema.Column.RefList("Extensionss", "ToolComponent"),
+                },
+                new Table("ToolComponent")
+                {
+                    Schema.Column.Simple("Name", "string"),
                 }
             };
 

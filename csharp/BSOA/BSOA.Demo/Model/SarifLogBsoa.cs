@@ -19,6 +19,8 @@ namespace BSOA.Demo.Model
         internal RegionTable Region { get; }
         internal ResultTable Result { get; }
         internal RunTable Run { get; }
+        internal ToolTable Tool { get; }
+        internal ToolComponentTable ToolComponent { get; }
 
         public SarifLogBsoa()
         {
@@ -34,6 +36,8 @@ namespace BSOA.Demo.Model
             Region = AddTable(nameof(Region), new RegionTable(this));
             Result = AddTable(nameof(Result), new ResultTable(this));
             Run = AddTable(nameof(Run), new RunTable(this));
+            Tool = AddTable(nameof(Tool), new ToolTable(this));
+            ToolComponent = AddTable(nameof(ToolComponent), new ToolComponentTable(this));
         }
     }
 }

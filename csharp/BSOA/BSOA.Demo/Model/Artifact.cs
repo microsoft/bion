@@ -1,6 +1,10 @@
-using BSOA.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+
+using BSOA.Model;
+
+using Newtonsoft.Json;
 
 namespace BSOA.Demo.Model
 {
@@ -29,60 +33,73 @@ namespace BSOA.Demo.Model
         public Artifact() : this(SarifLogBsoa.Current)
         { }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Message Description
         {
             get => _table.Database.Message.Get(_table.Description[_index]);
             set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public ArtifactLocation Location
         {
             get => _table.Database.ArtifactLocation.Get(_table.Location[_index]);
             set => _table.Location[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
+        [DefaultValue(-1)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int ParentIndex
         {
             get => _table.ParentIndex[_index];
             set => _table.ParentIndex[_index] = value;
         }
 
+        [DefaultValue(0)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int Offset
         {
             get => _table.Offset[_index];
             set => _table.Offset[_index] = value;
         }
 
+        [DefaultValue(-1)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int Length
         {
             get => _table.Length[_index];
             set => _table.Length[_index] = value;
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string MimeType
         {
             get => _table.MimeType[_index];
             set => _table.MimeType[_index] = value;
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public ArtifactContent Contents
         {
             get => _table.Database.ArtifactContent.Get(_table.Contents[_index]);
             set => _table.Contents[_index] = _table.Database.ArtifactContent.LocalIndex(value);
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Encoding
         {
             get => _table.Encoding[_index];
             set => _table.Encoding[_index] = value;
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string SourceLanguage
         {
             get => _table.SourceLanguage[_index];
             set => _table.SourceLanguage[_index] = value;
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public DateTime LastModifiedTimeUtc
         {
             get => _table.LastModifiedTimeUtc[_index];

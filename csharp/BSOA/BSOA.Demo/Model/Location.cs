@@ -1,6 +1,10 @@
-using BSOA.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+
+using BSOA.Model;
+
+using Newtonsoft.Json;
 
 namespace BSOA.Demo.Model
 {
@@ -29,29 +33,35 @@ namespace BSOA.Demo.Model
         public Location() : this(SarifLogBsoa.Current)
         { }
 
+        [DefaultValue(-1)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public PhysicalLocation PhysicalLocation
         {
             get => _table.Database.PhysicalLocation.Get(_table.PhysicalLocation[_index]);
             set => _table.PhysicalLocation[_index] = _table.Database.PhysicalLocation.LocalIndex(value);
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public IList<LogicalLocation> LogicalLocations
         {
             get => _table.Database.LogicalLocation.List(_table.LogicalLocations[_index]);
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public IList<Region> Annotations
         {
             get => _table.Database.Region.List(_table.Annotations[_index]);

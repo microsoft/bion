@@ -26,7 +26,8 @@ namespace BSOA.Generator.Generation
 
         static EntityModel()
         {
-            Code = File.ReadAllText(@"Templates\\Team.cs");
+            //Code = File.ReadAllText(@"Templates\\Team.cs");
+            Code = File.ReadAllText(@"Templates\\WithJson\\Team.cs");
             SimpleColumn = CodeSection.Extract(Code, nameof(SimpleColumn));
             EnumColumn = CodeSection.Extract(Code, nameof(EnumColumn));
             RefColumn = CodeSection.Extract(Code, nameof(RefColumn));
@@ -56,9 +57,22 @@ namespace BSOA.Generator.Generation
             switch (column.Category)
             {
                 case ColumnTypeCategory.Simple:
-                    return SimpleColumn
+                    var result = SimpleColumn;
+                    
+                    if (column.Default == null || column.Type == "DateTime")
+                    {
+                        result = result.Replace("        [DefaultValue(DateTime.MinValue)]\r\n", "");
+                    }
+                    else
+                    {
+                        result = result.Replace("DateTime.MinValue", column.Default);
+                    }
+                    
+                    result = result
                         .Replace("WhenFormed", column.Name)
                         .Replace("DateTime", column.Type);
+
+                    return result;    
                 case ColumnTypeCategory.Enum:
                     return EnumColumn
                         .Replace("JoinPolicy", column.Name)

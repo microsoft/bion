@@ -34,19 +34,20 @@ namespace BSOA.Demo
 
         public void Run(bool forceReconvert)
         {
+            SarifLogFiltered filtered = null;
+            SarifLogBsoa bsoa = null, unused = null;
+
             // Convert SarifLog to JSON, SoA JSON, and SoA Binary forms
             Convert(forceReconvert);
 
-            SarifLogFiltered filtered = null;
-            SarifLogBsoa bsoa = null;
-
-            // Load with diagnostics (see column sizes)
-            Console.WriteLine();
-            LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: 3);
+            //// Load with diagnostics (see column sizes)
+            //Console.WriteLine();
+            //LoadBsoaBinary(BsoaBinPath, diagnostics: true, diagnosticsDepth: 3);
 
             // Compare loading times
-            filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft to Normal classes", iterations: 3);
             bsoa = Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary to SoA model", iterations: 10);
+            filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft to Normal classes", iterations: 3);
+            unused = Measure(LoadBsoaViaNewtonsoft, NormalJsonPath, "JSON, Newtonsoft to BSOA directly", iterations: 3);
 
             // Verify logs match; change something to test verification logic
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
@@ -70,39 +71,16 @@ namespace BSOA.Demo
         {
             if (force == false && File.Exists(BsoaBinPath) && File.Exists(BsoaJsonPath) && File.Exists(NormalJsonPath)) { return; }
 
-            // Load Sarif Log with current OM
-            SarifLog log = null;
-
-            Time($"Loading {InputFilePath}...", () => log = SarifLog.Load(InputFilePath));
-
-            SarifLogFiltered filtered = null;
-            Time($"Extracting supported subset...", () =>
-            {
-                filtered = SarifLogFiltered.FromSarif(log);
-            });
-
-            // Extract a BSOA-supported SarifLog subset for apples-to-apples comparison with BSOA form
             SarifLogBsoa bsoaLog = new SarifLogBsoa();
-
-            Time($"Converting to BSOA model...", () =>
-            {
-                bsoaLog = filtered.ToBsoa();
-            }, iterations: 10);
-
-            Console.WriteLine($" -> {bsoaLog.ToString()}");
+            bsoaLog = Measure(LoadBsoaViaNewtonsoft, InputFilePath, $"Loading BSOA via Newtonsoft from SARIF JSON {InputFilePath}...", 1);
 
             Time($"Writing as JSON to '{NormalJsonPath}'...", () =>
             {
                 using (JsonTextWriter writer = new JsonTextWriter(File.CreateText(NormalJsonPath)))
                 {
                     //writer.Formatting = Formatting.Indented;
-                    _jsonSerializer.Serialize(writer, filtered);
+                    _jsonSerializer.Serialize(writer, bsoaLog);
                 }
-            });
-
-            Time($"Trimming (BSOA pre-serialization cost, not specific to JSON or Binary)...", () =>
-            {
-                bsoaLog.Trim();
             });
 
             Time($"Writing as BSOA Binary to '{BsoaBinPath}'...", () =>
@@ -113,13 +91,54 @@ namespace BSOA.Demo
                 }
             });
 
-            Time($"Writing as BSOA JSON to '{BsoaJsonPath}'...", () =>
-            {
-                using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Verbose = false }))
-                {
-                    bsoaLog.Write(writer);
-                }
-            });
+            //// Load Sarif Log with current OM
+            //SarifLog log = null;
+
+            //Time($"Loading {InputFilePath}...", () => log = SarifLog.Load(InputFilePath));
+
+            //// Extract a BSOA-supported SarifLog subset for apples-to-apples comparison with BSOA form
+            //SarifLogFiltered filtered = null;
+            //Time($"Extracting supported subset...", () =>
+            //{
+            //    filtered = SarifLogFiltered.FromSarif(log);
+            //});
+
+            //Time($"Converting to BSOA model...", () =>
+            //{
+            //    bsoaLog = filtered.ToBsoa();
+            //}, iterations: 10);
+
+            //Console.WriteLine($" -> {bsoaLog.ToString()}");
+
+            //Time($"Writing as JSON to '{NormalJsonPath}'...", () =>
+            //{
+            //    using (JsonTextWriter writer = new JsonTextWriter(File.CreateText(NormalJsonPath)))
+            //    {
+            //        //writer.Formatting = Formatting.Indented;
+            //        _jsonSerializer.Serialize(writer, filtered);
+            //    }
+            //});
+
+            //Time($"Trimming (BSOA pre-serialization cost, not specific to JSON or Binary)...", () =>
+            //{
+            //    bsoaLog.Trim();
+            //});
+
+            //Time($"Writing as BSOA Binary to '{BsoaBinPath}'...", () =>
+            //{
+            //    using (BinaryTreeWriter writer = new BinaryTreeWriter(File.Create(BsoaBinPath)))
+            //    {
+            //        bsoaLog.Write(writer);
+            //    }
+            //});
+
+            //Time($"Writing as BSOA JSON to '{BsoaJsonPath}'...", () =>
+            //{
+            //    using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Verbose = false }))
+            //    {
+            //        bsoaLog.Write(writer);
+            //    }
+            //});
         }
 
         public static TimeSpan Time(string description, Action method, int iterations = 1)
@@ -169,6 +188,13 @@ namespace BSOA.Demo
             {
                 return _jsonSerializer.Deserialize<SarifLogFiltered>(reader);
             }
+        }
+
+        private SarifLogBsoa LoadBsoaViaNewtonsoft(string jsonPath)
+        {
+            SarifLogBsoa log = AsJson.Load<SarifLogBsoa>(jsonPath);
+            log.Trim();
+            return log;
         }
 
         private SarifLogBsoa LoadBsoaJson(string bsoaJsonPath)

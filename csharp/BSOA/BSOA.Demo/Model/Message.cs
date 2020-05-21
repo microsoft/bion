@@ -1,6 +1,10 @@
-using BSOA.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+
+using BSOA.Model;
+
+using Newtonsoft.Json;
 
 namespace BSOA.Demo.Model
 {
@@ -29,18 +33,21 @@ namespace BSOA.Demo.Model
         public Message() : this(SarifLogBsoa.Current)
         { }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Text
         {
             get => _table.Text[_index];
             set => _table.Text[_index] = value;
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Markdown
         {
             get => _table.Markdown[_index];
             set => _table.Markdown[_index] = value;
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Id
         {
             get => _table.Id[_index];
