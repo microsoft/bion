@@ -40,7 +40,7 @@ namespace BSOA.Json
             };
 
             // Omit null values
-            _jsonSerializer.DefaultValueHandling = DefaultValueHandling.Ignore;
+            _jsonSerializer.DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate;
         }
     }
 }
