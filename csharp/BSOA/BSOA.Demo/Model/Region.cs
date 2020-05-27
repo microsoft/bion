@@ -43,10 +43,46 @@ namespace BSOA.Demo.Model
         public Region() : this(SarifLogBsoa.Current)
         { }
 
-        public Region(Region other) : this()
+        public Region(
+			int startLine,
+			int startColumn,
+			int endLine,
+			int endColumn,
+			int byteOffset,
+			int byteLength,
+			int charOffset,
+			int charLength,
+			ArtifactContent snippet,
+			Message message,
+			string sourceLanguage
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			StartLine = startLine;
+			StartColumn = startColumn;
+			EndLine = endLine;
+			EndColumn = endColumn;
+			ByteOffset = byteOffset;
+			ByteLength = byteLength;
+			CharOffset = charOffset;
+			CharLength = charLength;
+			Snippet = snippet;
+			Message = message;
+			SourceLanguage = sourceLanguage;
+        }
+
+        public Region(Region other)
+        {
+			StartLine = other.StartLine;
+			StartColumn = other.StartColumn;
+			EndLine = other.EndLine;
+			EndColumn = other.EndColumn;
+			ByteOffset = other.ByteOffset;
+			ByteLength = other.ByteLength;
+			CharOffset = other.CharOffset;
+			CharLength = other.CharLength;
+			Snippet = other.Snippet;
+			Message = other.Message;
+			SourceLanguage = other.SourceLanguage;
         }
 
         [DataMember(Name = "startLine", IsRequired = false, EmitDefaultValue = false)]

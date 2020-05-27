@@ -43,10 +43,22 @@ namespace BSOA.Demo.Model
         public PhysicalLocation() : this(SarifLogBsoa.Current)
         { }
 
-        public PhysicalLocation(PhysicalLocation other) : this()
+        public PhysicalLocation(
+			ArtifactLocation artifactLocation,
+			Region region,
+			Region contextRegion
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			ArtifactLocation = artifactLocation;
+			Region = region;
+			ContextRegion = contextRegion;
+        }
+
+        public PhysicalLocation(PhysicalLocation other)
+        {
+			ArtifactLocation = other.ArtifactLocation;
+			Region = other.Region;
+			ContextRegion = other.ContextRegion;
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]

@@ -53,7 +53,8 @@ namespace BSOA.Generator.Generation
                     return template
                         .Replace("Members", column.Name)
                         .Replace("members", CamelCase(column.Name))
-                        .Replace("Employee", column.Type)
+                        .Replace("IList<Employee>", column.Type)
+                        .Replace("Employee", column.ReferencedTableName)
                         .Replace("CompanyDatabase", database.Name);
                 default:
                     throw new NotImplementedException($"Populate not implemented with defaults to replace for category {column.Category} ({column.Name})");

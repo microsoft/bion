@@ -43,10 +43,19 @@ namespace BSOA.Demo.Model
         public Tool() : this(SarifLogBsoa.Current)
         { }
 
-        public Tool(Tool other) : this()
+        public Tool(
+			ToolComponent driver,
+			IList<ToolComponent> extensions
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			Driver = driver;
+			Extensions = extensions;
+        }
+
+        public Tool(Tool other)
+        {
+			Driver = other.Driver;
+			Extensions = other.Extensions;
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -60,6 +69,7 @@ namespace BSOA.Demo.Model
         public IList<ToolComponent> Extensions
         {
             get => _table.Database.ToolComponent.List(_table.Extensions[_index]);
+            set => _table.Database.ToolComponent.List(_table.Extensions[_index]).SetTo(value);
         }
 
         #region IRow

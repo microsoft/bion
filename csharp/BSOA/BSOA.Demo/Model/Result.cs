@@ -43,10 +43,31 @@ namespace BSOA.Demo.Model
         public Result() : this(SarifLogBsoa.Current)
         { }
 
-        public Result(Result other) : this()
+        public Result(
+			Microsoft.CodeAnalysis.Sarif.BaselineState baselineState,
+			string ruleId,
+			int ruleIndex,
+			Message message,
+			IList<Location> locations,
+			string guid
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			BaselineState = baselineState;
+			RuleId = ruleId;
+			RuleIndex = ruleIndex;
+			Message = message;
+			Locations = locations;
+			Guid = guid;
+        }
+
+        public Result(Result other)
+        {
+			BaselineState = other.BaselineState;
+			RuleId = other.RuleId;
+			RuleIndex = other.RuleIndex;
+			Message = other.Message;
+			Locations = other.Locations;
+			Guid = other.Guid;
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -86,6 +107,7 @@ namespace BSOA.Demo.Model
         public IList<Location> Locations
         {
             get => _table.Database.Location.List(_table.Locations[_index]);
+            set => _table.Database.Location.List(_table.Locations[_index]).SetTo(value);
         }
 
         [DataMember(Name = "guid", IsRequired = false, EmitDefaultValue = false)]

@@ -43,10 +43,19 @@ namespace BSOA.Demo.Model
         public ArtifactContent() : this(SarifLogBsoa.Current)
         { }
 
-        public ArtifactContent(ArtifactContent other) : this()
+        public ArtifactContent(
+			string text,
+			string binary
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			Text = text;
+			Binary = binary;
+        }
+
+        public ArtifactContent(ArtifactContent other)
+        {
+			Text = other.Text;
+			Binary = other.Binary;
         }
 
         [DataMember(Name = "text", IsRequired = false, EmitDefaultValue = false)]

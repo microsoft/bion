@@ -43,10 +43,37 @@ namespace BSOA.Generator.Templates
         public Team() : this(CompanyDatabase.Current)
         { }
 
-        public Team(Team other) : this()
+        public Team(
+            // <ParameterList>
+            long employeeId,
+            DateTime whenFormed,
+            SecurityPolicy joinPolicy,
+            GroupAttributes attributes,
+            Employee manager,
+            IList<Employee> members
+            // </ParameterList>
+        ) : this(CompanyDatabase.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+            // <AssignmentList>
+            EmployeeId = employeeId;
+            WhenFormed = whenFormed;
+            JoinPolicy = joinPolicy;
+            Attributes = attributes;
+            Manager = manager;
+            Members = members;
+            // </AssignmentList>
+        }
+
+        public Team(Team other)
+        {
+            // <OtherAssignmentList>
+            EmployeeId = other.EmployeeId;
+            WhenFormed = other.WhenFormed;
+            JoinPolicy = other.JoinPolicy;
+            Attributes = other.Attributes;
+            Manager = other.Manager;
+            Members = other.Members;
+            // </OtherAssignmentList>
         }
 
         // <Columns>
@@ -106,6 +133,7 @@ namespace BSOA.Generator.Templates
         public IList<Employee> Members
         {
             get => _table.Database.Employee.List(_table.Members[_index]);
+            set => _table.Database.Employee.List(_table.Members[_index]).SetTo(value);
         }
         //   </RefListColumn>
         // </Columns>

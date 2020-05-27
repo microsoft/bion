@@ -43,10 +43,16 @@ namespace BSOA.Demo.Model
         public ToolComponent() : this(SarifLogBsoa.Current)
         { }
 
-        public ToolComponent(ToolComponent other) : this()
+        public ToolComponent(
+			string name
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			Name = name;
+        }
+
+        public ToolComponent(ToolComponent other)
+        {
+			Name = other.Name;
         }
 
         [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]

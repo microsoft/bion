@@ -8,14 +8,16 @@
         public string Type { get; set; }
         public string Default { get; set; }
         public string UnderlyingType { get; set; }
+        public string ReferencedTableName { get; set; }
 
-        private Column(ColumnTypeCategory category, string name, string type, string defaultValue, string underlyingType = null)
+        private Column(ColumnTypeCategory category, string name, string type, string defaultValue = null, string underlyingType = null, string referencedTableName = null)
         {
             Category = category;
             Name = name;
             Type = type;
             UnderlyingType = underlyingType;
             Default = defaultValue ?? "null";
+            ReferencedTableName = referencedTableName;
         }
 
         public static Column Simple(string name, string type, string defaultValue = null)
@@ -40,12 +42,12 @@
 
         public static Column Ref(string name, string targetTable)
         {
-            return new Column(ColumnTypeCategory.Ref, name, targetTable, null);
+            return new Column(ColumnTypeCategory.Ref, name, targetTable, referencedTableName: targetTable);
         }
 
         public static Column RefList(string name, string targetTable)
         {
-            return new Column(ColumnTypeCategory.RefList, name, targetTable, null);
+            return new Column(ColumnTypeCategory.RefList, name, $"IList<{targetTable}>", referencedTableName: targetTable);
         }
     }
 }

@@ -43,10 +43,25 @@ namespace BSOA.Demo.Model
         public ArtifactLocation() : this(SarifLogBsoa.Current)
         { }
 
-        public ArtifactLocation(ArtifactLocation other) : this()
+        public ArtifactLocation(
+			Uri uri,
+			string uriBaseId,
+			int index,
+			Message description
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			Uri = uri;
+			UriBaseId = uriBaseId;
+			Index = index;
+			Description = description;
+        }
+
+        public ArtifactLocation(ArtifactLocation other)
+        {
+			Uri = other.Uri;
+			UriBaseId = other.UriBaseId;
+			Index = other.Index;
+			Description = other.Description;
         }
 
         [DataMember(Name = "uri", IsRequired = false, EmitDefaultValue = false)]

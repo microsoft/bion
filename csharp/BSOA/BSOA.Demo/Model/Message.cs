@@ -43,10 +43,22 @@ namespace BSOA.Demo.Model
         public Message() : this(SarifLogBsoa.Current)
         { }
 
-        public Message(Message other) : this()
+        public Message(
+			string text,
+			string markdown,
+			string id
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			Text = text;
+			Markdown = markdown;
+			Id = id;
+        }
+
+        public Message(Message other)
+        {
+			Text = other.Text;
+			Markdown = other.Markdown;
+			Id = other.Id;
         }
 
         [DataMember(Name = "text", IsRequired = false, EmitDefaultValue = false)]

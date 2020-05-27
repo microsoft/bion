@@ -43,10 +43,22 @@ namespace BSOA.Demo.Model
         public Run() : this(SarifLogBsoa.Current)
         { }
 
-        public Run(Run other) : this()
+        public Run(
+			Tool tool,
+			IList<Artifact> artifacts,
+			IList<Result> results
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			Tool = tool;
+			Artifacts = artifacts;
+			Results = results;
+        }
+
+        public Run(Run other)
+        {
+			Tool = other.Tool;
+			Artifacts = other.Artifacts;
+			Results = other.Results;
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -60,12 +72,14 @@ namespace BSOA.Demo.Model
         public IList<Artifact> Artifacts
         {
             get => _table.Database.Artifact.List(_table.Artifacts[_index]);
+            set => _table.Database.Artifact.List(_table.Artifacts[_index]).SetTo(value);
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public IList<Result> Results
         {
             get => _table.Database.Result.List(_table.Results[_index]);
+            set => _table.Database.Result.List(_table.Results[_index]).SetTo(value);
         }
 
         #region IRow

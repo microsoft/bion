@@ -43,10 +43,43 @@ namespace BSOA.Demo.Model
         public Artifact() : this(SarifLogBsoa.Current)
         { }
 
-        public Artifact(Artifact other) : this()
+        public Artifact(
+			Message description,
+			ArtifactLocation location,
+			int parentIndex,
+			int offset,
+			int length,
+			string mimeType,
+			ArtifactContent contents,
+			string encoding,
+			string sourceLanguage,
+			DateTime lastModifiedTimeUtc
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			Description = description;
+			Location = location;
+			ParentIndex = parentIndex;
+			Offset = offset;
+			Length = length;
+			MimeType = mimeType;
+			Contents = contents;
+			Encoding = encoding;
+			SourceLanguage = sourceLanguage;
+			LastModifiedTimeUtc = lastModifiedTimeUtc;
+        }
+
+        public Artifact(Artifact other)
+        {
+			Description = other.Description;
+			Location = other.Location;
+			ParentIndex = other.ParentIndex;
+			Offset = other.Offset;
+			Length = other.Length;
+			MimeType = other.MimeType;
+			Contents = other.Contents;
+			Encoding = other.Encoding;
+			SourceLanguage = other.SourceLanguage;
+			LastModifiedTimeUtc = other.LastModifiedTimeUtc;
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]

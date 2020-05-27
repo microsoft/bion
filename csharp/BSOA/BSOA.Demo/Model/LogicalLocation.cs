@@ -43,10 +43,31 @@ namespace BSOA.Demo.Model
         public LogicalLocation() : this(SarifLogBsoa.Current)
         { }
 
-        public LogicalLocation(LogicalLocation other) : this()
+        public LogicalLocation(
+			string name,
+			int index,
+			string fullyQualifiedName,
+			string decoratedName,
+			int parentIndex,
+			string kind
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			Name = name;
+			Index = index;
+			FullyQualifiedName = fullyQualifiedName;
+			DecoratedName = decoratedName;
+			ParentIndex = parentIndex;
+			Kind = kind;
+        }
+
+        public LogicalLocation(LogicalLocation other)
+        {
+			Name = other.Name;
+			Index = other.Index;
+			FullyQualifiedName = other.FullyQualifiedName;
+			DecoratedName = other.DecoratedName;
+			ParentIndex = other.ParentIndex;
+			Kind = other.Kind;
         }
 
         [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]

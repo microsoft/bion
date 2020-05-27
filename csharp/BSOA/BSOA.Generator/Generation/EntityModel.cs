@@ -42,17 +42,29 @@ namespace BSOA.Generator.Generation
         public virtual string Generate(Table table, Database database)
         {
             StringBuilder properties = new StringBuilder();
+            StringBuilder parameterList = new StringBuilder();
+            StringBuilder assignmentList = new StringBuilder();
+            StringBuilder otherAssignmentList = new StringBuilder();
+
             foreach (Schema.Column column in table)
             {
                 properties.AppendLine(TemplateDefaults.Populate(Templates, "Column", column, table, database));
+
+                if (parameterList.Length > 0) { parameterList.Append(",\r\n"); }
+                parameterList.Append($"\t\t\t{column.Type} {TemplateDefaults.CamelCase(column.Name)}");
+                assignmentList.AppendLine($"\t\t\t{column.Name} = {TemplateDefaults.CamelCase(column.Name)};");
+                otherAssignmentList.AppendLine($"\t\t\t{column.Name} = other.{column.Name};");
             }
 
-            string renamedCode = Code
+            string finalCode = Code
                 .Replace("Team", table.Name)
                 .Replace("CompanyDatabase", database.Name)
                 .Replace("BSOA.Generator.Templates", database.Namespace);
 
-            string finalCode = CodeSection.Replace(renamedCode, "Columns", properties.ToString());
+            finalCode = CodeSection.Replace(finalCode, "Columns", properties.ToString());
+            finalCode = CodeSection.Replace(finalCode, "ParameterList", parameterList.ToString() + "\r\n");
+            finalCode = CodeSection.Replace(finalCode, "AssignmentList", assignmentList.ToString());
+            finalCode = CodeSection.Replace(finalCode, "OtherAssignmentList", otherAssignmentList.ToString());
 
             return finalCode;
         }

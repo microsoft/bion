@@ -43,10 +43,28 @@ namespace BSOA.Demo.Model
         public Location() : this(SarifLogBsoa.Current)
         { }
 
-        public Location(Location other) : this()
+        public Location(
+			int id,
+			PhysicalLocation physicalLocation,
+			IList<LogicalLocation> logicalLocations,
+			Message message,
+			IList<Region> annotations
+        ) : this(SarifLogBsoa.Current)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
-            _table.CopyItem(_index, other._table, other._index);
+			Id = id;
+			PhysicalLocation = physicalLocation;
+			LogicalLocations = logicalLocations;
+			Message = message;
+			Annotations = annotations;
+        }
+
+        public Location(Location other)
+        {
+			Id = other.Id;
+			PhysicalLocation = other.PhysicalLocation;
+			LogicalLocations = other.LogicalLocations;
+			Message = other.Message;
+			Annotations = other.Annotations;
         }
 
         [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
@@ -69,6 +87,7 @@ namespace BSOA.Demo.Model
         public IList<LogicalLocation> LogicalLocations
         {
             get => _table.Database.LogicalLocation.List(_table.LogicalLocations[_index]);
+            set => _table.Database.LogicalLocation.List(_table.LogicalLocations[_index]).SetTo(value);
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -82,6 +101,7 @@ namespace BSOA.Demo.Model
         public IList<Region> Annotations
         {
             get => _table.Database.Region.List(_table.Annotations[_index]);
+            set => _table.Database.Region.List(_table.Annotations[_index]).SetTo(value);
         }
 
         #region IRow

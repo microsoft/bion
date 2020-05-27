@@ -62,8 +62,7 @@ namespace BSOA.Generator
 
         public static string Replace(string code, string markerName, string replacement)
         {
-            Match m = Match(code, markerName);
-            return code.Substring(0, m.Index) + replacement + code.Substring(m.Index + m.Length);
+            return Regex.Replace(code, CodeSectionRegex(markerName), replacement, Options);
         }
 
         public static string Remove(string code, string markerName)
