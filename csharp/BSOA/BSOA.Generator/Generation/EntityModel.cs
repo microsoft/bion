@@ -1,5 +1,6 @@
 ﻿using BSOA.Generator.Schema;
-using System;
+
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -16,30 +17,34 @@ namespace BSOA.Generator.Generation
     ///   - Column types
     ///   - Namespace
     /// </remarks>
-    public class EntityModel
+    public class EntityModel : ICodeGenerator
     {
-        public static string Code;
-        public static string SimpleColumn;
-        public static string EnumColumn;
-        public static string RefColumn;
-        public static string RefListColumn;
+        public string Code;
+        public Dictionary<string, string> Templates;
 
-        static EntityModel()
+        public EntityModel() : this(@"Templates\\Team.cs")
+        { }
+
+        public EntityModel(string templateFilePath)
         {
-            //Code = File.ReadAllText(@"Templates\\Team.cs");
-            Code = File.ReadAllText(@"Templates\\WithJson\\Team.cs");
-            SimpleColumn = CodeSection.Extract(Code, nameof(SimpleColumn));
-            EnumColumn = CodeSection.Extract(Code, nameof(EnumColumn));
-            RefColumn = CodeSection.Extract(Code, nameof(RefColumn));
-            RefListColumn = CodeSection.Extract(Code, nameof(RefListColumn));
+            Code = File.ReadAllText(templateFilePath);
+            Templates = CodeSection.AllTemplates(Code);
         }
 
-        public static string Generate(Table table, Database database)
+        public virtual void Generate(Database database, string outputFolder)
+        {
+            foreach (Table table in database.Tables)
+            {
+                File.WriteAllText(Path.Combine(outputFolder, $"{table.Name}.cs"), Generate(table, database));
+            }
+        }
+
+        public virtual string Generate(Table table, Database database)
         {
             StringBuilder properties = new StringBuilder();
             foreach (Schema.Column column in table)
             {
-                properties.AppendLine(ColumnProperty(column));
+                properties.AppendLine(TemplateDefaults.Populate(Templates, "Column", column, table, database));
             }
 
             string renamedCode = Code
@@ -50,45 +55,6 @@ namespace BSOA.Generator.Generation
             string finalCode = CodeSection.Replace(renamedCode, "Columns", properties.ToString());
 
             return finalCode;
-        }
-
-        public static string ColumnProperty(Schema.Column column)
-        {
-            switch (column.Category)
-            {
-                case ColumnTypeCategory.Simple:
-                    var result = SimpleColumn;
-                    
-                    if (column.Default == null || column.Type == "DateTime")
-                    {
-                        result = result.Replace("        [DefaultValue(DateTime.MinValue)]\r\n", "");
-                    }
-                    else
-                    {
-                        result = result.Replace("DateTime.MinValue", column.Default);
-                    }
-                    
-                    result = result
-                        .Replace("WhenFormed", column.Name)
-                        .Replace("DateTime", column.Type);
-
-                    return result;    
-                case ColumnTypeCategory.Enum:
-                    return EnumColumn
-                        .Replace("JoinPolicy", column.Name)
-                        .Replace("SecurityPolicy", column.Type)
-                        .Replace("byte", column.UnderlyingType);
-                case ColumnTypeCategory.Ref:
-                    return RefColumn
-                        .Replace("Manager", column.Name)
-                        .Replace("Employee", column.Type);
-                case ColumnTypeCategory.RefList:
-                    return RefListColumn
-                        .Replace("Members", column.Name)
-                        .Replace("Employee", column.Type);
-                default:
-                    throw new NotImplementedException($"{nameof(EntityModel)} unable to generate Column of Category {column.Category} ({column.Name})");
-            }
         }
     }
 }

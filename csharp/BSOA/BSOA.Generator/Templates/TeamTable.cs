@@ -13,11 +13,17 @@ namespace BSOA.Generator.Templates
 
         // <ColumnMembers>
         // <SimpleColumnMember>
-        internal IColumn<DateTime> WhenFormed;
+        internal IColumn<long> EmployeeId;
         // </SimpleColumnMember>
+        // <DateTimeColumnMember>
+        internal IColumn<DateTime> WhenFormed;
+        // </DateTimeColumnMember>
         // <EnumColumnMember>
         internal IColumn<byte> JoinPolicy;
         // </EnumColumnMember>
+        // <FlagsEnumColumnMember>
+        internal IColumn<long> Attributes;
+        // </FlagsEnumColumnMember>
         // <RefColumnMember>
         internal RefColumn Manager;
         // </RefColumnMember>
@@ -33,12 +39,20 @@ namespace BSOA.Generator.Templates
             // <ColumnConstructors>
 
             // <SimpleColumnConstructor>
-            WhenFormed = AddColumn(nameof(WhenFormed), ColumnFactory.Build<DateTime>(DateTime.MinValue));
+            EmployeeId = AddColumn(nameof(EmployeeId), ColumnFactory.Build<long>(-1));
             // </SimpleColumnConstructor>
+
+            // <DateTimeColumnConstructor>
+            WhenFormed = AddColumn(nameof(WhenFormed), ColumnFactory.Build<DateTime>(DateTime.MinValue));
+            // </DateTimeColumnConstructor>
 
             // <EnumColumnConstructor>
             JoinPolicy = AddColumn(nameof(JoinPolicy), ColumnFactory.Build<byte>((byte)SecurityPolicy.Open));
             // </EnumColumnConstructor>
+
+            // <FlagsEnumColumnConstructor>
+            Attributes = AddColumn(nameof(Attributes), ColumnFactory.Build<long>((long)GroupAttributes.None));
+            // </FlagsEnumColumnConstructor>
 
             // <RefColumnConstructor>
             Manager = AddColumn(nameof(Manager), new RefColumn(nameof(CompanyDatabase.Employee)));

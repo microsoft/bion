@@ -12,14 +12,14 @@ namespace BSOA.Demo.Model
         internal SarifLogBsoa Database;
 
         internal RefColumn Driver;
-        internal RefListColumn Extensionss;
+        internal RefListColumn Extensions;
 
         public ToolTable(SarifLogBsoa database) : base()
         {
             Database = database;
 
             Driver = AddColumn(nameof(Driver), new RefColumn(nameof(SarifLogBsoa.ToolComponent)));
-            Extensionss = AddColumn(nameof(Extensionss), new RefListColumn(nameof(SarifLogBsoa.ToolComponent)));
+            Extensions = AddColumn(nameof(Extensions), new RefListColumn(nameof(SarifLogBsoa.ToolComponent)));
         }
 
         public override Tool Get(int index)

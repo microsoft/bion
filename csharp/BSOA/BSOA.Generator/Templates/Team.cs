@@ -31,12 +31,20 @@ namespace BSOA.Generator.Templates
 
         // <Columns>
         //   <SimpleColumn>
+        public long EmployeeId
+        {
+            get => _table.EmployeeId[_index];
+            set => _table.EmployeeId[_index] = value;
+        }
+        //   </SimpleColumn>
+
+        //   <DateTimeColumn>
         public DateTime WhenFormed
         {
             get => _table.WhenFormed[_index];
             set => _table.WhenFormed[_index] = value;
         }
-        //   </SimpleColumn>
+        //   </DateTimeColumn>
 
         //   <EnumColumn>
         public SecurityPolicy JoinPolicy
@@ -45,6 +53,14 @@ namespace BSOA.Generator.Templates
             set => _table.JoinPolicy[_index] = (byte)value;
         }
         //   </EnumColumn>
+
+        //   <FlagsEnumColumn>
+        public GroupAttributes Attributes
+        {
+            get => (GroupAttributes)_table.Attributes[_index];
+            set => _table.Attributes[_index] = (long)value;
+        }
+        //   </FlagsEnumColumn>
 
         //   <RefColumn>
         public Employee Manager

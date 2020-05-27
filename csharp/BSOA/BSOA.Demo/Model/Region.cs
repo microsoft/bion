@@ -1,8 +1,16 @@
+// Copyright (c) Microsoft.  All Rights Reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 using BSOA.Model;
+
+using Microsoft.CodeAnalysis.Sarif;
+using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
 
@@ -11,7 +19,9 @@ namespace BSOA.Demo.Model
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Region'
     /// </summary>
-    public partial class Region : IRow
+    [DataContract]
+    [GeneratedCode("BSOA.Generator", "0.5.0")]
+    public partial class Region : PropertyBagHolder, ISarifNode, IRow
     {
         private RegionTable _table;
         private int _index;
@@ -33,6 +43,13 @@ namespace BSOA.Demo.Model
         public Region() : this(SarifLogBsoa.Current)
         { }
 
+        public Region(Region other) : this()
+        {
+            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+            _table.CopyItem(_index, other._table, other._index);
+        }
+
+        [DataMember(Name = "startLine", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(0)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int StartLine
@@ -41,6 +58,7 @@ namespace BSOA.Demo.Model
             set => _table.StartLine[_index] = value;
         }
 
+        [DataMember(Name = "startColumn", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(0)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int StartColumn
@@ -49,6 +67,7 @@ namespace BSOA.Demo.Model
             set => _table.StartColumn[_index] = value;
         }
 
+        [DataMember(Name = "endLine", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(0)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int EndLine
@@ -57,6 +76,7 @@ namespace BSOA.Demo.Model
             set => _table.EndLine[_index] = value;
         }
 
+        [DataMember(Name = "endColumn", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(0)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int EndColumn
@@ -65,6 +85,7 @@ namespace BSOA.Demo.Model
             set => _table.EndColumn[_index] = value;
         }
 
+        [DataMember(Name = "byteOffset", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int ByteOffset
@@ -73,6 +94,7 @@ namespace BSOA.Demo.Model
             set => _table.ByteOffset[_index] = value;
         }
 
+        [DataMember(Name = "byteLength", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(0)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int ByteLength
@@ -81,6 +103,7 @@ namespace BSOA.Demo.Model
             set => _table.ByteLength[_index] = value;
         }
 
+        [DataMember(Name = "charOffset", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int CharOffset
@@ -89,6 +112,7 @@ namespace BSOA.Demo.Model
             set => _table.CharOffset[_index] = value;
         }
 
+        [DataMember(Name = "charLength", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(0)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int CharLength
@@ -111,6 +135,8 @@ namespace BSOA.Demo.Model
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
+        [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string SourceLanguage
         {
@@ -128,5 +154,31 @@ namespace BSOA.Demo.Model
             _index = index;
         }
         #endregion
+
+        #region ISarifNode
+        public SarifNodeKind SarifNodeKind => SarifNodeKind.Region;
+
+        ISarifNode ISarifNode.DeepClone()
+        {
+            return DeepCloneCore();
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this instance.
+        /// </summary>
+        public Region DeepClone()
+        {
+            return (Region)DeepCloneCore();
+        }
+
+        private ISarifNode DeepCloneCore()
+        {
+            return new Region(this);
+        }
+        #endregion
+
+        //public static IEqualityComparer<Region> ValueComparer => RegionEqualityComparer.Instance;
+        //public bool ValueEquals(Region other) => ValueComparer.Equals(this, other);
+        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
     }
 }

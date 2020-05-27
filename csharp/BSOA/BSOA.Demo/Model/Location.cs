@@ -1,8 +1,16 @@
+// Copyright (c) Microsoft.  All Rights Reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 using BSOA.Model;
+
+using Microsoft.CodeAnalysis.Sarif;
+using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
 
@@ -11,7 +19,9 @@ namespace BSOA.Demo.Model
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Location'
     /// </summary>
-    public partial class Location : IRow
+    [DataContract]
+    [GeneratedCode("BSOA.Generator", "0.5.0")]
+    public partial class Location : PropertyBagHolder, ISarifNode, IRow
     {
         private LocationTable _table;
         private int _index;
@@ -33,6 +43,13 @@ namespace BSOA.Demo.Model
         public Location() : this(SarifLogBsoa.Current)
         { }
 
+        public Location(Location other) : this()
+        {
+            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+            _table.CopyItem(_index, other._table, other._index);
+        }
+
+        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int Id
@@ -77,5 +94,31 @@ namespace BSOA.Demo.Model
             _index = index;
         }
         #endregion
+
+        #region ISarifNode
+        public SarifNodeKind SarifNodeKind => SarifNodeKind.Location;
+
+        ISarifNode ISarifNode.DeepClone()
+        {
+            return DeepCloneCore();
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this instance.
+        /// </summary>
+        public Location DeepClone()
+        {
+            return (Location)DeepCloneCore();
+        }
+
+        private ISarifNode DeepCloneCore()
+        {
+            return new Location(this);
+        }
+        #endregion
+
+        //public static IEqualityComparer<Location> ValueComparer => LocationEqualityComparer.Instance;
+        //public bool ValueEquals(Location other) => ValueComparer.Equals(this, other);
+        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
     }
 }

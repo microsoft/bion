@@ -22,12 +22,12 @@ namespace BSOA.Demo.Model
         {
             Database = database;
 
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>());
+            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(null));
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
-            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), ColumnFactory.Build<string>());
-            DecoratedName = AddColumn(nameof(DecoratedName), ColumnFactory.Build<string>());
+            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), ColumnFactory.Build<string>(null));
+            DecoratedName = AddColumn(nameof(DecoratedName), ColumnFactory.Build<string>(null));
             ParentIndex = AddColumn(nameof(ParentIndex), ColumnFactory.Build<int>(-1));
-            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<string>());
+            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<string>(null));
         }
 
         public override LogicalLocation Get(int index)

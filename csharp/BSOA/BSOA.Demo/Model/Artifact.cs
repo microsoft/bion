@@ -1,8 +1,16 @@
+// Copyright (c) Microsoft.  All Rights Reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 using BSOA.Model;
+
+using Microsoft.CodeAnalysis.Sarif;
+using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
 
@@ -11,7 +19,9 @@ namespace BSOA.Demo.Model
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Artifact'
     /// </summary>
-    public partial class Artifact : IRow
+    [DataContract]
+    [GeneratedCode("BSOA.Generator", "0.5.0")]
+    public partial class Artifact : PropertyBagHolder, ISarifNode, IRow
     {
         private ArtifactTable _table;
         private int _index;
@@ -33,6 +43,12 @@ namespace BSOA.Demo.Model
         public Artifact() : this(SarifLogBsoa.Current)
         { }
 
+        public Artifact(Artifact other) : this()
+        {
+            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+            _table.CopyItem(_index, other._table, other._index);
+        }
+
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Message Description
         {
@@ -47,6 +63,7 @@ namespace BSOA.Demo.Model
             set => _table.Location[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
+        [DataMember(Name = "parentIndex", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int ParentIndex
@@ -55,6 +72,7 @@ namespace BSOA.Demo.Model
             set => _table.ParentIndex[_index] = value;
         }
 
+        [DataMember(Name = "offset", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(0)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int Offset
@@ -63,6 +81,7 @@ namespace BSOA.Demo.Model
             set => _table.Offset[_index] = value;
         }
 
+        [DataMember(Name = "length", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int Length
@@ -71,6 +90,8 @@ namespace BSOA.Demo.Model
             set => _table.Length[_index] = value;
         }
 
+        [DataMember(Name = "mimeType", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string MimeType
         {
@@ -85,6 +106,8 @@ namespace BSOA.Demo.Model
             set => _table.Contents[_index] = _table.Database.ArtifactContent.LocalIndex(value);
         }
 
+        [DataMember(Name = "encoding", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Encoding
         {
@@ -92,6 +115,8 @@ namespace BSOA.Demo.Model
             set => _table.Encoding[_index] = value;
         }
 
+        [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string SourceLanguage
         {
@@ -99,7 +124,9 @@ namespace BSOA.Demo.Model
             set => _table.SourceLanguage[_index] = value;
         }
 
+        [DataMember(Name = "lastModifiedTimeUtc", IsRequired = false, EmitDefaultValue = false)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.DateTimeConverter))]
         public DateTime LastModifiedTimeUtc
         {
             get => _table.LastModifiedTimeUtc[_index];
@@ -116,5 +143,31 @@ namespace BSOA.Demo.Model
             _index = index;
         }
         #endregion
+
+        #region ISarifNode
+        public SarifNodeKind SarifNodeKind => SarifNodeKind.Artifact;
+
+        ISarifNode ISarifNode.DeepClone()
+        {
+            return DeepCloneCore();
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this instance.
+        /// </summary>
+        public Artifact DeepClone()
+        {
+            return (Artifact)DeepCloneCore();
+        }
+
+        private ISarifNode DeepCloneCore()
+        {
+            return new Artifact(this);
+        }
+        #endregion
+
+        //public static IEqualityComparer<Artifact> ValueComparer => ArtifactEqualityComparer.Instance;
+        //public bool ValueEquals(Artifact other) => ValueComparer.Equals(this, other);
+        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
     }
 }

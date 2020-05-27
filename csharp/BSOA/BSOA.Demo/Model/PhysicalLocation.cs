@@ -1,8 +1,16 @@
+// Copyright (c) Microsoft.  All Rights Reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 using BSOA.Model;
+
+using Microsoft.CodeAnalysis.Sarif;
+using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
 
@@ -11,7 +19,9 @@ namespace BSOA.Demo.Model
     /// <summary>
     ///  GENERATED: BSOA Entity for 'PhysicalLocation'
     /// </summary>
-    public partial class PhysicalLocation : IRow
+    [DataContract]
+    [GeneratedCode("BSOA.Generator", "0.5.0")]
+    public partial class PhysicalLocation : PropertyBagHolder, ISarifNode, IRow
     {
         private PhysicalLocationTable _table;
         private int _index;
@@ -32,6 +42,12 @@ namespace BSOA.Demo.Model
 
         public PhysicalLocation() : this(SarifLogBsoa.Current)
         { }
+
+        public PhysicalLocation(PhysicalLocation other) : this()
+        {
+            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+            _table.CopyItem(_index, other._table, other._index);
+        }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public ArtifactLocation ArtifactLocation
@@ -64,5 +80,31 @@ namespace BSOA.Demo.Model
             _index = index;
         }
         #endregion
+
+        #region ISarifNode
+        public SarifNodeKind SarifNodeKind => SarifNodeKind.PhysicalLocation;
+
+        ISarifNode ISarifNode.DeepClone()
+        {
+            return DeepCloneCore();
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this instance.
+        /// </summary>
+        public PhysicalLocation DeepClone()
+        {
+            return (PhysicalLocation)DeepCloneCore();
+        }
+
+        private ISarifNode DeepCloneCore()
+        {
+            return new PhysicalLocation(this);
+        }
+        #endregion
+
+        //public static IEqualityComparer<PhysicalLocation> ValueComparer => PhysicalLocationEqualityComparer.Instance;
+        //public bool ValueEquals(PhysicalLocation other) => ValueComparer.Equals(this, other);
+        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
     }
 }

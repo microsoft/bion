@@ -13,21 +13,29 @@ namespace BSOA.Generator.Generation
     ///   - DB type name
     ///   - Namespace
     /// </remarks>
-    public class DatabaseModel
+    public class DatabaseModel : ICodeGenerator
     {
-        public static string Code;
-        public static string TableMember;
-        public static string TableConstructor;
+        public string Code;
+        public string TableMember;
+        public string TableConstructor;
 
-        static DatabaseModel()
+        public DatabaseModel() : this(@"Templates\\CompanyDatabase.cs")
+        { }
+
+        public DatabaseModel(string templateFilePath)
         {
-            Code = File.ReadAllText(@"Templates\\CompanyDatabase.cs");
+            Code = File.ReadAllText(templateFilePath);
 
             TableMember = CodeSection.Extract(Code, nameof(TableMember));
             TableConstructor = CodeSection.Extract(Code, nameof(TableConstructor));
         }
 
-        public static string Generate(Database database)
+        public virtual void Generate(Database database, string outputPath)
+        {
+            File.WriteAllText(Path.Combine(outputPath, $"{database.Name}.cs"), Generate(database));
+        }
+
+        public virtual string Generate(Database database)
         {
             StringBuilder members = new StringBuilder();
             StringBuilder constructors = new StringBuilder();

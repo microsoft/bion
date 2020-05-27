@@ -1,8 +1,16 @@
+// Copyright (c) Microsoft.  All Rights Reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 using BSOA.Model;
+
+using Microsoft.CodeAnalysis.Sarif;
+using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
 
@@ -11,7 +19,9 @@ namespace BSOA.Demo.Model
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Message'
     /// </summary>
-    public partial class Message : IRow
+    [DataContract]
+    [GeneratedCode("BSOA.Generator", "0.5.0")]
+    public partial class Message : PropertyBagHolder, ISarifNode, IRow
     {
         private MessageTable _table;
         private int _index;
@@ -33,6 +43,14 @@ namespace BSOA.Demo.Model
         public Message() : this(SarifLogBsoa.Current)
         { }
 
+        public Message(Message other) : this()
+        {
+            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+            _table.CopyItem(_index, other._table, other._index);
+        }
+
+        [DataMember(Name = "text", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Text
         {
@@ -40,6 +58,8 @@ namespace BSOA.Demo.Model
             set => _table.Text[_index] = value;
         }
 
+        [DataMember(Name = "markdown", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Markdown
         {
@@ -47,6 +67,8 @@ namespace BSOA.Demo.Model
             set => _table.Markdown[_index] = value;
         }
 
+        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Id
         {
@@ -64,5 +86,31 @@ namespace BSOA.Demo.Model
             _index = index;
         }
         #endregion
+
+        #region ISarifNode
+        public SarifNodeKind SarifNodeKind => SarifNodeKind.Message;
+
+        ISarifNode ISarifNode.DeepClone()
+        {
+            return DeepCloneCore();
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this instance.
+        /// </summary>
+        public Message DeepClone()
+        {
+            return (Message)DeepCloneCore();
+        }
+
+        private ISarifNode DeepCloneCore()
+        {
+            return new Message(this);
+        }
+        #endregion
+
+        //public static IEqualityComparer<Message> ValueComparer => MessageEqualityComparer.Instance;
+        //public bool ValueEquals(Message other) => ValueComparer.Equals(this, other);
+        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
     }
 }

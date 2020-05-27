@@ -37,7 +37,7 @@ namespace BSOA.Demo.Model
             CharLength = AddColumn(nameof(CharLength), ColumnFactory.Build<int>(0));
             Snippet = AddColumn(nameof(Snippet), new RefColumn(nameof(SarifLogBsoa.ArtifactContent)));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogBsoa.Message)));
-            SourceLanguage = AddColumn(nameof(SourceLanguage), ColumnFactory.Build<string>());
+            SourceLanguage = AddColumn(nameof(SourceLanguage), ColumnFactory.Build<string>(null));
         }
 
         public override Region Get(int index)

@@ -1,8 +1,16 @@
+// Copyright (c) Microsoft.  All Rights Reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 using BSOA.Model;
+
+using Microsoft.CodeAnalysis.Sarif;
+using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
 
@@ -11,7 +19,9 @@ namespace BSOA.Demo.Model
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ToolComponent'
     /// </summary>
-    public partial class ToolComponent : IRow
+    [DataContract]
+    [GeneratedCode("BSOA.Generator", "0.5.0")]
+    public partial class ToolComponent : PropertyBagHolder, ISarifNode, IRow
     {
         private ToolComponentTable _table;
         private int _index;
@@ -33,6 +43,14 @@ namespace BSOA.Demo.Model
         public ToolComponent() : this(SarifLogBsoa.Current)
         { }
 
+        public ToolComponent(ToolComponent other) : this()
+        {
+            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+            _table.CopyItem(_index, other._table, other._index);
+        }
+
+        [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Name
         {
@@ -50,5 +68,31 @@ namespace BSOA.Demo.Model
             _index = index;
         }
         #endregion
+
+        #region ISarifNode
+        public SarifNodeKind SarifNodeKind => SarifNodeKind.ToolComponent;
+
+        ISarifNode ISarifNode.DeepClone()
+        {
+            return DeepCloneCore();
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this instance.
+        /// </summary>
+        public ToolComponent DeepClone()
+        {
+            return (ToolComponent)DeepCloneCore();
+        }
+
+        private ISarifNode DeepCloneCore()
+        {
+            return new ToolComponent(this);
+        }
+        #endregion
+
+        //public static IEqualityComparer<ToolComponent> ValueComparer => ToolComponentEqualityComparer.Instance;
+        //public bool ValueEquals(ToolComponent other) => ValueComparer.Equals(this, other);
+        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
     }
 }

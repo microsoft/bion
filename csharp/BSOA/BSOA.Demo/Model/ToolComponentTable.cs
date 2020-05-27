@@ -17,7 +17,7 @@ namespace BSOA.Demo.Model
         {
             Database = database;
 
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>());
+            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(null));
         }
 
         public override ToolComponent Get(int index)

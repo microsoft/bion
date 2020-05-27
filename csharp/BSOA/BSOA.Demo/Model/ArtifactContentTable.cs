@@ -18,8 +18,8 @@ namespace BSOA.Demo.Model
         {
             Database = database;
 
-            Text = AddColumn(nameof(Text), ColumnFactory.Build<string>());
-            Binary = AddColumn(nameof(Binary), ColumnFactory.Build<string>());
+            Text = AddColumn(nameof(Text), ColumnFactory.Build<string>(null));
+            Binary = AddColumn(nameof(Binary), ColumnFactory.Build<string>(null));
         }
 
         public override ArtifactContent Get(int index)

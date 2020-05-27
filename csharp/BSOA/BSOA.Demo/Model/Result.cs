@@ -1,8 +1,16 @@
+// Copyright (c) Microsoft.  All Rights Reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 using BSOA.Model;
+
+using Microsoft.CodeAnalysis.Sarif;
+using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
 
@@ -11,7 +19,9 @@ namespace BSOA.Demo.Model
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Result'
     /// </summary>
-    public partial class Result : IRow
+    [DataContract]
+    [GeneratedCode("BSOA.Generator", "0.5.0")]
+    public partial class Result : PropertyBagHolder, ISarifNode, IRow
     {
         private ResultTable _table;
         private int _index;
@@ -33,6 +43,12 @@ namespace BSOA.Demo.Model
         public Result() : this(SarifLogBsoa.Current)
         { }
 
+        public Result(Result other) : this()
+        {
+            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+            _table.CopyItem(_index, other._table, other._index);
+        }
+
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public Microsoft.CodeAnalysis.Sarif.BaselineState BaselineState
@@ -41,6 +57,8 @@ namespace BSOA.Demo.Model
             set => _table.BaselineState[_index] = (int)value;
         }
 
+        [DataMember(Name = "ruleId", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string RuleId
         {
@@ -48,6 +66,7 @@ namespace BSOA.Demo.Model
             set => _table.RuleId[_index] = value;
         }
 
+        [DataMember(Name = "ruleIndex", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int RuleIndex
@@ -69,6 +88,8 @@ namespace BSOA.Demo.Model
             get => _table.Database.Location.List(_table.Locations[_index]);
         }
 
+        [DataMember(Name = "guid", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Guid
         {
@@ -86,5 +107,31 @@ namespace BSOA.Demo.Model
             _index = index;
         }
         #endregion
+
+        #region ISarifNode
+        public SarifNodeKind SarifNodeKind => SarifNodeKind.Result;
+
+        ISarifNode ISarifNode.DeepClone()
+        {
+            return DeepCloneCore();
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this instance.
+        /// </summary>
+        public Result DeepClone()
+        {
+            return (Result)DeepCloneCore();
+        }
+
+        private ISarifNode DeepCloneCore()
+        {
+            return new Result(this);
+        }
+        #endregion
+
+        //public static IEqualityComparer<Result> ValueComparer => ResultEqualityComparer.Instance;
+        //public bool ValueEquals(Result other) => ValueComparer.Equals(this, other);
+        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
     }
 }

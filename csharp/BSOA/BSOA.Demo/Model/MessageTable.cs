@@ -19,9 +19,9 @@ namespace BSOA.Demo.Model
         {
             Database = database;
 
-            Text = AddColumn(nameof(Text), ColumnFactory.Build<string>());
-            Markdown = AddColumn(nameof(Markdown), ColumnFactory.Build<string>());
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>());
+            Text = AddColumn(nameof(Text), ColumnFactory.Build<string>(null));
+            Markdown = AddColumn(nameof(Markdown), ColumnFactory.Build<string>(null));
+            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(null));
         }
 
         public override Message Get(int index)

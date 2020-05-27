@@ -1,4 +1,7 @@
-﻿using BSOA.Generator.Schema;
+﻿using BSOA.Generator.Generation;
+using BSOA.Generator.Schema;
+
+using System.Collections.Generic;
 
 namespace BSOA.Generator
 {
@@ -19,7 +22,7 @@ namespace BSOA.Generator
                     Schema.Column.Ref("Contents", "ArtifactContent"),
                     Schema.Column.Simple("Encoding", "string"),
                     Schema.Column.Simple("SourceLanguage", "string"),
-                    Schema.Column.Simple("LastModifiedTimeUtc", "DateTime", "DateTime.MinValue"),
+                    Schema.Column.DateTime("LastModifiedTimeUtc", "DateTime.MinValue"),
                 },
                 new Table("ArtifactContent")
                 {
@@ -94,7 +97,7 @@ namespace BSOA.Generator
                 new Table("Tool")
                 {
                     Schema.Column.Ref("Driver", "ToolComponent"),
-                    Schema.Column.RefList("Extensionss", "ToolComponent"),
+                    Schema.Column.RefList("Extensions", "ToolComponent"),
                 },
                 new Table("ToolComponent")
                 {
@@ -102,12 +105,18 @@ namespace BSOA.Generator
                 }
             };
 
-            CodeGenerator generator = new CodeGenerator()
+            List<ICodeGenerator> generators = new List<ICodeGenerator>()
             {
-                OutputFolder = @"..\..\..\..\BSOA.Demo\Model",
+                new DatabaseModel(),
+                new TableModel(),
+                new EntityModel(@"Templates\\Sarif\\Team.cs")
             };
 
-            generator.Generate(db);
+            string outputFolder = @"..\..\..\..\BSOA.Demo\Model";
+            foreach (ICodeGenerator generator in generators)
+            {
+                generator.Generate(db, outputFolder);
+            }
           }
     }
 }

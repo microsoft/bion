@@ -23,11 +23,11 @@ namespace BSOA.Demo.Model
             Database = database;
 
             BaselineState = AddColumn(nameof(BaselineState), ColumnFactory.Build<int>((int)Microsoft.CodeAnalysis.Sarif.BaselineState.None));
-            RuleId = AddColumn(nameof(RuleId), ColumnFactory.Build<string>());
+            RuleId = AddColumn(nameof(RuleId), ColumnFactory.Build<string>(null));
             RuleIndex = AddColumn(nameof(RuleIndex), ColumnFactory.Build<int>(-1));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogBsoa.Message)));
             Locations = AddColumn(nameof(Locations), new RefListColumn(nameof(SarifLogBsoa.Location)));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>());
+            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(null));
         }
 
         public override Result Get(int index)

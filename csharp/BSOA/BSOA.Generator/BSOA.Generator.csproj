@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Templates\WithJson\Team.cs" />
+    <Compile Remove="Templates\Sarif\Team.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Templates\WithJson\Team.cs">
+    <None Include="Templates\Sarif\Team.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

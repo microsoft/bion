@@ -20,8 +20,8 @@ namespace BSOA.Demo.Model
         {
             Database = database;
 
-            Uri = AddColumn(nameof(Uri), ColumnFactory.Build<Uri>());
-            UriBaseId = AddColumn(nameof(UriBaseId), ColumnFactory.Build<string>());
+            Uri = AddColumn(nameof(Uri), ColumnFactory.Build<Uri>(null));
+            UriBaseId = AddColumn(nameof(UriBaseId), ColumnFactory.Build<string>(null));
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogBsoa.Message)));
         }

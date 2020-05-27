@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace BSOA.Generator
@@ -9,7 +10,7 @@ namespace BSOA.Generator
     /// </summary>
     public static class CodeSection
     {
-        private const RegexOptions Options = RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+        private const RegexOptions Options = RegexOptions.Singleline | RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
 
         private static string CodeSectionRegex(string markerName)
         {
@@ -19,7 +20,31 @@ namespace BSOA.Generator
             //  - Line with "       // </MarkerName>"
             //  - Subsequent whitespace only line, if present
 
-            return $"([ \t]*//[ ]+<{markerName}>[^\n]*\n)(?<Content>.*?)([ \t]*//[ ]+</{markerName}>[^\n]*\n([ \t\r]*\n)?)";
+            return $"(^[ \t]*//[ \t]+<{markerName}>[^\n]*\n)(?<Content>.*?)([ \t]*//[ \t]+</{markerName}>[^\n]*\n([ \t\r]*\n)?)";
+        }
+
+        public static Dictionary<string, string> AllTemplates(string code)
+        {
+            Dictionary<string, string> templates = new Dictionary<string, string>();
+
+            foreach(string templateName in AllTemplateNames(code))
+            {
+                templates[templateName] = Extract(code, templateName);
+            }
+
+            return templates;
+        }
+
+        public static List<string> AllTemplateNames(string code)
+        {
+            List<string> results = new List<string>();
+
+            foreach (Match match in Regex.Matches(code, $"^[ \t]*//[ \t]+<([^ />]+)>[^\n]$", Options))
+            {
+                results.Add(match.Groups[1].Value);
+            }
+
+            return results;
         }
 
         private static Match Match(string code, string markerName)
