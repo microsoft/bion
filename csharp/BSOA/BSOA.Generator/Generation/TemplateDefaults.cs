@@ -10,9 +10,9 @@ namespace BSOA.Generator.Generation
         public static string Populate(Dictionary<string, string> templates, string templateName, Schema.Column column, Table table, Database database)
         {
             string template;
-            if (!templates.TryGetValue($"{column.Category}{templateName}", out template))
+            if (!templates.TryGetValue($"{column.Category}{templateName}", out template) && !templates.TryGetValue(templateName, out template))
             {
-                throw new NotSupportedException($"Could not find template '{column.Category}{templateName}' in collection: ({string.Join(", ", templates.Keys)}");
+                throw new NotSupportedException($"Could not find template '{column.Category}{templateName}' or '{templateName}' in collection: ({string.Join(", ", templates.Keys)}");
             }
 
             switch (column.Category)

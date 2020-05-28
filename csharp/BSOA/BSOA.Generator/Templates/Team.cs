@@ -1,4 +1,5 @@
 ﻿using BSOA.Model;
+
 using System;
 using System.Collections.Generic;
 
@@ -111,6 +112,50 @@ namespace BSOA.Generator.Templates
         }
         //   </RefListColumn>
         // </Columns>
+
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (EmployeeId != default(long))
+                {
+                    result = (result * 31) + EmployeeId.GetHashCode();
+                }
+
+                result = (result * 31) + WhenFormed.GetHashCode();
+                result = (result * 31) + JoinPolicy.GetHashCode();
+                result = (result * 31) + Attributes.GetHashCode();
+
+                if (Manager != default(Employee))
+                {
+                    result = (result * 31) + Manager.GetHashCode();
+                }
+
+                if (Members != null)
+                {
+                    result = (result * 31) + Members.GetHashCode();
+                }
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            Team other = obj as Team;
+            if (other == null) { return false; }
+
+            if (this.EmployeeId != other.EmployeeId) { return false; }
+            if (this.WhenFormed != other.WhenFormed) { return false; }
+            if (this.JoinPolicy != other.JoinPolicy) { return false; }
+            if (this.Attributes != other.Attributes) { return false; }
+            if (this.Manager != other.Manager) { return false; }
+            if (this.Members != other.Members) { return false; }
+
+            return true;
+        }
 
         #region IRow
         ITable IRow.Table => _table;

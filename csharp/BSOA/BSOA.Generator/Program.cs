@@ -1,5 +1,6 @@
 ﻿using BSOA.Generator.Generation;
 using BSOA.Generator.Schema;
+using BSOA.Json;
 
 using System.Collections.Generic;
 
@@ -104,6 +105,8 @@ namespace BSOA.Generator
                     Schema.Column.Simple("Name", "string"),
                 }
             };
+
+            AsJson.Save("Sarif.BsoaSchema.json", db, verbose: true);
 
             List<ICodeGenerator> generators = new List<ICodeGenerator>()
             {

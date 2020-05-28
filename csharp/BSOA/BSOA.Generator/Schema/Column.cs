@@ -1,7 +1,11 @@
-﻿namespace BSOA.Generator.Schema
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace BSOA.Generator.Schema
 {
     public class Column
     {
+        [JsonConverter(typeof(StringEnumConverter))]
         public ColumnTypeCategory Category { get; set; }
 
         public string Name { get; set; }
@@ -9,6 +13,9 @@
         public string Default { get; set; }
         public string UnderlyingType { get; set; }
         public string ReferencedTableName { get; set; }
+
+        internal Column()
+        { }
 
         private Column(ColumnTypeCategory category, string name, string type, string defaultValue = null, string underlyingType = null, string referencedTableName = null)
         {
