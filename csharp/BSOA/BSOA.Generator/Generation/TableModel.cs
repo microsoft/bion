@@ -46,7 +46,7 @@ namespace BSOA.Generator.Generation
             StringBuilder members = new StringBuilder();
             StringBuilder constructors = new StringBuilder();
 
-            foreach (Schema.Column column in table)
+            foreach (Schema.Column column in table.Columns)
             {
                 members.Append(TemplateDefaults.Populate(Templates, "ColumnMember", column, table, database));
                 constructors.Append(TemplateDefaults.Populate(Templates, "ColumnConstructor", column, table, database));

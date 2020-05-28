@@ -48,7 +48,7 @@ namespace BSOA.Generator.Generation
             StringBuilder getHashCodeList = new StringBuilder();
             StringBuilder equalsList = new StringBuilder();
 
-            foreach (Schema.Column column in table)
+            foreach (Schema.Column column in table.Columns)
             {
                 properties.AppendLine(TemplateDefaults.Populate(Templates, "Column", column, table, database));
                 argumentList.Append(TemplateDefaults.Populate(Templates, "Argument", column, table, database));

@@ -40,7 +40,7 @@ namespace BSOA.Generator.Generation
             StringBuilder members = new StringBuilder();
             StringBuilder constructors = new StringBuilder();
 
-            foreach (Schema.Table table in database)
+            foreach (Schema.Table table in database.Tables)
             {
                 members.Append(TableMember.Replace("Employee", table.Name));
                 constructors.Append(TableConstructor .Replace("Employee", table.Name));
