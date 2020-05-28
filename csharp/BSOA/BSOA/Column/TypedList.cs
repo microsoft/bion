@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BSOA.Extensions;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -100,6 +102,26 @@ namespace BSOA
         IEnumerator IEnumerable.GetEnumerator()
         {
             return new ListEnumerator<TItem>(this);
+        }
+
+        public override int GetHashCode()
+        {
+            return ReadOnlyListExtensions.GetHashCode(this);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ReadOnlyListExtensions.AreEqual(this, obj as IReadOnlyList<TItem>);
+        }
+
+        public static bool operator ==(TypedList<TItem> left, TypedList<TItem> right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(TypedList<TItem> left, TypedList<TItem> right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
         }
     }
 }
