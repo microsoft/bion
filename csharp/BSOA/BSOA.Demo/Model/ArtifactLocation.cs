@@ -44,24 +44,24 @@ namespace BSOA.Demo.Model
         { }
 
         public ArtifactLocation(
-			Uri uri,
-			string uriBaseId,
-			int index,
-			Message description
+            Uri uri,
+            string uriBaseId,
+            int index,
+            Message description
         ) : this(SarifLogBsoa.Current)
         {
-			Uri = uri;
-			UriBaseId = uriBaseId;
-			Index = index;
-			Description = description;
+            Uri = uri;
+            UriBaseId = uriBaseId;
+            Index = index;
+            Description = description;
         }
 
         public ArtifactLocation(ArtifactLocation other)
         {
-			Uri = other.Uri;
-			UriBaseId = other.UriBaseId;
-			Index = other.Index;
-			Description = other.Description;
+            Uri = other.Uri;
+            UriBaseId = other.UriBaseId;
+            Index = other.Index;
+            Description = other.Description;
         }
 
         [DataMember(Name = "uri", IsRequired = false, EmitDefaultValue = false)]
@@ -98,6 +98,67 @@ namespace BSOA.Demo.Model
             set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
+        #region IEquatable<ArtifactLocation>
+        public bool Equals(ArtifactLocation other)
+        {
+            if (other == null) { return false; }
+
+            if (this.Uri != other.Uri) { return false; }
+            if (this.UriBaseId != other.UriBaseId) { return false; }
+            if (this.Index != other.Index) { return false; }
+            if (this.Description != other.Description) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (Uri != default(Uri))
+                {
+                    result = (result * 31) + Uri.GetHashCode();
+                }
+
+                if (UriBaseId != default(string))
+                {
+                    result = (result * 31) + UriBaseId.GetHashCode();
+                }
+
+                if (Index != default(int))
+                {
+                    result = (result * 31) + Index.GetHashCode();
+                }
+
+                if (Description != default(Message))
+                {
+                    result = (result * 31) + Description.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ArtifactLocation);
+        }
+
+        public static bool operator ==(ArtifactLocation left, ArtifactLocation right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(ArtifactLocation left, ArtifactLocation right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
+
         #region IRow
         ITable IRow.Table => _table;
         int IRow.Index => _index;
@@ -131,8 +192,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<ArtifactLocation> ValueComparer => ArtifactLocationEqualityComparer.Instance;
-        //public bool ValueEquals(ArtifactLocation other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<ArtifactLocation> ValueComparer => EqualityComparer<ArtifactLocation>.Default;
+        public bool ValueEquals(ArtifactLocation other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }

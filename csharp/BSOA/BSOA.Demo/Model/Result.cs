@@ -44,30 +44,30 @@ namespace BSOA.Demo.Model
         { }
 
         public Result(
-			Microsoft.CodeAnalysis.Sarif.BaselineState baselineState,
-			string ruleId,
-			int ruleIndex,
-			Message message,
-			IList<Location> locations,
-			string guid
+            Microsoft.CodeAnalysis.Sarif.BaselineState baselineState,
+            string ruleId,
+            int ruleIndex,
+            Message message,
+            IList<Location> locations,
+            string guid
         ) : this(SarifLogBsoa.Current)
         {
-			BaselineState = baselineState;
-			RuleId = ruleId;
-			RuleIndex = ruleIndex;
-			Message = message;
-			Locations = locations;
-			Guid = guid;
+            BaselineState = baselineState;
+            RuleId = ruleId;
+            RuleIndex = ruleIndex;
+            Message = message;
+            Locations = locations;
+            Guid = guid;
         }
 
         public Result(Result other)
         {
-			BaselineState = other.BaselineState;
-			RuleId = other.RuleId;
-			RuleIndex = other.RuleIndex;
-			Message = other.Message;
-			Locations = other.Locations;
-			Guid = other.Guid;
+            BaselineState = other.BaselineState;
+            RuleId = other.RuleId;
+            RuleIndex = other.RuleIndex;
+            Message = other.Message;
+            Locations = other.Locations;
+            Guid = other.Guid;
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -119,6 +119,79 @@ namespace BSOA.Demo.Model
             set => _table.Guid[_index] = value;
         }
 
+        #region IEquatable<Result>
+        public bool Equals(Result other)
+        {
+            if (other == null) { return false; }
+
+            if (this.BaselineState != other.BaselineState) { return false; }
+            if (this.RuleId != other.RuleId) { return false; }
+            if (this.RuleIndex != other.RuleIndex) { return false; }
+            if (this.Message != other.Message) { return false; }
+            if (this.Locations != other.Locations) { return false; }
+            if (this.Guid != other.Guid) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (BaselineState != default(Microsoft.CodeAnalysis.Sarif.BaselineState))
+                {
+                    result = (result * 31) + BaselineState.GetHashCode();
+                }
+
+                if (RuleId != default(string))
+                {
+                    result = (result * 31) + RuleId.GetHashCode();
+                }
+
+                if (RuleIndex != default(int))
+                {
+                    result = (result * 31) + RuleIndex.GetHashCode();
+                }
+
+                if (Message != default(Message))
+                {
+                    result = (result * 31) + Message.GetHashCode();
+                }
+
+                if (Locations != default(IList<Location>))
+                {
+                    result = (result * 31) + Locations.GetHashCode();
+                }
+
+                if (Guid != default(string))
+                {
+                    result = (result * 31) + Guid.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Result);
+        }
+
+        public static bool operator ==(Result left, Result right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(Result left, Result right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
+
         #region IRow
         ITable IRow.Table => _table;
         int IRow.Index => _index;
@@ -152,8 +225,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<Result> ValueComparer => ResultEqualityComparer.Instance;
-        //public bool ValueEquals(Result other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<Result> ValueComparer => EqualityComparer<Result>.Default;
+        public bool ValueEquals(Result other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }

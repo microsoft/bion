@@ -44,21 +44,21 @@ namespace BSOA.Demo.Model
         { }
 
         public Message(
-			string text,
-			string markdown,
-			string id
+            string text,
+            string markdown,
+            string id
         ) : this(SarifLogBsoa.Current)
         {
-			Text = text;
-			Markdown = markdown;
-			Id = id;
+            Text = text;
+            Markdown = markdown;
+            Id = id;
         }
 
         public Message(Message other)
         {
-			Text = other.Text;
-			Markdown = other.Markdown;
-			Id = other.Id;
+            Text = other.Text;
+            Markdown = other.Markdown;
+            Id = other.Id;
         }
 
         [DataMember(Name = "text", IsRequired = false, EmitDefaultValue = false)]
@@ -87,6 +87,61 @@ namespace BSOA.Demo.Model
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
+
+        #region IEquatable<Message>
+        public bool Equals(Message other)
+        {
+            if (other == null) { return false; }
+
+            if (this.Text != other.Text) { return false; }
+            if (this.Markdown != other.Markdown) { return false; }
+            if (this.Id != other.Id) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (Text != default(string))
+                {
+                    result = (result * 31) + Text.GetHashCode();
+                }
+
+                if (Markdown != default(string))
+                {
+                    result = (result * 31) + Markdown.GetHashCode();
+                }
+
+                if (Id != default(string))
+                {
+                    result = (result * 31) + Id.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Message);
+        }
+
+        public static bool operator ==(Message left, Message right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(Message left, Message right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
 
         #region IRow
         ITable IRow.Table => _table;
@@ -121,8 +176,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<Message> ValueComparer => MessageEqualityComparer.Instance;
-        //public bool ValueEquals(Message other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<Message> ValueComparer => EqualityComparer<Message>.Default;
+        public bool ValueEquals(Message other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }

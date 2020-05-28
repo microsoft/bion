@@ -44,27 +44,27 @@ namespace BSOA.Demo.Model
         { }
 
         public Location(
-			int id,
-			PhysicalLocation physicalLocation,
-			IList<LogicalLocation> logicalLocations,
-			Message message,
-			IList<Region> annotations
+            int id,
+            PhysicalLocation physicalLocation,
+            IList<LogicalLocation> logicalLocations,
+            Message message,
+            IList<Region> annotations
         ) : this(SarifLogBsoa.Current)
         {
-			Id = id;
-			PhysicalLocation = physicalLocation;
-			LogicalLocations = logicalLocations;
-			Message = message;
-			Annotations = annotations;
+            Id = id;
+            PhysicalLocation = physicalLocation;
+            LogicalLocations = logicalLocations;
+            Message = message;
+            Annotations = annotations;
         }
 
         public Location(Location other)
         {
-			Id = other.Id;
-			PhysicalLocation = other.PhysicalLocation;
-			LogicalLocations = other.LogicalLocations;
-			Message = other.Message;
-			Annotations = other.Annotations;
+            Id = other.Id;
+            PhysicalLocation = other.PhysicalLocation;
+            LogicalLocations = other.LogicalLocations;
+            Message = other.Message;
+            Annotations = other.Annotations;
         }
 
         [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
@@ -104,6 +104,73 @@ namespace BSOA.Demo.Model
             set => _table.Database.Region.List(_table.Annotations[_index]).SetTo(value);
         }
 
+        #region IEquatable<Location>
+        public bool Equals(Location other)
+        {
+            if (other == null) { return false; }
+
+            if (this.Id != other.Id) { return false; }
+            if (this.PhysicalLocation != other.PhysicalLocation) { return false; }
+            if (this.LogicalLocations != other.LogicalLocations) { return false; }
+            if (this.Message != other.Message) { return false; }
+            if (this.Annotations != other.Annotations) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (Id != default(int))
+                {
+                    result = (result * 31) + Id.GetHashCode();
+                }
+
+                if (PhysicalLocation != default(PhysicalLocation))
+                {
+                    result = (result * 31) + PhysicalLocation.GetHashCode();
+                }
+
+                if (LogicalLocations != default(IList<LogicalLocation>))
+                {
+                    result = (result * 31) + LogicalLocations.GetHashCode();
+                }
+
+                if (Message != default(Message))
+                {
+                    result = (result * 31) + Message.GetHashCode();
+                }
+
+                if (Annotations != default(IList<Region>))
+                {
+                    result = (result * 31) + Annotations.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Location);
+        }
+
+        public static bool operator ==(Location left, Location right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(Location left, Location right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
+
         #region IRow
         ITable IRow.Table => _table;
         int IRow.Index => _index;
@@ -137,8 +204,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<Location> ValueComparer => LocationEqualityComparer.Instance;
-        //public bool ValueEquals(Location other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<Location> ValueComparer => EqualityComparer<Location>.Default;
+        public bool ValueEquals(Location other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }

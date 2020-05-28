@@ -44,21 +44,21 @@ namespace BSOA.Demo.Model
         { }
 
         public PhysicalLocation(
-			ArtifactLocation artifactLocation,
-			Region region,
-			Region contextRegion
+            ArtifactLocation artifactLocation,
+            Region region,
+            Region contextRegion
         ) : this(SarifLogBsoa.Current)
         {
-			ArtifactLocation = artifactLocation;
-			Region = region;
-			ContextRegion = contextRegion;
+            ArtifactLocation = artifactLocation;
+            Region = region;
+            ContextRegion = contextRegion;
         }
 
         public PhysicalLocation(PhysicalLocation other)
         {
-			ArtifactLocation = other.ArtifactLocation;
-			Region = other.Region;
-			ContextRegion = other.ContextRegion;
+            ArtifactLocation = other.ArtifactLocation;
+            Region = other.Region;
+            ContextRegion = other.ContextRegion;
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -81,6 +81,61 @@ namespace BSOA.Demo.Model
             get => _table.Database.Region.Get(_table.ContextRegion[_index]);
             set => _table.ContextRegion[_index] = _table.Database.Region.LocalIndex(value);
         }
+
+        #region IEquatable<PhysicalLocation>
+        public bool Equals(PhysicalLocation other)
+        {
+            if (other == null) { return false; }
+
+            if (this.ArtifactLocation != other.ArtifactLocation) { return false; }
+            if (this.Region != other.Region) { return false; }
+            if (this.ContextRegion != other.ContextRegion) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (ArtifactLocation != default(ArtifactLocation))
+                {
+                    result = (result * 31) + ArtifactLocation.GetHashCode();
+                }
+
+                if (Region != default(Region))
+                {
+                    result = (result * 31) + Region.GetHashCode();
+                }
+
+                if (ContextRegion != default(Region))
+                {
+                    result = (result * 31) + ContextRegion.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as PhysicalLocation);
+        }
+
+        public static bool operator ==(PhysicalLocation left, PhysicalLocation right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(PhysicalLocation left, PhysicalLocation right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
 
         #region IRow
         ITable IRow.Table => _table;
@@ -115,8 +170,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<PhysicalLocation> ValueComparer => PhysicalLocationEqualityComparer.Instance;
-        //public bool ValueEquals(PhysicalLocation other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<PhysicalLocation> ValueComparer => EqualityComparer<PhysicalLocation>.Default;
+        public bool ValueEquals(PhysicalLocation other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }

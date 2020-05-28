@@ -44,18 +44,18 @@ namespace BSOA.Demo.Model
         { }
 
         public ArtifactContent(
-			string text,
-			string binary
+            string text,
+            string binary
         ) : this(SarifLogBsoa.Current)
         {
-			Text = text;
-			Binary = binary;
+            Text = text;
+            Binary = binary;
         }
 
         public ArtifactContent(ArtifactContent other)
         {
-			Text = other.Text;
-			Binary = other.Binary;
+            Text = other.Text;
+            Binary = other.Binary;
         }
 
         [DataMember(Name = "text", IsRequired = false, EmitDefaultValue = false)]
@@ -75,6 +75,55 @@ namespace BSOA.Demo.Model
             get => _table.Binary[_index];
             set => _table.Binary[_index] = value;
         }
+
+        #region IEquatable<ArtifactContent>
+        public bool Equals(ArtifactContent other)
+        {
+            if (other == null) { return false; }
+
+            if (this.Text != other.Text) { return false; }
+            if (this.Binary != other.Binary) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (Text != default(string))
+                {
+                    result = (result * 31) + Text.GetHashCode();
+                }
+
+                if (Binary != default(string))
+                {
+                    result = (result * 31) + Binary.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ArtifactContent);
+        }
+
+        public static bool operator ==(ArtifactContent left, ArtifactContent right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(ArtifactContent left, ArtifactContent right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
 
         #region IRow
         ITable IRow.Table => _table;
@@ -109,8 +158,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<ArtifactContent> ValueComparer => ArtifactContentEqualityComparer.Instance;
-        //public bool ValueEquals(ArtifactContent other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<ArtifactContent> ValueComparer => EqualityComparer<ArtifactContent>.Default;
+        public bool ValueEquals(ArtifactContent other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }

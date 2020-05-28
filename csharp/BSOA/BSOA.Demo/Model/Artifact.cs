@@ -44,42 +44,42 @@ namespace BSOA.Demo.Model
         { }
 
         public Artifact(
-			Message description,
-			ArtifactLocation location,
-			int parentIndex,
-			int offset,
-			int length,
-			string mimeType,
-			ArtifactContent contents,
-			string encoding,
-			string sourceLanguage,
-			DateTime lastModifiedTimeUtc
+            Message description,
+            ArtifactLocation location,
+            int parentIndex,
+            int offset,
+            int length,
+            string mimeType,
+            ArtifactContent contents,
+            string encoding,
+            string sourceLanguage,
+            DateTime lastModifiedTimeUtc
         ) : this(SarifLogBsoa.Current)
         {
-			Description = description;
-			Location = location;
-			ParentIndex = parentIndex;
-			Offset = offset;
-			Length = length;
-			MimeType = mimeType;
-			Contents = contents;
-			Encoding = encoding;
-			SourceLanguage = sourceLanguage;
-			LastModifiedTimeUtc = lastModifiedTimeUtc;
+            Description = description;
+            Location = location;
+            ParentIndex = parentIndex;
+            Offset = offset;
+            Length = length;
+            MimeType = mimeType;
+            Contents = contents;
+            Encoding = encoding;
+            SourceLanguage = sourceLanguage;
+            LastModifiedTimeUtc = lastModifiedTimeUtc;
         }
 
         public Artifact(Artifact other)
         {
-			Description = other.Description;
-			Location = other.Location;
-			ParentIndex = other.ParentIndex;
-			Offset = other.Offset;
-			Length = other.Length;
-			MimeType = other.MimeType;
-			Contents = other.Contents;
-			Encoding = other.Encoding;
-			SourceLanguage = other.SourceLanguage;
-			LastModifiedTimeUtc = other.LastModifiedTimeUtc;
+            Description = other.Description;
+            Location = other.Location;
+            ParentIndex = other.ParentIndex;
+            Offset = other.Offset;
+            Length = other.Length;
+            MimeType = other.MimeType;
+            Contents = other.Contents;
+            Encoding = other.Encoding;
+            SourceLanguage = other.SourceLanguage;
+            LastModifiedTimeUtc = other.LastModifiedTimeUtc;
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -166,6 +166,103 @@ namespace BSOA.Demo.Model
             set => _table.LastModifiedTimeUtc[_index] = value;
         }
 
+        #region IEquatable<Artifact>
+        public bool Equals(Artifact other)
+        {
+            if (other == null) { return false; }
+
+            if (this.Description != other.Description) { return false; }
+            if (this.Location != other.Location) { return false; }
+            if (this.ParentIndex != other.ParentIndex) { return false; }
+            if (this.Offset != other.Offset) { return false; }
+            if (this.Length != other.Length) { return false; }
+            if (this.MimeType != other.MimeType) { return false; }
+            if (this.Contents != other.Contents) { return false; }
+            if (this.Encoding != other.Encoding) { return false; }
+            if (this.SourceLanguage != other.SourceLanguage) { return false; }
+            if (this.LastModifiedTimeUtc != other.LastModifiedTimeUtc) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (Description != default(Message))
+                {
+                    result = (result * 31) + Description.GetHashCode();
+                }
+
+                if (Location != default(ArtifactLocation))
+                {
+                    result = (result * 31) + Location.GetHashCode();
+                }
+
+                if (ParentIndex != default(int))
+                {
+                    result = (result * 31) + ParentIndex.GetHashCode();
+                }
+
+                if (Offset != default(int))
+                {
+                    result = (result * 31) + Offset.GetHashCode();
+                }
+
+                if (Length != default(int))
+                {
+                    result = (result * 31) + Length.GetHashCode();
+                }
+
+                if (MimeType != default(string))
+                {
+                    result = (result * 31) + MimeType.GetHashCode();
+                }
+
+                if (Contents != default(ArtifactContent))
+                {
+                    result = (result * 31) + Contents.GetHashCode();
+                }
+
+                if (Encoding != default(string))
+                {
+                    result = (result * 31) + Encoding.GetHashCode();
+                }
+
+                if (SourceLanguage != default(string))
+                {
+                    result = (result * 31) + SourceLanguage.GetHashCode();
+                }
+
+                if (LastModifiedTimeUtc != default(DateTime))
+                {
+                    result = (result * 31) + LastModifiedTimeUtc.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Artifact);
+        }
+
+        public static bool operator ==(Artifact left, Artifact right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(Artifact left, Artifact right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
+
         #region IRow
         ITable IRow.Table => _table;
         int IRow.Index => _index;
@@ -199,8 +296,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<Artifact> ValueComparer => ArtifactEqualityComparer.Instance;
-        //public bool ValueEquals(Artifact other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<Artifact> ValueComparer => EqualityComparer<Artifact>.Default;
+        public bool ValueEquals(Artifact other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }

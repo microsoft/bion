@@ -44,45 +44,45 @@ namespace BSOA.Demo.Model
         { }
 
         public Region(
-			int startLine,
-			int startColumn,
-			int endLine,
-			int endColumn,
-			int byteOffset,
-			int byteLength,
-			int charOffset,
-			int charLength,
-			ArtifactContent snippet,
-			Message message,
-			string sourceLanguage
+            int startLine,
+            int startColumn,
+            int endLine,
+            int endColumn,
+            int byteOffset,
+            int byteLength,
+            int charOffset,
+            int charLength,
+            ArtifactContent snippet,
+            Message message,
+            string sourceLanguage
         ) : this(SarifLogBsoa.Current)
         {
-			StartLine = startLine;
-			StartColumn = startColumn;
-			EndLine = endLine;
-			EndColumn = endColumn;
-			ByteOffset = byteOffset;
-			ByteLength = byteLength;
-			CharOffset = charOffset;
-			CharLength = charLength;
-			Snippet = snippet;
-			Message = message;
-			SourceLanguage = sourceLanguage;
+            StartLine = startLine;
+            StartColumn = startColumn;
+            EndLine = endLine;
+            EndColumn = endColumn;
+            ByteOffset = byteOffset;
+            ByteLength = byteLength;
+            CharOffset = charOffset;
+            CharLength = charLength;
+            Snippet = snippet;
+            Message = message;
+            SourceLanguage = sourceLanguage;
         }
 
         public Region(Region other)
         {
-			StartLine = other.StartLine;
-			StartColumn = other.StartColumn;
-			EndLine = other.EndLine;
-			EndColumn = other.EndColumn;
-			ByteOffset = other.ByteOffset;
-			ByteLength = other.ByteLength;
-			CharOffset = other.CharOffset;
-			CharLength = other.CharLength;
-			Snippet = other.Snippet;
-			Message = other.Message;
-			SourceLanguage = other.SourceLanguage;
+            StartLine = other.StartLine;
+            StartColumn = other.StartColumn;
+            EndLine = other.EndLine;
+            EndColumn = other.EndColumn;
+            ByteOffset = other.ByteOffset;
+            ByteLength = other.ByteLength;
+            CharOffset = other.CharOffset;
+            CharLength = other.CharLength;
+            Snippet = other.Snippet;
+            Message = other.Message;
+            SourceLanguage = other.SourceLanguage;
         }
 
         [DataMember(Name = "startLine", IsRequired = false, EmitDefaultValue = false)]
@@ -180,6 +180,109 @@ namespace BSOA.Demo.Model
             set => _table.SourceLanguage[_index] = value;
         }
 
+        #region IEquatable<Region>
+        public bool Equals(Region other)
+        {
+            if (other == null) { return false; }
+
+            if (this.StartLine != other.StartLine) { return false; }
+            if (this.StartColumn != other.StartColumn) { return false; }
+            if (this.EndLine != other.EndLine) { return false; }
+            if (this.EndColumn != other.EndColumn) { return false; }
+            if (this.ByteOffset != other.ByteOffset) { return false; }
+            if (this.ByteLength != other.ByteLength) { return false; }
+            if (this.CharOffset != other.CharOffset) { return false; }
+            if (this.CharLength != other.CharLength) { return false; }
+            if (this.Snippet != other.Snippet) { return false; }
+            if (this.Message != other.Message) { return false; }
+            if (this.SourceLanguage != other.SourceLanguage) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (StartLine != default(int))
+                {
+                    result = (result * 31) + StartLine.GetHashCode();
+                }
+
+                if (StartColumn != default(int))
+                {
+                    result = (result * 31) + StartColumn.GetHashCode();
+                }
+
+                if (EndLine != default(int))
+                {
+                    result = (result * 31) + EndLine.GetHashCode();
+                }
+
+                if (EndColumn != default(int))
+                {
+                    result = (result * 31) + EndColumn.GetHashCode();
+                }
+
+                if (ByteOffset != default(int))
+                {
+                    result = (result * 31) + ByteOffset.GetHashCode();
+                }
+
+                if (ByteLength != default(int))
+                {
+                    result = (result * 31) + ByteLength.GetHashCode();
+                }
+
+                if (CharOffset != default(int))
+                {
+                    result = (result * 31) + CharOffset.GetHashCode();
+                }
+
+                if (CharLength != default(int))
+                {
+                    result = (result * 31) + CharLength.GetHashCode();
+                }
+
+                if (Snippet != default(ArtifactContent))
+                {
+                    result = (result * 31) + Snippet.GetHashCode();
+                }
+
+                if (Message != default(Message))
+                {
+                    result = (result * 31) + Message.GetHashCode();
+                }
+
+                if (SourceLanguage != default(string))
+                {
+                    result = (result * 31) + SourceLanguage.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Region);
+        }
+
+        public static bool operator ==(Region left, Region right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(Region left, Region right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
+
         #region IRow
         ITable IRow.Table => _table;
         int IRow.Index => _index;
@@ -213,8 +316,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<Region> ValueComparer => RegionEqualityComparer.Instance;
-        //public bool ValueEquals(Region other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<Region> ValueComparer => EqualityComparer<Region>.Default;
+        public bool ValueEquals(Region other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }

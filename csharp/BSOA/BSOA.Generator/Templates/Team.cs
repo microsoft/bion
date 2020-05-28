@@ -2,13 +2,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BSOA.Generator.Templates
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Team'
     /// </summary>
-    public partial class Team : IRow
+    public partial class Team : IRow, IEquatable<Team>
     {
         private TeamTable _table;
         private int _index;
@@ -31,18 +32,22 @@ namespace BSOA.Generator.Templates
         { }
 
         public Team(
-            // <ParameterList>
+            // <ArgumentList>
+            //  <Argument>
             long employeeId,
+            //  </Argument>
             DateTime whenFormed,
             SecurityPolicy joinPolicy,
             GroupAttributes attributes,
             Employee manager,
             IList<Employee> members
-            // </ParameterList>
+            // </ArgumentList>
         ) : this(CompanyDatabase.Current)
         {
             // <AssignmentList>
+            //  <Assignment>
             EmployeeId = employeeId;
+            //  </Assignment>
             WhenFormed = whenFormed;
             JoinPolicy = joinPolicy;
             Attributes = attributes;
@@ -54,7 +59,9 @@ namespace BSOA.Generator.Templates
         public Team(Team other)
         {
             // <OtherAssignmentList>
+            //  <OtherAssignment>
             EmployeeId = other.EmployeeId;
+            //  </OtherAssignment>
             WhenFormed = other.WhenFormed;
             JoinPolicy = other.JoinPolicy;
             Attributes = other.Attributes;
@@ -113,30 +120,66 @@ namespace BSOA.Generator.Templates
         //   </RefListColumn>
         // </Columns>
 
+        #region IEquatable<Team>
+        public bool Equals(Team other)
+        {
+            if (other == null) { return false; }
+
+            // <EqualsList>
+            //  <Equals>
+            if (this.EmployeeId != other.EmployeeId) { return false; }
+            //  </Equals>
+            if (this.WhenFormed != other.WhenFormed) { return false; }
+            if (this.JoinPolicy != other.JoinPolicy) { return false; }
+            if (this.Attributes != other.Attributes) { return false; }
+            if (this.Manager != other.Manager) { return false; }
+            if (this.Members != other.Members) { return false; }
+            // </EqualsList>
+
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
         public override int GetHashCode()
         {
             int result = 17;
 
             unchecked
             {
+                // <GetHashCodeList>
+                //  <GetHashCode>
                 if (EmployeeId != default(long))
                 {
                     result = (result * 31) + EmployeeId.GetHashCode();
                 }
 
-                result = (result * 31) + WhenFormed.GetHashCode();
-                result = (result * 31) + JoinPolicy.GetHashCode();
-                result = (result * 31) + Attributes.GetHashCode();
+                //  </GetHashCode>
+                if (WhenFormed != default(DateTime))
+                {
+                    result = (result * 31) + WhenFormed.GetHashCode();
+                }
+
+                if (JoinPolicy != default(SecurityPolicy))
+                {
+                    result = (result * 31) + JoinPolicy.GetHashCode();
+                }
+
+                if (Attributes != default(GroupAttributes))
+                {
+                    result = (result * 31) + Attributes.GetHashCode();
+                }
 
                 if (Manager != default(Employee))
                 {
                     result = (result * 31) + Manager.GetHashCode();
                 }
 
-                if (Members != null)
+                if (Members != default(IList<Employee>))
                 {
                     result = (result * 31) + Members.GetHashCode();
                 }
+                // </GetHashCodeList>
             }
 
             return result;
@@ -144,18 +187,19 @@ namespace BSOA.Generator.Templates
 
         public override bool Equals(object obj)
         {
-            Team other = obj as Team;
-            if (other == null) { return false; }
-
-            if (this.EmployeeId != other.EmployeeId) { return false; }
-            if (this.WhenFormed != other.WhenFormed) { return false; }
-            if (this.JoinPolicy != other.JoinPolicy) { return false; }
-            if (this.Attributes != other.Attributes) { return false; }
-            if (this.Manager != other.Manager) { return false; }
-            if (this.Members != other.Members) { return false; }
-
-            return true;
+            return Equals(obj as Team);
         }
+
+        public static bool operator ==(Team left, Team right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(Team left, Team right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
 
         #region IRow
         ITable IRow.Table => _table;

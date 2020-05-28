@@ -44,18 +44,18 @@ namespace BSOA.Demo.Model
         { }
 
         public Tool(
-			ToolComponent driver,
-			IList<ToolComponent> extensions
+            ToolComponent driver,
+            IList<ToolComponent> extensions
         ) : this(SarifLogBsoa.Current)
         {
-			Driver = driver;
-			Extensions = extensions;
+            Driver = driver;
+            Extensions = extensions;
         }
 
         public Tool(Tool other)
         {
-			Driver = other.Driver;
-			Extensions = other.Extensions;
+            Driver = other.Driver;
+            Extensions = other.Extensions;
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -71,6 +71,55 @@ namespace BSOA.Demo.Model
             get => _table.Database.ToolComponent.List(_table.Extensions[_index]);
             set => _table.Database.ToolComponent.List(_table.Extensions[_index]).SetTo(value);
         }
+
+        #region IEquatable<Tool>
+        public bool Equals(Tool other)
+        {
+            if (other == null) { return false; }
+
+            if (this.Driver != other.Driver) { return false; }
+            if (this.Extensions != other.Extensions) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (Driver != default(ToolComponent))
+                {
+                    result = (result * 31) + Driver.GetHashCode();
+                }
+
+                if (Extensions != default(IList<ToolComponent>))
+                {
+                    result = (result * 31) + Extensions.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Tool);
+        }
+
+        public static bool operator ==(Tool left, Tool right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(Tool left, Tool right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
 
         #region IRow
         ITable IRow.Table => _table;
@@ -105,8 +154,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<Tool> ValueComparer => ToolEqualityComparer.Instance;
-        //public bool ValueEquals(Tool other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<Tool> ValueComparer => EqualityComparer<Tool>.Default;
+        public bool ValueEquals(Tool other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }

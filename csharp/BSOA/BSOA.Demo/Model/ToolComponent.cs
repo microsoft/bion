@@ -44,15 +44,15 @@ namespace BSOA.Demo.Model
         { }
 
         public ToolComponent(
-			string name
+            string name
         ) : this(SarifLogBsoa.Current)
         {
-			Name = name;
+            Name = name;
         }
 
         public ToolComponent(ToolComponent other)
         {
-			Name = other.Name;
+            Name = other.Name;
         }
 
         [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]
@@ -63,6 +63,49 @@ namespace BSOA.Demo.Model
             get => _table.Name[_index];
             set => _table.Name[_index] = value;
         }
+
+        #region IEquatable<ToolComponent>
+        public bool Equals(ToolComponent other)
+        {
+            if (other == null) { return false; }
+
+            if (this.Name != other.Name) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (Name != default(string))
+                {
+                    result = (result * 31) + Name.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ToolComponent);
+        }
+
+        public static bool operator ==(ToolComponent left, ToolComponent right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(ToolComponent left, ToolComponent right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
 
         #region IRow
         ITable IRow.Table => _table;
@@ -97,8 +140,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<ToolComponent> ValueComparer => ToolComponentEqualityComparer.Instance;
-        //public bool ValueEquals(ToolComponent other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<ToolComponent> ValueComparer => EqualityComparer<ToolComponent>.Default;
+        public bool ValueEquals(ToolComponent other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }

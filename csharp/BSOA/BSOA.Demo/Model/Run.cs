@@ -44,21 +44,21 @@ namespace BSOA.Demo.Model
         { }
 
         public Run(
-			Tool tool,
-			IList<Artifact> artifacts,
-			IList<Result> results
+            Tool tool,
+            IList<Artifact> artifacts,
+            IList<Result> results
         ) : this(SarifLogBsoa.Current)
         {
-			Tool = tool;
-			Artifacts = artifacts;
-			Results = results;
+            Tool = tool;
+            Artifacts = artifacts;
+            Results = results;
         }
 
         public Run(Run other)
         {
-			Tool = other.Tool;
-			Artifacts = other.Artifacts;
-			Results = other.Results;
+            Tool = other.Tool;
+            Artifacts = other.Artifacts;
+            Results = other.Results;
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -81,6 +81,61 @@ namespace BSOA.Demo.Model
             get => _table.Database.Result.List(_table.Results[_index]);
             set => _table.Database.Result.List(_table.Results[_index]).SetTo(value);
         }
+
+        #region IEquatable<Run>
+        public bool Equals(Run other)
+        {
+            if (other == null) { return false; }
+
+            if (this.Tool != other.Tool) { return false; }
+            if (this.Artifacts != other.Artifacts) { return false; }
+            if (this.Results != other.Results) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (Tool != default(Tool))
+                {
+                    result = (result * 31) + Tool.GetHashCode();
+                }
+
+                if (Artifacts != default(IList<Artifact>))
+                {
+                    result = (result * 31) + Artifacts.GetHashCode();
+                }
+
+                if (Results != default(IList<Result>))
+                {
+                    result = (result * 31) + Results.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Run);
+        }
+
+        public static bool operator ==(Run left, Run right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(Run left, Run right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
 
         #region IRow
         ITable IRow.Table => _table;
@@ -115,8 +170,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<Run> ValueComparer => RunEqualityComparer.Instance;
-        //public bool ValueEquals(Run other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<Run> ValueComparer => EqualityComparer<Run>.Default;
+        public bool ValueEquals(Run other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }

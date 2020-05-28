@@ -44,30 +44,30 @@ namespace BSOA.Demo.Model
         { }
 
         public LogicalLocation(
-			string name,
-			int index,
-			string fullyQualifiedName,
-			string decoratedName,
-			int parentIndex,
-			string kind
+            string name,
+            int index,
+            string fullyQualifiedName,
+            string decoratedName,
+            int parentIndex,
+            string kind
         ) : this(SarifLogBsoa.Current)
         {
-			Name = name;
-			Index = index;
-			FullyQualifiedName = fullyQualifiedName;
-			DecoratedName = decoratedName;
-			ParentIndex = parentIndex;
-			Kind = kind;
+            Name = name;
+            Index = index;
+            FullyQualifiedName = fullyQualifiedName;
+            DecoratedName = decoratedName;
+            ParentIndex = parentIndex;
+            Kind = kind;
         }
 
         public LogicalLocation(LogicalLocation other)
         {
-			Name = other.Name;
-			Index = other.Index;
-			FullyQualifiedName = other.FullyQualifiedName;
-			DecoratedName = other.DecoratedName;
-			ParentIndex = other.ParentIndex;
-			Kind = other.Kind;
+            Name = other.Name;
+            Index = other.Index;
+            FullyQualifiedName = other.FullyQualifiedName;
+            DecoratedName = other.DecoratedName;
+            ParentIndex = other.ParentIndex;
+            Kind = other.Kind;
         }
 
         [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]
@@ -124,6 +124,79 @@ namespace BSOA.Demo.Model
             set => _table.Kind[_index] = value;
         }
 
+        #region IEquatable<LogicalLocation>
+        public bool Equals(LogicalLocation other)
+        {
+            if (other == null) { return false; }
+
+            if (this.Name != other.Name) { return false; }
+            if (this.Index != other.Index) { return false; }
+            if (this.FullyQualifiedName != other.FullyQualifiedName) { return false; }
+            if (this.DecoratedName != other.DecoratedName) { return false; }
+            if (this.ParentIndex != other.ParentIndex) { return false; }
+            if (this.Kind != other.Kind) { return false; }
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (Name != default(string))
+                {
+                    result = (result * 31) + Name.GetHashCode();
+                }
+
+                if (Index != default(int))
+                {
+                    result = (result * 31) + Index.GetHashCode();
+                }
+
+                if (FullyQualifiedName != default(string))
+                {
+                    result = (result * 31) + FullyQualifiedName.GetHashCode();
+                }
+
+                if (DecoratedName != default(string))
+                {
+                    result = (result * 31) + DecoratedName.GetHashCode();
+                }
+
+                if (ParentIndex != default(int))
+                {
+                    result = (result * 31) + ParentIndex.GetHashCode();
+                }
+
+                if (Kind != default(string))
+                {
+                    result = (result * 31) + Kind.GetHashCode();
+                }
+
+            }
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as LogicalLocation);
+        }
+
+        public static bool operator ==(LogicalLocation left, LogicalLocation right)
+        {
+            return (left == null ? right == null : left.Equals(right));
+        }
+
+        public static bool operator !=(LogicalLocation left, LogicalLocation right)
+        {
+            return (left == null ? right != null : !(left.Equals(right)));
+        }
+        #endregion
+
         #region IRow
         ITable IRow.Table => _table;
         int IRow.Index => _index;
@@ -157,8 +230,8 @@ namespace BSOA.Demo.Model
         }
         #endregion
 
-        //public static IEqualityComparer<LogicalLocation> ValueComparer => LogicalLocationEqualityComparer.Instance;
-        //public bool ValueEquals(LogicalLocation other) => ValueComparer.Equals(this, other);
-        //public int ValueGetHashCode() => ValueComparer.GetHashCode(this);
+        public static IEqualityComparer<LogicalLocation> ValueComparer => EqualityComparer<LogicalLocation>.Default;
+        public bool ValueEquals(LogicalLocation other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
     }
 }
