@@ -5,16 +5,16 @@ using System.Collections.Generic;
 namespace BSOA
 {
     /// <summary>
-    ///  NumberListConverter wraps a NumberList and converts it from the internal int (an index of some entity)
+    ///  TypedList wraps a NumberList and converts it from the internal int (an index of some entity)
     ///  to instances of the entity type for external use.
     /// </summary>
-    public class NumberListConverter<TItem> : IList<TItem>, IReadOnlyList<TItem>
+    public class TypedList<TItem> : IList<TItem>, IReadOnlyList<TItem>
     {
         private NumberList<int> _inner;
         private Func<int, TItem> _toInstance;
         private Func<TItem, int> _toIndex;
 
-        public NumberListConverter(NumberList<int> indices, Func<int, TItem> toInstance, Func<TItem, int> toIndex)
+        public TypedList(NumberList<int> indices, Func<int, TItem> toInstance, Func<TItem, int> toIndex)
         {
             _inner = indices;
             _toInstance = toInstance;

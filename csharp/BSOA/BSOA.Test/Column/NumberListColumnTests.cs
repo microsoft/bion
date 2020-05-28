@@ -100,7 +100,7 @@ namespace BSOA.Test
 
             // Verify second value is in a shared array, not at index zero, not expandable (yet), not ReadOnly
             NumberList<int> innerSlice = column[1];
-            NumberListConverter<int> slice = new NumberListConverter<int>(innerSlice, (index) => index, (index) => index);
+            TypedList<int> slice = new TypedList<int>(innerSlice, (index) => index, (index) => index);
 
             // Test second sample row slice IList members on NumberListConverter
             IList.Basics(slice, (index) => index % 20);
@@ -111,7 +111,7 @@ namespace BSOA.Test
             Assert.Equal(values, string.Join(", ", column[1]));
 
             // SetTo(other)
-            NumberListConverter<int> firstRow = new NumberListConverter<int>(column[0], (index) => index, (index) => index);
+            TypedList<int> firstRow = new TypedList<int>(column[0], (index) => index, (index) => index);
             slice.SetTo(firstRow);
             Assert.Equal(string.Join(", ", firstRow), string.Join(", ", slice));
 
