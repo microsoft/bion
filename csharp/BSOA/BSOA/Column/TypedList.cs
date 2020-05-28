@@ -116,12 +116,22 @@ namespace BSOA
 
         public static bool operator ==(TypedList<TItem> left, TypedList<TItem> right)
         {
-            return (left == null ? right == null : left.Equals(right));
+            if (object.ReferenceEquals(left, null))
+            {
+                return object.ReferenceEquals(right, null);
+            }
+
+            return left.Equals(right);
         }
 
         public static bool operator !=(TypedList<TItem> left, TypedList<TItem> right)
         {
-            return (left == null ? right != null : !(left.Equals(right)));
+            if (object.ReferenceEquals(left, null))
+            {
+                return !object.ReferenceEquals(right, null);
+            }
+
+            return !left.Equals(right);
         }
     }
 }

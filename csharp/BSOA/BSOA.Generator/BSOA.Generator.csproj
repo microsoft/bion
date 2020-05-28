@@ -7,13 +7,9 @@
 
   <ItemGroup>
     <Compile Remove="Templates\Sarif\Team.cs" />
-    <Compile Remove="Templates\Sarif\TeamEqualityComparer.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Templates\Sarif\TeamEqualityComparer.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Templates\Sarif\Team.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

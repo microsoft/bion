@@ -192,12 +192,22 @@ namespace BSOA.Generator.Templates
 
         public static bool operator ==(Team left, Team right)
         {
-            return (left == null ? right == null : left.Equals(right));
+            if (object.ReferenceEquals(left, null))
+            {
+                return object.ReferenceEquals(right, null);
+            }
+
+            return left.Equals(right);
         }
 
         public static bool operator !=(Team left, Team right)
         {
-            return (left == null ? right != null : !(left.Equals(right)));
+            if (object.ReferenceEquals(left, null))
+            {
+                return !object.ReferenceEquals(right, null);
+            }
+
+            return !left.Equals(right);
         }
         #endregion
 

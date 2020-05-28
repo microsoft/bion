@@ -134,12 +134,22 @@ namespace BSOA.Demo.Model
 
         public static bool operator ==(Message left, Message right)
         {
-            return (left == null ? right == null : left.Equals(right));
+            if (object.ReferenceEquals(left, null))
+            {
+                return object.ReferenceEquals(right, null);
+            }
+
+            return left.Equals(right);
         }
 
         public static bool operator !=(Message left, Message right)
         {
-            return (left == null ? right != null : !(left.Equals(right)));
+            if (object.ReferenceEquals(left, null))
+            {
+                return !object.ReferenceEquals(right, null);
+            }
+
+            return !left.Equals(right);
         }
         #endregion
 
