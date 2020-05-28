@@ -1,74 +1,130 @@
-﻿using BSOA.Model;
+using BSOA.Model;
+
 using System;
+using System.Collections.Generic;
 
 namespace BSOA.Test.Model.V2
 {
     /// <summary>
-    ///  Person (V2) shows a change to Person - replacing 'Age' with 'Birthdate'
+    ///  GENERATED: BSOA Entity for 'Person'
     /// </summary>
-    public class Person : IRow
+    public partial class Person : IRow, IEquatable<Person>
     {
-        private PersonTable Table { get; set; }
-        private int Index { get; set; }
+        private PersonTable _table;
+        private int _index;
 
-        public Person() : this(PersonDatabase.Current)
-        { }
-
-        public Person(PersonDatabase database) : this(database.Person)
-        { }
+        internal Person(PersonTable table, int index)
+        {
+            this._table = table;
+            this._index = index;
+        }
 
         public Person(PersonTable table) : this(table, table.Count)
         {
             table.Add();
         }
 
-        internal Person(PersonTable table, int index)
+        public Person(PersonDatabase database) : this(database.Person)
+        { }
+
+        public Person() : this(PersonDatabase.Current)
+        { }
+
+        public Person(
+            DateTime birthdate,
+            string name
+        ) : this(PersonDatabase.Current)
         {
-            this.Table = table;
-            this.Index = index;
+            Birthdate = birthdate;
+            Name = name;
         }
 
-        ITable IRow.Table => Table;
-        int IRow.Index => Index;
-
-        void IRow.Reset(ITable table, int index)
+        public Person(Person other)
         {
-            Table = (PersonTable)table;
-            Index = index;
+            Birthdate = other.Birthdate;
+            Name = other.Name;
         }
-
-        // Properties for each column get and set array entries in the columns
-
-        //public byte Age
-        //{
-        //    get => Table.Age[Index];
-        //    set => Table.Age[Index] = value;
-        //}
 
         public DateTime Birthdate
         {
-            get => Table.Birthdate[Index];
-            set => Table.Birthdate[Index] = value;
+            get => _table.Birthdate[_index];
+            set => _table.Birthdate[_index] = value;
         }
 
         public string Name
         {
-            get => Table.Name[Index];
-            set => Table.Name[Index] = value;
+            get => _table.Name[_index];
+            set => _table.Name[_index] = value;
         }
 
-        // Not required; these overrides facilitate unit tests
-        public override bool Equals(object obj)
+        #region IEquatable<Person>
+        public bool Equals(Person other)
         {
-            if (obj == null || !(obj is Person)) { return false; }
+            if (other == null) { return false; }
 
-            Person other = obj as Person;
-            return this.Birthdate.Equals(other.Birthdate) && this.Name.Equals(other.Name);
+            if (this.Birthdate != other.Birthdate) { return false; }
+            if (this.Name != other.Name) { return false; }
+            return true;
         }
+        #endregion
 
+        #region Object overrides
         public override int GetHashCode()
         {
-            return this.Birthdate.GetHashCode() ^ this.Name.GetHashCode();
+            int result = 17;
+
+            unchecked
+            {
+                if (Birthdate != default(DateTime))
+                {
+                    result = (result * 31) + Birthdate.GetHashCode();
+                }
+
+                if (Name != default(string))
+                {
+                    result = (result * 31) + Name.GetHashCode();
+                }
+
+            }
+
+            return result;
         }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Person);
+        }
+
+        public static bool operator ==(Person left, Person right)
+        {
+            if (object.ReferenceEquals(left, null))
+            {
+                return object.ReferenceEquals(right, null);
+            }
+
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Person left, Person right)
+        {
+            if (object.ReferenceEquals(left, null))
+            {
+                return !object.ReferenceEquals(right, null);
+            }
+
+            return !left.Equals(right);
+        }
+        #endregion
+
+        #region IRow
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
+
+        void IRow.Reset(ITable table, int index)
+        {
+            _table = (PersonTable)table;
+            _index = index;
+        }
+        #endregion
     }
 }

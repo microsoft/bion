@@ -2,7 +2,9 @@
 using BSOA.Generator.Schema;
 using BSOA.Json;
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace BSOA.Generator
 {
@@ -10,16 +12,26 @@ namespace BSOA.Generator
     {
         static void Main(string[] args)
         {
-            Database db = AsJson.Load<Database>(@"..\..\..\BsoaDemo.schema.json");
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: BSOA.Generator <SchemaJsonFile> <OutputFolder> [<EntityTemplate>]?");
+                return;
+            }
+
+            string schemaPath = args[0];
+            string outputFolder = (args.Length > 1 ? args[1] : @"Model");
+            string entityTemplatePath = (args.Length > 2 ? args[2] : @"Templates\Team.cs");
+
+            Database db = AsJson.Load<Database>(schemaPath);
+            Directory.CreateDirectory(outputFolder);
 
             List<ICodeGenerator> generators = new List<ICodeGenerator>()
             {
                 new DatabaseModel(),
                 new TableModel(),
-                new EntityModel(@"Templates\\Sarif\\Team.cs")
+                new EntityModel(entityTemplatePath)
             };
 
-            string outputFolder = @"..\..\..\..\BSOA.Demo\Model";
             foreach (ICodeGenerator generator in generators)
             {
                 generator.Generate(db, outputFolder);
@@ -30,7 +42,7 @@ namespace BSOA.Generator
         {
             Database db = new Database("SarifLogBsoa", "BSOA.Demo.Model");
             Table table;
-            
+
             table = new Table("Artifact");
             table.Columns.Add(Schema.Column.Ref("Description", "Message"));
             table.Columns.Add(Schema.Column.Ref("Location", "ArtifactLocation"));
@@ -113,12 +125,12 @@ namespace BSOA.Generator
             table.Columns.Add(Schema.Column.RefList("Artifacts", "Artifact"));
             table.Columns.Add(Schema.Column.RefList("Results", "Result"));
             db.Tables.Add(table);
-          
+
             table = new Table("Tool");
             table.Columns.Add(Schema.Column.Ref("Driver", "ToolComponent"));
             table.Columns.Add(Schema.Column.RefList("Extensions", "ToolComponent"));
             db.Tables.Add(table);
-                
+
             table = new Table("ToolComponent");
             table.Columns.Add(Schema.Column.Simple("Name", "string"));
             db.Tables.Add(table);

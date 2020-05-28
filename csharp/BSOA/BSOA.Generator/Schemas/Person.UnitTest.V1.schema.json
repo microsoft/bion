@@ -1,0 +1,21 @@
+{
+  "name": "PersonDatabase",
+  "namespace": "BSOA.Test.Model.V1",
+  "tables": [
+    {
+      "name": "Person",
+      "columns": [
+        {
+          "category": "Simple",
+          "name": "Age",
+          "type": "byte"
+        },
+        {
+          "category": "Simple",
+          "name": "Name",
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}

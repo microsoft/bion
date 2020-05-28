@@ -1,0 +1,21 @@
+{
+  "name": "PersonDatabase",
+  "namespace": "BSOA.Test.Model.V2",
+  "tables": [
+    {
+      "name": "Person",
+      "columns": [
+        {
+          "category": "DateTime",
+          "name": "Birthdate",
+          "type": "DateTime"
+        },
+        {
+          "category": "Simple",
+          "name": "Name",
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}

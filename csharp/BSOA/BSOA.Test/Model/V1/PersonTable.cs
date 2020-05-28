@@ -1,35 +1,25 @@
-﻿using BSOA.Column;
+using BSOA.Column;
 using BSOA.Model;
+using System;
 
 namespace BSOA.Test.Model.V1
 {
     /// <summary>
-    ///  PersonTable is an example of a SoA table type.
+    ///  GENERATED: BSOA Table for 'Person' entity.
     /// </summary>
-    /// <remarks>
-    ///  - Has strongly typed column properties for instant access by item struct properties.
-    ///  - Controls column construction (types and defaults).
-    ///  - Calls AddColumn on columns (so base class can manage serialization)
-    ///  - Provides indexer (controls construction of item instances).
-    /// </remarks>
-    public class PersonTable : Table<Person>
+    public partial class PersonTable : Table<Person>
     {
-        // Tables need Database reference (so items with only table reference can refer to items in other tables)
         internal PersonDatabase Database;
 
-        // Table needs hardcoded properties for each column
         internal IColumn<byte> Age;
         internal IColumn<string> Name;
 
-        // Table constructor creates columns with the desired types and defaults.
-        // Column names will be serialized and must be kept stable to maintain file compatibility.
         public PersonTable(PersonDatabase database) : base()
         {
             Database = database;
 
-            // NOTE: All columns must be passed to 'AddColumn' so the base class can serialize them
-            Age = AddColumn(nameof(Age), new NumberColumn<byte>(0));
-            Name = AddColumn(nameof(Name), new StringColumn());
+            Age = AddColumn(nameof(Age), ColumnFactory.Build<byte>());
+            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>());
         }
 
         public override Person Get(int index)

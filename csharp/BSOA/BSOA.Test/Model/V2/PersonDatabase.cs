@@ -1,15 +1,20 @@
-﻿using BSOA.Model;
+using BSOA.Model;
 
 namespace BSOA.Test.Model.V2
 {
-    public class PersonDatabase : Database
+    /// <summary>
+    ///  GENERATED: BSOA Database
+    /// </summary>
+    public partial class PersonDatabase : Database
     {
-        public static PersonDatabase Current { get; private set; }
-        public PersonTable Person { get; }
+        internal static PersonDatabase Current { get; private set; }
+
+        internal PersonTable Person { get; }
 
         public PersonDatabase()
         {
             Current = this;
+
             Person = AddTable(nameof(Person), new PersonTable(this));
         }
     }
