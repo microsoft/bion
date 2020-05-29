@@ -11,7 +11,7 @@ namespace BSOA.Generator.Templates
     {
         internal CompanyDatabase Database;
 
-        // <ColumnMembers>
+        // <ColumnMemberList>
         // <SimpleColumnMember>
         internal IColumn<long> EmployeeId;
         // </SimpleColumnMember>
@@ -30,13 +30,13 @@ namespace BSOA.Generator.Templates
         // <RefListColumnMember>
         internal RefListColumn Members;
         // </RefListColumnMember>
-        // </ColumnMembers>
+        // </ColumnMemberList>
 
         public TeamTable(CompanyDatabase database) : base()
         {
             Database = database;
 
-            // <ColumnConstructors>
+            // <ColumnConstructorList>
 
             // <SimpleColumnConstructor>
             EmployeeId = AddColumn(nameof(EmployeeId), ColumnFactory.Build<long>(-1));
@@ -62,7 +62,7 @@ namespace BSOA.Generator.Templates
             Members = AddColumn(nameof(Members), new RefListColumn(nameof(CompanyDatabase.Employee)));
             // </RefListColumnConstructor>
 
-            // </ColumnConstructors>
+            // </ColumnConstructorList>
         }
 
         public override Team Get(int index)

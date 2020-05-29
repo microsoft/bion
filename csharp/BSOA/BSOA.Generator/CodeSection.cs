@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BSOA.Generator.Generation;
+
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -20,14 +22,14 @@ namespace BSOA.Generator
             //  - Line with "       // </MarkerName>"
             //  - Subsequent whitespace only line, if present
 
-            return $"(^[ \t]*//[ \t]+<{markerName}>[^\n]*\n)(?<Content>.*?)([ \t]*//[ \t]+</{markerName}>[^\n]*\n([ \t\r]*\n)?)";
+            return $"(^[ \t]*//[ \t]+<{markerName}>[^\n]*\n)(?<Content>.*?)([ \t]*//[ \t]+</{markerName}>[^\n]*\n)";
         }
 
         public static Dictionary<string, string> AllTemplates(string code)
         {
             Dictionary<string, string> templates = new Dictionary<string, string>();
 
-            foreach(string templateName in AllTemplateNames(code))
+            foreach (string templateName in AllTemplateNames(code))
             {
                 templates[templateName] = Extract(code, templateName);
             }
@@ -39,7 +41,7 @@ namespace BSOA.Generator
         {
             List<string> results = new List<string>();
 
-            foreach (Match match in Regex.Matches(code, $"^[ \t]*//[ \t]+<([^ />]+)>[^\n]$", Options))
+            foreach (Match match in Regex.Matches(code, $"^[ \t]*//[ \t]+<([^ />]+)>[^\n]*$", Options))
             {
                 results.Add(match.Groups[1].Value);
             }
@@ -68,6 +70,56 @@ namespace BSOA.Generator
         public static string Remove(string code, string markerName)
         {
             return Replace(code, markerName, "");
+        }
+
+        public static string Populate(Dictionary<string, string> templates, string templateName, Schema.Column column)
+        {
+            string template;
+            Schema.Column columnInTemplate;
+
+            // Use a category-specific template, if found
+            if (templates.TryGetValue($"{column.Category}{templateName}", out template))
+            {
+                if (!TemplateDefaults.Columns.TryGetValue(column.Category, out columnInTemplate))
+                {
+                    throw new NotImplementedException($"Populate not implemented with defaults to replace for category {column.Category} ({column.Name})");
+                }
+
+                return Populate(template, columnInTemplate, column);
+            }
+
+            // Otherwise, use a non-specific template (using the Simple column defaults)
+            if (templates.TryGetValue(templateName, out template))
+            {
+                return Populate(template, TemplateDefaults.Columns[Schema.ColumnTypeCategory.Simple], column);
+            }
+
+            throw new NotSupportedException($"Could not find template '{column.Category}{templateName}' or '{templateName}' in collection: ({string.Join(", ", templates.Keys)}");
+        }
+
+        public static string Populate(string template, Schema.Column columnInTemplate, Schema.Column column)
+        {
+            string populated = template
+                .Replace(columnInTemplate.Name, column.Name)
+                .Replace(CamelCase(columnInTemplate.Name), CamelCase(column.Name))
+                .Replace(columnInTemplate.Type, column.Type);
+
+            if (columnInTemplate.UnderlyingType != null)
+            {
+                populated = populated.Replace(columnInTemplate.UnderlyingType, column.UnderlyingType);
+            }
+
+            if (columnInTemplate.Default != null)
+            {
+                populated = populated.Replace(columnInTemplate.Default, column.Default ?? "null");
+            }
+
+            return populated;
+        }
+
+        public static string CamelCase(string value)
+        {
+            return Char.ToLowerInvariant(value[0]) + value.Substring(1);
         }
     }
 }

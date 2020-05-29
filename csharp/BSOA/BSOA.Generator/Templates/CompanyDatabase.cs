@@ -9,27 +9,23 @@ namespace BSOA.Generator.Templates
     {
         internal static CompanyDatabase Current { get; private set; }
 
-        // <TableMembers>
+        // <TableMemberList>
         //   <TableMember>
         internal EmployeeTable Employee { get; }
         //   </TableMember>
         internal TeamTable Team { get; }
-        // </TableMembers>
-
-        // <Properties>
-        public ILimitedList<Team> Teams => Team;
-        // </Properties>
+        // </TableMemberList>
 
         public CompanyDatabase()
         {
             Current = this;
 
-            // <TableConstructors>
+            // <TableConstructorList>
             //   <TableConstructor>
             Employee = AddTable(nameof(Employee), new EmployeeTable(this));
             //   </TableConstructor>
             Team = AddTable(nameof(Team), new TeamTable(this));
-            // </TableConstructors>
+            // </TableConstructorList>
         }
     }
 }

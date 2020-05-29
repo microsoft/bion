@@ -69,13 +69,14 @@ namespace BSOA.Generator.Templates
             // </OtherAssignmentList>
         }
 
-        // <Columns>
+        // <ColumnList>
         //   <SimpleColumn>
         public long EmployeeId
         {
             get => _table.EmployeeId[_index];
             set => _table.EmployeeId[_index] = value;
         }
+
         //   </SimpleColumn>
 
         //   <DateTimeColumn>
@@ -84,6 +85,7 @@ namespace BSOA.Generator.Templates
             get => _table.WhenFormed[_index];
             set => _table.WhenFormed[_index] = value;
         }
+
         //   </DateTimeColumn>
 
         //   <EnumColumn>
@@ -92,6 +94,7 @@ namespace BSOA.Generator.Templates
             get => (SecurityPolicy)_table.JoinPolicy[_index];
             set => _table.JoinPolicy[_index] = (byte)value;
         }
+
         //   </EnumColumn>
 
         //   <FlagsEnumColumn>
@@ -100,6 +103,7 @@ namespace BSOA.Generator.Templates
             get => (GroupAttributes)_table.Attributes[_index];
             set => _table.Attributes[_index] = (long)value;
         }
+
         //   </FlagsEnumColumn>
 
         //   <RefColumn>
@@ -108,6 +112,7 @@ namespace BSOA.Generator.Templates
             get => _table.Database.Employee.Get(_table.Manager[_index]);
             set => _table.Manager[_index] = _table.Database.Employee.LocalIndex(value);
         }
+
         //   </RefColumn>
 
         //   <RefListColumn>
@@ -116,8 +121,9 @@ namespace BSOA.Generator.Templates
             get => _table.Database.Employee.List(_table.Members[_index]);
             set => _table.Database.Employee.List(_table.Members[_index]).SetTo(value);
         }
+
         //   </RefListColumn>
-        // </Columns>
+        // </ColumnList>
 
         #region IEquatable<Team>
         public bool Equals(Team other)
