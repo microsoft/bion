@@ -78,7 +78,6 @@ namespace BSOA.Generator.Templates
         }
 
         //   </SimpleColumn>
-
         //   <DateTimeColumn>
         public DateTime WhenFormed
         {
@@ -87,7 +86,6 @@ namespace BSOA.Generator.Templates
         }
 
         //   </DateTimeColumn>
-
         //   <EnumColumn>
         public SecurityPolicy JoinPolicy
         {
@@ -96,7 +94,6 @@ namespace BSOA.Generator.Templates
         }
 
         //   </EnumColumn>
-
         //   <FlagsEnumColumn>
         public GroupAttributes Attributes
         {
@@ -105,7 +102,6 @@ namespace BSOA.Generator.Templates
         }
 
         //   </FlagsEnumColumn>
-
         //   <RefColumn>
         public Employee Manager
         {
@@ -114,7 +110,6 @@ namespace BSOA.Generator.Templates
         }
 
         //   </RefColumn>
-
         //   <RefListColumn>
         public IList<Employee> Members
         {
@@ -140,7 +135,6 @@ namespace BSOA.Generator.Templates
             if (this.Manager != other.Manager) { return false; }
             if (this.Members != other.Members) { return false; }
             // </EqualsList>
-
             return true;
         }
         #endregion
@@ -185,6 +179,7 @@ namespace BSOA.Generator.Templates
                     result = (result * 31) + Members.GetHashCode();
                 }
                 // </GetHashCodeList>
+
             }
 
             return result;

@@ -99,10 +99,11 @@ namespace BSOA.Generator
 
         public static string Populate(string template, Schema.Column columnInTemplate, Schema.Column column)
         {
-            string populated = template
-                .Replace(columnInTemplate.Name, column.Name)
-                .Replace(CamelCase(columnInTemplate.Name), CamelCase(column.Name))
-                .Replace(columnInTemplate.Type, column.Type);
+            // Populate by replacing default values.
+            
+            // Replace type, default, table name first to avoid string.Replace errors 
+            // if the column name or type is contained within those values.
+            string populated = template;
 
             if (columnInTemplate.UnderlyingType != null)
             {
@@ -113,6 +114,16 @@ namespace BSOA.Generator
             {
                 populated = populated.Replace(columnInTemplate.Default, column.Default ?? "null");
             }
+
+            if (columnInTemplate.ReferencedTableName != null)
+            {
+                populated = populated.Replace(columnInTemplate.ReferencedTableName, column.ReferencedTableName);
+            }
+
+            populated = populated
+                .Replace(columnInTemplate.Type, column.Type)
+                .Replace(columnInTemplate.Name, column.Name)
+                .Replace(CamelCase(columnInTemplate.Name), CamelCase(column.Name));
 
             return populated;
         }

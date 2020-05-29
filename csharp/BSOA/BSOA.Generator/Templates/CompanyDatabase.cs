@@ -10,10 +10,10 @@ namespace BSOA.Generator.Templates
         internal static CompanyDatabase Current { get; private set; }
 
         // <TableMemberList>
-        //   <TableMember>
         internal EmployeeTable Employee { get; }
-        //   </TableMember>
+        //   <TableMember>
         internal TeamTable Team { get; }
+        //   </TableMember>
         // </TableMemberList>
 
         public CompanyDatabase()
@@ -21,10 +21,10 @@ namespace BSOA.Generator.Templates
             Current = this;
 
             // <TableConstructorList>
-            //   <TableConstructor>
             Employee = AddTable(nameof(Employee), new EmployeeTable(this));
-            //   </TableConstructor>
+            //   <TableConstructor>
             Team = AddTable(nameof(Team), new TeamTable(this));
+            //   </TableConstructor>
             // </TableConstructorList>
         }
     }

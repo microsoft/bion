@@ -94,7 +94,6 @@ namespace BSOA.Generator.Templates
         }
 
         //   </SimpleColumn>
-
         //   <DateTimeColumn>
         [DataMember(Name = "whenFormed", IsRequired = false, EmitDefaultValue = false)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -106,7 +105,6 @@ namespace BSOA.Generator.Templates
         }
 
         //   </DateTimeColumn>
-
         //   <EnumColumn>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
@@ -117,8 +115,7 @@ namespace BSOA.Generator.Templates
         }
 
         //   </EnumColumn>
-
-        //   <EnumColumn>
+        //   <FlagsEnumColumn>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.FlagsEnumConverter))]
         public GroupAttributes Attributes
@@ -127,8 +124,7 @@ namespace BSOA.Generator.Templates
             set => _table.Attributes[_index] = (long)value;
         }
 
-        //   </EnumColumn>
-
+        //   </FlagsEnumColumn>
         //   <RefColumn>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Employee Manager
@@ -138,7 +134,6 @@ namespace BSOA.Generator.Templates
         }
 
         //   </RefColumn>
-
         //   <RefListColumn>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public IList<Employee> Members
@@ -149,7 +144,6 @@ namespace BSOA.Generator.Templates
 
         //   </RefListColumn>
         // </ColumnList>
-
 
         #region IEquatable<Team>
         public bool Equals(Team other)
@@ -166,7 +160,6 @@ namespace BSOA.Generator.Templates
             if (this.Manager != other.Manager) { return false; }
             if (this.Members != other.Members) { return false; }
             // </EqualsList>
-
             return true;
         }
         #endregion
@@ -211,6 +204,7 @@ namespace BSOA.Generator.Templates
                     result = (result * 31) + Members.GetHashCode();
                 }
                 // </GetHashCodeList>
+
             }
 
             return result;
