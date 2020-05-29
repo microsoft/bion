@@ -79,6 +79,7 @@ namespace BSOA.Demo.Model
 
             if (this.Driver != other.Driver) { return false; }
             if (this.Extensions != other.Extensions) { return false; }
+
             return true;
         }
         #endregion
@@ -99,7 +100,6 @@ namespace BSOA.Demo.Model
                 {
                     result = (result * 31) + Extensions.GetHashCode();
                 }
-
             }
 
             return result;

@@ -181,6 +181,7 @@ namespace BSOA.Demo.Model
             if (this.Encoding != other.Encoding) { return false; }
             if (this.SourceLanguage != other.SourceLanguage) { return false; }
             if (this.LastModifiedTimeUtc != other.LastModifiedTimeUtc) { return false; }
+
             return true;
         }
         #endregion
@@ -241,7 +242,6 @@ namespace BSOA.Demo.Model
                 {
                     result = (result * 31) + LastModifiedTimeUtc.GetHashCode();
                 }
-
             }
 
             return result;

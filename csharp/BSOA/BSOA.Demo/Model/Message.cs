@@ -96,6 +96,7 @@ namespace BSOA.Demo.Model
             if (this.Text != other.Text) { return false; }
             if (this.Markdown != other.Markdown) { return false; }
             if (this.Id != other.Id) { return false; }
+
             return true;
         }
         #endregion
@@ -121,7 +122,6 @@ namespace BSOA.Demo.Model
                 {
                     result = (result * 31) + Id.GetHashCode();
                 }
-
             }
 
             return result;

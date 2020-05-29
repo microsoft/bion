@@ -107,6 +107,7 @@ namespace BSOA.Demo.Model
             if (this.UriBaseId != other.UriBaseId) { return false; }
             if (this.Index != other.Index) { return false; }
             if (this.Description != other.Description) { return false; }
+
             return true;
         }
         #endregion
@@ -137,7 +138,6 @@ namespace BSOA.Demo.Model
                 {
                     result = (result * 31) + Description.GetHashCode();
                 }
-
             }
 
             return result;

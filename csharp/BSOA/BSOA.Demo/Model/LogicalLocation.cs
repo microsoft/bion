@@ -135,6 +135,7 @@ namespace BSOA.Demo.Model
             if (this.DecoratedName != other.DecoratedName) { return false; }
             if (this.ParentIndex != other.ParentIndex) { return false; }
             if (this.Kind != other.Kind) { return false; }
+
             return true;
         }
         #endregion
@@ -175,7 +176,6 @@ namespace BSOA.Demo.Model
                 {
                     result = (result * 31) + Kind.GetHashCode();
                 }
-
             }
 
             return result;

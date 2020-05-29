@@ -70,6 +70,7 @@ namespace BSOA.Demo.Model
             if (other == null) { return false; }
 
             if (this.Name != other.Name) { return false; }
+
             return true;
         }
         #endregion
@@ -85,7 +86,6 @@ namespace BSOA.Demo.Model
                 {
                     result = (result * 31) + Name.GetHashCode();
                 }
-
             }
 
             return result;

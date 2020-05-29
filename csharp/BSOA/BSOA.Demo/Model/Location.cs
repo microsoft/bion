@@ -114,6 +114,7 @@ namespace BSOA.Demo.Model
             if (this.LogicalLocations != other.LogicalLocations) { return false; }
             if (this.Message != other.Message) { return false; }
             if (this.Annotations != other.Annotations) { return false; }
+
             return true;
         }
         #endregion
@@ -149,7 +150,6 @@ namespace BSOA.Demo.Model
                 {
                     result = (result * 31) + Annotations.GetHashCode();
                 }
-
             }
 
             return result;

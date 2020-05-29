@@ -64,6 +64,7 @@ namespace BSOA.Test.Model.V2
 
             if (this.Birthdate != other.Birthdate) { return false; }
             if (this.Name != other.Name) { return false; }
+
             return true;
         }
         #endregion
@@ -84,7 +85,6 @@ namespace BSOA.Test.Model.V2
                 {
                     result = (result * 31) + Name.GetHashCode();
                 }
-
             }
 
             return result;

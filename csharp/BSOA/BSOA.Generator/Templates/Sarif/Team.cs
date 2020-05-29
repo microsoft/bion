@@ -160,6 +160,7 @@ namespace BSOA.Generator.Templates
             if (this.Manager != other.Manager) { return false; }
             if (this.Members != other.Members) { return false; }
             // </EqualsList>
+
             return true;
         }
         #endregion
@@ -204,7 +205,6 @@ namespace BSOA.Generator.Templates
                     result = (result * 31) + Members.GetHashCode();
                 }
                 // </GetHashCodeList>
-
             }
 
             return result;

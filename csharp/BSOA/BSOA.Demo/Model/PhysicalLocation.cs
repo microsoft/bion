@@ -90,6 +90,7 @@ namespace BSOA.Demo.Model
             if (this.ArtifactLocation != other.ArtifactLocation) { return false; }
             if (this.Region != other.Region) { return false; }
             if (this.ContextRegion != other.ContextRegion) { return false; }
+
             return true;
         }
         #endregion
@@ -115,7 +116,6 @@ namespace BSOA.Demo.Model
                 {
                     result = (result * 31) + ContextRegion.GetHashCode();
                 }
-
             }
 
             return result;

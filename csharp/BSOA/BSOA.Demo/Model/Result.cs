@@ -130,6 +130,7 @@ namespace BSOA.Demo.Model
             if (this.Message != other.Message) { return false; }
             if (this.Locations != other.Locations) { return false; }
             if (this.Guid != other.Guid) { return false; }
+
             return true;
         }
         #endregion
@@ -170,7 +171,6 @@ namespace BSOA.Demo.Model
                 {
                     result = (result * 31) + Guid.GetHashCode();
                 }
-
             }
 
             return result;

@@ -83,6 +83,7 @@ namespace BSOA.Demo.Model
 
             if (this.Text != other.Text) { return false; }
             if (this.Binary != other.Binary) { return false; }
+
             return true;
         }
         #endregion
@@ -103,7 +104,6 @@ namespace BSOA.Demo.Model
                 {
                     result = (result * 31) + Binary.GetHashCode();
                 }
-
             }
 
             return result;

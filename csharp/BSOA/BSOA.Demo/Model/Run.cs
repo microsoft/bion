@@ -90,6 +90,7 @@ namespace BSOA.Demo.Model
             if (this.Tool != other.Tool) { return false; }
             if (this.Artifacts != other.Artifacts) { return false; }
             if (this.Results != other.Results) { return false; }
+
             return true;
         }
         #endregion
@@ -115,7 +116,6 @@ namespace BSOA.Demo.Model
                 {
                     result = (result * 31) + Results.GetHashCode();
                 }
-
             }
 
             return result;
