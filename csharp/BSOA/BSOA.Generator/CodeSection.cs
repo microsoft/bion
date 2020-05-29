@@ -112,7 +112,7 @@ namespace BSOA.Generator
 
             if (columnInTemplate.Default != null)
             {
-                populated = populated.Replace(columnInTemplate.Default, column.Default ?? "null");
+                populated = populated.Replace(columnInTemplate.Default, column.Default ?? "");
             }
 
             if (columnInTemplate.ReferencedTableName != null)
