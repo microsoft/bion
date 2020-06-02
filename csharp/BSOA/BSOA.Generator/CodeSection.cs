@@ -1,4 +1,5 @@
-﻿using BSOA.Generator.Generation;
+﻿using BSOA.Generator.Extensions;
+using BSOA.Generator.Generation;
 
 using System;
 using System.Collections.Generic;
@@ -123,14 +124,9 @@ namespace BSOA.Generator
             populated = populated
                 .Replace(columnInTemplate.Type, column.Type)
                 .Replace(columnInTemplate.Name, column.Name)
-                .Replace(CamelCase(columnInTemplate.Name), CamelCase(column.Name));
+                .Replace(columnInTemplate.Name.ToCamelCase(), column.Name.ToCamelCase());
 
             return populated;
-        }
-
-        public static string CamelCase(string value)
-        {
-            return Char.ToLowerInvariant(value[0]) + value.Substring(1);
         }
     }
 }

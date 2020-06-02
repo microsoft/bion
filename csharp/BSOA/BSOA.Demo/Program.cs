@@ -1,4 +1,7 @@
-﻿namespace BSOA.Demo
+﻿using BSOA.Demo.Model;
+using BSOA.Json;
+
+namespace BSOA.Demo
 {
     class Program
     {

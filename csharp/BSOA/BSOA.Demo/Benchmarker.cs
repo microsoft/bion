@@ -1,7 +1,6 @@
 ﻿using BSOA.Demo.Model;
 using BSOA.IO;
 using BSOA.Json;
-using Microsoft.CodeAnalysis.Sarif;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -74,6 +73,7 @@ namespace BSOA.Demo
             SarifLogBsoa bsoaLog = new SarifLogBsoa();
             bsoaLog = Measure(LoadBsoaViaNewtonsoft, InputFilePath, $"Loading BSOA via Newtonsoft from SARIF JSON {InputFilePath}...", 1);
 
+            // For "apples to apples" comparison, write SARIF JSON of the supported log subset out
             Time($"Writing as JSON to '{NormalJsonPath}'...", () =>
             {
                 using (JsonTextWriter writer = new JsonTextWriter(File.CreateText(NormalJsonPath)))
@@ -90,55 +90,6 @@ namespace BSOA.Demo
                     bsoaLog.Write(writer);
                 }
             });
-
-            //// Load Sarif Log with current OM
-            //SarifLog log = null;
-
-            //Time($"Loading {InputFilePath}...", () => log = SarifLog.Load(InputFilePath));
-
-            //// Extract a BSOA-supported SarifLog subset for apples-to-apples comparison with BSOA form
-            //SarifLogFiltered filtered = null;
-            //Time($"Extracting supported subset...", () =>
-            //{
-            //    filtered = SarifLogFiltered.FromSarif(log);
-            //});
-
-            //Time($"Converting to BSOA model...", () =>
-            //{
-            //    bsoaLog = filtered.ToBsoa();
-            //}, iterations: 10);
-
-            //Console.WriteLine($" -> {bsoaLog.ToString()}");
-
-            //Time($"Writing as JSON to '{NormalJsonPath}'...", () =>
-            //{
-            //    using (JsonTextWriter writer = new JsonTextWriter(File.CreateText(NormalJsonPath)))
-            //    {
-            //        //writer.Formatting = Formatting.Indented;
-            //        _jsonSerializer.Serialize(writer, filtered);
-            //    }
-            //});
-
-            //Time($"Trimming (BSOA pre-serialization cost, not specific to JSON or Binary)...", () =>
-            //{
-            //    bsoaLog.Trim();
-            //});
-
-            //Time($"Writing as BSOA Binary to '{BsoaBinPath}'...", () =>
-            //{
-            //    using (BinaryTreeWriter writer = new BinaryTreeWriter(File.Create(BsoaBinPath)))
-            //    {
-            //        bsoaLog.Write(writer);
-            //    }
-            //});
-
-            //Time($"Writing as BSOA JSON to '{BsoaJsonPath}'...", () =>
-            //{
-            //    using (JsonTreeWriter writer = new JsonTreeWriter(File.Create(BsoaJsonPath), new TreeSerializationSettings() { Verbose = false }))
-            //    {
-            //        bsoaLog.Write(writer);
-            //    }
-            //});
         }
 
         public static TimeSpan Time(string description, Action method, int iterations = 1)

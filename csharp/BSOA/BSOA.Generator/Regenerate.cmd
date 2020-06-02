@@ -9,4 +9,7 @@ BSOA.Generator.exe "..\..\..\Schemas\Person.UnitTest.V2.schema.json" "..\..\..\.
 ECHO Generating Demo model...
 BSOA.Generator.exe "..\..\..\Schemas\BsoaDemo.schema.json" "..\..\..\..\BSOA.Demo\Model" "Templates\Sarif\Team.cs"
 
+ECHO Generating Sarif SDK model...
+BSOA.Generator.exe "..\..\..\Schemas\Sarif-2.1.0-rtm.5.schema.json" "..\..\..\SarifSdkModel" "Templates\Sarif\Team.cs"
+
 POPD
