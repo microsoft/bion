@@ -59,6 +59,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "text", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Text
         {
@@ -67,6 +68,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "binary", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Binary
         {

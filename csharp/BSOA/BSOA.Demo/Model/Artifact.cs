@@ -124,6 +124,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "mimeType", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string MimeType
         {
@@ -139,6 +140,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "encoding", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Encoding
         {
@@ -147,6 +149,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string SourceLanguage
         {
