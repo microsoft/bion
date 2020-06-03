@@ -10,7 +10,10 @@ namespace BSOA.Generator.Schema
 
         public string Name { get; set; }
         public string Type { get; set; }
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Default { get; set; }
+        
         public string UnderlyingType { get; set; }
         public string ReferencedTableName { get; set; }
 

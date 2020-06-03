@@ -12,33 +12,27 @@
         },
         {
           "name": "RelativeAddress",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "Length",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "Kind",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Name",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "FullyQualifiedName",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "OffsetFromParent",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "Index",
@@ -59,14 +53,12 @@
           "category": "Ref",
           "name": "Description",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "Ref",
           "name": "Location",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
@@ -76,8 +68,7 @@
         },
         {
           "name": "Offset",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "Length",
@@ -88,41 +79,34 @@
           "category": "FlagsEnum",
           "name": "Roles",
           "type": "ArtifactRoles",
-          "default": "null",
           "underlyingType": "long"
         },
         {
           "name": "MimeType",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "Contents",
           "type": "ArtifactContent",
-          "default": "null",
           "referencedTableName": "ArtifactContent"
         },
         {
           "name": "Encoding",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "SourceLanguage",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Hashes",
-          "type": "IDictionary<string, string>",
-          "default": "null"
+          "type": "IDictionary<string, string>"
         },
         {
           "category": "DateTime",
           "name": "LastModifiedTimeUtc",
-          "type": "DateTime",
-          "default": "null"
+          "type": "DateTime"
         }
       ]
     },
@@ -133,14 +117,12 @@
           "category": "Ref",
           "name": "ArtifactLocation",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "category": "RefList",
           "name": "Replacements",
           "type": "IList<Replacement>",
-          "default": "null",
           "referencedTableName": "Replacement"
         }
       ]
@@ -150,19 +132,16 @@
       "columns": [
         {
           "name": "Text",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Binary",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "Rendered",
           "type": "MultiformatMessageString",
-          "default": "null",
           "referencedTableName": "MultiformatMessageString"
         }
       ]
@@ -172,13 +151,11 @@
       "columns": [
         {
           "name": "Uri",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "UriBaseId",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Index",
@@ -189,7 +166,6 @@
           "category": "Ref",
           "name": "Description",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         }
       ]
@@ -201,28 +177,24 @@
           "category": "Ref",
           "name": "Description",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "Ref",
           "name": "ArtifactLocation",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "category": "RefList",
           "name": "Regions",
           "type": "IList<Region>",
-          "default": "null",
           "referencedTableName": "Region"
         },
         {
           "category": "RefList",
           "name": "Rectangles",
           "type": "IList<Rectangle>",
-          "default": "null",
           "referencedTableName": "Rectangle"
         }
       ]
@@ -234,14 +206,12 @@
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "RefList",
           "name": "ThreadFlows",
           "type": "IList<ThreadFlow>",
-          "default": "null",
           "referencedTableName": "ThreadFlow"
         }
       ]
@@ -253,14 +223,12 @@
           "category": "Ref",
           "name": "Configuration",
           "type": "ReportingConfiguration",
-          "default": "null",
           "referencedTableName": "ReportingConfiguration"
         },
         {
           "category": "Ref",
           "name": "Descriptor",
           "type": "ReportingDescriptorReference",
-          "default": "null",
           "referencedTableName": "ReportingDescriptorReference"
         }
       ]
@@ -272,21 +240,18 @@
           "category": "Ref",
           "name": "Tool",
           "type": "Tool",
-          "default": "null",
           "referencedTableName": "Tool"
         },
         {
           "category": "Ref",
           "name": "Invocation",
           "type": "Invocation",
-          "default": "null",
           "referencedTableName": "Invocation"
         },
         {
           "category": "RefList",
           "name": "AnalysisToolLogFiles",
           "type": "IList<ArtifactLocation>",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         }
       ]
@@ -296,25 +261,21 @@
       "columns": [
         {
           "name": "Id",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "Label",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "name": "SourceNodeId",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "TargetNodeId",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         }
       ]
     },
@@ -323,25 +284,21 @@
       "columns": [
         {
           "name": "EdgeId",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "name": "FinalState",
-          "type": "IDictionary<string, MultiformatMessageString>",
-          "default": "null"
+          "type": "IDictionary<string, MultiformatMessageString>"
         },
         {
           "name": "StepOverEdgeCount",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         }
       ]
     },
@@ -350,26 +307,22 @@
       "columns": [
         {
           "name": "Kind",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Message",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "Stack",
           "type": "Stack",
-          "default": "null",
           "referencedTableName": "Stack"
         },
         {
           "category": "RefList",
           "name": "InnerExceptions",
           "type": "IList<Exception>",
-          "default": "null",
           "referencedTableName": "Exception"
         }
       ]
@@ -379,136 +332,116 @@
       "columns": [
         {
           "name": "Schema",
-          "type": "Uri",
-          "default": "null"
+          "type": "Uri"
         },
         {
           "category": "Enum",
           "name": "Version",
           "type": "ExternalPropertiesVersion",
-          "default": "null",
           "underlyingType": "int"
         },
         {
           "name": "Guid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "RunGuid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "Conversion",
           "type": "Conversion",
-          "default": "null",
           "referencedTableName": "Conversion"
         },
         {
           "category": "RefList",
           "name": "Graphs",
           "type": "IList<Graph>",
-          "default": "null",
           "referencedTableName": "Graph"
         },
         {
           "category": "Ref",
           "name": "ExternalizedProperties",
           "type": "PropertyBag",
-          "default": "null",
           "referencedTableName": "PropertyBag"
         },
         {
           "category": "RefList",
           "name": "Artifacts",
           "type": "IList<Artifact>",
-          "default": "null",
           "referencedTableName": "Artifact"
         },
         {
           "category": "RefList",
           "name": "Invocations",
           "type": "IList<Invocation>",
-          "default": "null",
           "referencedTableName": "Invocation"
         },
         {
           "category": "RefList",
           "name": "LogicalLocations",
           "type": "IList<LogicalLocation>",
-          "default": "null",
           "referencedTableName": "LogicalLocation"
         },
         {
           "category": "RefList",
           "name": "ThreadFlowLocations",
           "type": "IList<ThreadFlowLocation>",
-          "default": "null",
           "referencedTableName": "ThreadFlowLocation"
         },
         {
           "category": "RefList",
           "name": "Results",
           "type": "IList<Result>",
-          "default": "null",
           "referencedTableName": "Result"
         },
         {
           "category": "RefList",
           "name": "Taxonomies",
           "type": "IList<ToolComponent>",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         },
         {
           "category": "Ref",
           "name": "Driver",
           "type": "ToolComponent",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         },
         {
           "category": "RefList",
           "name": "Extensions",
           "type": "IList<ToolComponent>",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         },
         {
           "category": "RefList",
           "name": "Policies",
           "type": "IList<ToolComponent>",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         },
         {
           "category": "RefList",
           "name": "Translations",
           "type": "IList<ToolComponent>",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         },
         {
           "category": "RefList",
           "name": "Addresses",
           "type": "IList<Address>",
-          "default": "null",
           "referencedTableName": "Address"
         },
         {
           "category": "RefList",
           "name": "WebRequests",
           "type": "IList<WebRequest>",
-          "default": "null",
           "referencedTableName": "WebRequest"
         },
         {
           "category": "RefList",
           "name": "WebResponses",
           "type": "IList<WebResponse>",
-          "default": "null",
           "referencedTableName": "WebResponse"
         }
       ]
@@ -520,13 +453,11 @@
           "category": "Ref",
           "name": "Location",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "name": "Guid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "ItemCount",
@@ -542,112 +473,96 @@
           "category": "Ref",
           "name": "Conversion",
           "type": "ExternalPropertyFileReference",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "Graphs",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "Ref",
           "name": "ExternalizedProperties",
           "type": "ExternalPropertyFileReference",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "Artifacts",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "Invocations",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "LogicalLocations",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "ThreadFlowLocations",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "Results",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "Taxonomies",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "Addresses",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "Ref",
           "name": "Driver",
           "type": "ExternalPropertyFileReference",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "Extensions",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "Policies",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "Translations",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "WebRequests",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         },
         {
           "category": "RefList",
           "name": "WebResponses",
           "type": "IList<ExternalPropertyFileReference>",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReference"
         }
       ]
@@ -659,14 +574,12 @@
           "category": "Ref",
           "name": "Description",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "RefList",
           "name": "ArtifactChanges",
           "type": "IList<ArtifactChange>",
-          "default": "null",
           "referencedTableName": "ArtifactChange"
         }
       ]
@@ -678,21 +591,18 @@
           "category": "Ref",
           "name": "Description",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "RefList",
           "name": "Nodes",
           "type": "IList<Node>",
-          "default": "null",
           "referencedTableName": "Node"
         },
         {
           "category": "RefList",
           "name": "Edges",
           "type": "IList<Edge>",
-          "default": "null",
           "referencedTableName": "Edge"
         }
       ]
@@ -714,24 +624,20 @@
           "category": "Ref",
           "name": "Description",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "name": "InitialState",
-          "type": "IDictionary<string, MultiformatMessageString>",
-          "default": "null"
+          "type": "IDictionary<string, MultiformatMessageString>"
         },
         {
           "name": "ImmutableState",
-          "type": "IDictionary<string, MultiformatMessageString>",
-          "default": "null"
+          "type": "IDictionary<string, MultiformatMessageString>"
         },
         {
           "category": "RefList",
           "name": "EdgeTraversals",
           "type": "IList<EdgeTraversal>",
-          "default": "null",
           "referencedTableName": "EdgeTraversal"
         }
       ]
@@ -741,151 +647,126 @@
       "columns": [
         {
           "name": "CommandLine",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Arguments",
-          "type": "IList<string>",
-          "default": "null"
+          "type": "IList<string>"
         },
         {
           "category": "RefList",
           "name": "ResponseFiles",
           "type": "IList<ArtifactLocation>",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "category": "DateTime",
           "name": "StartTimeUtc",
-          "type": "DateTime",
-          "default": "null"
+          "type": "DateTime"
         },
         {
           "category": "DateTime",
           "name": "EndTimeUtc",
-          "type": "DateTime",
-          "default": "null"
+          "type": "DateTime"
         },
         {
           "name": "ExitCode",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "category": "RefList",
           "name": "RuleConfigurationOverrides",
           "type": "IList<ConfigurationOverride>",
-          "default": "null",
           "referencedTableName": "ConfigurationOverride"
         },
         {
           "category": "RefList",
           "name": "NotificationConfigurationOverrides",
           "type": "IList<ConfigurationOverride>",
-          "default": "null",
           "referencedTableName": "ConfigurationOverride"
         },
         {
           "category": "RefList",
           "name": "ToolExecutionNotifications",
           "type": "IList<Notification>",
-          "default": "null",
           "referencedTableName": "Notification"
         },
         {
           "category": "RefList",
           "name": "ToolConfigurationNotifications",
           "type": "IList<Notification>",
-          "default": "null",
           "referencedTableName": "Notification"
         },
         {
           "name": "ExitCodeDescription",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "ExitSignalName",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "ExitSignalNumber",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "ProcessStartFailureMessage",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "ExecutionSuccessful",
-          "type": "bool",
-          "default": "null"
+          "type": "bool"
         },
         {
           "name": "Machine",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Account",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "ProcessId",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "category": "Ref",
           "name": "ExecutableLocation",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "category": "Ref",
           "name": "WorkingDirectory",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "name": "EnvironmentVariables",
-          "type": "IDictionary<string, string>",
-          "default": "null"
+          "type": "IDictionary<string, string>"
         },
         {
           "category": "Ref",
           "name": "Stdin",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "category": "Ref",
           "name": "Stdout",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "category": "Ref",
           "name": "Stderr",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "category": "Ref",
           "name": "StdoutStderr",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         }
       ]
@@ -902,35 +783,30 @@
           "category": "Ref",
           "name": "PhysicalLocation",
           "type": "PhysicalLocation",
-          "default": "null",
           "referencedTableName": "PhysicalLocation"
         },
         {
           "category": "RefList",
           "name": "LogicalLocations",
           "type": "IList<LogicalLocation>",
-          "default": "null",
           "referencedTableName": "LogicalLocation"
         },
         {
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "RefList",
           "name": "Annotations",
           "type": "IList<Region>",
-          "default": "null",
           "referencedTableName": "Region"
         },
         {
           "category": "RefList",
           "name": "Relationships",
           "type": "IList<LocationRelationship>",
-          "default": "null",
           "referencedTableName": "LocationRelationship"
         }
       ]
@@ -940,8 +816,7 @@
       "columns": [
         {
           "name": "Target",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "Kinds",
@@ -952,7 +827,6 @@
           "category": "Ref",
           "name": "Description",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         }
       ]
@@ -962,8 +836,7 @@
       "columns": [
         {
           "name": "Name",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Index",
@@ -972,13 +845,11 @@
         },
         {
           "name": "FullyQualifiedName",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "DecoratedName",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "ParentIndex",
@@ -987,8 +858,7 @@
         },
         {
           "name": "Kind",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         }
       ]
     },
@@ -997,18 +867,15 @@
       "columns": [
         {
           "name": "Text",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Markdown",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Id",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Arguments",
@@ -1022,13 +889,11 @@
       "columns": [
         {
           "name": "Text",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Markdown",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         }
       ]
     },
@@ -1037,28 +902,24 @@
       "columns": [
         {
           "name": "Id",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "Label",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "Ref",
           "name": "Location",
           "type": "Location",
-          "default": "null",
           "referencedTableName": "Location"
         },
         {
           "category": "RefList",
           "name": "Children",
           "type": "IList<Node>",
-          "default": "null",
           "referencedTableName": "Node"
         }
       ]
@@ -1070,53 +931,45 @@
           "category": "RefList",
           "name": "Locations",
           "type": "IList<Location>",
-          "default": "null",
           "referencedTableName": "Location"
         },
         {
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "Enum",
           "name": "Level",
           "type": "NotificationLevel",
-          "default": "null",
           "underlyingType": "int"
         },
         {
           "name": "ThreadId",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "category": "DateTime",
           "name": "TimeUtc",
-          "type": "DateTime",
-          "default": "null"
+          "type": "DateTime"
         },
         {
           "category": "Ref",
           "name": "Exception",
           "type": "Exception",
-          "default": "null",
           "referencedTableName": "Exception"
         },
         {
           "category": "Ref",
           "name": "Descriptor",
           "type": "ReportingDescriptorReference",
-          "default": "null",
           "referencedTableName": "ReportingDescriptorReference"
         },
         {
           "category": "Ref",
           "name": "AssociatedRule",
           "type": "ReportingDescriptorReference",
-          "default": "null",
           "referencedTableName": "ReportingDescriptorReference"
         }
       ]
@@ -1128,28 +981,24 @@
           "category": "Ref",
           "name": "Address",
           "type": "Address",
-          "default": "null",
           "referencedTableName": "Address"
         },
         {
           "category": "Ref",
           "name": "ArtifactLocation",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "category": "Ref",
           "name": "Region",
           "type": "Region",
-          "default": "null",
           "referencedTableName": "Region"
         },
         {
           "category": "Ref",
           "name": "ContextRegion",
           "type": "Region",
-          "default": "null",
           "referencedTableName": "Region"
         }
       ]
@@ -1169,29 +1018,24 @@
       "columns": [
         {
           "name": "Top",
-          "type": "double",
-          "default": "null"
+          "type": "double"
         },
         {
           "name": "Left",
-          "type": "double",
-          "default": "null"
+          "type": "double"
         },
         {
           "name": "Bottom",
-          "type": "double",
-          "default": "null"
+          "type": "double"
         },
         {
           "name": "Right",
-          "type": "double",
-          "default": "null"
+          "type": "double"
         },
         {
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         }
       ]
@@ -1201,23 +1045,19 @@
       "columns": [
         {
           "name": "StartLine",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "StartColumn",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "EndLine",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "EndColumn",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "CharOffset",
@@ -1226,8 +1066,7 @@
         },
         {
           "name": "CharLength",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "ByteOffset",
@@ -1236,27 +1075,23 @@
         },
         {
           "name": "ByteLength",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "category": "Ref",
           "name": "Snippet",
           "type": "ArtifactContent",
-          "default": "null",
           "referencedTableName": "ArtifactContent"
         },
         {
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "name": "SourceLanguage",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         }
       ]
     },
@@ -1267,14 +1102,12 @@
           "category": "Ref",
           "name": "DeletedRegion",
           "type": "Region",
-          "default": "null",
           "referencedTableName": "Region"
         },
         {
           "category": "Ref",
           "name": "InsertedContent",
           "type": "ArtifactContent",
-          "default": "null",
           "referencedTableName": "ArtifactContent"
         }
       ]
@@ -1284,77 +1117,64 @@
       "columns": [
         {
           "name": "Id",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "DeprecatedIds",
-          "type": "IList<string>",
-          "default": "null"
+          "type": "IList<string>"
         },
         {
           "name": "Guid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "DeprecatedGuids",
-          "type": "IList<string>",
-          "default": "null"
+          "type": "IList<string>"
         },
         {
           "name": "Name",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "DeprecatedNames",
-          "type": "IList<string>",
-          "default": "null"
+          "type": "IList<string>"
         },
         {
           "category": "Ref",
           "name": "ShortDescription",
           "type": "MultiformatMessageString",
-          "default": "null",
           "referencedTableName": "MultiformatMessageString"
         },
         {
           "category": "Ref",
           "name": "FullDescription",
           "type": "MultiformatMessageString",
-          "default": "null",
           "referencedTableName": "MultiformatMessageString"
         },
         {
           "name": "MessageStrings",
-          "type": "IDictionary<string, MultiformatMessageString>",
-          "default": "null"
+          "type": "IDictionary<string, MultiformatMessageString>"
         },
         {
           "category": "Ref",
           "name": "DefaultConfiguration",
           "type": "ReportingConfiguration",
-          "default": "null",
           "referencedTableName": "ReportingConfiguration"
         },
         {
           "name": "HelpUri",
-          "type": "Uri",
-          "default": "null"
+          "type": "Uri"
         },
         {
           "category": "Ref",
           "name": "Help",
           "type": "MultiformatMessageString",
-          "default": "null",
           "referencedTableName": "MultiformatMessageString"
         },
         {
           "category": "RefList",
           "name": "Relationships",
           "type": "IList<ReportingDescriptorRelationship>",
-          "default": "null",
           "referencedTableName": "ReportingDescriptorRelationship"
         }
       ]
@@ -1371,7 +1191,6 @@
           "category": "Enum",
           "name": "Level",
           "type": "ReportingConfigurationLevel",
-          "default": "null",
           "underlyingType": "int"
         },
         {
@@ -1383,7 +1202,6 @@
           "category": "Ref",
           "name": "Parameters",
           "type": "PropertyBag",
-          "default": "null",
           "referencedTableName": "PropertyBag"
         }
       ]
@@ -1393,8 +1211,7 @@
       "columns": [
         {
           "name": "Id",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Index",
@@ -1403,14 +1220,12 @@
         },
         {
           "name": "Guid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "ToolComponent",
           "type": "ToolComponentReference",
-          "default": "null",
           "referencedTableName": "ToolComponentReference"
         }
       ]
@@ -1422,7 +1237,6 @@
           "category": "Ref",
           "name": "Target",
           "type": "ReportingDescriptorReference",
-          "default": "null",
           "referencedTableName": "ReportingDescriptorReference"
         },
         {
@@ -1434,7 +1248,6 @@
           "category": "Ref",
           "name": "Description",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         }
       ]
@@ -1444,8 +1257,7 @@
       "columns": [
         {
           "name": "RuleId",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "RuleIndex",
@@ -1456,116 +1268,98 @@
           "category": "Ref",
           "name": "Rule",
           "type": "ReportingDescriptorReference",
-          "default": "null",
           "referencedTableName": "ReportingDescriptorReference"
         },
         {
           "category": "Enum",
           "name": "Kind",
           "type": "ResultKind",
-          "default": "null",
           "underlyingType": "int"
         },
         {
           "category": "Enum",
           "name": "Level",
           "type": "ResultLevel",
-          "default": "null",
           "underlyingType": "int"
         },
         {
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "Ref",
           "name": "AnalysisTarget",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "category": "RefList",
           "name": "Locations",
           "type": "IList<Location>",
-          "default": "null",
           "referencedTableName": "Location"
         },
         {
           "name": "Guid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "CorrelationGuid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "OccurrenceCount",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "PartialFingerprints",
-          "type": "IDictionary<string, string>",
-          "default": "null"
+          "type": "IDictionary<string, string>"
         },
         {
           "name": "Fingerprints",
-          "type": "IDictionary<string, string>",
-          "default": "null"
+          "type": "IDictionary<string, string>"
         },
         {
           "category": "RefList",
           "name": "Stacks",
           "type": "IList<Stack>",
-          "default": "null",
           "referencedTableName": "Stack"
         },
         {
           "category": "RefList",
           "name": "CodeFlows",
           "type": "IList<CodeFlow>",
-          "default": "null",
           "referencedTableName": "CodeFlow"
         },
         {
           "category": "RefList",
           "name": "Graphs",
           "type": "IList<Graph>",
-          "default": "null",
           "referencedTableName": "Graph"
         },
         {
           "category": "RefList",
           "name": "GraphTraversals",
           "type": "IList<GraphTraversal>",
-          "default": "null",
           "referencedTableName": "GraphTraversal"
         },
         {
           "category": "RefList",
           "name": "RelatedLocations",
           "type": "IList<Location>",
-          "default": "null",
           "referencedTableName": "Location"
         },
         {
           "category": "RefList",
           "name": "Suppressions",
           "type": "IList<Suppression>",
-          "default": "null",
           "referencedTableName": "Suppression"
         },
         {
           "category": "Enum",
           "name": "BaselineState",
           "type": "ResultBaselineState",
-          "default": "null",
           "underlyingType": "int"
         },
         {
@@ -1577,52 +1371,44 @@
           "category": "RefList",
           "name": "Attachments",
           "type": "IList<Attachment>",
-          "default": "null",
           "referencedTableName": "Attachment"
         },
         {
           "name": "HostedViewerUri",
-          "type": "Uri",
-          "default": "null"
+          "type": "Uri"
         },
         {
           "name": "WorkItemUris",
-          "type": "IList<Uri>",
-          "default": "null"
+          "type": "IList<Uri>"
         },
         {
           "category": "Ref",
           "name": "Provenance",
           "type": "ResultProvenance",
-          "default": "null",
           "referencedTableName": "ResultProvenance"
         },
         {
           "category": "RefList",
           "name": "Fixes",
           "type": "IList<Fix>",
-          "default": "null",
           "referencedTableName": "Fix"
         },
         {
           "category": "RefList",
           "name": "Taxa",
           "type": "IList<ReportingDescriptorReference>",
-          "default": "null",
           "referencedTableName": "ReportingDescriptorReference"
         },
         {
           "category": "Ref",
           "name": "WebRequest",
           "type": "WebRequest",
-          "default": "null",
           "referencedTableName": "WebRequest"
         },
         {
           "category": "Ref",
           "name": "WebResponse",
           "type": "WebResponse",
-          "default": "null",
           "referencedTableName": "WebResponse"
         }
       ]
@@ -1633,24 +1419,20 @@
         {
           "category": "DateTime",
           "name": "FirstDetectionTimeUtc",
-          "type": "DateTime",
-          "default": "null"
+          "type": "DateTime"
         },
         {
           "category": "DateTime",
           "name": "LastDetectionTimeUtc",
-          "type": "DateTime",
-          "default": "null"
+          "type": "DateTime"
         },
         {
           "name": "FirstDetectionRunGuid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "LastDetectionRunGuid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "InvocationIndex",
@@ -1661,7 +1443,6 @@
           "category": "RefList",
           "name": "ConversionSources",
           "type": "IList<PhysicalLocation>",
-          "default": "null",
           "referencedTableName": "PhysicalLocation"
         }
       ]
@@ -1673,21 +1454,18 @@
           "category": "Ref",
           "name": "Tool",
           "type": "Tool",
-          "default": "null",
           "referencedTableName": "Tool"
         },
         {
           "category": "RefList",
           "name": "Invocations",
           "type": "IList<Invocation>",
-          "default": "null",
           "referencedTableName": "Invocation"
         },
         {
           "category": "Ref",
           "name": "Conversion",
           "type": "Conversion",
-          "default": "null",
           "referencedTableName": "Conversion"
         },
         {
@@ -1699,60 +1477,51 @@
           "category": "RefList",
           "name": "VersionControlProvenance",
           "type": "IList<VersionControlDetails>",
-          "default": "null",
           "referencedTableName": "VersionControlDetails"
         },
         {
           "name": "OriginalUriBaseIds",
-          "type": "IDictionary<string, ArtifactLocation>",
-          "default": "null"
+          "type": "IDictionary<string, ArtifactLocation>"
         },
         {
           "category": "RefList",
           "name": "Artifacts",
           "type": "IList<Artifact>",
-          "default": "null",
           "referencedTableName": "Artifact"
         },
         {
           "category": "RefList",
           "name": "LogicalLocations",
           "type": "IList<LogicalLocation>",
-          "default": "null",
           "referencedTableName": "LogicalLocation"
         },
         {
           "category": "RefList",
           "name": "Graphs",
           "type": "IList<Graph>",
-          "default": "null",
           "referencedTableName": "Graph"
         },
         {
           "category": "RefList",
           "name": "Results",
           "type": "IList<Result>",
-          "default": "null",
           "referencedTableName": "Result"
         },
         {
           "category": "Ref",
           "name": "AutomationDetails",
           "type": "RunAutomationDetails",
-          "default": "null",
           "referencedTableName": "RunAutomationDetails"
         },
         {
           "category": "RefList",
           "name": "RunAggregates",
           "type": "IList<RunAutomationDetails>",
-          "default": "null",
           "referencedTableName": "RunAutomationDetails"
         },
         {
           "name": "BaselineGuid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "RedactionTokens",
@@ -1761,13 +1530,11 @@
         },
         {
           "name": "DefaultEncoding",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "DefaultSourceLanguage",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "NewlineSequences",
@@ -1778,70 +1545,60 @@
           "category": "Enum",
           "name": "ColumnKind",
           "type": "RunColumnKind",
-          "default": "null",
           "underlyingType": "int"
         },
         {
           "category": "Ref",
           "name": "ExternalPropertyFileReferences",
           "type": "ExternalPropertyFileReferences",
-          "default": "null",
           "referencedTableName": "ExternalPropertyFileReferences"
         },
         {
           "category": "RefList",
           "name": "ThreadFlowLocations",
           "type": "IList<ThreadFlowLocation>",
-          "default": "null",
           "referencedTableName": "ThreadFlowLocation"
         },
         {
           "category": "RefList",
           "name": "Taxonomies",
           "type": "IList<ToolComponent>",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         },
         {
           "category": "RefList",
           "name": "Addresses",
           "type": "IList<Address>",
-          "default": "null",
           "referencedTableName": "Address"
         },
         {
           "category": "RefList",
           "name": "Translations",
           "type": "IList<ToolComponent>",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         },
         {
           "category": "RefList",
           "name": "Policies",
           "type": "IList<ToolComponent>",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         },
         {
           "category": "RefList",
           "name": "WebRequests",
           "type": "IList<WebRequest>",
-          "default": "null",
           "referencedTableName": "WebRequest"
         },
         {
           "category": "RefList",
           "name": "WebResponses",
           "type": "IList<WebResponse>",
-          "default": "null",
           "referencedTableName": "WebResponse"
         },
         {
           "category": "Ref",
           "name": "SpecialLocations",
           "type": "SpecialLocations",
-          "default": "null",
           "referencedTableName": "SpecialLocations"
         }
       ]
@@ -1853,23 +1610,19 @@
           "category": "Ref",
           "name": "Description",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "name": "Id",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Guid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "CorrelationGuid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         }
       ]
     },
@@ -1880,7 +1633,6 @@
           "category": "Ref",
           "name": "DisplayBase",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         }
       ]
@@ -1892,14 +1644,12 @@
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "RefList",
           "name": "Frames",
           "type": "IList<StackFrame>",
-          "default": "null",
           "referencedTableName": "StackFrame"
         }
       ]
@@ -1911,18 +1661,15 @@
           "category": "Ref",
           "name": "Location",
           "type": "Location",
-          "default": "null",
           "referencedTableName": "Location"
         },
         {
           "name": "Module",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "ThreadId",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "Parameters",
@@ -1936,33 +1683,28 @@
       "columns": [
         {
           "name": "Guid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Enum",
           "name": "Kind",
           "type": "SuppressionKind",
-          "default": "null",
           "underlyingType": "int"
         },
         {
           "category": "Enum",
           "name": "Status",
           "type": "SuppressionStatus",
-          "default": "null",
           "underlyingType": "int"
         },
         {
           "name": "Justification",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "Location",
           "type": "Location",
-          "default": "null",
           "referencedTableName": "Location"
         }
       ]
@@ -1972,31 +1714,26 @@
       "columns": [
         {
           "name": "Id",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "name": "InitialState",
-          "type": "IDictionary<string, MultiformatMessageString>",
-          "default": "null"
+          "type": "IDictionary<string, MultiformatMessageString>"
         },
         {
           "name": "ImmutableState",
-          "type": "IDictionary<string, MultiformatMessageString>",
-          "default": "null"
+          "type": "IDictionary<string, MultiformatMessageString>"
         },
         {
           "category": "RefList",
           "name": "Locations",
           "type": "IList<ThreadFlowLocation>",
-          "default": "null",
           "referencedTableName": "ThreadFlowLocation"
         }
       ]
@@ -2013,14 +1750,12 @@
           "category": "Ref",
           "name": "Location",
           "type": "Location",
-          "default": "null",
           "referencedTableName": "Location"
         },
         {
           "category": "Ref",
           "name": "Stack",
           "type": "Stack",
-          "default": "null",
           "referencedTableName": "Stack"
         },
         {
@@ -2032,23 +1767,19 @@
           "category": "RefList",
           "name": "Taxa",
           "type": "IList<ReportingDescriptorReference>",
-          "default": "null",
           "referencedTableName": "ReportingDescriptorReference"
         },
         {
           "name": "Module",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "State",
-          "type": "IDictionary<string, MultiformatMessageString>",
-          "default": "null"
+          "type": "IDictionary<string, MultiformatMessageString>"
         },
         {
           "name": "NestingLevel",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "ExecutionOrder",
@@ -2058,28 +1789,24 @@
         {
           "category": "DateTime",
           "name": "ExecutionTimeUtc",
-          "type": "DateTime",
-          "default": "null"
+          "type": "DateTime"
         },
         {
           "category": "Enum",
           "name": "Importance",
           "type": "ThreadFlowLocationImportance",
-          "default": "null",
           "underlyingType": "int"
         },
         {
           "category": "Ref",
           "name": "WebRequest",
           "type": "WebRequest",
-          "default": "null",
           "referencedTableName": "WebRequest"
         },
         {
           "category": "Ref",
           "name": "WebResponse",
           "type": "WebResponse",
-          "default": "null",
           "referencedTableName": "WebResponse"
         }
       ]
@@ -2091,14 +1818,12 @@
           "category": "Ref",
           "name": "Driver",
           "type": "ToolComponent",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         },
         {
           "category": "RefList",
           "name": "Extensions",
           "type": "IList<ToolComponent>",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         }
       ]
@@ -2108,109 +1833,90 @@
       "columns": [
         {
           "name": "Guid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Name",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Organization",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Product",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "ProductSuite",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "ShortDescription",
           "type": "MultiformatMessageString",
-          "default": "null",
           "referencedTableName": "MultiformatMessageString"
         },
         {
           "category": "Ref",
           "name": "FullDescription",
           "type": "MultiformatMessageString",
-          "default": "null",
           "referencedTableName": "MultiformatMessageString"
         },
         {
           "name": "FullName",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Version",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "SemanticVersion",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "DottedQuadFileVersion",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "ReleaseDateUtc",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "DownloadUri",
-          "type": "Uri",
-          "default": "null"
+          "type": "Uri"
         },
         {
           "name": "InformationUri",
-          "type": "Uri",
-          "default": "null"
+          "type": "Uri"
         },
         {
           "name": "GlobalMessageStrings",
-          "type": "IDictionary<string, MultiformatMessageString>",
-          "default": "null"
+          "type": "IDictionary<string, MultiformatMessageString>"
         },
         {
           "category": "RefList",
           "name": "Notifications",
           "type": "IList<ReportingDescriptor>",
-          "default": "null",
           "referencedTableName": "ReportingDescriptor"
         },
         {
           "category": "RefList",
           "name": "Rules",
           "type": "IList<ReportingDescriptor>",
-          "default": "null",
           "referencedTableName": "ReportingDescriptor"
         },
         {
           "category": "RefList",
           "name": "Taxa",
           "type": "IList<ReportingDescriptor>",
-          "default": "null",
           "referencedTableName": "ReportingDescriptor"
         },
         {
           "category": "RefList",
           "name": "Locations",
           "type": "IList<ArtifactLocation>",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
@@ -2222,7 +1928,6 @@
           "category": "FlagsEnum",
           "name": "Contents",
           "type": "ToolComponentContents",
-          "default": "null",
           "underlyingType": "long"
         },
         {
@@ -2232,33 +1937,28 @@
         },
         {
           "name": "LocalizedDataSemanticVersion",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "MinimumRequiredLocalizedDataSemanticVersion",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "AssociatedComponent",
           "type": "ToolComponentReference",
-          "default": "null",
           "referencedTableName": "ToolComponentReference"
         },
         {
           "category": "Ref",
           "name": "TranslationMetadata",
           "type": "TranslationMetadata",
-          "default": "null",
           "referencedTableName": "TranslationMetadata"
         },
         {
           "category": "RefList",
           "name": "SupportedTaxonomies",
           "type": "IList<ToolComponentReference>",
-          "default": "null",
           "referencedTableName": "ToolComponentReference"
         }
       ]
@@ -2268,8 +1968,7 @@
       "columns": [
         {
           "name": "Name",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Index",
@@ -2278,8 +1977,7 @@
         },
         {
           "name": "Guid",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         }
       ]
     },
@@ -2288,37 +1986,31 @@
       "columns": [
         {
           "name": "Name",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "FullName",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "Ref",
           "name": "ShortDescription",
           "type": "MultiformatMessageString",
-          "default": "null",
           "referencedTableName": "MultiformatMessageString"
         },
         {
           "category": "Ref",
           "name": "FullDescription",
           "type": "MultiformatMessageString",
-          "default": "null",
           "referencedTableName": "MultiformatMessageString"
         },
         {
           "name": "DownloadUri",
-          "type": "Uri",
-          "default": "null"
+          "type": "Uri"
         },
         {
           "name": "InformationUri",
-          "type": "Uri",
-          "default": "null"
+          "type": "Uri"
         }
       ]
     },
@@ -2327,35 +2019,29 @@
       "columns": [
         {
           "name": "RepositoryUri",
-          "type": "Uri",
-          "default": "null"
+          "type": "Uri"
         },
         {
           "name": "RevisionId",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Branch",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "RevisionTag",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "category": "DateTime",
           "name": "AsOfTimeUtc",
-          "type": "DateTime",
-          "default": "null"
+          "type": "DateTime"
         },
         {
           "category": "Ref",
           "name": "MappedTo",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         }
       ]
@@ -2370,39 +2056,32 @@
         },
         {
           "name": "Protocol",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Version",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Target",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Method",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Headers",
-          "type": "IDictionary<string, string>",
-          "default": "null"
+          "type": "IDictionary<string, string>"
         },
         {
           "name": "Parameters",
-          "type": "IDictionary<string, string>",
-          "default": "null"
+          "type": "IDictionary<string, string>"
         },
         {
           "category": "Ref",
           "name": "Body",
           "type": "ArtifactContent",
-          "default": "null",
           "referencedTableName": "ArtifactContent"
         }
       ]
@@ -2417,34 +2096,28 @@
         },
         {
           "name": "Protocol",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Version",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "StatusCode",
-          "type": "int",
-          "default": "null"
+          "type": "int"
         },
         {
           "name": "ReasonPhrase",
-          "type": "string",
-          "default": "null"
+          "type": "string"
         },
         {
           "name": "Headers",
-          "type": "IDictionary<string, string>",
-          "default": "null"
+          "type": "IDictionary<string, string>"
         },
         {
           "category": "Ref",
           "name": "Body",
           "type": "ArtifactContent",
-          "default": "null",
           "referencedTableName": "ArtifactContent"
         },
         {
