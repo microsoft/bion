@@ -23,7 +23,7 @@ namespace BSOA.Generator.Schema
             Name = name;
             Type = type;
             UnderlyingType = underlyingType;
-            Default = defaultValue ?? "null";
+            Default = defaultValue;
             ReferencedTableName = referencedTableName;
         }
 

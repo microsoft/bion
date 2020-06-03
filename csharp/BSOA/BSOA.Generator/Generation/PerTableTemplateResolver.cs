@@ -14,9 +14,10 @@ namespace BSOA.Generator.Generation
     /// </summary>
     public class PerTableTemplateResolver : ICodeGenerator
     {
-        public string FileNameSuffix;
-        public string Code;
-        public Dictionary<string, string> Templates;
+        public string FileNameSuffix { get; set; }
+        public string Code { get; set; }
+        public Dictionary<string, string> Templates { get; set; }
+        public Dictionary<string, string> PostReplacements { get; set; }
 
         public PerTableTemplateResolver() : this("", @"Templates\\CompanyDatabase.cs")
         { }
@@ -30,7 +31,14 @@ namespace BSOA.Generator.Generation
 
         public virtual void Generate(Database database, string outputPath)
         {
-            File.WriteAllText(Path.Combine(outputPath, $"{database.Name}{FileNameSuffix}.cs"), Generate(database));
+            // Generate code by filling out template
+            string code = Generate(database);
+
+            // Evaluate any post-replacement Regexes
+            code = CodeSection.MakeReplacements(code, PostReplacements);
+
+            // Write the database class file
+            File.WriteAllText(Path.Combine(outputPath, $"{database.Name}{FileNameSuffix}.cs"), code);
         }
 
         public virtual string Generate(Database database)

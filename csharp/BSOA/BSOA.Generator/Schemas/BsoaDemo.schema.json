@@ -9,14 +9,12 @@
           "category": "Ref",
           "name": "Description",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "Ref",
           "name": "Location",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
@@ -43,7 +41,6 @@
           "category": "Ref",
           "name": "Contents",
           "type": "ArtifactContent",
-          "default": "null",
           "referencedTableName": "ArtifactContent"
         },
         {
@@ -101,7 +98,6 @@
           "category": "Ref",
           "name": "Description",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         }
       ]
@@ -118,28 +114,24 @@
           "category": "Ref",
           "name": "PhysicalLocation",
           "type": "PhysicalLocation",
-          "default": "null",
           "referencedTableName": "PhysicalLocation"
         },
         {
           "category": "RefList",
           "name": "LogicalLocations",
           "type": "IList<LogicalLocation>",
-          "default": "null",
           "referencedTableName": "LogicalLocation"
         },
         {
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "RefList",
           "name": "Annotations",
           "type": "IList<Region>",
-          "default": "null",
           "referencedTableName": "Region"
         }
       ]
@@ -206,21 +198,18 @@
           "category": "Ref",
           "name": "ArtifactLocation",
           "type": "ArtifactLocation",
-          "default": "null",
           "referencedTableName": "ArtifactLocation"
         },
         {
           "category": "Ref",
           "name": "Region",
           "type": "Region",
-          "default": "null",
           "referencedTableName": "Region"
         },
         {
           "category": "Ref",
           "name": "ContextRegion",
           "type": "Region",
-          "default": "null",
           "referencedTableName": "Region"
         }
       ]
@@ -272,14 +261,12 @@
           "category": "Ref",
           "name": "Snippet",
           "type": "ArtifactContent",
-          "default": "null",
           "referencedTableName": "ArtifactContent"
         },
         {
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
@@ -313,14 +300,12 @@
           "category": "Ref",
           "name": "Message",
           "type": "Message",
-          "default": "null",
           "referencedTableName": "Message"
         },
         {
           "category": "RefList",
           "name": "Locations",
           "type": "IList<Location>",
-          "default": "null",
           "referencedTableName": "Location"
         },
         {
@@ -337,21 +322,18 @@
           "category": "Ref",
           "name": "Tool",
           "type": "Tool",
-          "default": "null",
           "referencedTableName": "Tool"
         },
         {
           "category": "RefList",
           "name": "Artifacts",
           "type": "IList<Artifact>",
-          "default": "null",
           "referencedTableName": "Artifact"
         },
         {
           "category": "RefList",
           "name": "Results",
           "type": "IList<Result>",
-          "default": "null",
           "referencedTableName": "Result"
         }
       ]
@@ -363,14 +345,12 @@
           "category": "Ref",
           "name": "Driver",
           "type": "ToolComponent",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         },
         {
           "category": "RefList",
           "name": "Extensions",
           "type": "IList<ToolComponent>",
-          "default": "null",
           "referencedTableName": "ToolComponent"
         }
       ]

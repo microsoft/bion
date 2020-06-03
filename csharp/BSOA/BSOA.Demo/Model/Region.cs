@@ -172,7 +172,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string SourceLanguage
         {

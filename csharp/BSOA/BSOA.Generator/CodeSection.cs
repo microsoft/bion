@@ -101,7 +101,7 @@ namespace BSOA.Generator
         public static string Populate(string template, Schema.Column columnInTemplate, Schema.Column column)
         {
             // Populate by replacing default values.
-            
+
             // Replace type, default, table name first to avoid string.Replace errors 
             // if the column name or type is contained within those values.
             string populated = template;
@@ -127,6 +127,19 @@ namespace BSOA.Generator
                 .Replace(columnInTemplate.Name.ToCamelCase(), column.Name.ToCamelCase());
 
             return populated;
+        }
+
+        public static string MakeReplacements(string code, Dictionary<string, string> replacements)
+        {
+            if (replacements?.Count > 0)
+            {
+                foreach (KeyValuePair<string, string> replacement in replacements)
+                {
+                    code = Regex.Replace(code, replacement.Key, replacement.Value, Options);
+                }
+            }
+
+            return code;
         }
     }
 }

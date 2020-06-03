@@ -1,10 +1,13 @@
 ﻿using BSOA.Generator.Schema;
 
+using Microsoft.VisualBasic.CompilerServices;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace BSOA.Generator.Generation
 {
@@ -14,9 +17,10 @@ namespace BSOA.Generator.Generation
     /// </summary>
     public class PerColumnTemplateResolver : ICodeGenerator
     {
-        public string FileNameSuffix;
-        public string Code;
-        public Dictionary<string, string> Templates;
+        public string FileNameSuffix { get; set; }
+        public string Code { get; set; }
+        public Dictionary<string, string> Templates { get; set; }
+        public Dictionary<string, string> PostReplacements { get; set; }
 
         public PerColumnTemplateResolver() : this("", @"Templates\\Team.cs")
         { }
@@ -32,7 +36,14 @@ namespace BSOA.Generator.Generation
         {
             foreach (Table table in database.Tables)
             {
-                File.WriteAllText(Path.Combine(outputFolder, $"{table.Name}{FileNameSuffix}.cs"), Generate(table, database));
+                // Generate code by filling out template
+                string code = Generate(table, database);
+
+                // Evaluate any post-replacement Regexes
+                code = CodeSection.MakeReplacements(code, PostReplacements);
+                
+                // Write the per-table class file
+                File.WriteAllText(Path.Combine(outputFolder, $"{table.Name}{FileNameSuffix}.cs"), code);
             }
         }
 

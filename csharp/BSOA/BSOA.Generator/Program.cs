@@ -43,6 +43,8 @@ namespace BSOA.Generator
             string outputFolder = (args.Length > 1 ? args[1] : @"Model");
             string entityTemplatePath = (args.Length > 2 ? args[2] : @"Templates\Team.cs");
 
+            Console.WriteLine($"Generating BSOA object model from schema\r\n  '{schemaPath}' at \r\n  '{outputFolder}'...");
+
             Database db = AsJson.Load<Database>(schemaPath);
             Directory.CreateDirectory(outputFolder);
 
@@ -50,13 +52,21 @@ namespace BSOA.Generator
             {
                 new PerTableTemplateResolver(),
                 new PerColumnTemplateResolver("Table", @"Templates\TeamTable.cs"),
-                new PerColumnTemplateResolver("", entityTemplatePath)
+                new PerColumnTemplateResolver("", entityTemplatePath) 
+                { 
+                    PostReplacements = new Dictionary<string, string>()
+                    {
+                        ["^[ \t]+\\[DefaultValue\\(null\\)\\][ \t\r]*\n"] = ""
+                    }
+                }
             };
 
             foreach (ICodeGenerator generator in generators)
             {
                 generator.Generate(db, outputFolder);
             }
+
+            Console.WriteLine("Done.");
         }
 
         static Database SarifDemoSchema()

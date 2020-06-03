@@ -65,7 +65,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "uri", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Uri Uri
         {
@@ -74,7 +73,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "uriBaseId", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(null)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string UriBaseId
         {
