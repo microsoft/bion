@@ -1,6 +1,7 @@
 {
   "name": "SarifLogBsoa",
   "namespace": "BSOA.Demo.Model",
+  "rootTableName": "Root",
   "tables": [
     {
       "name": "Artifact",
@@ -362,6 +363,17 @@
           "name": "Name",
           "type": "string",
           "default": "null"
+        }
+      ]
+    },
+    {
+      "name": "Root",
+      "columns": [
+        {
+          "category": "RefList",
+          "name": "Runs",
+          "type": "IList<Run>",
+          "referencedTableName": "Run"
         }
       ]
     }

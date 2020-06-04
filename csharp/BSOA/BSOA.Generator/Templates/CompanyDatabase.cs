@@ -1,5 +1,8 @@
 ﻿using BSOA.Model;
 
+using System;
+using System.Collections.Generic;
+
 namespace BSOA.Generator.Templates
 {
     /// <summary>
@@ -8,12 +11,13 @@ namespace BSOA.Generator.Templates
     public partial class CompanyDatabase : Database
     {
         internal static CompanyDatabase Current { get; private set; }
-
+        
         // <TableMemberList>
         internal EmployeeTable Employee { get; }
         //   <TableMember>
         internal TeamTable Team { get; }
         //   </TableMember>
+        internal RootTable Root { get; }
         // </TableMemberList>
 
         public CompanyDatabase()
@@ -25,6 +29,7 @@ namespace BSOA.Generator.Templates
             //   <TableConstructor>
             Team = AddTable(nameof(Team), new TeamTable(this));
             //   </TableConstructor>
+            Root = AddTable(nameof(Root), new RootTable(this));
             // </TableConstructorList>
         }
     }

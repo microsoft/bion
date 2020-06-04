@@ -36,14 +36,7 @@ namespace BSOA.Generator.Generation
         {
             foreach (Table table in database.Tables)
             {
-                // Generate code by filling out template
-                string code = Generate(table, database);
-
-                // Evaluate any post-replacement Regexes
-                code = CodeSection.MakeReplacements(code, PostReplacements);
-                
-                // Write the per-table class file
-                File.WriteAllText(Path.Combine(outputFolder, $"{table.Name}{FileNameSuffix}.cs"), code);
+                File.WriteAllText(Path.Combine(outputFolder, $"{table.Name}{FileNameSuffix}.cs"), Generate(table, database));
             }
         }
 
@@ -83,6 +76,8 @@ namespace BSOA.Generator.Generation
                 .Replace(TemplateDefaults.TableName, table.Name)
                 .Replace(TemplateDefaults.DatabaseName, database.Name)
                 .Replace(TemplateDefaults.Namespace, database.Namespace);
+
+            finalCode = CodeSection.MakeReplacements(finalCode, PostReplacements);
 
             return finalCode;
         }

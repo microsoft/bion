@@ -1,5 +1,8 @@
 using BSOA.Model;
 
+using System;
+using System.Collections.Generic;
+
 namespace BSOA.Demo.Model
 {
     /// <summary>
@@ -8,7 +11,7 @@ namespace BSOA.Demo.Model
     public partial class SarifLogBsoa : Database
     {
         internal static SarifLogBsoa Current { get; private set; }
-
+        
         internal ArtifactTable Artifact { get; }
         internal ArtifactContentTable ArtifactContent { get; }
         internal ArtifactLocationTable ArtifactLocation { get; }
@@ -21,6 +24,7 @@ namespace BSOA.Demo.Model
         internal RunTable Run { get; }
         internal ToolTable Tool { get; }
         internal ToolComponentTable ToolComponent { get; }
+        internal RootTable Root { get; }
 
         public SarifLogBsoa()
         {
@@ -38,6 +42,7 @@ namespace BSOA.Demo.Model
             Run = AddTable(nameof(Run), new RunTable(this));
             Tool = AddTable(nameof(Tool), new ToolTable(this));
             ToolComponent = AddTable(nameof(ToolComponent), new ToolComponentTable(this));
+            Root = AddTable(nameof(Root), new RootTable(this));
         }
     }
 }

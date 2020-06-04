@@ -1,6 +1,7 @@
 {
   "name": "PersonDatabase",
   "namespace": "BSOA.Test.Model.V2",
+  "rootTableName": "Root",
   "tables": [
     {
       "name": "Person",
@@ -14,6 +15,17 @@
           "category": "Simple",
           "name": "Name",
           "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "Root",
+      "columns": [
+        {
+          "category": "RefList",
+          "name": "People",
+          "type": "IList<Person>",
+          "referencedTableName": "Person"
         }
       ]
     }

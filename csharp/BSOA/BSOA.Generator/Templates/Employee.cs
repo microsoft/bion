@@ -1,4 +1,7 @@
-﻿using BSOA.Model;
+﻿using System;
+using System.Collections;
+
+using BSOA.Model;
 
 namespace BSOA.Generator.Templates
 {

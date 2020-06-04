@@ -5,6 +5,7 @@ using BSOA.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace BSOA.Generator
 {
@@ -51,12 +52,21 @@ namespace BSOA.Generator
             List<ICodeGenerator> generators = new List<ICodeGenerator>()
             {
                 new PerTableTemplateResolver(),
-                new PerColumnTemplateResolver("Table", @"Templates\TeamTable.cs"),
+                new PerColumnTemplateResolver("Table", @"Templates\TeamTable.cs")
+                {
+                    PostReplacements = new Dictionary<string, string>()
+                    {
+                        ["public partial class RootTable"] = "internal partial class RootTable"
+                    }
+                },
                 new PerColumnTemplateResolver("", entityTemplatePath) 
                 { 
                     PostReplacements = new Dictionary<string, string>()
                     {
-                        ["^[ \t]+\\[DefaultValue\\((null)?\\)\\][ \t\r]*\n"] = ""
+                        ["^[ \t]+\\[DefaultValue\\((null)?\\)\\][ \t\r]*\n"] = "",
+                        ["SarifNodeKind.Root"] = "SarifNodeKind.SarifLog",
+                        ["public partial class Root"] = "internal partial class Root",
+                        ["PropertyBag : PropertyBagHolder, "] = "PropertyBag : ",
                     }
                 }
             };
@@ -66,14 +76,21 @@ namespace BSOA.Generator
                 generator.Generate(db, outputFolder);
             }
 
+            PerColumnTemplateResolver rootPropsGenerator = new PerColumnTemplateResolver("Props", @"Templates\CompanyDatabaseProps.cs");
+            File.WriteAllText(Path.Combine(outputFolder, $"{db.Name}Props.cs"), rootPropsGenerator.Generate(db.Tables.Where((t) => t.Name.Equals(db.RootTableName)).First(), db));
+
             Console.WriteLine("Done.");
             Console.WriteLine();
         }
 
         static Database SarifDemoSchema()
         {
-            Database db = new Database("SarifLogBsoa", "BSOA.Demo.Model");
+            Database db = new Database("SarifLogBsoa", "BSOA.Demo.Model", "Root");
             Table table;
+
+            table = new Table("Root");
+            table.Columns.Add(Schema.Column.RefList("Runs", "Run"));
+            db.Tables.Add(table);
 
             table = new Table("Artifact");
             table.Columns.Add(Schema.Column.Ref("Description", "Message"));

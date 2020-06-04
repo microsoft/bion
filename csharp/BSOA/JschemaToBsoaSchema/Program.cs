@@ -12,10 +12,17 @@ namespace JschemaToBsoaSchema
 {
     class Program
     {
+        static Dictionary<string, string> NameRenames = new Dictionary<string, string>()
+        {
+            ["$schema"] = "SchemaUri"
+        };
+
         static Dictionary<string, string> TypeRenames = new Dictionary<string, string>()
         {
             ["Exception"] = "ExceptionData",
+            ["$schema"] = "SchemaUri",
             ["SarifLogVersion"] = "SarifVersion",
+            ["RootVersion"] = "SarifVersion",
             ["ExternalPropertiesVersion"] = "SarifVersion",
             ["RunColumnKind"] = "ColumnKind",
             ["ResultBaselineState"] = "BaselineState",
@@ -37,9 +44,13 @@ namespace JschemaToBsoaSchema
                 schema = SchemaReader.ReadSchema(sr, jschemaPath);
             }
 
-            Database db = new Database("SarifLog", "Microsoft.CodeAnalysis.Sarif");
-
             schema = JsonSchema.Collapse(schema);
+
+            Database db = new Database("SarifLog", "Microsoft.CodeAnalysis.Sarif", "Root");
+
+            Table root = new Table("Root");
+            db.Tables.Add(root);
+            AddColumns(root, schema);
 
             foreach (KeyValuePair<string, JsonSchema> type in schema.Definitions)
             {
@@ -47,16 +58,8 @@ namespace JschemaToBsoaSchema
                 if (TypeRenames.TryGetValue(tableName, out string renamed)) { tableName = renamed; }
 
                 Table table = new Table(tableName);
+                AddColumns(table, type.Value);
                 db.Tables.Add(table);
-
-                // PropertyInfoDictionary.PropertyInfoDictionaryFromSchema
-                foreach (KeyValuePair<string, JsonSchema> prop in type.Value.Properties)
-                {
-                    string columnName = prop.Key.ToPascalCase();
-                    if (columnName == "Properties" || columnName == "Tags") { continue; }
-
-                    table.Columns.Add(ToColumn(tableName, columnName, prop.Value));
-                }
             }
 
             AsJson.Save(outputPath, db, verbose: true);
@@ -64,10 +67,23 @@ namespace JschemaToBsoaSchema
             Console.WriteLine();
         }
 
+        static void AddColumns(Table table, JsonSchema schema)
+        {
+            // PropertyInfoDictionary.PropertyInfoDictionaryFromSchema
+            foreach (KeyValuePair<string, JsonSchema> prop in schema.Properties)
+            {
+                string columnName = prop.Key.ToPascalCase();
+                if (columnName == "Properties") { continue; }
+
+                table.Columns.Add(ToColumn(table.Name, columnName, prop.Value));
+            }
+        }
+
         static Column ToColumn(string tableName, string columnName, JsonSchema schema)
         {
             SchemaType type = schema.SafeGetType();
             string defaultValue = schema.Default?.ToString();
+            if (NameRenames.TryGetValue(columnName, out string columnRename)) { columnName = columnRename; }
 
             switch (type)
             {

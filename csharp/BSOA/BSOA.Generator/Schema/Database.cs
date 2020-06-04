@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace BSOA.Generator.Schema
 {
@@ -7,12 +6,14 @@ namespace BSOA.Generator.Schema
     {
         public string Name { get; set; }
         public string Namespace { get; set; }
+        public string RootTableName { get; set; }
         public IList<Table> Tables { get; set; }
 
-        public Database(string name, string ns)
+        public Database(string name, string ns, string rootTableName)
         {
             Name = name;
             Namespace = ns;
+            RootTableName = rootTableName;
             Tables = new List<Table>();
         }
     }

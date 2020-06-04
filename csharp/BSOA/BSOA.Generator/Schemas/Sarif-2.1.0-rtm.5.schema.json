@@ -1,7 +1,36 @@
 {
   "name": "SarifLog",
   "namespace": "Microsoft.CodeAnalysis.Sarif",
+  "rootTableName": "Root",
   "tables": [
+    {
+      "name": "Root",
+      "columns": [
+        {
+          "name": "SchemaUri",
+          "type": "Uri"
+        },
+        {
+          "category": "Enum",
+          "name": "Version",
+          "type": "SarifVersion",
+          "default": "default(SarifVersion)",
+          "underlyingType": "int"
+        },
+        {
+          "category": "RefList",
+          "name": "Runs",
+          "type": "IList<Run>",
+          "referencedTableName": "Run"
+        },
+        {
+          "category": "RefList",
+          "name": "InlineExternalProperties",
+          "type": "IList<ExternalProperties>",
+          "referencedTableName": "ExternalProperties"
+        }
+      ]
+    },
     {
       "name": "Address",
       "columns": [

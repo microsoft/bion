@@ -31,14 +31,7 @@ namespace BSOA.Generator.Generation
 
         public virtual void Generate(Database database, string outputPath)
         {
-            // Generate code by filling out template
-            string code = Generate(database);
-
-            // Evaluate any post-replacement Regexes
-            code = CodeSection.MakeReplacements(code, PostReplacements);
-
-            // Write the database class file
-            File.WriteAllText(Path.Combine(outputPath, $"{database.Name}{FileNameSuffix}.cs"), code);
+            File.WriteAllText(Path.Combine(outputPath, $"{database.Name}{FileNameSuffix}.cs"), Generate(database));
         }
 
         public virtual string Generate(Database database)
@@ -75,6 +68,8 @@ namespace BSOA.Generator.Generation
             finalCode = finalCode
                 .Replace(TemplateDefaults.DatabaseName, database.Name)
                 .Replace(TemplateDefaults.Namespace, database.Namespace);
+
+            finalCode = CodeSection.MakeReplacements(finalCode, PostReplacements);
 
             return finalCode;
         }
