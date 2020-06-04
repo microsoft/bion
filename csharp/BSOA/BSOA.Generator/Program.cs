@@ -56,7 +56,7 @@ namespace BSOA.Generator
                 { 
                     PostReplacements = new Dictionary<string, string>()
                     {
-                        ["^[ \t]+\\[DefaultValue\\(null\\)\\][ \t\r]*\n"] = ""
+                        ["^[ \t]+\\[DefaultValue\\((null)?\\)\\][ \t\r]*\n"] = ""
                     }
                 }
             };
@@ -67,6 +67,7 @@ namespace BSOA.Generator
             }
 
             Console.WriteLine("Done.");
+            Console.WriteLine();
         }
 
         static Database SarifDemoSchema()

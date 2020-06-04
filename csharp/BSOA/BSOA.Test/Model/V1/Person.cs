@@ -1,7 +1,7 @@
-using BSOA.Model;
-
 using System;
 using System.Collections.Generic;
+
+using BSOA.Model;
 
 namespace BSOA.Test.Model.V1
 {
