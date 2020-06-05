@@ -13,22 +13,22 @@ namespace BSOA.Generator.Templates
         private EmployeeTable _table;
         private int _index;
 
+        public Employee() : this(CompanyDatabase.Current.Employee)
+        { }
+
+        public Employee(Company root) : this(root.Database.Employee)
+        { }
+
+        internal Employee(EmployeeTable table) : this(table, table.Count)
+        {
+            table.Add();
+        }
+
         internal Employee(EmployeeTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
-
-        public Employee(EmployeeTable table) : this(table, table.Count)
-        {
-            table.Add();
-        }
-
-        public Employee(CompanyDatabase database) : this(database.Employee)
-        { }
-
-        public Employee() : this(CompanyDatabase.Current)
-        { }
 
         public string Name
         {
@@ -45,6 +45,8 @@ namespace BSOA.Generator.Templates
             _table = (EmployeeTable)table;
             _index = index;
         }
+
+        internal CompanyDatabase Database => _table.Database;
         #endregion
     }
 }

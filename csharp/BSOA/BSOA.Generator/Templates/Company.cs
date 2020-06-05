@@ -1,4 +1,5 @@
-﻿using BSOA.Model;
+﻿using BSOA.IO;
+using BSOA.Model;
 
 using System;
 using System.Collections.Generic;
@@ -6,63 +7,25 @@ using System.Collections.Generic;
 namespace BSOA.Generator.Templates
 {
     /// <summary>
-    ///  BSOA GENERATED Entity for 'Team'
+    ///  BSOA GENERATED Root Entity for 'Company'
     /// </summary>
-    public partial class Team : IRow, IEquatable<Team>
+    public partial class Company : IRow
     {
-        private TeamTable _table;
+        private CompanyTable _table;
         private int _index;
 
-        public Team() : this(CompanyDatabase.Current.Team)
+        public Company() : this(new CompanyDatabase().Company)
         { }
-
-        public Team(Company root) : this(root.Database.Team)
-        { }
-
-        internal Team(TeamTable table) : this(table, table.Count)
+        
+        internal Company(CompanyTable table) : this(table, table.Count)
         {
             table.Add();
         }
-        
-        internal Team(TeamTable table, int index)
+
+        internal Company(CompanyTable table, int index)
         {
             this._table = table;
             this._index = index;
-        }
-
-        public Team(
-            // <ArgumentList>
-            //  <Argument>
-            long id,
-            //  </Argument>
-            SecurityPolicy joinPolicy,
-            Employee owner,
-            IList<Employee> members
-            // </ArgumentList>
-        ) 
-            : this(CompanyDatabase.Current.Team)
-        {
-            // <AssignmentList>
-            //  <Assignment>
-            Id = id;
-            //  </Assignment>
-            JoinPolicy = joinPolicy;
-            Owner = owner;
-            Members = members;
-            // </AssignmentList>
-        }
-
-        public Team(Team other) 
-            : this(CompanyDatabase.Current.Team)
-        {
-            // <OtherAssignmentList>
-            //  <OtherAssignment>
-            Id = other.Id;
-            //  </OtherAssignment>
-            JoinPolicy = other.JoinPolicy;
-            Owner = other.Owner;
-            Members = other.Members;
-            // </OtherAssignmentList>
         }
 
         // <ColumnList>
@@ -82,26 +45,30 @@ namespace BSOA.Generator.Templates
         }
 
         //   </EnumColumn>
-        //   <RefColumn>
+        //  <RefColumn>
         public Employee Owner
         {
-            get => _table.Database.Employee.Get(_table.Owner[_index]);
-            set => _table.Owner[_index] = _table.Database.Employee.LocalIndex(value);
+            get => _table.Database.Employee[_table.Owner[_index]];
         }
-
-        //   </RefColumn>
-        //   <RefListColumn>
+        //  </RefColumn>
+        //  <RefListColumn>
         public IList<Employee> Members
         {
             get => _table.Database.Employee.List(_table.Members[_index]);
             set => _table.Database.Employee.List(_table.Members[_index]).SetTo(value);
         }
 
-        //   </RefListColumn>
+        //  </RefListColumn>
+        public IList<Team> Teams
+        {
+            get => _table.Database.Team.List(_table.Teams[_index]);
+            set => _table.Database.Team.List(_table.Teams[_index]).SetTo(value);
+        }
         // </ColumnList>
 
-        #region IEquatable<Team>
-        public bool Equals(Team other)
+
+        #region IEquatable<Company>
+        public bool Equals(Company other)
         {
             if (other == null) { return false; }
 
@@ -155,10 +122,10 @@ namespace BSOA.Generator.Templates
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as Team);
+            return Equals(obj as Company);
         }
 
-        public static bool operator ==(Team left, Team right)
+        public static bool operator ==(Company left, Company right)
         {
             if (object.ReferenceEquals(left, null))
             {
@@ -168,7 +135,7 @@ namespace BSOA.Generator.Templates
             return left.Equals(right);
         }
 
-        public static bool operator !=(Team left, Team right)
+        public static bool operator !=(Company left, Company right)
         {
             if (object.ReferenceEquals(left, null))
             {
@@ -185,9 +152,12 @@ namespace BSOA.Generator.Templates
 
         void IRow.Reset(ITable table, int index)
         {
-            _table = (TeamTable)table;
+            _table = (CompanyTable)table;
             _index = index;
         }
         #endregion
+
+        internal CompanyDatabase Database => _table.Database;
+        public ITreeSerializable DB => _table.Database;
     }
 }

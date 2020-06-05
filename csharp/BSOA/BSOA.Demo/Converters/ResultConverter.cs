@@ -5,25 +5,6 @@ namespace BSOA.Demo.Conversion
 {
     public class ResultConverter
     {
-        public static Model.Result Convert(Microsoft.CodeAnalysis.Sarif.Result source, SarifLogBsoa toDatabase)
-        {
-            Model.Result result = new Model.Result(toDatabase.Result);
-
-            result.BaselineState = source.BaselineState;
-            result.RuleId = source.RuleId;
-            result.RuleIndex = source.RuleIndex;
-
-            if (source.Message != null)
-            {
-                result.Message = MessageConverter.Convert(source.Message, toDatabase);
-            }
-
-            result.Locations.ConvertList(source.Locations, toDatabase, (item, db) => LocationConverter.Convert(item, db));
-            result.Guid = source.Guid;
-
-            return result;
-        }
-
         public static bool Compare(Microsoft.CodeAnalysis.Sarif.Result expected, Model.Result actual)
         {
             if (expected == null) { return actual == null; }

@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft.  All Rights Reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
-
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
+
+using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace BSOA.Demo.Model
 {
@@ -26,22 +26,22 @@ namespace BSOA.Demo.Model
         private ArtifactTable _table;
         private int _index;
 
+        public Artifact() : this(SarifLogDatabase.Current.Artifact)
+        { }
+
+        public Artifact(SarifLog root) : this(root.Database.Artifact)
+        { }
+
+        internal Artifact(ArtifactTable table) : this(table, table.Count)
+        {
+            table.Add();
+        }
+
         internal Artifact(ArtifactTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
-
-        public Artifact(ArtifactTable table) : this(table, table.Count)
-        {
-            table.Add();
-        }
-
-        public Artifact(SarifLogBsoa database) : this(database.Artifact)
-        { }
-
-        public Artifact() : this(SarifLogBsoa.Current)
-        { }
 
         public Artifact(
             Message description,
@@ -54,7 +54,8 @@ namespace BSOA.Demo.Model
             string encoding,
             string sourceLanguage,
             DateTime lastModifiedTimeUtc
-        ) : this(SarifLogBsoa.Current)
+        ) 
+            : this(SarifLogDatabase.Current.Artifact)
         {
             Description = description;
             Location = location;
@@ -68,7 +69,8 @@ namespace BSOA.Demo.Model
             LastModifiedTimeUtc = lastModifiedTimeUtc;
         }
 
-        public Artifact(Artifact other)
+        public Artifact(Artifact other) 
+            : this(SarifLogDatabase.Current.Artifact)
         {
             Description = other.Description;
             Location = other.Location;
@@ -106,7 +108,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "offset", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(0)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int Offset
         {
@@ -124,6 +126,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "mimeType", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string MimeType
         {
@@ -139,6 +142,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "encoding", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Encoding
         {
@@ -147,6 +151,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string SourceLanguage
         {
@@ -155,8 +160,8 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "lastModifiedTimeUtc", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.DateTimeConverter))]
         public DateTime LastModifiedTimeUtc
         {
             get => _table.LastModifiedTimeUtc[_index];

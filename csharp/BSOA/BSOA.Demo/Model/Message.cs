@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft.  All Rights Reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
-
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
+
+using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace BSOA.Demo.Model
 {
@@ -26,35 +26,37 @@ namespace BSOA.Demo.Model
         private MessageTable _table;
         private int _index;
 
+        public Message() : this(SarifLogDatabase.Current.Message)
+        { }
+
+        public Message(SarifLog root) : this(root.Database.Message)
+        { }
+
+        internal Message(MessageTable table) : this(table, table.Count)
+        {
+            table.Add();
+        }
+
         internal Message(MessageTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
 
-        public Message(MessageTable table) : this(table, table.Count)
-        {
-            table.Add();
-        }
-
-        public Message(SarifLogBsoa database) : this(database.Message)
-        { }
-
-        public Message() : this(SarifLogBsoa.Current)
-        { }
-
         public Message(
             string text,
             string markdown,
             string id
-        ) : this(SarifLogBsoa.Current)
+        ) 
+            : this(SarifLogDatabase.Current.Message)
         {
             Text = text;
             Markdown = markdown;
             Id = id;
         }
 
-        public Message(Message other)
+        public Message(Message other) 
+            : this(SarifLogDatabase.Current.Message)
         {
             Text = other.Text;
             Markdown = other.Markdown;
@@ -62,6 +64,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "text", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Text
         {
@@ -70,6 +73,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "markdown", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Markdown
         {
@@ -78,6 +82,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Id
         {

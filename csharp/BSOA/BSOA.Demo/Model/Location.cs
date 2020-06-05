@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft.  All Rights Reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
-
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
+
+using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace BSOA.Demo.Model
 {
@@ -26,22 +26,22 @@ namespace BSOA.Demo.Model
         private LocationTable _table;
         private int _index;
 
+        public Location() : this(SarifLogDatabase.Current.Location)
+        { }
+
+        public Location(SarifLog root) : this(root.Database.Location)
+        { }
+
+        internal Location(LocationTable table) : this(table, table.Count)
+        {
+            table.Add();
+        }
+
         internal Location(LocationTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
-
-        public Location(LocationTable table) : this(table, table.Count)
-        {
-            table.Add();
-        }
-
-        public Location(SarifLogBsoa database) : this(database.Location)
-        { }
-
-        public Location() : this(SarifLogBsoa.Current)
-        { }
 
         public Location(
             int id,
@@ -49,7 +49,8 @@ namespace BSOA.Demo.Model
             IList<LogicalLocation> logicalLocations,
             Message message,
             IList<Region> annotations
-        ) : this(SarifLogBsoa.Current)
+        ) 
+            : this(SarifLogDatabase.Current.Location)
         {
             Id = id;
             PhysicalLocation = physicalLocation;
@@ -58,7 +59,8 @@ namespace BSOA.Demo.Model
             Annotations = annotations;
         }
 
-        public Location(Location other)
+        public Location(Location other) 
+            : this(SarifLogDatabase.Current.Location)
         {
             Id = other.Id;
             PhysicalLocation = other.PhysicalLocation;

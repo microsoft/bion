@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft.  All Rights Reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
-
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
+
+using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace BSOA.Demo.Model
 {
@@ -26,29 +26,30 @@ namespace BSOA.Demo.Model
         private ArtifactLocationTable _table;
         private int _index;
 
+        public ArtifactLocation() : this(SarifLogDatabase.Current.ArtifactLocation)
+        { }
+
+        public ArtifactLocation(SarifLog root) : this(root.Database.ArtifactLocation)
+        { }
+
+        internal ArtifactLocation(ArtifactLocationTable table) : this(table, table.Count)
+        {
+            table.Add();
+        }
+
         internal ArtifactLocation(ArtifactLocationTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
 
-        public ArtifactLocation(ArtifactLocationTable table) : this(table, table.Count)
-        {
-            table.Add();
-        }
-
-        public ArtifactLocation(SarifLogBsoa database) : this(database.ArtifactLocation)
-        { }
-
-        public ArtifactLocation() : this(SarifLogBsoa.Current)
-        { }
-
         public ArtifactLocation(
             Uri uri,
             string uriBaseId,
             int index,
             Message description
-        ) : this(SarifLogBsoa.Current)
+        ) 
+            : this(SarifLogDatabase.Current.ArtifactLocation)
         {
             Uri = uri;
             UriBaseId = uriBaseId;
@@ -56,7 +57,8 @@ namespace BSOA.Demo.Model
             Description = description;
         }
 
-        public ArtifactLocation(ArtifactLocation other)
+        public ArtifactLocation(ArtifactLocation other) 
+            : this(SarifLogDatabase.Current.ArtifactLocation)
         {
             Uri = other.Uri;
             UriBaseId = other.UriBaseId;
@@ -65,6 +67,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "uri", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Uri Uri
         {
@@ -73,6 +76,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "uriBaseId", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string UriBaseId
         {

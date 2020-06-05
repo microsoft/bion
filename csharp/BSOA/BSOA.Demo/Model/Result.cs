@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft.  All Rights Reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
-
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
+
+using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace BSOA.Demo.Model
 {
@@ -26,22 +26,22 @@ namespace BSOA.Demo.Model
         private ResultTable _table;
         private int _index;
 
+        public Result() : this(SarifLogDatabase.Current.Result)
+        { }
+
+        public Result(SarifLog root) : this(root.Database.Result)
+        { }
+
+        internal Result(ResultTable table) : this(table, table.Count)
+        {
+            table.Add();
+        }
+
         internal Result(ResultTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
-
-        public Result(ResultTable table) : this(table, table.Count)
-        {
-            table.Add();
-        }
-
-        public Result(SarifLogBsoa database) : this(database.Result)
-        { }
-
-        public Result() : this(SarifLogBsoa.Current)
-        { }
 
         public Result(
             Microsoft.CodeAnalysis.Sarif.BaselineState baselineState,
@@ -50,7 +50,8 @@ namespace BSOA.Demo.Model
             Message message,
             IList<Location> locations,
             string guid
-        ) : this(SarifLogBsoa.Current)
+        ) 
+            : this(SarifLogDatabase.Current.Result)
         {
             BaselineState = baselineState;
             RuleId = ruleId;
@@ -60,7 +61,8 @@ namespace BSOA.Demo.Model
             Guid = guid;
         }
 
-        public Result(Result other)
+        public Result(Result other) 
+            : this(SarifLogDatabase.Current.Result)
         {
             BaselineState = other.BaselineState;
             RuleId = other.RuleId;
@@ -79,6 +81,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "ruleId", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string RuleId
         {
@@ -110,6 +113,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "guid", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Guid
         {

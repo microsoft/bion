@@ -1,45 +1,47 @@
+using BSOA.Model;
+
 using System;
 using System.Collections.Generic;
-
-using BSOA.Model;
 
 namespace BSOA.Test.Model.V1
 {
     /// <summary>
-    ///  GENERATED: BSOA Entity for 'Person'
+    ///  BSOA GENERATED Entity for 'Person'
     /// </summary>
     public partial class Person : IRow, IEquatable<Person>
     {
         private PersonTable _table;
         private int _index;
 
+        public Person() : this(PersonDatabase.Current.Person)
+        { }
+
+        public Person(Community root) : this(root.Database.Person)
+        { }
+
+        internal Person(PersonTable table) : this(table, table.Count)
+        {
+            table.Add();
+        }
+        
         internal Person(PersonTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
 
-        public Person(PersonTable table) : this(table, table.Count)
-        {
-            table.Add();
-        }
-
-        public Person(PersonDatabase database) : this(database.Person)
-        { }
-
-        public Person() : this(PersonDatabase.Current)
-        { }
-
         public Person(
             byte age,
             string name
-        ) : this(PersonDatabase.Current)
+        ) 
+            : this(PersonDatabase.Current.Person)
         {
             Age = age;
             Name = name;
         }
 
-        public Person(Person other)
+        public Person(Person other) 
+            : this(PersonDatabase.Current.Person)
         {
             Age = other.Age;
             Name = other.Name;

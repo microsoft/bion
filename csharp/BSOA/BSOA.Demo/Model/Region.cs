@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft.  All Rights Reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
-
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
+
+using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace BSOA.Demo.Model
 {
@@ -26,22 +26,22 @@ namespace BSOA.Demo.Model
         private RegionTable _table;
         private int _index;
 
+        public Region() : this(SarifLogDatabase.Current.Region)
+        { }
+
+        public Region(SarifLog root) : this(root.Database.Region)
+        { }
+
+        internal Region(RegionTable table) : this(table, table.Count)
+        {
+            table.Add();
+        }
+
         internal Region(RegionTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
-
-        public Region(RegionTable table) : this(table, table.Count)
-        {
-            table.Add();
-        }
-
-        public Region(SarifLogBsoa database) : this(database.Region)
-        { }
-
-        public Region() : this(SarifLogBsoa.Current)
-        { }
 
         public Region(
             int startLine,
@@ -55,7 +55,8 @@ namespace BSOA.Demo.Model
             ArtifactContent snippet,
             Message message,
             string sourceLanguage
-        ) : this(SarifLogBsoa.Current)
+        ) 
+            : this(SarifLogDatabase.Current.Region)
         {
             StartLine = startLine;
             StartColumn = startColumn;
@@ -70,7 +71,8 @@ namespace BSOA.Demo.Model
             SourceLanguage = sourceLanguage;
         }
 
-        public Region(Region other)
+        public Region(Region other) 
+            : this(SarifLogDatabase.Current.Region)
         {
             StartLine = other.StartLine;
             StartColumn = other.StartColumn;
@@ -86,7 +88,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "startLine", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(0)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int StartLine
         {
@@ -95,7 +97,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "startColumn", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(0)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int StartColumn
         {
@@ -104,7 +106,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "endLine", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(0)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int EndLine
         {
@@ -113,7 +115,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "endColumn", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(0)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int EndColumn
         {
@@ -131,7 +133,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "byteLength", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(0)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int ByteLength
         {
@@ -149,7 +151,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "charLength", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(0)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int CharLength
         {
@@ -172,6 +174,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string SourceLanguage
         {

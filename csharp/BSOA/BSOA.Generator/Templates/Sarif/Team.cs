@@ -1,18 +1,18 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
-
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
+
+using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace BSOA.Generator.Templates
 {
@@ -26,85 +26,72 @@ namespace BSOA.Generator.Templates
         private TeamTable _table;
         private int _index;
 
+        public Team() : this(CompanyDatabase.Current.Team)
+        { }
+
+        public Team(Company root) : this(root.Database.Team)
+        { }
+
+        internal Team(TeamTable table) : this(table, table.Count)
+        {
+            table.Add();
+        }
+
         internal Team(TeamTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
 
-        public Team(TeamTable table) : this(table, table.Count)
-        {
-            table.Add();
-        }
-
-        public Team(CompanyDatabase database) : this(database.Team)
-        { }
-
-        public Team() : this(CompanyDatabase.Current)
-        { }
-
         public Team(
             // <ArgumentList>
             //  <Argument>
-            long employeeId,
+            long id,
             //  </Argument>
-            DateTime whenFormed,
             SecurityPolicy joinPolicy,
-            GroupAttributes attributes,
-            Employee manager,
+            Employee owner,
             IList<Employee> members
         // </ArgumentList>
-        ) : this(CompanyDatabase.Current)
+        ) 
+            : this(CompanyDatabase.Current.Team)
         {
             // <AssignmentList>
             //  <Assignment>
-            EmployeeId = employeeId;
+            Id = id;
             //  </Assignment>
             WhenFormed = whenFormed;
             JoinPolicy = joinPolicy;
             Attributes = attributes;
-            Manager = manager;
-            Members = members;
+            Owner = owner;
+            Employees = members;
             // </AssignmentList>
         }
 
-        public Team(Team other)
+        public Team(Team other) 
+            : this(CompanyDatabase.Current.Team)
         {
             // <OtherAssignmentList>
             //  <OtherAssignment>
-            EmployeeId = other.EmployeeId;
+            Id = other.Id;
             //  </OtherAssignment>
-            WhenFormed = other.WhenFormed;
             JoinPolicy = other.JoinPolicy;
-            Attributes = other.Attributes;
-            Manager = other.Manager;
-            Members = other.Members;
+            Owner = other.Owner;
+            Employees = other.Employees;
             // </OtherAssignmentList>
         }
 
         // <ColumnList>
         //   <SimpleColumn>
-        [DataMember(Name = "employeeId", IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public long EmployeeId
+        public long Id
         {
-            get => _table.EmployeeId[_index];
-            set => _table.EmployeeId[_index] = value;
+            get => _table.Id[_index];
+            set => _table.Id[_index] = value;
         }
 
         //   </SimpleColumn>
-        //   <DateTimeColumn>
-        [DataMember(Name = "whenFormed", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.DateTimeConverter))]
-        public DateTime WhenFormed
-        {
-            get => _table.WhenFormed[_index];
-            set => _table.WhenFormed[_index] = value;
-        }
-
-        //   </DateTimeColumn>
         //   <EnumColumn>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
@@ -115,22 +102,12 @@ namespace BSOA.Generator.Templates
         }
 
         //   </EnumColumn>
-        //   <FlagsEnumColumn>
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.FlagsEnumConverter))]
-        public GroupAttributes Attributes
-        {
-            get => (GroupAttributes)_table.Attributes[_index];
-            set => _table.Attributes[_index] = (long)value;
-        }
-
-        //   </FlagsEnumColumn>
         //   <RefColumn>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public Employee Manager
+        public Employee Owner
         {
-            get => _table.Database.Employee.Get(_table.Manager[_index]);
-            set => _table.Manager[_index] = _table.Database.Employee.LocalIndex(value);
+            get => _table.Database.Employee.Get(_table.Owner[_index]);
+            set => _table.Owner[_index] = _table.Database.Employee.LocalIndex(value);
         }
 
         //   </RefColumn>
@@ -152,13 +129,11 @@ namespace BSOA.Generator.Templates
 
             // <EqualsList>
             //  <Equals>
-            if (this.EmployeeId != other.EmployeeId) { return false; }
+            if (this.Id != other.Id) { return false; }
             //  </Equals>
-            if (this.WhenFormed != other.WhenFormed) { return false; }
             if (this.JoinPolicy != other.JoinPolicy) { return false; }
-            if (this.Attributes != other.Attributes) { return false; }
-            if (this.Manager != other.Manager) { return false; }
-            if (this.Members != other.Members) { return false; }
+            if (this.Owner != other.Owner) { return false; }
+            if (this.Employees != other.Employees) { return false; }
             // </EqualsList>
 
             return true;
@@ -174,35 +149,26 @@ namespace BSOA.Generator.Templates
             {
                 // <GetHashCodeList>
                 //  <GetHashCode>
-                if (EmployeeId != default(long))
+                if (Id != default(long))
                 {
-                    result = (result * 31) + EmployeeId.GetHashCode();
+                    result = (result * 31) + Id.GetHashCode();
                 }
 
                 //  </GetHashCode>
-                if (WhenFormed != default(DateTime))
-                {
-                    result = (result * 31) + WhenFormed.GetHashCode();
-                }
-
+                
                 if (JoinPolicy != default(SecurityPolicy))
                 {
                     result = (result * 31) + JoinPolicy.GetHashCode();
                 }
 
-                if (Attributes != default(GroupAttributes))
+                if (Owner != default(Employee))
                 {
-                    result = (result * 31) + Attributes.GetHashCode();
+                    result = (result * 31) + Owner.GetHashCode();
                 }
 
-                if (Manager != default(Employee))
+                if (Employees != default(IList<Employee>))
                 {
-                    result = (result * 31) + Manager.GetHashCode();
-                }
-
-                if (Members != default(IList<Employee>))
-                {
-                    result = (result * 31) + Members.GetHashCode();
+                    result = (result * 31) + Employees.GetHashCode();
                 }
                 // </GetHashCodeList>
             }

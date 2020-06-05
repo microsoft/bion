@@ -1,36 +1,47 @@
-﻿using BSOA.Model;
+﻿// Copyright (c) Microsoft.  All Rights Reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using BSOA.IO;
+using BSOA.Model;
+
+using Microsoft.CodeAnalysis.Sarif;
+using Microsoft.CodeAnalysis.Sarif.Readers;
+
+using Newtonsoft.Json;
 
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace BSOA.Generator.Templates
 {
     /// <summary>
-    ///  BSOA GENERATED Entity for 'Team'
+    ///  GENERATED: BSOA Root Entity for 'Company'
     /// </summary>
-    public partial class Team : IRow, IEquatable<Team>
+    [DataContract]
+    [GeneratedCode("BSOA.Generator", "0.5.0")]
+    public partial class Company : PropertyBagHolder, ISarifNode, IRow
     {
-        private TeamTable _table;
+        private CompanyTable _table;
         private int _index;
 
-        public Team() : this(CompanyDatabase.Current.Team)
+        public Company() : this(new CompanyDatabase().Company)
         { }
-
-        public Team(Company root) : this(root.Database.Team)
-        { }
-
-        internal Team(TeamTable table) : this(table, table.Count)
+        
+        internal Company(CompanyTable table) : this(table, table.Count)
         {
             table.Add();
         }
-        
-        internal Team(TeamTable table, int index)
+
+        internal Company(CompanyTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
 
-        public Team(
+        public Company(
             // <ArgumentList>
             //  <Argument>
             long id,
@@ -38,22 +49,23 @@ namespace BSOA.Generator.Templates
             SecurityPolicy joinPolicy,
             Employee owner,
             IList<Employee> members
-            // </ArgumentList>
-        ) 
-            : this(CompanyDatabase.Current.Team)
+        // </ArgumentList>
+        ) : this()
         {
             // <AssignmentList>
             //  <Assignment>
             Id = id;
             //  </Assignment>
+            WhenFormed = whenFormed;
             JoinPolicy = joinPolicy;
+            Attributes = attributes;
             Owner = owner;
             Members = members;
             // </AssignmentList>
         }
 
-        public Team(Team other) 
-            : this(CompanyDatabase.Current.Team)
+        public Company(Company other)
+            : this()
         {
             // <OtherAssignmentList>
             //  <OtherAssignment>
@@ -67,6 +79,9 @@ namespace BSOA.Generator.Templates
 
         // <ColumnList>
         //   <SimpleColumn>
+        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public long Id
         {
             get => _table.Id[_index];
@@ -75,6 +90,8 @@ namespace BSOA.Generator.Templates
 
         //   </SimpleColumn>
         //   <EnumColumn>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public SecurityPolicy JoinPolicy
         {
             get => (SecurityPolicy)_table.JoinPolicy[_index];
@@ -83,14 +100,16 @@ namespace BSOA.Generator.Templates
 
         //   </EnumColumn>
         //   <RefColumn>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Employee Owner
         {
             get => _table.Database.Employee.Get(_table.Owner[_index]);
-            set => _table.Owner[_index] = _table.Database.Employee.LocalIndex(value);
+            set => _table.Manager[_index] = _table.Database.Employee.LocalIndex(value);
         }
 
         //   </RefColumn>
         //   <RefListColumn>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public IList<Employee> Members
         {
             get => _table.Database.Employee.List(_table.Members[_index]);
@@ -100,8 +119,8 @@ namespace BSOA.Generator.Templates
         //   </RefListColumn>
         // </ColumnList>
 
-        #region IEquatable<Team>
-        public bool Equals(Team other)
+        #region IEquatable<Company>
+        public bool Equals(Company other)
         {
             if (other == null) { return false; }
 
@@ -133,6 +152,7 @@ namespace BSOA.Generator.Templates
                 }
 
                 //  </GetHashCode>
+
                 if (JoinPolicy != default(SecurityPolicy))
                 {
                     result = (result * 31) + JoinPolicy.GetHashCode();
@@ -155,10 +175,10 @@ namespace BSOA.Generator.Templates
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as Team);
+            return Equals(obj as Company);
         }
 
-        public static bool operator ==(Team left, Team right)
+        public static bool operator ==(Company left, Company right)
         {
             if (object.ReferenceEquals(left, null))
             {
@@ -168,7 +188,7 @@ namespace BSOA.Generator.Templates
             return left.Equals(right);
         }
 
-        public static bool operator !=(Team left, Team right)
+        public static bool operator !=(Company left, Company right)
         {
             if (object.ReferenceEquals(left, null))
             {
@@ -185,9 +205,38 @@ namespace BSOA.Generator.Templates
 
         void IRow.Reset(ITable table, int index)
         {
-            _table = (TeamTable)table;
+            _table = (CompanyTable)table;
             _index = index;
         }
         #endregion
+
+        #region ISarifNode
+        public SarifNodeKind SarifNodeKind => SarifNodeKind.Company;
+
+        ISarifNode ISarifNode.DeepClone()
+        {
+            return DeepCloneCore();
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this instance.
+        /// </summary>
+        public Company DeepClone()
+        {
+            return (Company)DeepCloneCore();
+        }
+
+        private ISarifNode DeepCloneCore()
+        {
+            return new Company(this);
+        }
+        #endregion
+
+        public static IEqualityComparer<Company> ValueComparer => EqualityComparer<Company>.Default;
+        public bool ValueEquals(Company other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
+
+        internal CompanyDatabase Database => _table.Database;
+        public ITreeSerializable DB => _table.Database;
     }
 }

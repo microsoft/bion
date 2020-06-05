@@ -1,12 +1,12 @@
-﻿using BSOA.Model;
+﻿using System.Linq;
 
 namespace BSOA.Demo.Model
 {
-    public partial class SarifLogBsoa
+    public partial class SarifLog
     {
         public override string ToString()
         {
-            return $"{Result.Count:n0} {nameof(Result)}s";
+            return $"{Runs.Sum((run) => run?.Results?.Count ?? 0):n0} {nameof(Result)}s";
         }
     }
 }
