@@ -88,7 +88,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "startLine", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int StartLine
         {
@@ -97,7 +96,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "startColumn", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int StartColumn
         {
@@ -106,7 +104,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "endLine", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int EndLine
         {
@@ -115,7 +112,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "endColumn", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int EndColumn
         {
@@ -133,7 +129,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "byteLength", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int ByteLength
         {
@@ -151,7 +146,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "charLength", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int CharLength
         {
@@ -174,7 +168,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string SourceLanguage
         {

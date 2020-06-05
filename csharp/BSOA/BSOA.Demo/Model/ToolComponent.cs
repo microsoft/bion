@@ -58,7 +58,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Name
         {

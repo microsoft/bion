@@ -83,7 +83,7 @@ namespace BSOA.Generator.Templates
         // <ColumnList>
         //   <SimpleColumn>
         [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
+        [DefaultValue(99)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public long Id
         {

@@ -73,7 +73,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Name
         {
@@ -91,7 +90,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "fullyQualifiedName", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string FullyQualifiedName
         {
@@ -100,7 +98,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "decoratedName", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string DecoratedName
         {
@@ -118,7 +115,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "kind", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Kind
         {

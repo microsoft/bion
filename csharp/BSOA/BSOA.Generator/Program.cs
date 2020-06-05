@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace BSOA.Generator
 {
@@ -54,8 +55,11 @@ namespace BSOA.Generator
 
             Dictionary<string, string> postReplacements = new Dictionary<string, string>()
             {
-                ["^[ \t]+\\[DefaultValue\\((null)?\\)\\][ \t\r]*\n"] = "",
-                ["PropertyBag : PropertyBagHolder, "] = "PropertyBag : ",
+                ["^[ \t]+\\[DefaultValue\\(null\\)\\][ \t\r]*\n"] = "",
+                ["^[ \t]+\\[DefaultValue\\(0\\)\\][ \t\r]*\n"] = "",
+                ["^[ \t]+\\[DefaultValue\\(\\)\\][ \t\r]*\n"] = "",
+                [Regex.Escape("PropertyBag : PropertyBagHolder, ")] = "PropertyBag : ",
+                [Regex.Escape(@"[DefaultValue(DateTime.MinValue)]")] = "[JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.DateTimeConverter))]"
             };
 
             // Generate Database class

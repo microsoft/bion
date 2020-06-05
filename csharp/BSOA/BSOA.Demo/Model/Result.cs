@@ -81,7 +81,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "ruleId", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string RuleId
         {
@@ -113,7 +112,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "guid", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Guid
         {

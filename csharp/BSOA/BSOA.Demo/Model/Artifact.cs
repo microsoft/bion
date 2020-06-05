@@ -108,7 +108,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "offset", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int Offset
         {
@@ -126,7 +125,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "mimeType", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string MimeType
         {
@@ -142,7 +140,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "encoding", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Encoding
         {
@@ -151,7 +148,6 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string SourceLanguage
         {
@@ -160,7 +156,7 @@ namespace BSOA.Demo.Model
         }
 
         [DataMember(Name = "lastModifiedTimeUtc", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
+        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.DateTimeConverter))]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public DateTime LastModifiedTimeUtc
         {
