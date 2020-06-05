@@ -35,19 +35,9 @@ namespace BSOA.Generator.Schema
             return new Column(ColumnTypeCategory.Simple, name, type, defaultValue);
         }
 
-        public static Column DateTime(string name, string defaultValue = null)
-        {
-            return new Column(ColumnTypeCategory.DateTime, name, "DateTime", defaultValue);
-        }
-
         public static Column Enum(string name, string type, string underlyingType, string defaultValue = null)
         {
             return new Column(ColumnTypeCategory.Enum, name, type, defaultValue, underlyingType);
-        }
-
-        public static Column FlagsEnum(string name, string type, string underlyingType, string defaultValue = null)
-        {
-            return new Column(ColumnTypeCategory.FlagsEnum, name, type, defaultValue, underlyingType);
         }
 
         public static Column Ref(string name, string targetTable)

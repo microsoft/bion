@@ -1,7 +1,7 @@
 ﻿using BSOA.Generator.Schema;
 using System.Collections.Generic;
 
-namespace BSOA.Generator.Generation
+namespace BSOA.Generator
 {
     /// <summary>
     ///  TemplateDefaults knows the values used in the Template code; these are used to string.Replace
@@ -14,17 +14,16 @@ namespace BSOA.Generator.Generation
     /// </remarks>
     public static class TemplateDefaults
     {
-        public static string TableName = "Team";
-        public static string DatabaseName = "CompanyDatabase";
         public static string Namespace = "BSOA.Generator.Templates";
+        public static string DatabaseName = "CompanyDatabase";
+        public static string RootTableName = "Company";
+        public static string TableName = "Team";
 
         public static Dictionary<ColumnTypeCategory, Schema.Column> Columns = new Dictionary<ColumnTypeCategory, Schema.Column>()
         {
-            [ColumnTypeCategory.Simple]     = Schema.Column.Simple("EmployeeId", "long", "-1"),
-            [ColumnTypeCategory.DateTime]   = Schema.Column.DateTime("WhenFormed", "DateTime.MinValue"),
+            [ColumnTypeCategory.Simple]     = Schema.Column.Simple("Id", "long", "99"),
             [ColumnTypeCategory.Enum]       = Schema.Column.Enum("JoinPolicy", "SecurityPolicy", "byte", "SecurityPolicy.Open"),
-            [ColumnTypeCategory.FlagsEnum]  = Schema.Column.FlagsEnum("Attributes", "GroupAttributes", "long", "GroupAttributes.None"),
-            [ColumnTypeCategory.Ref]        = Schema.Column.Ref("Manager", "Employee"),
+            [ColumnTypeCategory.Ref]        = Schema.Column.Ref("Owner", "Employee"),
             [ColumnTypeCategory.RefList]    = Schema.Column.RefList("Members", "Employee")
         };
     }

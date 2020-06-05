@@ -1,7 +1,7 @@
 {
-  "name": "SarifLogBsoa",
+  "name": "SarifLogDatabase",
   "namespace": "BSOA.Demo.Model",
-  "rootTableName": "Root",
+  "rootTableName": "SarifLog",
   "tables": [
     {
       "name": "Artifact",
@@ -55,7 +55,7 @@
           "default": "null"
         },
         {
-          "category": "DateTime",
+          "category": "Simple",
           "name": "LastModifiedTimeUtc",
           "type": "DateTime",
           "default": "DateTime.MinValue"
@@ -367,7 +367,7 @@
       ]
     },
     {
-      "name": "Root",
+      "name": "SarifLog",
       "columns": [
         {
           "category": "RefList",

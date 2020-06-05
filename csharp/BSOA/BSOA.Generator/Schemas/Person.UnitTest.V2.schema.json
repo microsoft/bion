@@ -1,13 +1,13 @@
 {
   "name": "PersonDatabase",
   "namespace": "BSOA.Test.Model.V2",
-  "rootTableName": "Root",
+  "rootTableName": "Community",
   "tables": [
     {
       "name": "Person",
       "columns": [
         {
-          "category": "DateTime",
+          "category": "Simple",
           "name": "Birthdate",
           "type": "DateTime"
         },
@@ -19,7 +19,7 @@
       ]
     },
     {
-      "name": "Root",
+      "name": "Community",
       "columns": [
         {
           "category": "RefList",

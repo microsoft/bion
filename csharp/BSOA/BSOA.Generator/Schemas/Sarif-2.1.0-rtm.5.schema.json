@@ -131,7 +131,6 @@
           "type": "IDictionary<string, string>"
         },
         {
-          "category": "DateTime",
           "name": "LastModifiedTimeUtc",
           "type": "DateTime"
         }
@@ -688,12 +687,10 @@
           "referencedTableName": "ArtifactLocation"
         },
         {
-          "category": "DateTime",
           "name": "StartTimeUtc",
           "type": "DateTime"
         },
         {
-          "category": "DateTime",
           "name": "EndTimeUtc",
           "type": "DateTime"
         },
@@ -977,7 +974,6 @@
           "type": "int"
         },
         {
-          "category": "DateTime",
           "name": "TimeUtc",
           "type": "DateTime"
         },
@@ -1446,12 +1442,10 @@
       "name": "ResultProvenance",
       "columns": [
         {
-          "category": "DateTime",
           "name": "FirstDetectionTimeUtc",
           "type": "DateTime"
         },
         {
-          "category": "DateTime",
           "name": "LastDetectionTimeUtc",
           "type": "DateTime"
         },
@@ -1815,7 +1809,6 @@
           "default": "-1"
         },
         {
-          "category": "DateTime",
           "name": "ExecutionTimeUtc",
           "type": "DateTime"
         },
@@ -2061,7 +2054,6 @@
           "type": "string"
         },
         {
-          "category": "DateTime",
           "name": "AsOfTimeUtc",
           "type": "DateTime"
         },

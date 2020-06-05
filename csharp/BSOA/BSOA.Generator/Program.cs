@@ -1,5 +1,4 @@
-﻿using BSOA.Generator.Generation;
-using BSOA.Generator.Schema;
+﻿using BSOA.Generator.Schema;
 using BSOA.Json;
 
 using System;
@@ -32,160 +31,57 @@ namespace BSOA.Generator
     /// </summary>
     class Program
     {
+        private const string DefaultTemplateFolderPath = @"Templates";
+
         static void Main(string[] args)
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("Usage: BSOA.Generator <SchemaJsonFile> <OutputFolder> [<EntityTemplate>]?");
+                Console.WriteLine("Usage: BSOA.Generator <SchemaJsonFile> <OutputFolder> [<TemplateFolderPath>]?");
                 return;
             }
 
             string schemaPath = args[0];
             string outputFolder = (args.Length > 1 ? args[1] : @"Model");
-            string entityTemplatePath = (args.Length > 2 ? args[2] : @"Templates\Team.cs");
+            string templateFolderPath = (args.Length > 2 ? args[2] : DefaultTemplateFolderPath).TrimEnd('\\');
 
             Console.WriteLine($"Generating BSOA object model from schema\r\n  '{schemaPath}' at \r\n  '{outputFolder}'...");
 
             Database db = AsJson.Load<Database>(schemaPath);
+
+            if (Directory.Exists(outputFolder)) { Directory.Delete(outputFolder, true); }
             Directory.CreateDirectory(outputFolder);
 
-            List<ICodeGenerator> generators = new List<ICodeGenerator>()
+            Dictionary<string, string> postReplacements = new Dictionary<string, string>()
             {
-                new PerTableTemplateResolver(),
-                new PerColumnTemplateResolver("Table", @"Templates\TeamTable.cs")
-                {
-                    PostReplacements = new Dictionary<string, string>()
-                    {
-                        ["public partial class RootTable"] = "internal partial class RootTable"
-                    }
-                },
-                new PerColumnTemplateResolver("", entityTemplatePath) 
-                { 
-                    PostReplacements = new Dictionary<string, string>()
-                    {
-                        ["^[ \t]+\\[DefaultValue\\((null)?\\)\\][ \t\r]*\n"] = "",
-                        ["SarifNodeKind.Root"] = "SarifNodeKind.SarifLog",
-                        ["public partial class Root"] = "internal partial class Root",
-                        ["PropertyBag : PropertyBagHolder, "] = "PropertyBag : ",
-                    }
-                }
+                ["^[ \t]+\\[DefaultValue\\((null)?\\)\\][ \t\r]*\n"] = "",
+                ["PropertyBag : PropertyBagHolder, "] = "PropertyBag : ",
             };
 
-            foreach (ICodeGenerator generator in generators)
-            {
-                generator.Generate(db, outputFolder);
-            }
+            // Generate Database class
+            new CodeGenerator(TemplateType.Database, TemplatePath(templateFolderPath, @"Internal\CompanyDatabase.cs"), @"Internal\{0}.cs") { PostReplacements = postReplacements }
+                .Generate(outputFolder, db);
 
-            PerColumnTemplateResolver rootPropsGenerator = new PerColumnTemplateResolver("Props", @"Templates\CompanyDatabaseProps.cs");
-            File.WriteAllText(Path.Combine(outputFolder, $"{db.Name}Props.cs"), rootPropsGenerator.Generate(db.Tables.Where((t) => t.Name.Equals(db.RootTableName)).First(), db));
+            // Generate Tables
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Internal\TeamTable.cs"), @"Internal\{0}Table.cs") { PostReplacements = postReplacements }
+                .Generate(outputFolder, db);
+
+            // Generate Entities
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Team.cs"), "{0}.cs") { PostReplacements = postReplacements }
+                .Generate(outputFolder, db);
+
+            // Generate Root Entity (overwrite normal style)
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Company.cs"), @"{0}.cs") { PostReplacements = postReplacements }
+                .Generate(outputFolder, db.Tables.Where((table) => table.Name.Equals(db.RootTableName)).First(), db);
 
             Console.WriteLine("Done.");
             Console.WriteLine();
         }
 
-        static Database SarifDemoSchema()
+        static string TemplatePath(string templateFolderPath, string templateFilePath)
         {
-            Database db = new Database("SarifLogBsoa", "BSOA.Demo.Model", "Root");
-            Table table;
-
-            table = new Table("Root");
-            table.Columns.Add(Schema.Column.RefList("Runs", "Run"));
-            db.Tables.Add(table);
-
-            table = new Table("Artifact");
-            table.Columns.Add(Schema.Column.Ref("Description", "Message"));
-            table.Columns.Add(Schema.Column.Ref("Location", "ArtifactLocation"));
-            table.Columns.Add(Schema.Column.Simple("ParentIndex", "int", "-1"));
-            table.Columns.Add(Schema.Column.Simple("Offset", "int", "0"));
-            table.Columns.Add(Schema.Column.Simple("Length", "int", "-1"));
-            table.Columns.Add(Schema.Column.Simple("MimeType", "string"));
-            table.Columns.Add(Schema.Column.Ref("Contents", "ArtifactContent"));
-            table.Columns.Add(Schema.Column.Simple("Encoding", "string"));
-            table.Columns.Add(Schema.Column.Simple("SourceLanguage", "string"));
-            table.Columns.Add(Schema.Column.DateTime("LastModifiedTimeUtc", "DateTime.MinValue"));
-            db.Tables.Add(table);
-
-            table = new Table("ArtifactContent");
-            table.Columns.Add(Schema.Column.Simple("Text", "string"));
-            table.Columns.Add(Schema.Column.Simple("Binary", "string"));
-            db.Tables.Add(table);
-
-            table = new Table("ArtifactLocation");
-            table.Columns.Add(Schema.Column.Simple("Uri", "Uri"));
-            table.Columns.Add(Schema.Column.Simple("UriBaseId", "string"));
-            table.Columns.Add(Schema.Column.Simple("Index", "int", "-1"));
-            table.Columns.Add(Schema.Column.Ref("Description", "Message"));
-            db.Tables.Add(table);
-
-            table = new Table("Location");
-            table.Columns.Add(Schema.Column.Simple("Id", "int", "-1"));
-            table.Columns.Add(Schema.Column.Ref("PhysicalLocation", "PhysicalLocation"));
-            table.Columns.Add(Schema.Column.RefList("LogicalLocations", "LogicalLocation"));
-            table.Columns.Add(Schema.Column.Ref("Message", "Message"));
-            table.Columns.Add(Schema.Column.RefList("Annotations", "Region"));
-            db.Tables.Add(table);
-
-            table = new Table("LogicalLocation");
-            table.Columns.Add(Schema.Column.Simple("Name", "string"));
-            table.Columns.Add(Schema.Column.Simple("Index", "int", "-1"));
-            table.Columns.Add(Schema.Column.Simple("FullyQualifiedName", "string"));
-            table.Columns.Add(Schema.Column.Simple("DecoratedName", "string"));
-            table.Columns.Add(Schema.Column.Simple("ParentIndex", "int", "-1"));
-            table.Columns.Add(Schema.Column.Simple("Kind", "string"));
-            db.Tables.Add(table);
-
-            table = new Table("Message");
-            table.Columns.Add(Schema.Column.Simple("Text", "string"));
-            table.Columns.Add(Schema.Column.Simple("Markdown", "string"));
-            table.Columns.Add(Schema.Column.Simple("Id", "string"));
-            db.Tables.Add(table);
-
-            table = new Table("PhysicalLocation");
-            table.Columns.Add(Schema.Column.Ref("ArtifactLocation", "ArtifactLocation"));
-            table.Columns.Add(Schema.Column.Ref("Region", "Region"));
-            table.Columns.Add(Schema.Column.Ref("ContextRegion", "Region"));
-            db.Tables.Add(table);
-
-            table = new Table("Region");
-            table.Columns.Add(Schema.Column.Simple("StartLine", "int", "0"));
-            table.Columns.Add(Schema.Column.Simple("StartColumn", "int", "0"));
-            table.Columns.Add(Schema.Column.Simple("EndLine", "int", "0"));
-            table.Columns.Add(Schema.Column.Simple("EndColumn", "int", "0"));
-            table.Columns.Add(Schema.Column.Simple("ByteOffset", "int", "-1"));
-            table.Columns.Add(Schema.Column.Simple("ByteLength", "int", "0"));
-            table.Columns.Add(Schema.Column.Simple("CharOffset", "int", "-1"));
-            table.Columns.Add(Schema.Column.Simple("CharLength", "int", "0"));
-            table.Columns.Add(Schema.Column.Ref("Snippet", "ArtifactContent"));
-            table.Columns.Add(Schema.Column.Ref("Message", "Message"));
-            table.Columns.Add(Schema.Column.Simple("SourceLanguage", "string"));
-            db.Tables.Add(table);
-
-            table = new Table("Result");
-            table.Columns.Add(Schema.Column.Enum("BaselineState", "Microsoft.CodeAnalysis.Sarif.BaselineState", "int", "Microsoft.CodeAnalysis.Sarif.BaselineState.None"));
-            table.Columns.Add(Schema.Column.Simple("RuleId", "string"));
-            table.Columns.Add(Schema.Column.Simple("RuleIndex", "int", "-1"));
-            table.Columns.Add(Schema.Column.Ref("Message", "Message"));
-            table.Columns.Add(Schema.Column.RefList("Locations", "Location"));
-            table.Columns.Add(Schema.Column.Simple("Guid", "string"));
-            db.Tables.Add(table);
-
-            table = new Table("Run");
-            table.Columns.Add(Schema.Column.Ref("Tool", "Tool"));
-            table.Columns.Add(Schema.Column.RefList("Artifacts", "Artifact"));
-            table.Columns.Add(Schema.Column.RefList("Results", "Result"));
-            db.Tables.Add(table);
-
-            table = new Table("Tool");
-            table.Columns.Add(Schema.Column.Ref("Driver", "ToolComponent"));
-            table.Columns.Add(Schema.Column.RefList("Extensions", "ToolComponent"));
-            db.Tables.Add(table);
-
-            table = new Table("ToolComponent");
-            table.Columns.Add(Schema.Column.Simple("Name", "string"));
-            db.Tables.Add(table);
-
-            AsJson.Save(@"..\..\..\BsoaDemo.schema.json", db, verbose: true);
-            return db;
+            string path = Path.Combine(templateFolderPath, templateFilePath);
+            return File.Exists(path) ? path : Path.Combine(DefaultTemplateFolderPath, templateFilePath);
         }
     }
 }

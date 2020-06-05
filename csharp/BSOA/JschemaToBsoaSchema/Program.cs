@@ -100,7 +100,7 @@ namespace JschemaToBsoaSchema
                     }
                     else if (schema.Format == "date-time")
                     {
-                        return Column.DateTime(columnName);
+                        return Column.Simple(columnName, "DateTime");
                     }
                     else
                     {
@@ -139,7 +139,7 @@ namespace JschemaToBsoaSchema
                             defaultValue = $"{enumType}.{defaultValue.ToPascalCase()}";
                         }
 
-                        return Column.FlagsEnum(columnName, enumType, "int", defaultValue);
+                        return Column.Enum(columnName, enumType, "int", defaultValue);
                     }
                     else
                     {

@@ -1,5 +1,4 @@
 ﻿using BSOA.Generator.Extensions;
-using BSOA.Generator.Generation;
 
 using System;
 using System.Collections.Generic;
@@ -108,25 +107,29 @@ namespace BSOA.Generator
 
             if (columnInTemplate.UnderlyingType != null)
             {
-                populated = populated.Replace(columnInTemplate.UnderlyingType, column.UnderlyingType);
+                populated = ReplaceTerm(populated, columnInTemplate.UnderlyingType, column.UnderlyingType);
             }
 
             if (columnInTemplate.Default != null)
             {
-                populated = populated.Replace(columnInTemplate.Default, column.Default ?? "");
+                populated = ReplaceTerm(populated, columnInTemplate.Default, column.Default ?? "");
             }
 
             if (columnInTemplate.ReferencedTableName != null)
             {
-                populated = populated.Replace(columnInTemplate.ReferencedTableName, column.ReferencedTableName);
+                populated = ReplaceTerm(populated, columnInTemplate.ReferencedTableName, column.ReferencedTableName);
             }
 
-            populated = populated
-                .Replace(columnInTemplate.Type, column.Type)
-                .Replace(columnInTemplate.Name, column.Name)
-                .Replace(columnInTemplate.Name.ToCamelCase(), column.Name.ToCamelCase());
+            populated = ReplaceTerm(populated, columnInTemplate.Type, column.Type);
+            populated = ReplaceTerm(populated, columnInTemplate.Name, column.Name);
+            populated = ReplaceTerm(populated, columnInTemplate.Name.ToCamelCase(), column.Name.ToCamelCase());
 
             return populated;
+        }
+
+        private static string ReplaceTerm(string content, string token, string replacement)
+        {
+            return Regex.Replace(content, $"\\b{Regex.Escape(token)}\\b", replacement);
         }
 
         public static string MakeReplacements(string code, Dictionary<string, string> replacements)

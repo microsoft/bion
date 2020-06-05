@@ -1,7 +1,7 @@
 {
   "name": "PersonDatabase",
   "namespace": "BSOA.Test.Model.V1",
-  "rootTableName": "Root",
+  "rootTableName": "Community",
   "tables": [
     {
       "name": "Person",
@@ -19,7 +19,7 @@
       ]
     },
     {
-      "name": "Root",
+      "name": "Community",
       "columns": [
         {
           "category": "RefList",

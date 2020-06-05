@@ -34,7 +34,7 @@ namespace BSOA.Demo
         public void Run(bool forceReconvert)
         {
             SarifLogFiltered filtered = null;
-            SarifLogBsoa bsoa = null, unused = null;
+            SarifLog bsoa = null, unused = null;
 
             // Convert SarifLog to JSON, SoA JSON, and SoA Binary forms
             Convert(forceReconvert);
@@ -56,13 +56,13 @@ namespace BSOA.Demo
             Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
         }
 
-        private void ChangeSomething(SarifLogBsoa log)
+        private void ChangeSomething(SarifLog log)
         {
             //log.Location[log.Location.Count / 2].PhysicalLocation.ArtifactLocation.Index = 45;
 
             //log.Location[log.Location.Count / 2].PhysicalLocation.Region.Snippet.Text = "Changed!";
 
-            var results = log.Run[0].Results;
+            var results = log.Runs[0].Results;
             results[results.Count / 2].Message.Text = "Different";
         }
 
@@ -70,7 +70,7 @@ namespace BSOA.Demo
         {
             if (force == false && File.Exists(BsoaBinPath) && File.Exists(BsoaJsonPath) && File.Exists(NormalJsonPath)) { return; }
 
-            SarifLogBsoa bsoaLog = new SarifLogBsoa();
+            SarifLog bsoaLog = new SarifLog();
             bsoaLog = Measure(LoadBsoaViaNewtonsoft, InputFilePath, $"Loading BSOA via Newtonsoft from SARIF JSON {InputFilePath}...", 1);
 
             // For "apples to apples" comparison, write SARIF JSON of the supported log subset out
@@ -87,7 +87,7 @@ namespace BSOA.Demo
             {
                 using (BinaryTreeWriter writer = new BinaryTreeWriter(File.Create(BsoaBinPath)))
                 {
-                    bsoaLog.Write(writer);
+                    bsoaLog.DB.Write(writer);
                 }
             });
         }
@@ -141,37 +141,37 @@ namespace BSOA.Demo
             }
         }
 
-        private SarifLogBsoa LoadBsoaViaNewtonsoft(string jsonPath)
+        private SarifLog LoadBsoaViaNewtonsoft(string jsonPath)
         {
-            SarifLogBsoa log = AsJson.Load<SarifLogBsoa>(jsonPath);
-            log.Trim();
+            SarifLog log = AsJson.Load<SarifLog>(jsonPath);
+            log.DB.Trim();
             return log;
         }
 
-        private SarifLogBsoa LoadBsoaJson(string bsoaJsonPath)
+        private SarifLog LoadBsoaJson(string bsoaJsonPath)
         {
-            SarifLogBsoa log = new SarifLogBsoa();
+            SarifLog log = new SarifLog();
 
             using (ITreeReader reader = new JsonTreeReader(File.OpenRead(bsoaJsonPath)))
             {
-                log.Read(reader);
+                log.DB.Read(reader);
             }
 
             return log;
         }
 
-        private SarifLogBsoa LoadBsoaBinary(string bsoaBinaryPath)
+        private SarifLog LoadBsoaBinary(string bsoaBinaryPath)
         {
             return LoadBsoaBinary(bsoaBinaryPath, false);
         }
 
-        private SarifLogBsoa LoadBsoaBinary(string bsoaBinaryPath, bool diagnostics, int diagnosticsDepth = -1)
+        private SarifLog LoadBsoaBinary(string bsoaBinaryPath, bool diagnostics, int diagnosticsDepth = -1)
         {
-            SarifLogBsoa log = new SarifLogBsoa();
+            SarifLog log = new SarifLog();
 
             using (ITreeReader reader = Build(bsoaBinaryPath, diagnostics))
             {
-                log.Read(reader);
+                log.DB.Read(reader);
 
                 if (diagnostics)
                 {
