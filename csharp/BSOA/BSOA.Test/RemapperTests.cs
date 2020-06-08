@@ -17,6 +17,11 @@ namespace BSOA.Test
             remapper.RemoveValues(sample, unusedItems);
             Assert.Equal("0, 1", string.Join(", ", unusedItems));
 
+            // Try RemoveValues with empty Vector (early return)
+            unusedItems.Clear();
+            remapper.RemoveValues(sample, unusedItems);
+            Assert.Empty(unusedItems);
+
             // Verify RemapAbove changes 50 and 51 to 100, 101 when instructed
             remapper.RemapAbove(sample, 50, new int[] { 100, 101 });
             Assert.Equal(49, sample[47]);
