@@ -1,10 +1,10 @@
 {
-  "name": "SarifLog",
+  "name": "SarifLogDatabase",
   "namespace": "Microsoft.CodeAnalysis.Sarif",
-  "rootTableName": "Root",
+  "rootTableName": "SarifLog",
   "tables": [
     {
-      "name": "Root",
+      "name": "SarifLog",
       "columns": [
         {
           "name": "SchemaUri",
@@ -105,8 +105,11 @@
           "default": "-1"
         },
         {
+          "category": "Enum",
           "name": "Roles",
-          "type": "IList<ArtifactRoles>"
+          "type": "ArtifactRoles",
+          "default": "default(ArtifactRoles)",
+          "underlyingType": "int"
         },
         {
           "name": "MimeType",
@@ -1947,8 +1950,11 @@
           "default": "\"en-US\""
         },
         {
+          "category": "Enum",
           "name": "Contents",
-          "type": "IList<ToolComponentContents>"
+          "type": "ToolComponentContents",
+          "default": "default(ToolComponentContents)",
+          "underlyingType": "int"
         },
         {
           "name": "IsComprehensive",

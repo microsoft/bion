@@ -46,9 +46,9 @@ namespace JschemaToBsoaSchema
 
             schema = JsonSchema.Collapse(schema);
 
-            Database db = new Database("SarifLog", "Microsoft.CodeAnalysis.Sarif", "Root");
+            Database db = new Database("SarifLogDatabase", "Microsoft.CodeAnalysis.Sarif", "SarifLog");
 
-            Table root = new Table("Root");
+            Table root = new Table("SarifLog");
             db.Tables.Add(root);
             AddColumns(root, schema);
 
@@ -122,28 +122,19 @@ namespace JschemaToBsoaSchema
                 case SchemaType.Array:
                     Column itemType = ToColumn(tableName, columnName, schema.Items.Schema);
 
-                    if (itemType.ReferencedTableName == null)
+                    if (itemType.Category == ColumnTypeCategory.Enum)
                     {
-                        return Column.Simple(columnName, $"IList<{itemType.Type}>");
-                    }
-                    else if (itemType.Category == ColumnTypeCategory.Enum)
-                    {
+                        // NOTE: DefaultValue not translated for FlagsEnum
                         string enumType = itemType.Type;
-
-                        if (defaultValue == null)
-                        {
-                            defaultValue = $"default({enumType})";
-                        }
-                        else
-                        {
-                            defaultValue = $"{enumType}.{defaultValue.ToPascalCase()}";
-                        }
-
-                        return Column.Enum(columnName, enumType, "int", defaultValue);
+                        return Column.Enum(columnName, enumType, "int", $"default({enumType})");
+                    }
+                    else if (itemType.ReferencedTableName != null)
+                    {
+                        return Column.RefList(columnName, itemType.ReferencedTableName);
                     }
                     else
                     {
-                        return Column.RefList(columnName, itemType.ReferencedTableName);
+                        return Column.Simple(columnName, $"IList<{itemType.Type}>");
                     }
                 case SchemaType.None:
                     if (schema.Enum != null)
