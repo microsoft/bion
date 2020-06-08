@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using BSOA.Collections;
+
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace BSOA.Test
+namespace BSOA.Test.Collections
 {
     public class BitVectorTests
     {

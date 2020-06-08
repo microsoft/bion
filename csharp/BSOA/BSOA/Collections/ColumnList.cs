@@ -1,4 +1,5 @@
-﻿using BSOA.Column;
+﻿using BSOA.Collections;
+using BSOA.Column;
 using BSOA.Extensions;
 using BSOA.Model;
 using System;
@@ -19,7 +20,7 @@ namespace BSOA
     {
         private const int MinimumSize = 16;
         private readonly ListColumn<T> _column;
-        private readonly int _indexOfList;
+        private readonly int _rowIndex;
 
         public static ColumnList<T> Empty = new ColumnList<T>();
 
@@ -27,10 +28,10 @@ namespace BSOA
         {
             if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
             _column = column;
-            _indexOfList = index;
+            _rowIndex = index;
         }
 
-        internal ArraySlice<int> Indices => _column?._indices[_indexOfList] ?? ArraySlice<int>.Empty;
+        internal ArraySlice<int> Indices => _column?._indices[_rowIndex] ?? ArraySlice<int>.Empty;
         internal IColumn<T> Values => _column?._values;
 
         public T this[int indexWithinList]
@@ -58,7 +59,7 @@ namespace BSOA
                 indices.Array[nextIndex] = newValueIndex;
 
                 // Record new length
-                _column._indices[_indexOfList] = new ArraySlice<int>(indices.Array, indices.Index, indices.Count + 1, indices.IsExpandable);
+                _column._indices[_rowIndex] = new ArraySlice<int>(indices.Array, indices.Index, indices.Count + 1, indices.IsExpandable);
             }
             else
             {
@@ -75,7 +76,7 @@ namespace BSOA
                 newArray[indices.Count] = newValueIndex;
 
                 // Record new expandable slice with new array and length
-                _column._indices[_indexOfList] = new ArraySlice<int>(newArray, 0, indices.Count + 1, isExpandable: true);
+                _column._indices[_rowIndex] = new ArraySlice<int>(newArray, 0, indices.Count + 1, isExpandable: true);
             }
         }
 
@@ -88,7 +89,7 @@ namespace BSOA
             }
 
             // Clear indices
-            _column._indices[_indexOfList] = ArraySlice<int>.Empty;
+            _column._indices[_rowIndex] = ArraySlice<int>.Empty;
         }
 
         public bool Contains(T item)
@@ -98,17 +99,7 @@ namespace BSOA
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            IColumn<T> values = Values;
-            ArraySlice<int> indices = Indices;
-
-            if (arrayIndex < 0) { throw new ArgumentOutOfRangeException(nameof(arrayIndex)); }
-            if (array == null) { throw new ArgumentNullException(nameof(array)); }
-            if (arrayIndex + indices.Count > array.Length) { throw new ArgumentException(nameof(arrayIndex)); }
-
-            for (int i = 0; i < indices.Count; ++i)
-            {
-                array[arrayIndex + i] = values[indices[i]];
-            }
+            EnumerableExtensions.CopyTo(this, this.Count, array, arrayIndex);
         }
 
         public int IndexOf(T item)
@@ -180,7 +171,7 @@ namespace BSOA
             Array.Copy(indices.Array, realIndex + 1, indices.Array, realIndex, countAfterIndex);
 
             // Record shortened length
-            _column._indices[_indexOfList] = new ArraySlice<int>(indices.Array, indices.Index, indices.Count - 1, indices.IsExpandable);
+            _column._indices[_rowIndex] = new ArraySlice<int>(indices.Array, indices.Index, indices.Count - 1, indices.IsExpandable);
         }
 
         public IEnumerator<T> GetEnumerator()

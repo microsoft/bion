@@ -1,4 +1,5 @@
-﻿using BSOA.IO;
+﻿using BSOA.Collections;
+using BSOA.IO;
 using BSOA.Model;
 using System;
 using System.Collections.Generic;

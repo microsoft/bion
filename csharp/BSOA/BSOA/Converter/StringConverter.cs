@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using BSOA.Collections;
+
+using System.Text;
 
 namespace BSOA.Converter
 {

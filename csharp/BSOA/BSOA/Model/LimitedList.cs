@@ -1,4 +1,7 @@
-﻿using System;
+﻿using BSOA.Collections;
+using BSOA.Extensions;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -71,19 +74,12 @@ namespace BSOA.Model
         {
             T[] typed = array as T[];
             if (typed == null) { throw new ArgumentException(nameof(array)); }
-            CopyTo(typed, index);
+            EnumerableExtensions.CopyTo(this, this.Count, typed, index);
         }
 
         public virtual void CopyTo(T[] array, int arrayIndex)
         {
-            if (array == null) { throw new ArgumentNullException(nameof(array)); }
-            if (arrayIndex < 0) { throw new ArgumentOutOfRangeException(nameof(arrayIndex)); }
-            if (array.Length < arrayIndex + Count) { throw new ArgumentException(nameof(array)); }
-
-            for (int i = 0; i < Count; ++i)
-            {
-                array[arrayIndex + i] = this[i];
-            }
+            EnumerableExtensions.CopyTo(this, this.Count, array, arrayIndex);
         }
 
         public IEnumerator<T> GetEnumerator()

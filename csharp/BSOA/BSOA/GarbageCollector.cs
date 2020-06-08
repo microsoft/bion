@@ -1,4 +1,5 @@
-﻿using BSOA.Column;
+﻿using BSOA.Collections;
+using BSOA.Column;
 using BSOA.Model;
 using System.Linq;
 

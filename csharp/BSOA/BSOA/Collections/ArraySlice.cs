@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BSOA
+namespace BSOA.Collections
 {
     public struct ArraySlice<T> : IReadOnlyList<T>, ITreeSerializable where T : unmanaged
     {

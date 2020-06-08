@@ -1,9 +1,10 @@
-﻿using BSOA.Test.Components;
+﻿using BSOA.Collections;
+using BSOA.Test.Components;
 using System;
 using System.Linq;
 using Xunit;
 
-namespace BSOA.Test
+namespace BSOA.Test.Collections
 {
     public class ArraySliceTests
     {

@@ -1,10 +1,15 @@
-﻿namespace BSOA.Column
+﻿using BSOA.Collections;
+using BSOA.Model;
+
+using System;
+
+namespace BSOA.Column
 {
     /// <summary>
-    ///  RefListColumn provides a reference from an item in one table to a set
-    ///  of items in another table. It stores the integer indices of the references.
+    ///  NumberListColumn adds mutability to the lists in an ArraySliceColumn by returning
+    ///  NumberLists, which remember the column and row they represent and update the value on changes.
     /// </summary>
-    public class NumberListColumn<T> : WrappingColumn<NumberList<T>, ArraySlice<T>> where T : unmanaged
+    public class NumberListColumn<T> : WrappingColumn<NumberList<T>, ArraySlice<T>>, INumberColumn<T> where T : unmanaged
     {
         public NumberListColumn() : base(new ArraySliceColumn<T>())
         { }
@@ -13,6 +18,11 @@
         {
             get => new NumberList<T>(Inner, index);
             set => Inner[index] = value.Slice;
+        }
+
+        public void ForEach(Action<ArraySlice<T>> action)
+        {
+            ((ArraySliceColumn<T>)Inner).ForEach(action);
         }
     }
 }

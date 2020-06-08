@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BSOA
+namespace BSOA.Collections
 {
     /// <summary>
     ///  BitVector provides set operations, tracking whether each item is included with a bit in an int[].

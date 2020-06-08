@@ -30,5 +30,9 @@
         public const string ValueEnd = nameof(ValueEnd);
         public const string SmallValues = nameof(SmallValues);
         public const string LargeValues = nameof(LargeValues);
+
+        // DictionaryColumn
+        public const string Keys = nameof(Keys);
+        public const string Pairs = nameof(Pairs);
     }
 }

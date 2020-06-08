@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BSOA.Collections;
+
+using System;
 using System.Linq;
 using Xunit;
 

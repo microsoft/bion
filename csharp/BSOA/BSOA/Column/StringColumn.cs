@@ -1,4 +1,5 @@
-﻿using BSOA.Converter;
+﻿using BSOA.Collections;
+using BSOA.Converter;
 
 namespace BSOA.Column
 {

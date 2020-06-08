@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace BSOA
+namespace BSOA.Collections
 {
     public struct ListEnumerator<T> : IEnumerator<T>
     {

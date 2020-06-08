@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BSOA
+namespace BSOA.Collections
 {
     /// <summary>
     ///  TypedList wraps a NumberList and converts it from the internal int (an index of some entity)
@@ -64,14 +64,7 @@ namespace BSOA
 
         public void CopyTo(TItem[] array, int arrayIndex)
         {
-            if (array == null) { throw new ArgumentNullException(nameof(array)); }
-            if (arrayIndex < 0) { throw new ArgumentOutOfRangeException(nameof(arrayIndex)); }
-            if (arrayIndex + Count > array.Length) { throw new ArgumentException(nameof(arrayIndex)); }
-
-            for (int i = 0; i < Count; ++i)
-            {
-                array[i + arrayIndex] = _toInstance(_inner[i]);
-            }
+            EnumerableExtensions.CopyTo(this, this.Count, array, arrayIndex);
         }
 
         public int IndexOf(TItem item)

@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BSOA
+namespace BSOA.Collections
 {
     /// <summary>
     ///  NumberList exposes a mutable IList on top of ArraySlices from NumberListColumn.
