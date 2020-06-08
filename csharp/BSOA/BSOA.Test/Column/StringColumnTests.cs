@@ -105,16 +105,16 @@ namespace BSOA.Test
             }
 
             // Verify values properly captured
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Proactively Trim (before serialization) and verify values not corrupted
             column.Trim();
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Verify roundtripped column and column not corrupted by serialization
             roundTripped = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
-            ReadOnlyList.VerifySame(expected, roundTripped);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, roundTripped);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Set a short value to long and a long value to short, and add another value
             expected[0] = new string(':', 2400);
@@ -127,12 +127,12 @@ namespace BSOA.Test
             }
 
             // Verify values read back correctly immediately
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Verify values re-roundtrip again properly (merging old and new immutable values)
             roundTripped = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
-            ReadOnlyList.VerifySame(expected, roundTripped);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, roundTripped);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Add a value causing a gap; verify count, new value returned, values in gap defaulted properly
             column[100] = "Centennial";

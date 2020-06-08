@@ -25,8 +25,8 @@ namespace BSOA.Test.Collections
             Assert.Equal(2, collection.Count);
 
             // Enumeration
-            ReadOnlyList.VerifySame(keys, (IndirectCollection<string>)row.Keys);
-            ReadOnlyList.VerifySame(values, (IndirectCollection<string>)row.Values);
+            CollectionReadVerifier.VerifySame(keys, (IndirectCollection<string>)row.Keys);
+            CollectionReadVerifier.VerifySame(values, (IndirectCollection<string>)row.Values);
 
             // Read-Only-ness
             Assert.True(collection.IsReadOnly);

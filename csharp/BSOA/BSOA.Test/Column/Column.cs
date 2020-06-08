@@ -28,8 +28,8 @@ namespace BSOA.Test
             Assert.Equal(0, column.Count);
 
             // Empty roundtrip works
-            ReadOnlyList.VerifySame(expected, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary));
-            ReadOnlyList.VerifySame(expected, TreeSerializer.RoundTrip(column, builder, TreeFormat.Json));
+            CollectionReadVerifier.VerifySame(expected, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary));
+            CollectionReadVerifier.VerifySame(expected, TreeSerializer.RoundTrip(column, builder, TreeFormat.Json));
 
             // Empty trim works
             column.Trim();
@@ -44,7 +44,7 @@ namespace BSOA.Test
 
             // Verify count, values, indexer, enumerators
             Assert.Equal(expected.Count, column.Count);
-            ReadOnlyList.VerifySame<T>(expected, column);
+            CollectionReadVerifier.VerifySame<T>(expected, column);
 
             // Verify item type supports equatability (needed for IndexOf, Contains to work)
             Assert.True(otherValue.Equals(otherValue));
@@ -78,7 +78,7 @@ namespace BSOA.Test
             // CopyTo (untyped)
             other = new T[column.Count];
             column.CopyTo((Array)other, 0);
-            ReadOnlyList.VerifySame(column, other, quick: true);
+            CollectionReadVerifier.VerifySame(other, column, quick: true);
 
             // Change existing value
             column[1] = otherValue;
@@ -118,8 +118,8 @@ namespace BSOA.Test
             Assert.Equal(defaultValue, column[101]);
 
             // Verify serialization round trip via all current serialization mechanisms
-            ReadOnlyList.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary), quick: true);
-            ReadOnlyList.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Json), quick: true);
+            CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary), quick: true);
+            CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Json), quick: true);
 
             // Verify column is properly skippable (required to allow flexible file format schema)
             TreeSerializer.VerifySkip(column, TreeFormat.Binary);

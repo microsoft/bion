@@ -28,7 +28,7 @@ namespace BSOA.Test
             });
 
             // Test the ColumnList item members
-            IList.Basics(column[1], (index) => index % 20);
+            CollectionChangeVerifier.VerifyList(column[1], (index) => index % 20);
 
             // ColumnList.Empty handling
             ColumnList<int> empty = ColumnList<int>.Empty;

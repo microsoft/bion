@@ -50,11 +50,11 @@ namespace BSOA.Test
             // Verify column is mapping, has 11 unique values (default + 10), and matches expected array
             Assert.True(column.IsMappingValues);
             Assert.Equal(11, column.DistinctCount);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Round trip; verify mapped column rehydrates properly
             column = TreeSerializer.RoundTrip(column, ctor, TreeFormat.Binary);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Add enough values to force the column to convert
             for (int i = 1000; i < 1300; ++i)
@@ -65,16 +65,16 @@ namespace BSOA.Test
 
             Assert.False(column.IsMappingValues);
             Assert.Equal(-1, column.DistinctCount);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Round-trip; verify individual values column rehydrates properly
             column = TreeSerializer.RoundTrip(column, ctor, TreeFormat.Binary);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Test RemoveFromEnd on unmapped form of column
             column.RemoveFromEnd(100);
             expected.RemoveRange(expected.Count - 100, 100);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
         }
 
         [Fact]
@@ -97,13 +97,13 @@ namespace BSOA.Test
             // Verify column is mapping, has 11 unique values (default + 10), and matches expected array
             Assert.True(column.IsMappingValues);
             Assert.Equal(11, column.DistinctCount);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Verify Trim does not remap
             column.Trim();
             Assert.True(column.IsMappingValues);
             Assert.Equal(11, column.DistinctCount);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Set rows to just three (middle) values
             for (int i = 0; i < 1000; ++i)
@@ -117,7 +117,7 @@ namespace BSOA.Test
             column.Trim();
             Assert.True(column.IsMappingValues);
             Assert.Equal(4, column.DistinctCount);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
         }
     }
 }

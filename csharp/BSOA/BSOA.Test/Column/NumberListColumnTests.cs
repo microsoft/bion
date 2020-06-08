@@ -51,14 +51,14 @@ namespace BSOA.Test
 
             for (int i = 0; i < expected.Count; ++i)
             {
-                ReadOnlyList.VerifySame(expected[i], column[i]);
+                CollectionReadVerifier.VerifySame(expected[i], column[i]);
             }
 
             // Round trip and verify they deserialize correctly (note, these will be in a shared array now)
             roundTripped = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
             for (int i = 0; i < expected.Count; ++i)
             {
-                ReadOnlyList.VerifySame(expected[i], column[i]);
+                CollectionReadVerifier.VerifySame(expected[i], column[i]);
             }
 
             return roundTripped;
@@ -77,7 +77,7 @@ namespace BSOA.Test
             Assert.False(slice.Slice.IsExpandable);
 
             // Test second sample row slice IList members
-            IList.Basics(slice, (index) => index % 20);
+            CollectionChangeVerifier.VerifyList(slice, (index) => index % 20);
 
             // Verify expandable after test
             Assert.Equal(0, slice.Slice.Index);
@@ -103,7 +103,7 @@ namespace BSOA.Test
             TypedList<int> row1Typed = new TypedList<int>(row1List, (index) => index, (index) => index);
 
             // Test second sample row slice IList members on NumberListConverter
-            IList.Basics(row1Typed, (index) => index % 20);
+            CollectionChangeVerifier.VerifyList(row1Typed, (index) => index % 20);
 
             // Verify values are re-merged and re-loaded properly
             string values = string.Join(", ", row1List);

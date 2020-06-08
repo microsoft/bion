@@ -20,6 +20,12 @@ namespace BSOA.Test.Collections
 
             string unusedName = "Unused";
 
+            Dictionary<string, string> expected = new Dictionary<string, string>()
+            {
+                [sampleName] = sampleValue,
+                [secondName] = secondValue
+            };
+
             IDictionary<string, string> row = DictionaryColumnTests.SampleRow();
             Assert.True(0 == ColumnDictionary<string, string>.Empty.Count);
             Assert.False(row.IsReadOnly);
@@ -51,6 +57,9 @@ namespace BSOA.Test.Collections
             Assert.True(row.Contains(new KeyValuePair<string, string>(secondName, secondValue)));
             Assert.Equal($"{sampleName}, {secondName}", string.Join(", ", row.Keys));
             Assert.Equal($"{sampleValue}, {secondValue}", string.Join(", ", row.Values));
+
+            // Test DictionaryEnumerator
+            CollectionReadVerifier.VerifySame<KeyValuePair<string, string>>(expected, row);
 
             // Negative (missing item) cases
             Assert.False(row.Contains(new KeyValuePair<string, string>(sampleName, secondValue)));
