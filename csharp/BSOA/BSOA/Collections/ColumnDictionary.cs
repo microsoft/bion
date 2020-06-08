@@ -70,7 +70,7 @@ namespace BSOA.Collections
         {
             if (this.ContainsKey(key)) { throw new ArgumentException(nameof(key)); }
 
-            int newPairIndex = _column.Count;
+            int newPairIndex = Pairs.Count;
             _column._keys[newPairIndex] = key;
             _column._values[newPairIndex] = value;
             Pairs.Add(newPairIndex);
