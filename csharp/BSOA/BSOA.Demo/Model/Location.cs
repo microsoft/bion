@@ -1,86 +1,223 @@
-﻿using BSOA.Column;
+// Copyright (c) Microsoft.  All Rights Reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using BSOA.Model;
+
+using Microsoft.CodeAnalysis.Sarif;
+using Microsoft.CodeAnalysis.Sarif.Readers;
+
+using Newtonsoft.Json;
+
+using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace BSOA.Demo.Model
 {
-    public readonly struct Location
+    /// <summary>
+    ///  GENERATED: BSOA Entity for 'Location'
+    /// </summary>
+    [DataContract]
+    [GeneratedCode("BSOA.Generator", "0.5.0")]
+    public partial class Location : PropertyBagHolder, ISarifNode, IRow
     {
-        internal readonly LocationTable _table;
-        internal readonly int _index;
+        private LocationTable _table;
+        private int _index;
 
-        public Location(LocationTable table, int index)
-        {
-            _table = table;
-            _index = index;
-        }
+        public Location() : this(SarifLogDatabase.Current.Location)
+        { }
 
-        public Location(LocationTable table) : this(table, table.Count)
+        public Location(SarifLog root) : this(root.Database.Location)
+        { }
+
+        internal Location(LocationTable table) : this(table, table.Count)
         {
             table.Add();
         }
 
-        public Location(SarifLogBsoa database) : this(database.Location)
-        { }
+        internal Location(LocationTable table, int index)
+        {
+            this._table = table;
+            this._index = index;
+        }
 
-        public bool IsNull => (_table == null || _index < 0);
+        public Location(
+            int id,
+            PhysicalLocation physicalLocation,
+            IList<LogicalLocation> logicalLocations,
+            Message message,
+            IList<Region> annotations
+        ) 
+            : this(SarifLogDatabase.Current.Location)
+        {
+            Id = id;
+            PhysicalLocation = physicalLocation;
+            LogicalLocations = logicalLocations;
+            Message = message;
+            Annotations = annotations;
+        }
 
+        public Location(Location other) 
+            : this(SarifLogDatabase.Current.Location)
+        {
+            Id = other.Id;
+            PhysicalLocation = other.PhysicalLocation;
+            LogicalLocations = other.LogicalLocations;
+            Message = other.Message;
+            Annotations = other.Annotations;
+        }
+
+        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public PhysicalLocation PhysicalLocation
         {
-            get => _table.Database.PhysicalLocation[_table.PhysicalLocation[_index]];
-            set => _table.PhysicalLocation[_index] = value._index;
+            get => _table.Database.PhysicalLocation.Get(_table.PhysicalLocation[_index]);
+            set => _table.PhysicalLocation[_index] = _table.Database.PhysicalLocation.LocalIndex(value);
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public IList<LogicalLocation> LogicalLocations
         {
-            get => new NumberListConverter<LogicalLocation, LogicalLocationTable>(_table.LogicalLocations[_index], _table.Database.LogicalLocation, (table, index) => new LogicalLocation(table, index), (table, item) => item._index);
-            set => new NumberListConverter<LogicalLocation, LogicalLocationTable>(_table.LogicalLocations[_index], _table.Database.LogicalLocation, (table, index) => new LogicalLocation(table, index), (table, item) => item._index).SetTo(value);
+            get => _table.Database.LogicalLocation.List(_table.LogicalLocations[_index]);
+            set => _table.Database.LogicalLocation.List(_table.LogicalLocations[_index]).SetTo(value);
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Message Message
         {
-            get => _table.Database.Message[_table.Message[_index]];
-            set => _table.Message[_index] = value._index;
+            get => _table.Database.Message.Get(_table.Message[_index]);
+            set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public IList<Region> Annotations
         {
-            get => new NumberListConverter<Region, RegionTable>(_table.Annotations[_index], _table.Database.Region, (table, index) => new Region(table, index), (table, item) => item._index);
-            set => new NumberListConverter<Region, RegionTable>(_table.Annotations[_index], _table.Database.Region, (table, index) => new Region(table, index), (table, item) => item._index).SetTo(value);
+            get => _table.Database.Region.List(_table.Annotations[_index]);
+            set => _table.Database.Region.List(_table.Annotations[_index]).SetTo(value);
         }
-    }
 
-    public class LocationTable : Table<Location>
-    {
-        internal SarifLogBsoa Database;
-
-        internal NumberColumn<int> Id;
-        internal RefColumn PhysicalLocation;
-        internal RefListColumn LogicalLocations;
-        internal RefColumn Message;
-        internal RefListColumn Annotations;
-
-        // RefListColumn Relationships
-        // Properties
-
-        public LocationTable(SarifLogBsoa database) : base()
+        #region IEquatable<Location>
+        public bool Equals(Location other)
         {
-            this.Database = database;
+            if (other == null) { return false; }
 
-            this.Id = AddColumn(nameof(Id), new NumberColumn<int>(-1));
-            this.PhysicalLocation = AddColumn(nameof(PhysicalLocation), new RefColumn(nameof(database.PhysicalLocation)));
-            this.LogicalLocations = AddColumn(nameof(LogicalLocations), new RefListColumn(nameof(database.LogicalLocation)));
-            this.Message = AddColumn(nameof(Message), new RefColumn(nameof(database.Message)));
-            this.Annotations = AddColumn(nameof(Annotations), new RefListColumn(nameof(database.Region)));
+            if (this.Id != other.Id) { return false; }
+            if (this.PhysicalLocation != other.PhysicalLocation) { return false; }
+            if (this.LogicalLocations != other.LogicalLocations) { return false; }
+            if (this.Message != other.Message) { return false; }
+            if (this.Annotations != other.Annotations) { return false; }
+
+            return true;
+        }
+        #endregion
+
+        #region Object overrides
+        public override int GetHashCode()
+        {
+            int result = 17;
+
+            unchecked
+            {
+                if (Id != default(int))
+                {
+                    result = (result * 31) + Id.GetHashCode();
+                }
+
+                if (PhysicalLocation != default(PhysicalLocation))
+                {
+                    result = (result * 31) + PhysicalLocation.GetHashCode();
+                }
+
+                if (LogicalLocations != default(IList<LogicalLocation>))
+                {
+                    result = (result * 31) + LogicalLocations.GetHashCode();
+                }
+
+                if (Message != default(Message))
+                {
+                    result = (result * 31) + Message.GetHashCode();
+                }
+
+                if (Annotations != default(IList<Region>))
+                {
+                    result = (result * 31) + Annotations.GetHashCode();
+                }
+            }
+
+            return result;
         }
 
-        public override Location this[int index] => new Location(this, index);
-    }
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Location);
+        }
 
+        public static bool operator ==(Location left, Location right)
+        {
+            if (object.ReferenceEquals(left, null))
+            {
+                return object.ReferenceEquals(right, null);
+            }
+
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Location left, Location right)
+        {
+            if (object.ReferenceEquals(left, null))
+            {
+                return !object.ReferenceEquals(right, null);
+            }
+
+            return !left.Equals(right);
+        }
+        #endregion
+
+        #region IRow
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
+
+        void IRow.Reset(ITable table, int index)
+        {
+            _table = (LocationTable)table;
+            _index = index;
+        }
+        #endregion
+
+        #region ISarifNode
+        public SarifNodeKind SarifNodeKind => SarifNodeKind.Location;
+
+        ISarifNode ISarifNode.DeepClone()
+        {
+            return DeepCloneCore();
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this instance.
+        /// </summary>
+        public Location DeepClone()
+        {
+            return (Location)DeepCloneCore();
+        }
+
+        private ISarifNode DeepCloneCore()
+        {
+            return new Location(this);
+        }
+        #endregion
+
+        public static IEqualityComparer<Location> ValueComparer => EqualityComparer<Location>.Default;
+        public bool ValueEquals(Location other) => Equals(other);
+        public int ValueGetHashCode() => GetHashCode();
+    }
 }

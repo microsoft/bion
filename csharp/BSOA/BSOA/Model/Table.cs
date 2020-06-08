@@ -25,7 +25,7 @@ namespace BSOA.Model
 
         public override int Count => _count;
 
-        protected abstract T Get(int index);
+        public abstract T Get(int index);
 
         public override T this[int index]
         {
@@ -40,7 +40,7 @@ namespace BSOA.Model
                 if (index >= Count) { _count = index + 1; }
 
                 IRow row = (IRow)value;
-                if (object.ReferenceEquals(this, row.Table))
+                if (object.ReferenceEquals(this, row.Table) && row.Index == index)
                 {
                     // Already here
                     return;
@@ -51,6 +51,35 @@ namespace BSOA.Model
                     CopyItem(index, row.Table, row.Index);
                 }
             }
+        }
+
+        /// <summary>
+        ///  Get index in this table for item.
+        ///  Copies item if it's from another database.
+        /// </summary>
+        /// <param name="value">Item to get local index for</param>
+        /// <returns>Existing index for local item, new index for copied item, -1 for null</returns>
+        public int LocalIndex(T value)
+        {
+            if (value == null) { return -1; }
+
+            IRow row = (IRow)value;
+            if (object.ReferenceEquals(this, row.Table))
+            {
+                // Already here
+                return row.Index;
+            }
+            else
+            {
+                // Copy from other table
+                CopyItem(_count, row.Table, row.Index);
+                return _count++;
+            }
+        }
+
+        public TypedList<T> List(NumberList<int> indices)
+        {
+            return new TypedList<T>(indices, (index) => this.Get(index), (value) => this.LocalIndex(value));
         }
 
         /// <summary>

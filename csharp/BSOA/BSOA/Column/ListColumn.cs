@@ -22,6 +22,9 @@ namespace BSOA.Column
             _values = values;
         }
 
+        public ListColumn(IColumn values) : this((IColumn<T>)values)
+        { }
+
         public override ColumnList<T> this[int index]
         {
             get => new ColumnList<T>(this, index);

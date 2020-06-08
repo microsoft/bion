@@ -19,11 +19,11 @@ namespace BSOA.Extensions
 
         public static int GetHashCode<T>(this IReadOnlyList<T> me)
         {
-            int hashCode = 0;
+            int hashCode = 17;
 
             for (int i = 0; i < me.Count; ++i)
             {
-                hashCode = unchecked(hashCode * 17) + me[i]?.GetHashCode() ?? 0;
+                hashCode = unchecked(hashCode * 31) + me[i]?.GetHashCode() ?? 0;
             }
 
             return hashCode;

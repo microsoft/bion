@@ -6,7 +6,7 @@ namespace BSOA.Demo.Converters
 {
     public static class ConverterExtensions
     {
-        public static void ConvertList<T, U>(this IList<U> target, IList<T> source, SarifLogBsoa database, Func<T, SarifLogBsoa, U> convertSingle)
+        public static void ConvertList<T, U>(this IList<U> target, IList<T> source, SarifLog database, Func<T, SarifLog, U> convertSingle)
         {
             if (source != null)
             {

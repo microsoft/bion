@@ -1,0 +1,33 @@
+{
+  "name": "PersonDatabase",
+  "namespace": "BSOA.Test.Model.V1",
+  "rootTableName": "Community",
+  "tables": [
+    {
+      "name": "Person",
+      "columns": [
+        {
+          "category": "Simple",
+          "name": "Age",
+          "type": "byte"
+        },
+        {
+          "category": "Simple",
+          "name": "Name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "Community",
+      "columns": [
+        {
+          "category": "RefList",
+          "name": "People",
+          "type": "IList<Person>",
+          "referencedTableName": "Person"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2156 @@
+{
+  "name": "SarifLogDatabase",
+  "namespace": "Microsoft.CodeAnalysis.Sarif",
+  "rootTableName": "SarifLog",
+  "tables": [
+    {
+      "name": "SarifLog",
+      "columns": [
+        {
+          "name": "SchemaUri",
+          "type": "Uri"
+        },
+        {
+          "category": "Enum",
+          "name": "Version",
+          "type": "SarifVersion",
+          "default": "default(SarifVersion)",
+          "underlyingType": "int"
+        },
+        {
+          "category": "RefList",
+          "name": "Runs",
+          "type": "IList<Run>",
+          "referencedTableName": "Run"
+        },
+        {
+          "category": "RefList",
+          "name": "InlineExternalProperties",
+          "type": "IList<ExternalProperties>",
+          "referencedTableName": "ExternalProperties"
+        }
+      ]
+    },
+    {
+      "name": "Address",
+      "columns": [
+        {
+          "name": "AbsoluteAddress",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "RelativeAddress",
+          "type": "int"
+        },
+        {
+          "name": "Length",
+          "type": "int"
+        },
+        {
+          "name": "Kind",
+          "type": "string"
+        },
+        {
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "name": "FullyQualifiedName",
+          "type": "string"
+        },
+        {
+          "name": "OffsetFromParent",
+          "type": "int"
+        },
+        {
+          "name": "Index",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "ParentIndex",
+          "type": "int",
+          "default": "-1"
+        }
+      ]
+    },
+    {
+      "name": "Artifact",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Description",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "category": "Ref",
+          "name": "Location",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "name": "ParentIndex",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "Offset",
+          "type": "int"
+        },
+        {
+          "name": "Length",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "category": "Enum",
+          "name": "Roles",
+          "type": "ArtifactRoles",
+          "default": "default(ArtifactRoles)",
+          "underlyingType": "int"
+        },
+        {
+          "name": "MimeType",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "Contents",
+          "type": "ArtifactContent",
+          "referencedTableName": "ArtifactContent"
+        },
+        {
+          "name": "Encoding",
+          "type": "string"
+        },
+        {
+          "name": "SourceLanguage",
+          "type": "string"
+        },
+        {
+          "name": "Hashes",
+          "type": "IDictionary<string, string>"
+        },
+        {
+          "name": "LastModifiedTimeUtc",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "name": "ArtifactChange",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "ArtifactLocation",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "category": "RefList",
+          "name": "Replacements",
+          "type": "IList<Replacement>",
+          "referencedTableName": "Replacement"
+        }
+      ]
+    },
+    {
+      "name": "ArtifactContent",
+      "columns": [
+        {
+          "name": "Text",
+          "type": "string"
+        },
+        {
+          "name": "Binary",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "Rendered",
+          "type": "MultiformatMessageString",
+          "referencedTableName": "MultiformatMessageString"
+        }
+      ]
+    },
+    {
+      "name": "ArtifactLocation",
+      "columns": [
+        {
+          "name": "Uri",
+          "type": "Uri"
+        },
+        {
+          "name": "UriBaseId",
+          "type": "string"
+        },
+        {
+          "name": "Index",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "category": "Ref",
+          "name": "Description",
+          "type": "Message",
+          "referencedTableName": "Message"
+        }
+      ]
+    },
+    {
+      "name": "Attachment",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Description",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "category": "Ref",
+          "name": "ArtifactLocation",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "category": "RefList",
+          "name": "Regions",
+          "type": "IList<Region>",
+          "referencedTableName": "Region"
+        },
+        {
+          "category": "RefList",
+          "name": "Rectangles",
+          "type": "IList<Rectangle>",
+          "referencedTableName": "Rectangle"
+        }
+      ]
+    },
+    {
+      "name": "CodeFlow",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Message",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "category": "RefList",
+          "name": "ThreadFlows",
+          "type": "IList<ThreadFlow>",
+          "referencedTableName": "ThreadFlow"
+        }
+      ]
+    },
+    {
+      "name": "ConfigurationOverride",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Configuration",
+          "type": "ReportingConfiguration",
+          "referencedTableName": "ReportingConfiguration"
+        },
+        {
+          "category": "Ref",
+          "name": "Descriptor",
+          "type": "ReportingDescriptorReference",
+          "referencedTableName": "ReportingDescriptorReference"
+        }
+      ]
+    },
+    {
+      "name": "Conversion",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Tool",
+          "type": "Tool",
+          "referencedTableName": "Tool"
+        },
+        {
+          "category": "Ref",
+          "name": "Invocation",
+          "type": "Invocation",
+          "referencedTableName": "Invocation"
+        },
+        {
+          "category": "RefList",
+          "name": "AnalysisToolLogFiles",
+          "type": "IList<ArtifactLocation>",
+          "referencedTableName": "ArtifactLocation"
+        }
+      ]
+    },
+    {
+      "name": "Edge",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "Label",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "name": "SourceNodeId",
+          "type": "string"
+        },
+        {
+          "name": "TargetNodeId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "EdgeTraversal",
+      "columns": [
+        {
+          "name": "EdgeId",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "Message",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "name": "FinalState",
+          "type": "IDictionary<string, MultiformatMessageString>"
+        },
+        {
+          "name": "StepOverEdgeCount",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "ExceptionData",
+      "columns": [
+        {
+          "name": "Kind",
+          "type": "string"
+        },
+        {
+          "name": "Message",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "Stack",
+          "type": "Stack",
+          "referencedTableName": "Stack"
+        },
+        {
+          "category": "RefList",
+          "name": "InnerExceptions",
+          "type": "IList<ExceptionData>",
+          "referencedTableName": "ExceptionData"
+        }
+      ]
+    },
+    {
+      "name": "ExternalProperties",
+      "columns": [
+        {
+          "name": "Schema",
+          "type": "Uri"
+        },
+        {
+          "category": "Enum",
+          "name": "Version",
+          "type": "SarifVersion",
+          "default": "default(SarifVersion)",
+          "underlyingType": "int"
+        },
+        {
+          "name": "Guid",
+          "type": "string"
+        },
+        {
+          "name": "RunGuid",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "Conversion",
+          "type": "Conversion",
+          "referencedTableName": "Conversion"
+        },
+        {
+          "category": "RefList",
+          "name": "Graphs",
+          "type": "IList<Graph>",
+          "referencedTableName": "Graph"
+        },
+        {
+          "category": "Ref",
+          "name": "ExternalizedProperties",
+          "type": "PropertyBag",
+          "referencedTableName": "PropertyBag"
+        },
+        {
+          "category": "RefList",
+          "name": "Artifacts",
+          "type": "IList<Artifact>",
+          "referencedTableName": "Artifact"
+        },
+        {
+          "category": "RefList",
+          "name": "Invocations",
+          "type": "IList<Invocation>",
+          "referencedTableName": "Invocation"
+        },
+        {
+          "category": "RefList",
+          "name": "LogicalLocations",
+          "type": "IList<LogicalLocation>",
+          "referencedTableName": "LogicalLocation"
+        },
+        {
+          "category": "RefList",
+          "name": "ThreadFlowLocations",
+          "type": "IList<ThreadFlowLocation>",
+          "referencedTableName": "ThreadFlowLocation"
+        },
+        {
+          "category": "RefList",
+          "name": "Results",
+          "type": "IList<Result>",
+          "referencedTableName": "Result"
+        },
+        {
+          "category": "RefList",
+          "name": "Taxonomies",
+          "type": "IList<ToolComponent>",
+          "referencedTableName": "ToolComponent"
+        },
+        {
+          "category": "Ref",
+          "name": "Driver",
+          "type": "ToolComponent",
+          "referencedTableName": "ToolComponent"
+        },
+        {
+          "category": "RefList",
+          "name": "Extensions",
+          "type": "IList<ToolComponent>",
+          "referencedTableName": "ToolComponent"
+        },
+        {
+          "category": "RefList",
+          "name": "Policies",
+          "type": "IList<ToolComponent>",
+          "referencedTableName": "ToolComponent"
+        },
+        {
+          "category": "RefList",
+          "name": "Translations",
+          "type": "IList<ToolComponent>",
+          "referencedTableName": "ToolComponent"
+        },
+        {
+          "category": "RefList",
+          "name": "Addresses",
+          "type": "IList<Address>",
+          "referencedTableName": "Address"
+        },
+        {
+          "category": "RefList",
+          "name": "WebRequests",
+          "type": "IList<WebRequest>",
+          "referencedTableName": "WebRequest"
+        },
+        {
+          "category": "RefList",
+          "name": "WebResponses",
+          "type": "IList<WebResponse>",
+          "referencedTableName": "WebResponse"
+        }
+      ]
+    },
+    {
+      "name": "ExternalPropertyFileReference",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Location",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "name": "Guid",
+          "type": "string"
+        },
+        {
+          "name": "ItemCount",
+          "type": "int",
+          "default": "-1"
+        }
+      ]
+    },
+    {
+      "name": "ExternalPropertyFileReferences",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Conversion",
+          "type": "ExternalPropertyFileReference",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "Graphs",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "Ref",
+          "name": "ExternalizedProperties",
+          "type": "ExternalPropertyFileReference",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "Artifacts",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "Invocations",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "LogicalLocations",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "ThreadFlowLocations",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "Results",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "Taxonomies",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "Addresses",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "Ref",
+          "name": "Driver",
+          "type": "ExternalPropertyFileReference",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "Extensions",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "Policies",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "Translations",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "WebRequests",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "category": "RefList",
+          "name": "WebResponses",
+          "type": "IList<ExternalPropertyFileReference>",
+          "referencedTableName": "ExternalPropertyFileReference"
+        }
+      ]
+    },
+    {
+      "name": "Fix",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Description",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "category": "RefList",
+          "name": "ArtifactChanges",
+          "type": "IList<ArtifactChange>",
+          "referencedTableName": "ArtifactChange"
+        }
+      ]
+    },
+    {
+      "name": "Graph",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Description",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "category": "RefList",
+          "name": "Nodes",
+          "type": "IList<Node>",
+          "referencedTableName": "Node"
+        },
+        {
+          "category": "RefList",
+          "name": "Edges",
+          "type": "IList<Edge>",
+          "referencedTableName": "Edge"
+        }
+      ]
+    },
+    {
+      "name": "GraphTraversal",
+      "columns": [
+        {
+          "name": "RunGraphIndex",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "ResultGraphIndex",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "category": "Ref",
+          "name": "Description",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "name": "InitialState",
+          "type": "IDictionary<string, MultiformatMessageString>"
+        },
+        {
+          "name": "ImmutableState",
+          "type": "IDictionary<string, MultiformatMessageString>"
+        },
+        {
+          "category": "RefList",
+          "name": "EdgeTraversals",
+          "type": "IList<EdgeTraversal>",
+          "referencedTableName": "EdgeTraversal"
+        }
+      ]
+    },
+    {
+      "name": "Invocation",
+      "columns": [
+        {
+          "name": "CommandLine",
+          "type": "string"
+        },
+        {
+          "name": "Arguments",
+          "type": "IList<string>"
+        },
+        {
+          "category": "RefList",
+          "name": "ResponseFiles",
+          "type": "IList<ArtifactLocation>",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "name": "StartTimeUtc",
+          "type": "DateTime"
+        },
+        {
+          "name": "EndTimeUtc",
+          "type": "DateTime"
+        },
+        {
+          "name": "ExitCode",
+          "type": "int"
+        },
+        {
+          "category": "RefList",
+          "name": "RuleConfigurationOverrides",
+          "type": "IList<ConfigurationOverride>",
+          "referencedTableName": "ConfigurationOverride"
+        },
+        {
+          "category": "RefList",
+          "name": "NotificationConfigurationOverrides",
+          "type": "IList<ConfigurationOverride>",
+          "referencedTableName": "ConfigurationOverride"
+        },
+        {
+          "category": "RefList",
+          "name": "ToolExecutionNotifications",
+          "type": "IList<Notification>",
+          "referencedTableName": "Notification"
+        },
+        {
+          "category": "RefList",
+          "name": "ToolConfigurationNotifications",
+          "type": "IList<Notification>",
+          "referencedTableName": "Notification"
+        },
+        {
+          "name": "ExitCodeDescription",
+          "type": "string"
+        },
+        {
+          "name": "ExitSignalName",
+          "type": "string"
+        },
+        {
+          "name": "ExitSignalNumber",
+          "type": "int"
+        },
+        {
+          "name": "ProcessStartFailureMessage",
+          "type": "string"
+        },
+        {
+          "name": "ExecutionSuccessful",
+          "type": "bool"
+        },
+        {
+          "name": "Machine",
+          "type": "string"
+        },
+        {
+          "name": "Account",
+          "type": "string"
+        },
+        {
+          "name": "ProcessId",
+          "type": "int"
+        },
+        {
+          "category": "Ref",
+          "name": "ExecutableLocation",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "category": "Ref",
+          "name": "WorkingDirectory",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "name": "EnvironmentVariables",
+          "type": "IDictionary<string, string>"
+        },
+        {
+          "category": "Ref",
+          "name": "Stdin",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "category": "Ref",
+          "name": "Stdout",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "category": "Ref",
+          "name": "Stderr",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "category": "Ref",
+          "name": "StdoutStderr",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        }
+      ]
+    },
+    {
+      "name": "Location",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "category": "Ref",
+          "name": "PhysicalLocation",
+          "type": "PhysicalLocation",
+          "referencedTableName": "PhysicalLocation"
+        },
+        {
+          "category": "RefList",
+          "name": "LogicalLocations",
+          "type": "IList<LogicalLocation>",
+          "referencedTableName": "LogicalLocation"
+        },
+        {
+          "category": "Ref",
+          "name": "Message",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "category": "RefList",
+          "name": "Annotations",
+          "type": "IList<Region>",
+          "referencedTableName": "Region"
+        },
+        {
+          "category": "RefList",
+          "name": "Relationships",
+          "type": "IList<LocationRelationship>",
+          "referencedTableName": "LocationRelationship"
+        }
+      ]
+    },
+    {
+      "name": "LocationRelationship",
+      "columns": [
+        {
+          "name": "Target",
+          "type": "int"
+        },
+        {
+          "name": "Kinds",
+          "type": "IList<string>"
+        },
+        {
+          "category": "Ref",
+          "name": "Description",
+          "type": "Message",
+          "referencedTableName": "Message"
+        }
+      ]
+    },
+    {
+      "name": "LogicalLocation",
+      "columns": [
+        {
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "name": "Index",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "FullyQualifiedName",
+          "type": "string"
+        },
+        {
+          "name": "DecoratedName",
+          "type": "string"
+        },
+        {
+          "name": "ParentIndex",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "Kind",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "Message",
+      "columns": [
+        {
+          "name": "Text",
+          "type": "string"
+        },
+        {
+          "name": "Markdown",
+          "type": "string"
+        },
+        {
+          "name": "Id",
+          "type": "string"
+        },
+        {
+          "name": "Arguments",
+          "type": "IList<string>"
+        }
+      ]
+    },
+    {
+      "name": "MultiformatMessageString",
+      "columns": [
+        {
+          "name": "Text",
+          "type": "string"
+        },
+        {
+          "name": "Markdown",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "Node",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "Label",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "category": "Ref",
+          "name": "Location",
+          "type": "Location",
+          "referencedTableName": "Location"
+        },
+        {
+          "category": "RefList",
+          "name": "Children",
+          "type": "IList<Node>",
+          "referencedTableName": "Node"
+        }
+      ]
+    },
+    {
+      "name": "Notification",
+      "columns": [
+        {
+          "category": "RefList",
+          "name": "Locations",
+          "type": "IList<Location>",
+          "referencedTableName": "Location"
+        },
+        {
+          "category": "Ref",
+          "name": "Message",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "category": "Enum",
+          "name": "Level",
+          "type": "FailureLevel",
+          "default": "FailureLevel.Warning",
+          "underlyingType": "int"
+        },
+        {
+          "name": "ThreadId",
+          "type": "int"
+        },
+        {
+          "name": "TimeUtc",
+          "type": "DateTime"
+        },
+        {
+          "category": "Ref",
+          "name": "Exception",
+          "type": "ExceptionData",
+          "referencedTableName": "ExceptionData"
+        },
+        {
+          "category": "Ref",
+          "name": "Descriptor",
+          "type": "ReportingDescriptorReference",
+          "referencedTableName": "ReportingDescriptorReference"
+        },
+        {
+          "category": "Ref",
+          "name": "AssociatedRule",
+          "type": "ReportingDescriptorReference",
+          "referencedTableName": "ReportingDescriptorReference"
+        }
+      ]
+    },
+    {
+      "name": "PhysicalLocation",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Address",
+          "type": "Address",
+          "referencedTableName": "Address"
+        },
+        {
+          "category": "Ref",
+          "name": "ArtifactLocation",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "category": "Ref",
+          "name": "Region",
+          "type": "Region",
+          "referencedTableName": "Region"
+        },
+        {
+          "category": "Ref",
+          "name": "ContextRegion",
+          "type": "Region",
+          "referencedTableName": "Region"
+        }
+      ]
+    },
+    {
+      "name": "PropertyBag",
+      "columns": [
+        {
+          "name": "Tags",
+          "type": "IList<string>"
+        }
+      ]
+    },
+    {
+      "name": "Rectangle",
+      "columns": [
+        {
+          "name": "Top",
+          "type": "double"
+        },
+        {
+          "name": "Left",
+          "type": "double"
+        },
+        {
+          "name": "Bottom",
+          "type": "double"
+        },
+        {
+          "name": "Right",
+          "type": "double"
+        },
+        {
+          "category": "Ref",
+          "name": "Message",
+          "type": "Message",
+          "referencedTableName": "Message"
+        }
+      ]
+    },
+    {
+      "name": "Region",
+      "columns": [
+        {
+          "name": "StartLine",
+          "type": "int"
+        },
+        {
+          "name": "StartColumn",
+          "type": "int"
+        },
+        {
+          "name": "EndLine",
+          "type": "int"
+        },
+        {
+          "name": "EndColumn",
+          "type": "int"
+        },
+        {
+          "name": "CharOffset",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "CharLength",
+          "type": "int"
+        },
+        {
+          "name": "ByteOffset",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "ByteLength",
+          "type": "int"
+        },
+        {
+          "category": "Ref",
+          "name": "Snippet",
+          "type": "ArtifactContent",
+          "referencedTableName": "ArtifactContent"
+        },
+        {
+          "category": "Ref",
+          "name": "Message",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "name": "SourceLanguage",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "Replacement",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "DeletedRegion",
+          "type": "Region",
+          "referencedTableName": "Region"
+        },
+        {
+          "category": "Ref",
+          "name": "InsertedContent",
+          "type": "ArtifactContent",
+          "referencedTableName": "ArtifactContent"
+        }
+      ]
+    },
+    {
+      "name": "ReportingDescriptor",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "string"
+        },
+        {
+          "name": "DeprecatedIds",
+          "type": "IList<string>"
+        },
+        {
+          "name": "Guid",
+          "type": "string"
+        },
+        {
+          "name": "DeprecatedGuids",
+          "type": "IList<string>"
+        },
+        {
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "name": "DeprecatedNames",
+          "type": "IList<string>"
+        },
+        {
+          "category": "Ref",
+          "name": "ShortDescription",
+          "type": "MultiformatMessageString",
+          "referencedTableName": "MultiformatMessageString"
+        },
+        {
+          "category": "Ref",
+          "name": "FullDescription",
+          "type": "MultiformatMessageString",
+          "referencedTableName": "MultiformatMessageString"
+        },
+        {
+          "name": "MessageStrings",
+          "type": "IDictionary<string, MultiformatMessageString>"
+        },
+        {
+          "category": "Ref",
+          "name": "DefaultConfiguration",
+          "type": "ReportingConfiguration",
+          "referencedTableName": "ReportingConfiguration"
+        },
+        {
+          "name": "HelpUri",
+          "type": "Uri"
+        },
+        {
+          "category": "Ref",
+          "name": "Help",
+          "type": "MultiformatMessageString",
+          "referencedTableName": "MultiformatMessageString"
+        },
+        {
+          "category": "RefList",
+          "name": "Relationships",
+          "type": "IList<ReportingDescriptorRelationship>",
+          "referencedTableName": "ReportingDescriptorRelationship"
+        }
+      ]
+    },
+    {
+      "name": "ReportingConfiguration",
+      "columns": [
+        {
+          "name": "Enabled",
+          "type": "bool",
+          "default": "true"
+        },
+        {
+          "category": "Enum",
+          "name": "Level",
+          "type": "FailureLevel",
+          "default": "FailureLevel.Warning",
+          "underlyingType": "int"
+        },
+        {
+          "name": "Rank",
+          "type": "double",
+          "default": "-1"
+        },
+        {
+          "category": "Ref",
+          "name": "Parameters",
+          "type": "PropertyBag",
+          "referencedTableName": "PropertyBag"
+        }
+      ]
+    },
+    {
+      "name": "ReportingDescriptorReference",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "string"
+        },
+        {
+          "name": "Index",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "Guid",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "ToolComponent",
+          "type": "ToolComponentReference",
+          "referencedTableName": "ToolComponentReference"
+        }
+      ]
+    },
+    {
+      "name": "ReportingDescriptorRelationship",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Target",
+          "type": "ReportingDescriptorReference",
+          "referencedTableName": "ReportingDescriptorReference"
+        },
+        {
+          "name": "Kinds",
+          "type": "IList<string>"
+        },
+        {
+          "category": "Ref",
+          "name": "Description",
+          "type": "Message",
+          "referencedTableName": "Message"
+        }
+      ]
+    },
+    {
+      "name": "Result",
+      "columns": [
+        {
+          "name": "RuleId",
+          "type": "string"
+        },
+        {
+          "name": "RuleIndex",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "category": "Ref",
+          "name": "Rule",
+          "type": "ReportingDescriptorReference",
+          "referencedTableName": "ReportingDescriptorReference"
+        },
+        {
+          "category": "Enum",
+          "name": "Kind",
+          "type": "ResultKind",
+          "default": "ResultKind.Fail",
+          "underlyingType": "int"
+        },
+        {
+          "category": "Enum",
+          "name": "Level",
+          "type": "FailureLevel",
+          "default": "FailureLevel.Warning",
+          "underlyingType": "int"
+        },
+        {
+          "category": "Ref",
+          "name": "Message",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "category": "Ref",
+          "name": "AnalysisTarget",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "category": "RefList",
+          "name": "Locations",
+          "type": "IList<Location>",
+          "referencedTableName": "Location"
+        },
+        {
+          "name": "Guid",
+          "type": "string"
+        },
+        {
+          "name": "CorrelationGuid",
+          "type": "string"
+        },
+        {
+          "name": "OccurrenceCount",
+          "type": "int"
+        },
+        {
+          "name": "PartialFingerprints",
+          "type": "IDictionary<string, string>"
+        },
+        {
+          "name": "Fingerprints",
+          "type": "IDictionary<string, string>"
+        },
+        {
+          "category": "RefList",
+          "name": "Stacks",
+          "type": "IList<Stack>",
+          "referencedTableName": "Stack"
+        },
+        {
+          "category": "RefList",
+          "name": "CodeFlows",
+          "type": "IList<CodeFlow>",
+          "referencedTableName": "CodeFlow"
+        },
+        {
+          "category": "RefList",
+          "name": "Graphs",
+          "type": "IList<Graph>",
+          "referencedTableName": "Graph"
+        },
+        {
+          "category": "RefList",
+          "name": "GraphTraversals",
+          "type": "IList<GraphTraversal>",
+          "referencedTableName": "GraphTraversal"
+        },
+        {
+          "category": "RefList",
+          "name": "RelatedLocations",
+          "type": "IList<Location>",
+          "referencedTableName": "Location"
+        },
+        {
+          "category": "RefList",
+          "name": "Suppressions",
+          "type": "IList<Suppression>",
+          "referencedTableName": "Suppression"
+        },
+        {
+          "category": "Enum",
+          "name": "BaselineState",
+          "type": "BaselineState",
+          "default": "default(BaselineState)",
+          "underlyingType": "int"
+        },
+        {
+          "name": "Rank",
+          "type": "double",
+          "default": "-1"
+        },
+        {
+          "category": "RefList",
+          "name": "Attachments",
+          "type": "IList<Attachment>",
+          "referencedTableName": "Attachment"
+        },
+        {
+          "name": "HostedViewerUri",
+          "type": "Uri"
+        },
+        {
+          "name": "WorkItemUris",
+          "type": "IList<Uri>"
+        },
+        {
+          "category": "Ref",
+          "name": "Provenance",
+          "type": "ResultProvenance",
+          "referencedTableName": "ResultProvenance"
+        },
+        {
+          "category": "RefList",
+          "name": "Fixes",
+          "type": "IList<Fix>",
+          "referencedTableName": "Fix"
+        },
+        {
+          "category": "RefList",
+          "name": "Taxa",
+          "type": "IList<ReportingDescriptorReference>",
+          "referencedTableName": "ReportingDescriptorReference"
+        },
+        {
+          "category": "Ref",
+          "name": "WebRequest",
+          "type": "WebRequest",
+          "referencedTableName": "WebRequest"
+        },
+        {
+          "category": "Ref",
+          "name": "WebResponse",
+          "type": "WebResponse",
+          "referencedTableName": "WebResponse"
+        }
+      ]
+    },
+    {
+      "name": "ResultProvenance",
+      "columns": [
+        {
+          "name": "FirstDetectionTimeUtc",
+          "type": "DateTime"
+        },
+        {
+          "name": "LastDetectionTimeUtc",
+          "type": "DateTime"
+        },
+        {
+          "name": "FirstDetectionRunGuid",
+          "type": "string"
+        },
+        {
+          "name": "LastDetectionRunGuid",
+          "type": "string"
+        },
+        {
+          "name": "InvocationIndex",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "category": "RefList",
+          "name": "ConversionSources",
+          "type": "IList<PhysicalLocation>",
+          "referencedTableName": "PhysicalLocation"
+        }
+      ]
+    },
+    {
+      "name": "Run",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Tool",
+          "type": "Tool",
+          "referencedTableName": "Tool"
+        },
+        {
+          "category": "RefList",
+          "name": "Invocations",
+          "type": "IList<Invocation>",
+          "referencedTableName": "Invocation"
+        },
+        {
+          "category": "Ref",
+          "name": "Conversion",
+          "type": "Conversion",
+          "referencedTableName": "Conversion"
+        },
+        {
+          "name": "Language",
+          "type": "string",
+          "default": "\"en-US\""
+        },
+        {
+          "category": "RefList",
+          "name": "VersionControlProvenance",
+          "type": "IList<VersionControlDetails>",
+          "referencedTableName": "VersionControlDetails"
+        },
+        {
+          "name": "OriginalUriBaseIds",
+          "type": "IDictionary<string, ArtifactLocation>"
+        },
+        {
+          "category": "RefList",
+          "name": "Artifacts",
+          "type": "IList<Artifact>",
+          "referencedTableName": "Artifact"
+        },
+        {
+          "category": "RefList",
+          "name": "LogicalLocations",
+          "type": "IList<LogicalLocation>",
+          "referencedTableName": "LogicalLocation"
+        },
+        {
+          "category": "RefList",
+          "name": "Graphs",
+          "type": "IList<Graph>",
+          "referencedTableName": "Graph"
+        },
+        {
+          "category": "RefList",
+          "name": "Results",
+          "type": "IList<Result>",
+          "referencedTableName": "Result"
+        },
+        {
+          "category": "Ref",
+          "name": "AutomationDetails",
+          "type": "RunAutomationDetails",
+          "referencedTableName": "RunAutomationDetails"
+        },
+        {
+          "category": "RefList",
+          "name": "RunAggregates",
+          "type": "IList<RunAutomationDetails>",
+          "referencedTableName": "RunAutomationDetails"
+        },
+        {
+          "name": "BaselineGuid",
+          "type": "string"
+        },
+        {
+          "name": "RedactionTokens",
+          "type": "IList<string>"
+        },
+        {
+          "name": "DefaultEncoding",
+          "type": "string"
+        },
+        {
+          "name": "DefaultSourceLanguage",
+          "type": "string"
+        },
+        {
+          "name": "NewlineSequences",
+          "type": "IList<string>"
+        },
+        {
+          "category": "Enum",
+          "name": "ColumnKind",
+          "type": "ColumnKind",
+          "default": "default(ColumnKind)",
+          "underlyingType": "int"
+        },
+        {
+          "category": "Ref",
+          "name": "ExternalPropertyFileReferences",
+          "type": "ExternalPropertyFileReferences",
+          "referencedTableName": "ExternalPropertyFileReferences"
+        },
+        {
+          "category": "RefList",
+          "name": "ThreadFlowLocations",
+          "type": "IList<ThreadFlowLocation>",
+          "referencedTableName": "ThreadFlowLocation"
+        },
+        {
+          "category": "RefList",
+          "name": "Taxonomies",
+          "type": "IList<ToolComponent>",
+          "referencedTableName": "ToolComponent"
+        },
+        {
+          "category": "RefList",
+          "name": "Addresses",
+          "type": "IList<Address>",
+          "referencedTableName": "Address"
+        },
+        {
+          "category": "RefList",
+          "name": "Translations",
+          "type": "IList<ToolComponent>",
+          "referencedTableName": "ToolComponent"
+        },
+        {
+          "category": "RefList",
+          "name": "Policies",
+          "type": "IList<ToolComponent>",
+          "referencedTableName": "ToolComponent"
+        },
+        {
+          "category": "RefList",
+          "name": "WebRequests",
+          "type": "IList<WebRequest>",
+          "referencedTableName": "WebRequest"
+        },
+        {
+          "category": "RefList",
+          "name": "WebResponses",
+          "type": "IList<WebResponse>",
+          "referencedTableName": "WebResponse"
+        },
+        {
+          "category": "Ref",
+          "name": "SpecialLocations",
+          "type": "SpecialLocations",
+          "referencedTableName": "SpecialLocations"
+        }
+      ]
+    },
+    {
+      "name": "RunAutomationDetails",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Description",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "name": "Id",
+          "type": "string"
+        },
+        {
+          "name": "Guid",
+          "type": "string"
+        },
+        {
+          "name": "CorrelationGuid",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "SpecialLocations",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "DisplayBase",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        }
+      ]
+    },
+    {
+      "name": "Stack",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Message",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "category": "RefList",
+          "name": "Frames",
+          "type": "IList<StackFrame>",
+          "referencedTableName": "StackFrame"
+        }
+      ]
+    },
+    {
+      "name": "StackFrame",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Location",
+          "type": "Location",
+          "referencedTableName": "Location"
+        },
+        {
+          "name": "Module",
+          "type": "string"
+        },
+        {
+          "name": "ThreadId",
+          "type": "int"
+        },
+        {
+          "name": "Parameters",
+          "type": "IList<string>"
+        }
+      ]
+    },
+    {
+      "name": "Suppression",
+      "columns": [
+        {
+          "name": "Guid",
+          "type": "string"
+        },
+        {
+          "category": "Enum",
+          "name": "Kind",
+          "type": "SuppressionKind",
+          "default": "default(SuppressionKind)",
+          "underlyingType": "int"
+        },
+        {
+          "category": "Enum",
+          "name": "Status",
+          "type": "SuppressionStatus",
+          "default": "default(SuppressionStatus)",
+          "underlyingType": "int"
+        },
+        {
+          "name": "Justification",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "Location",
+          "type": "Location",
+          "referencedTableName": "Location"
+        }
+      ]
+    },
+    {
+      "name": "ThreadFlow",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "Message",
+          "type": "Message",
+          "referencedTableName": "Message"
+        },
+        {
+          "name": "InitialState",
+          "type": "IDictionary<string, MultiformatMessageString>"
+        },
+        {
+          "name": "ImmutableState",
+          "type": "IDictionary<string, MultiformatMessageString>"
+        },
+        {
+          "category": "RefList",
+          "name": "Locations",
+          "type": "IList<ThreadFlowLocation>",
+          "referencedTableName": "ThreadFlowLocation"
+        }
+      ]
+    },
+    {
+      "name": "ThreadFlowLocation",
+      "columns": [
+        {
+          "name": "Index",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "category": "Ref",
+          "name": "Location",
+          "type": "Location",
+          "referencedTableName": "Location"
+        },
+        {
+          "category": "Ref",
+          "name": "Stack",
+          "type": "Stack",
+          "referencedTableName": "Stack"
+        },
+        {
+          "name": "Kinds",
+          "type": "IList<string>"
+        },
+        {
+          "category": "RefList",
+          "name": "Taxa",
+          "type": "IList<ReportingDescriptorReference>",
+          "referencedTableName": "ReportingDescriptorReference"
+        },
+        {
+          "name": "Module",
+          "type": "string"
+        },
+        {
+          "name": "State",
+          "type": "IDictionary<string, MultiformatMessageString>"
+        },
+        {
+          "name": "NestingLevel",
+          "type": "int"
+        },
+        {
+          "name": "ExecutionOrder",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "ExecutionTimeUtc",
+          "type": "DateTime"
+        },
+        {
+          "category": "Enum",
+          "name": "Importance",
+          "type": "ThreadFlowLocationImportance",
+          "default": "ThreadFlowLocationImportance.Important",
+          "underlyingType": "int"
+        },
+        {
+          "category": "Ref",
+          "name": "WebRequest",
+          "type": "WebRequest",
+          "referencedTableName": "WebRequest"
+        },
+        {
+          "category": "Ref",
+          "name": "WebResponse",
+          "type": "WebResponse",
+          "referencedTableName": "WebResponse"
+        }
+      ]
+    },
+    {
+      "name": "Tool",
+      "columns": [
+        {
+          "category": "Ref",
+          "name": "Driver",
+          "type": "ToolComponent",
+          "referencedTableName": "ToolComponent"
+        },
+        {
+          "category": "RefList",
+          "name": "Extensions",
+          "type": "IList<ToolComponent>",
+          "referencedTableName": "ToolComponent"
+        }
+      ]
+    },
+    {
+      "name": "ToolComponent",
+      "columns": [
+        {
+          "name": "Guid",
+          "type": "string"
+        },
+        {
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "name": "Organization",
+          "type": "string"
+        },
+        {
+          "name": "Product",
+          "type": "string"
+        },
+        {
+          "name": "ProductSuite",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "ShortDescription",
+          "type": "MultiformatMessageString",
+          "referencedTableName": "MultiformatMessageString"
+        },
+        {
+          "category": "Ref",
+          "name": "FullDescription",
+          "type": "MultiformatMessageString",
+          "referencedTableName": "MultiformatMessageString"
+        },
+        {
+          "name": "FullName",
+          "type": "string"
+        },
+        {
+          "name": "Version",
+          "type": "string"
+        },
+        {
+          "name": "SemanticVersion",
+          "type": "string"
+        },
+        {
+          "name": "DottedQuadFileVersion",
+          "type": "string"
+        },
+        {
+          "name": "ReleaseDateUtc",
+          "type": "string"
+        },
+        {
+          "name": "DownloadUri",
+          "type": "Uri"
+        },
+        {
+          "name": "InformationUri",
+          "type": "Uri"
+        },
+        {
+          "name": "GlobalMessageStrings",
+          "type": "IDictionary<string, MultiformatMessageString>"
+        },
+        {
+          "category": "RefList",
+          "name": "Notifications",
+          "type": "IList<ReportingDescriptor>",
+          "referencedTableName": "ReportingDescriptor"
+        },
+        {
+          "category": "RefList",
+          "name": "Rules",
+          "type": "IList<ReportingDescriptor>",
+          "referencedTableName": "ReportingDescriptor"
+        },
+        {
+          "category": "RefList",
+          "name": "Taxa",
+          "type": "IList<ReportingDescriptor>",
+          "referencedTableName": "ReportingDescriptor"
+        },
+        {
+          "category": "RefList",
+          "name": "Locations",
+          "type": "IList<ArtifactLocation>",
+          "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "name": "Language",
+          "type": "string",
+          "default": "\"en-US\""
+        },
+        {
+          "category": "Enum",
+          "name": "Contents",
+          "type": "ToolComponentContents",
+          "default": "default(ToolComponentContents)",
+          "underlyingType": "int"
+        },
+        {
+          "name": "IsComprehensive",
+          "type": "bool",
+          "default": "false"
+        },
+        {
+          "name": "LocalizedDataSemanticVersion",
+          "type": "string"
+        },
+        {
+          "name": "MinimumRequiredLocalizedDataSemanticVersion",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "AssociatedComponent",
+          "type": "ToolComponentReference",
+          "referencedTableName": "ToolComponentReference"
+        },
+        {
+          "category": "Ref",
+          "name": "TranslationMetadata",
+          "type": "TranslationMetadata",
+          "referencedTableName": "TranslationMetadata"
+        },
+        {
+          "category": "RefList",
+          "name": "SupportedTaxonomies",
+          "type": "IList<ToolComponentReference>",
+          "referencedTableName": "ToolComponentReference"
+        }
+      ]
+    },
+    {
+      "name": "ToolComponentReference",
+      "columns": [
+        {
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "name": "Index",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "Guid",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "TranslationMetadata",
+      "columns": [
+        {
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "name": "FullName",
+          "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "ShortDescription",
+          "type": "MultiformatMessageString",
+          "referencedTableName": "MultiformatMessageString"
+        },
+        {
+          "category": "Ref",
+          "name": "FullDescription",
+          "type": "MultiformatMessageString",
+          "referencedTableName": "MultiformatMessageString"
+        },
+        {
+          "name": "DownloadUri",
+          "type": "Uri"
+        },
+        {
+          "name": "InformationUri",
+          "type": "Uri"
+        }
+      ]
+    },
+    {
+      "name": "VersionControlDetails",
+      "columns": [
+        {
+          "name": "RepositoryUri",
+          "type": "Uri"
+        },
+        {
+          "name": "RevisionId",
+          "type": "string"
+        },
+        {
+          "name": "Branch",
+          "type": "string"
+        },
+        {
+          "name": "RevisionTag",
+          "type": "string"
+        },
+        {
+          "name": "AsOfTimeUtc",
+          "type": "DateTime"
+        },
+        {
+          "category": "Ref",
+          "name": "MappedTo",
+          "type": "ArtifactLocation",
+          "referencedTableName": "ArtifactLocation"
+        }
+      ]
+    },
+    {
+      "name": "WebRequest",
+      "columns": [
+        {
+          "name": "Index",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "Protocol",
+          "type": "string"
+        },
+        {
+          "name": "Version",
+          "type": "string"
+        },
+        {
+          "name": "Target",
+          "type": "string"
+        },
+        {
+          "name": "Method",
+          "type": "string"
+        },
+        {
+          "name": "Headers",
+          "type": "IDictionary<string, string>"
+        },
+        {
+          "name": "Parameters",
+          "type": "IDictionary<string, string>"
+        },
+        {
+          "category": "Ref",
+          "name": "Body",
+          "type": "ArtifactContent",
+          "referencedTableName": "ArtifactContent"
+        }
+      ]
+    },
+    {
+      "name": "WebResponse",
+      "columns": [
+        {
+          "name": "Index",
+          "type": "int",
+          "default": "-1"
+        },
+        {
+          "name": "Protocol",
+          "type": "string"
+        },
+        {
+          "name": "Version",
+          "type": "string"
+        },
+        {
+          "name": "StatusCode",
+          "type": "int"
+        },
+        {
+          "name": "ReasonPhrase",
+          "type": "string"
+        },
+        {
+          "name": "Headers",
+          "type": "IDictionary<string, string>"
+        },
+        {
+          "category": "Ref",
+          "name": "Body",
+          "type": "ArtifactContent",
+          "referencedTableName": "ArtifactContent"
+        },
+        {
+          "name": "NoResponseReceived",
+          "type": "bool",
+          "default": "false"
+        }
+      ]
+    }
+  ]
+}
