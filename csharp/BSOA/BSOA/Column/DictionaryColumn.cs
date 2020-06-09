@@ -35,6 +35,11 @@ namespace BSOA.Column
             _pairs.Clear();
         }
 
+        public override void Swap(int index1, int index2)
+        {
+            _pairs.Swap(index1, index2);
+        }
+
         public override void RemoveFromEnd(int count)
         {
             _pairs.RemoveFromEnd(count);

@@ -7,45 +7,45 @@ namespace BSOA.Test
 {
     public class DictionaryColumnTests
     {
-
-        public static IDictionary<string, string> SampleRow()
+        public static ColumnDictionary<string, string> SampleRow()
         {
             DictionaryColumn<string, string> column = new DictionaryColumn<string, string>(
                 new DistinctColumn<string>(new StringColumn(), null),
                 new StringColumn());
 
-            return column[0];
+            return (ColumnDictionary<string, string>)column[0];
         }
 
-        //[Fact]
-        //public void DictionaryColumn_Basics()
-        //{
-        //    DictionaryColumn<string, string> other = new DictionaryColumn<string, string>(
-        //        new StringColumn(), new StringColumn());
+        [Fact]
+        public void DictionaryColumn_Basics()
+        {
+            DictionaryColumn<string, string> scratch = new DictionaryColumn<string, string>(new StringColumn(), new StringColumn());
+            ColumnDictionary<string, string> defaultValue = ColumnDictionary<string, string>.Empty;
 
-        //    ColumnDictionary<string, string> defaultValue = ColumnDictionary<string, string>.Empty;
+            ColumnDictionary<string, string> otherValue = SampleRow();
+            otherValue.SetTo(new Dictionary<string, string>()
+            {
+                ["Name"] = "Scott",
+                ["City"] = "Redmond"
+            });
 
-        //    other[1] = new Dictionary<string, string>()
-        //    {
-        //        ["Name"] = "Scott",
-        //        ["City"] = "Redmond"
-        //    };
+            Column.Basics<IDictionary<string, string>>(
+                () => new DictionaryColumn<string, string>(
+                    new DistinctColumn<string>(new StringColumn(), null),
+                    new StringColumn()),
+                defaultValue,
+                otherValue,
+                (i) =>
+                {
+                    if (scratch[i].Count == 0)
+                    {
+                        scratch[i][(i % 10).ToString()] = i.ToString();
+                        scratch[i][((i + 1) % 10).ToString()] = i.ToString();
+                    }
 
-        //    IDictionary<string, string> otherValue = other[1];
-
-        //    Column.Basics<IDictionary<string, string>>(
-        //        () => new DictionaryColumn<string, string>(
-        //            new DistinctColumn<string>(new StringColumn(), null),
-        //            new StringColumn()),
-        //        defaultValue,
-        //        otherValue,
-        //        (i) => {
-        //            other[0].Clear();
-        //            other[0][(i % 10).ToString()] = i.ToString();
-        //            other[0][(i % 20).ToString()] = i.ToString();
-        //            return other[0];
-        //        }
-        //    );
-        //}
+                    return scratch[i];
+                }
+            );
+        }
     }
 }

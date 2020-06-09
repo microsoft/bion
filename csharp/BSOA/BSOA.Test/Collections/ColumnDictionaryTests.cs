@@ -23,7 +23,7 @@ namespace BSOA.Test.Collections
 
             Dictionary<string, string> expected = new Dictionary<string, string>();
 
-            IDictionary<string, string> row = DictionaryColumnTests.SampleRow();
+            ColumnDictionary<string, string> row = DictionaryColumnTests.SampleRow();
             Assert.True(0 == ColumnDictionary<string, string>.Empty.Count);
             Assert.False(row.IsReadOnly);
 
@@ -31,7 +31,7 @@ namespace BSOA.Test.Collections
             Assert.False(row.TryGetValue(sampleName, out retrievedValue));
             Assert.False(row.ContainsKey(sampleName));
             Assert.False(row.Remove(sampleName));
-            Assert.Equal(0, row.Count);
+            Assert.True(0 == row.Count);
             Assert.Empty(row.Keys);
             Assert.Empty(row.Values);
 
@@ -50,9 +50,9 @@ namespace BSOA.Test.Collections
             CollectionReadVerifier.VerifySame(expected.Values, row.Values);
 
             // Negative (missing item / already added item) cases
-            Assert.False(row.Contains(new KeyValuePair<string, string>(sampleName, secondValue)));
-            Assert.False(row.Contains(new KeyValuePair<string, string>(unusedName, sampleValue)));
-            Assert.False(row.ContainsKey(unusedName));
+            Assert.True(false == row.Contains(new KeyValuePair<string, string>(sampleName, secondValue)));
+            Assert.True(false == row.Contains(new KeyValuePair<string, string>(unusedName, sampleValue)));
+            Assert.True(false == row.ContainsKey(unusedName));
             Assert.Throws<KeyNotFoundException>(() => row[unusedName]);
             Assert.Throws<ArgumentException>(() => row.Add(new KeyValuePair<string, string>(sampleName, secondValue)));
 
@@ -79,8 +79,33 @@ namespace BSOA.Test.Collections
             Assert.Empty(row);
 
             // SetTo
-            ((ColumnDictionary<string, string>)row).SetTo(expected);
+            row.SetTo(expected);
             CollectionReadVerifier.VerifySame<KeyValuePair<string, string>>(expected, row);
+
+            // Create another Dictionary with the same values inserted in a different order
+            ColumnDictionary<string, string> row2 = DictionaryColumnTests.SampleRow();
+            row2[secondName] = secondValue;
+            row2[sampleName] = sampleValue;
+
+            // Equals (order-independent)
+            Assert.True(row.Equals(row));
+            Assert.True(row.Equals(row2));
+            Assert.False(row.Equals(ColumnDictionary<string, string>.Empty));
+            Assert.False(row.Equals(null));
+
+            // Operators
+            Assert.True(row == row2);
+            Assert.False(row == ColumnDictionary<string, string>.Empty);
+            Assert.True(ColumnDictionary<string, string>.Empty != row);
+            Assert.False(row2 != row);
+
+            // GetHashCode (order-independent)
+            Assert.Equal(row.GetHashCode(), row2.GetHashCode());
+            Assert.NotEqual(row.GetHashCode(), ColumnDictionary<string, string>.Empty.GetHashCode());
+
+            // GetHashCode handles null key/values safely
+            row[null] = null;
+            Assert.Equal(row.GetHashCode(), row2.GetHashCode());
 
             // Verify other collection manipulation
             // NOTE: Must use unique keys, because Add(KeyValuePair) will throw for a duplicate key

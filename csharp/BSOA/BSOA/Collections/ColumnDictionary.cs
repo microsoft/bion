@@ -70,7 +70,7 @@ namespace BSOA.Collections
         {
             if (this.ContainsKey(key)) { throw new ArgumentException(nameof(key)); }
 
-            int newPairIndex = Pairs.Count;
+            int newPairIndex = _column._values.Count;
             _column._keys[newPairIndex] = key;
             _column._values[newPairIndex] = value;
             Pairs.Add(newPairIndex);
@@ -165,5 +165,88 @@ namespace BSOA.Collections
         {
             return new DictionaryEnumerator<TKey, TValue>(_column, Pairs.Slice);
         }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 17;
+
+            // Combine Keys with XOR to ensure GetHashCode is order-independent
+            foreach (KeyValuePair<TKey, TValue> pair in this)
+            {
+                hashCode ^= pair.Key?.GetHashCode() ?? 0;
+                hashCode ^= 31 * (pair.Value?.GetHashCode() ?? 0);
+            }
+
+            return hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            IDictionary<TKey, TValue> other = obj as IDictionary<TKey, TValue>;
+            if (other == null) { return false; }
+
+            // Verify Dictionary counts match
+            if (this.Count != other.Count) { return false; }
+
+            // Try to compare keys in order (faster than lookup for each key)
+            using (IEnumerator<KeyValuePair<TKey, TValue>> thisEnumerator = GetEnumerator())
+            using (IEnumerator<KeyValuePair<TKey, TValue>> otherEnumerator = other.GetEnumerator())
+            {
+                int countCompared = 0;
+
+                while (thisEnumerator.MoveNext())
+                {
+                    // If other ran out of items first, definite non-match
+                    if (!otherEnumerator.MoveNext()) { return false; }
+
+                    KeyValuePair<TKey, TValue> thisPair = thisEnumerator.Current;
+                    KeyValuePair<TKey, TValue> otherPair = otherEnumerator.Current;
+
+                    // If keys don't match, they aren't in the same order; must fall back
+                    if (!thisPair.Key.Equals(otherPair.Key)) { break; }
+
+                    // If keys matched but values different, definite non-match
+                    if (!object.Equals(thisPair.Value, otherPair.Value)) { return false; }
+
+                    countCompared++;
+                }
+
+                // If we got fully through the lists, they match
+                if (countCompared == this.Count)
+                {
+                    return true;
+                }
+            }
+
+            // Otherwise, retrieve values by key (any order) and compare values)
+            foreach (KeyValuePair<TKey, TValue> pair in this)
+            {
+                if (!other.Contains(pair)) { return false; }
+            }
+
+            return true;
+        }
+
+        public static bool operator ==(ColumnDictionary<TKey, TValue> left, ColumnDictionary<TKey, TValue> right)
+        {
+            if (object.ReferenceEquals(left, null))
+            {
+                return object.ReferenceEquals(right, null);
+            }
+
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ColumnDictionary<TKey, TValue> left, ColumnDictionary<TKey, TValue> right)
+        {
+            if (object.ReferenceEquals(left, null))
+            {
+                return !object.ReferenceEquals(right, null);
+            }
+
+            return !left.Equals(right);
+        }
+
+        
     }
 }
