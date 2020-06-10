@@ -1,12 +1,14 @@
-﻿using System.Linq;
+﻿using Microsoft.CodeAnalysis.Sarif;
+
+using System.Linq;
 
 namespace BSOA.Demo.Model
 {
-    public partial class SarifLog
+    public static class SarifLogExtensions
     {
-        public override string ToString()
+        public static string Summary(this SarifLog log)
         {
-            return $"{Runs.Sum((run) => run?.Results?.Count ?? 0):n0} {nameof(Result)}s";
+            return $"{log.Runs.Sum((run) => run?.Results?.Count ?? 0):n0} {nameof(Result)}s";
         }
     }
 }

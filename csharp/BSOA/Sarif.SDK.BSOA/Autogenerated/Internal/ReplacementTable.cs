@@ -1,0 +1,34 @@
+using BSOA.Column;
+using BSOA.Model;
+
+using System;
+using System.Collections.Generic;
+
+namespace Microsoft.CodeAnalysis.Sarif
+{
+    /// <summary>
+    ///  BSOA GENERATED Table for 'Replacement'
+    /// </summary>
+    internal partial class ReplacementTable : Table<Replacement>
+    {
+        internal SarifLogDatabase Database;
+
+        internal RefColumn DeletedRegion;
+        internal RefColumn InsertedContent;
+        internal IColumn<IDictionary<string, string>> Properties;
+
+        internal ReplacementTable(SarifLogDatabase database) : base()
+        {
+            Database = database;
+
+            DeletedRegion = AddColumn(nameof(DeletedRegion), new RefColumn(nameof(SarifLogDatabase.Region)));
+            InsertedContent = AddColumn(nameof(InsertedContent), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+        }
+
+        public override Replacement Get(int index)
+        {
+            return (index == -1 ? null : new Replacement(this, index));
+        }
+    }
+}
