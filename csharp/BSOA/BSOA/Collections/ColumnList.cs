@@ -16,13 +16,13 @@ namespace BSOA
     ///  List therefore "points" to a row index in the column and retrieves the current slice on use.
     ///  List persists each Count change back to the column immediately.
     /// </remarks>
-    public readonly struct ColumnList<T> : IList<T>, IReadOnlyList<T>
+    public class ColumnList<T> : IList<T>, IReadOnlyList<T>
     {
         private const int MinimumSize = 16;
         private readonly ListColumn<T> _column;
         private readonly int _rowIndex;
 
-        public static ColumnList<T> Empty = new ColumnList<T>();
+        public static ColumnList<T> Empty = new ColumnList<T>(null, 0);
 
         public ColumnList(ListColumn<T> column, int index)
         {
@@ -42,6 +42,19 @@ namespace BSOA
 
         public int Count => Indices.Count;
         public bool IsReadOnly => false;
+
+        public void SetTo(IEnumerable<T> other)
+        {
+            Clear();
+
+            if (other != null)
+            {
+                foreach (T item in other)
+                {
+                    Add(item);
+                }
+            }
+        }
 
         public void Add(T item)
         {
@@ -194,12 +207,12 @@ namespace BSOA
             return ReadOnlyListExtensions.AreEqual(this, obj as IReadOnlyList<T>);
         }
 
-        public static bool operator ==(ColumnList<T> left, ColumnList<T> right)
+        public static bool operator ==(ColumnList<T> left, IReadOnlyList<T> right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(ColumnList<T> left, ColumnList<T> right)
+        public static bool operator !=(ColumnList<T> left, IReadOnlyList<T> right)
         {
             return !(left == right);
         }

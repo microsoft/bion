@@ -22,9 +22,9 @@ namespace BSOA.Json
         {
             BuildSerializer();
 
-            using (JsonTextReader writer = new JsonTextReader(System.IO.File.OpenText(filePath)))
+            using (JsonTextReader reader = new JsonTextReader(System.IO.File.OpenText(filePath)))
             {
-                return _jsonSerializer.Deserialize<T>(writer);
+                return _jsonSerializer.Deserialize<T>(reader);
             }
         }
 

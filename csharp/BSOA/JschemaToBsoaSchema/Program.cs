@@ -73,8 +73,6 @@ namespace JschemaToBsoaSchema
             foreach (KeyValuePair<string, JsonSchema> prop in schema.Properties)
             {
                 string columnName = prop.Key.ToPascalCase();
-                if (columnName == "Properties") { continue; }
-
                 table.Columns.Add(ToColumn(table.Name, columnName, prop.Value));
             }
         }
@@ -84,6 +82,11 @@ namespace JschemaToBsoaSchema
             SchemaType type = schema.SafeGetType();
             string defaultValue = schema.Default?.ToString();
             if (NameRenames.TryGetValue(columnName, out string columnRename)) { columnName = columnRename; }
+
+            if (columnName == "Properties")
+            {
+                return Column.Simple("Properties", "IDictionary<string, string>");
+            }
 
             switch (type)
             {

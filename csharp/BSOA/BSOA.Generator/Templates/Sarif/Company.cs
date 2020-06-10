@@ -90,6 +90,7 @@ namespace BSOA.Generator.Templates
 
         //   </SimpleColumn>
         //   <EnumColumn>
+        [DataMember(Name = "joinPolicy", IsRequired = false, EmitDefaultValue = false)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public SecurityPolicy JoinPolicy
@@ -100,6 +101,7 @@ namespace BSOA.Generator.Templates
 
         //   </EnumColumn>
         //   <RefColumn>
+        [DataMember(Name = "owner", IsRequired = false, EmitDefaultValue = false)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Employee Owner
         {
@@ -109,6 +111,7 @@ namespace BSOA.Generator.Templates
 
         //   </RefColumn>
         //   <RefListColumn>
+        [DataMember(Name = "members", IsRequired = false, EmitDefaultValue = false)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public IList<Employee> Members
         {

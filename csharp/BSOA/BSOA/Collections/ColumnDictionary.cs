@@ -7,12 +7,12 @@ using System.Collections.Generic;
 
 namespace BSOA.Collections
 {
-    public readonly struct ColumnDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : IEquatable<TKey>
+    public class ColumnDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : IEquatable<TKey>
     {
         private readonly DictionaryColumn<TKey, TValue> _column;
         private readonly int _rowIndex;
 
-        public static ColumnDictionary<TKey, TValue> Empty = new ColumnDictionary<TKey, TValue>();
+        public static ColumnDictionary<TKey, TValue> Empty = new ColumnDictionary<TKey, TValue>(null, 0);
 
         public ColumnDictionary(DictionaryColumn<TKey, TValue> column, int index)
         {
@@ -60,9 +60,12 @@ namespace BSOA.Collections
         {
             Clear();
 
-            foreach (KeyValuePair<TKey, TValue> pair in other)
+            if (other != null)
             {
-                this.Add(pair);
+                foreach (KeyValuePair<TKey, TValue> pair in other)
+                {
+                    this.Add(pair);
+                }
             }
         }
 

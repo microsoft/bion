@@ -29,13 +29,12 @@ namespace BSOA.Test
             AssertBuild<char>((char)1);
 
             Assert.Throws<NotImplementedException>(() => ColumnFactory.Build(typeof(DayOfWeek), DayOfWeek.Sunday));
-            Assert.Throws<NotImplementedException>(() => ColumnFactory.Build<IList<int>>());
 
-            IColumn<ColumnList<string>> column = (IColumn<ColumnList<string>>)ColumnFactory.Build(typeof(ColumnList<string>), null);
-            Assert.NotNull(column);
+            IColumn<IList<string>> listColumn = (IColumn<IList<string>>)ColumnFactory.Build(typeof(IList<string>), null);
+            Assert.NotNull(listColumn);
 
-            Assert.NotNull(ColumnFactory.Build<ColumnList<string>>());
-            Assert.NotNull(ColumnFactory.Build<ColumnList<string>>(ColumnList<string>.Empty));
+            IColumn<IDictionary<string, string>> dictionaryColumn = (IColumn<IDictionary<string, string>>)(ColumnFactory.Build(typeof(IDictionary<string, string>), null));
+            Assert.NotNull(dictionaryColumn);
         }
 
         private void AssertBuild<T>(object defaultValue)

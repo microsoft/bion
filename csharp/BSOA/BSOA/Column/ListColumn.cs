@@ -9,7 +9,7 @@ namespace BSOA.Column
     ///  It wraps a values column which contains the individual values
     ///  and an ArraySliceColumn which identifies which values each row-list has.
     /// </summary>
-    public class ListColumn<T> : LimitedList<ColumnList<T>>, IColumn<ColumnList<T>>
+    public class ListColumn<T> : LimitedList<IList<T>>, IColumn<IList<T>>
     {
         internal ArraySliceColumn<int> _indices;
         internal IColumn<T> _values;
@@ -22,23 +22,14 @@ namespace BSOA.Column
             _values = values;
         }
 
+        // ColumnFactory untyped constructor
         public ListColumn(IColumn values) : this((IColumn<T>)values)
         { }
 
-        public override ColumnList<T> this[int index]
+        public override IList<T> this[int index]
         {
             get => new ColumnList<T>(this, index);
-
-            set
-            {
-                ColumnList<T> current = this[index];
-                current.Clear();
-
-                for (int i = 0; i < value.Count; ++i)
-                {
-                    current.Add(value[i]);
-                }
-            }
+            set => new ColumnList<T>(this, index).SetTo(value);
         }
 
         public override void Swap(int index1, int index2)

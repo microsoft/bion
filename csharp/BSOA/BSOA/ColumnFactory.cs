@@ -1,4 +1,5 @@
 ﻿using BSOA.Model;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,24 +43,46 @@ namespace BSOA.Column
             {
                 return creator(defaultValue);
             }
-            
+
             if (type.IsEnum)
             {
                 throw new NotImplementedException($"Can't create EnumColumn via builder because can't generically define converting Funcs.");
             }
-            
+
             if (type.IsGenericType)
             {
                 Type genericType = type.GetGenericTypeDefinition();
-                Type innerType = type.GetGenericArguments().First();
-                if (genericType == typeof(ColumnList<>))
+                Type[] typeArguments = type.GetGenericArguments();
+
+                if (genericType == typeof(IList<>))
                 {
-                    IColumn innerColumn = Build(innerType, null);
-                    return (IColumn)(typeof(ListColumn<>).MakeGenericType(type.GetGenericArguments()).GetConstructor(new[] { typeof(IColumn) }).Invoke(new[] { innerColumn }));
+                    return BuildList(typeArguments[0]);
+                }
+                else if (genericType == typeof(IDictionary<,>))
+                {
+                    return BuildDictionary(typeArguments[0], typeArguments[1]);
                 }
             }
 
             throw new NotImplementedException($"ColumnFactory doesn't know how to build an IColumn<{type.Name}>.");
+        }
+
+        private static IColumn BuildList(Type itemType)
+        {
+            IColumn innerColumn = Build(itemType, null);
+            return (IColumn)(typeof(ListColumn<>).MakeGenericType(itemType).GetConstructor(new[] { typeof(IColumn) }).Invoke(new[] { innerColumn }));
+        }
+
+        private static IColumn BuildDictionary(Type keyType, Type valueType)
+        {
+            IColumn keyColumn = WrapInDistinct(Build(keyType, null), null);
+            IColumn valueColumn = Build(valueType, null);
+            return (IColumn)(typeof(DictionaryColumn<,>).MakeGenericType(keyType, valueType).GetConstructor(new[] { typeof(IColumn), typeof(IColumn) }).Invoke(new[] { keyColumn, valueColumn }));
+        }
+
+        private static IColumn WrapInDistinct(IColumn inner, object defaultValue)
+        {
+            return (IColumn)(typeof(DistinctColumn<>).MakeGenericType(inner.Type).GetConstructor(new[] { typeof(IColumn), typeof(object) }).Invoke(new[] { inner, defaultValue }));
         }
     }
 }

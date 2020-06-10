@@ -59,7 +59,12 @@ namespace BSOA.Generator
                 ["^[ \t]+\\[DefaultValue\\(0\\)\\][ \t\r]*\n"] = "",
                 ["^[ \t]+\\[DefaultValue\\(\\)\\][ \t\r]*\n"] = "",
                 [Regex.Escape("PropertyBag : PropertyBagHolder, ")] = "PropertyBag : ",
-                [Regex.Escape(@"[DefaultValue(DateTime.MinValue)]")] = "[JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.DateTimeConverter))]"
+                [Regex.Escape(@"[DefaultValue(DateTime.MinValue)]")] = "[JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.DateTimeConverter))]",
+                ["EnumConverter\\)\\)\\][^\n]*\n\\s+public SarifVersion"] = @"SarifVersionConverter))]
+        public SarifVersion",
+                [Regex.Escape("public IDictionary<string, string> Properties")] = "internal override IDictionary<string, string> Properties",
+                ["[^\n]+ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(\\)\\);"] = @"// $0",
+                ["[^\n]+ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(\\)\\);"] = @"// $0"
             };
 
             // Generate Database class

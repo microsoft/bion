@@ -14,7 +14,7 @@ namespace BSOA.Collections
     ///  NumberList therefore "points" to a row index in the column and retrieves the current slice on use.
     ///  NumberList persists each Count change back to the column immediately.
     /// </remarks>
-    public readonly struct NumberList<T> : IList<T>, IReadOnlyList<T> where T : unmanaged
+    public class NumberList<T> : IList<T>, IReadOnlyList<T> where T : unmanaged
     {
         private const int MinimumSize = 16;
 
@@ -22,7 +22,7 @@ namespace BSOA.Collections
         private readonly IColumn<ArraySlice<T>> _column;
         private readonly int _index;
 
-        public static NumberList<T> Empty = new NumberList<T>();
+        public static NumberList<T> Empty = new NumberList<T>(null, 0);
 
         public NumberList(IColumn<ArraySlice<T>> column, int index)
         {

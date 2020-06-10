@@ -20,6 +20,10 @@ namespace BSOA.Column
             _pairs = new NumberListColumn<int>();
         }
 
+        // ColumnFactory untyped constructor
+        public DictionaryColumn(IColumn keys, IColumn values) : this((IColumn<TKey>)keys, (IColumn<TValue>)values)
+        { }
+
         public override IDictionary<TKey, TValue> this[int index] 
         {
             get => new ColumnDictionary<TKey, TValue>(this, index);

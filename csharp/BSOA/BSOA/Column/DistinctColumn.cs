@@ -27,6 +27,10 @@ namespace BSOA.Column
             Clear();
         }
 
+        // ColumnFactory untyped constructor
+        public DistinctColumn(IColumn values, object defaultValue) : this((IColumn<T>)values, (T)defaultValue)
+        { }
+
         public bool IsMappingValues => (_distinct != null);
         public int DistinctCount => (IsMappingValues ? _distinct.Count + 1 : -1);
         public override int Count => (IsMappingValues ? _indices.Count : _values.Count);

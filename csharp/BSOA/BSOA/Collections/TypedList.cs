@@ -38,7 +38,7 @@ namespace BSOA.Collections
         {
             _inner.Clear();
 
-            if (list?.Count > 0)
+            if (list != null)
             {
                 for (int i = 0; i < list.Count; ++i)
                 {
