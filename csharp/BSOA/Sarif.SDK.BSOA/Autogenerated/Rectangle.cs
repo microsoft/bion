@@ -73,7 +73,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "top", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double Top
         {
             get => _table.Top[_index];
@@ -81,7 +80,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "left", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double Left
         {
             get => _table.Left[_index];
@@ -89,7 +87,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "bottom", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double Bottom
         {
             get => _table.Bottom[_index];
@@ -97,7 +94,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "right", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double Right
         {
             get => _table.Right[_index];
@@ -105,7 +101,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
@@ -113,7 +108,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         internal override IDictionary<string, string> Properties
         {
             get => _table.Properties[_index];

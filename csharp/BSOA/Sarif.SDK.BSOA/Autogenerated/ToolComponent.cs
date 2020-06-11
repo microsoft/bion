@@ -139,7 +139,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "guid", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Guid
         {
             get => _table.Guid[_index];
@@ -147,7 +146,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Name
         {
             get => _table.Name[_index];
@@ -155,7 +153,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "organization", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Organization
         {
             get => _table.Organization[_index];
@@ -163,7 +160,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "product", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Product
         {
             get => _table.Product[_index];
@@ -171,7 +167,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "productSuite", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string ProductSuite
         {
             get => _table.ProductSuite[_index];
@@ -179,7 +174,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "shortDescription", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public MultiformatMessageString ShortDescription
         {
             get => _table.Database.MultiformatMessageString.Get(_table.ShortDescription[_index]);
@@ -187,7 +181,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "fullDescription", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public MultiformatMessageString FullDescription
         {
             get => _table.Database.MultiformatMessageString.Get(_table.FullDescription[_index]);
@@ -195,7 +188,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "fullName", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string FullName
         {
             get => _table.FullName[_index];
@@ -203,7 +195,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "version", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Version
         {
             get => _table.Version[_index];
@@ -211,7 +202,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "semanticVersion", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string SemanticVersion
         {
             get => _table.SemanticVersion[_index];
@@ -219,7 +209,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "dottedQuadFileVersion", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string DottedQuadFileVersion
         {
             get => _table.DottedQuadFileVersion[_index];
@@ -227,7 +216,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "releaseDateUtc", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string ReleaseDateUtc
         {
             get => _table.ReleaseDateUtc[_index];
@@ -235,7 +223,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "downloadUri", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Uri DownloadUri
         {
             get => _table.DownloadUri[_index];
@@ -243,7 +230,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "informationUri", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Uri InformationUri
         {
             get => _table.InformationUri[_index];
@@ -251,7 +237,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "globalMessageStrings", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IDictionary<string, MultiformatMessageString> GlobalMessageStrings
         {
             get => _table.GlobalMessageStrings[_index];
@@ -259,7 +244,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "notifications", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ReportingDescriptor> Notifications
         {
             get => _table.Database.ReportingDescriptor.List(_table.Notifications[_index]);
@@ -267,7 +251,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "rules", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ReportingDescriptor> Rules
         {
             get => _table.Database.ReportingDescriptor.List(_table.Rules[_index]);
@@ -275,7 +258,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "taxa", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ReportingDescriptor> Taxa
         {
             get => _table.Database.ReportingDescriptor.List(_table.Taxa[_index]);
@@ -283,7 +265,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "locations", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ArtifactLocation> Locations
         {
             get => _table.Database.ArtifactLocation.List(_table.Locations[_index]);
@@ -292,7 +273,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "language", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue("en-US")]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Language
         {
             get => _table.Language[_index];
@@ -300,7 +280,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "contents", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public ToolComponentContents Contents
         {
@@ -310,7 +289,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "isComprehensive", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsComprehensive
         {
             get => _table.IsComprehensive[_index];
@@ -318,7 +296,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "localizedDataSemanticVersion", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string LocalizedDataSemanticVersion
         {
             get => _table.LocalizedDataSemanticVersion[_index];
@@ -326,7 +303,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "minimumRequiredLocalizedDataSemanticVersion", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string MinimumRequiredLocalizedDataSemanticVersion
         {
             get => _table.MinimumRequiredLocalizedDataSemanticVersion[_index];
@@ -334,7 +310,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "associatedComponent", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ToolComponentReference AssociatedComponent
         {
             get => _table.Database.ToolComponentReference.Get(_table.AssociatedComponent[_index]);
@@ -342,7 +317,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "translationMetadata", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public TranslationMetadata TranslationMetadata
         {
             get => _table.Database.TranslationMetadata.Get(_table.TranslationMetadata[_index]);
@@ -350,7 +324,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "supportedTaxonomies", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ToolComponentReference> SupportedTaxonomies
         {
             get => _table.Database.ToolComponentReference.List(_table.SupportedTaxonomies[_index]);
@@ -358,7 +331,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         internal override IDictionary<string, string> Properties
         {
             get => _table.Properties[_index];

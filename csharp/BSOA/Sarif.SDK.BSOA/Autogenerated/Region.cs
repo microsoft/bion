@@ -91,7 +91,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "startLine", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int StartLine
         {
             get => _table.StartLine[_index];
@@ -99,7 +98,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "startColumn", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int StartColumn
         {
             get => _table.StartColumn[_index];
@@ -107,7 +105,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "endLine", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int EndLine
         {
             get => _table.EndLine[_index];
@@ -115,7 +112,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "endColumn", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int EndColumn
         {
             get => _table.EndColumn[_index];
@@ -124,7 +120,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "charOffset", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int CharOffset
         {
             get => _table.CharOffset[_index];
@@ -132,7 +127,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "charLength", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int CharLength
         {
             get => _table.CharLength[_index];
@@ -141,7 +135,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "byteOffset", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int ByteOffset
         {
             get => _table.ByteOffset[_index];
@@ -149,7 +142,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "byteLength", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int ByteLength
         {
             get => _table.ByteLength[_index];
@@ -157,7 +149,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "snippet", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ArtifactContent Snippet
         {
             get => _table.Database.ArtifactContent.Get(_table.Snippet[_index]);
@@ -165,7 +156,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
@@ -173,7 +163,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string SourceLanguage
         {
             get => _table.SourceLanguage[_index];
@@ -181,7 +170,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         internal override IDictionary<string, string> Properties
         {
             get => _table.Properties[_index];

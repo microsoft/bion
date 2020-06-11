@@ -70,7 +70,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "edgeId", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string EdgeId
         {
             get => _table.EdgeId[_index];
@@ -78,7 +77,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
@@ -86,7 +84,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "finalState", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IDictionary<string, MultiformatMessageString> FinalState
         {
             get => _table.FinalState[_index];
@@ -94,7 +91,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "stepOverEdgeCount", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int StepOverEdgeCount
         {
             get => _table.StepOverEdgeCount[_index];
@@ -102,7 +98,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         internal override IDictionary<string, string> Properties
         {
             get => _table.Properties[_index];

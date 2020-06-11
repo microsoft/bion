@@ -76,7 +76,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Name
         {
             get => _table.Name[_index];
@@ -85,7 +84,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "index", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int Index
         {
             get => _table.Index[_index];
@@ -93,7 +91,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "fullyQualifiedName", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string FullyQualifiedName
         {
             get => _table.FullyQualifiedName[_index];
@@ -101,7 +98,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "decoratedName", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string DecoratedName
         {
             get => _table.DecoratedName[_index];
@@ -110,7 +106,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "parentIndex", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int ParentIndex
         {
             get => _table.ParentIndex[_index];
@@ -118,7 +113,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "kind", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Kind
         {
             get => _table.Kind[_index];
@@ -126,7 +120,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         internal override IDictionary<string, string> Properties
         {
             get => _table.Properties[_index];

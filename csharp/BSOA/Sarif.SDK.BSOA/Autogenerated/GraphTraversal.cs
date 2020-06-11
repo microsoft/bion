@@ -77,7 +77,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "runGraphIndex", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int RunGraphIndex
         {
             get => _table.RunGraphIndex[_index];
@@ -86,7 +85,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "resultGraphIndex", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int ResultGraphIndex
         {
             get => _table.ResultGraphIndex[_index];
@@ -94,7 +92,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "description", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Message Description
         {
             get => _table.Database.Message.Get(_table.Description[_index]);
@@ -102,7 +99,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "initialState", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IDictionary<string, MultiformatMessageString> InitialState
         {
             get => _table.InitialState[_index];
@@ -110,7 +106,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "immutableState", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IDictionary<string, MultiformatMessageString> ImmutableState
         {
             get => _table.ImmutableState[_index];
@@ -118,7 +113,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "edgeTraversals", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<EdgeTraversal> EdgeTraversals
         {
             get => _table.Database.EdgeTraversal.List(_table.EdgeTraversals[_index]);
@@ -126,7 +120,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         internal override IDictionary<string, string> Properties
         {
             get => _table.Properties[_index];

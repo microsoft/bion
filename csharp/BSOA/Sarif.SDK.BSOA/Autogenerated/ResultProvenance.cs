@@ -76,7 +76,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "firstDetectionTimeUtc", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime FirstDetectionTimeUtc
         {
             get => _table.FirstDetectionTimeUtc[_index];
@@ -84,7 +83,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "lastDetectionTimeUtc", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime LastDetectionTimeUtc
         {
             get => _table.LastDetectionTimeUtc[_index];
@@ -92,7 +90,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "firstDetectionRunGuid", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string FirstDetectionRunGuid
         {
             get => _table.FirstDetectionRunGuid[_index];
@@ -100,7 +97,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "lastDetectionRunGuid", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string LastDetectionRunGuid
         {
             get => _table.LastDetectionRunGuid[_index];
@@ -109,7 +105,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "invocationIndex", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int InvocationIndex
         {
             get => _table.InvocationIndex[_index];
@@ -117,7 +112,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "conversionSources", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<PhysicalLocation> ConversionSources
         {
             get => _table.Database.PhysicalLocation.List(_table.ConversionSources[_index]);
@@ -125,7 +119,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         internal override IDictionary<string, string> Properties
         {
             get => _table.Properties[_index];

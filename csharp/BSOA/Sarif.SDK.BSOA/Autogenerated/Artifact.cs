@@ -94,7 +94,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "description", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Message Description
         {
             get => _table.Database.Message.Get(_table.Description[_index]);
@@ -102,7 +101,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "location", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ArtifactLocation Location
         {
             get => _table.Database.ArtifactLocation.Get(_table.Location[_index]);
@@ -111,7 +109,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "parentIndex", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int ParentIndex
         {
             get => _table.ParentIndex[_index];
@@ -119,7 +116,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "offset", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int Offset
         {
             get => _table.Offset[_index];
@@ -128,7 +124,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "length", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int Length
         {
             get => _table.Length[_index];
@@ -136,7 +131,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "roles", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public ArtifactRoles Roles
         {
@@ -145,7 +139,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "mimeType", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string MimeType
         {
             get => _table.MimeType[_index];
@@ -153,7 +146,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "contents", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ArtifactContent Contents
         {
             get => _table.Database.ArtifactContent.Get(_table.Contents[_index]);
@@ -161,7 +153,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "encoding", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Encoding
         {
             get => _table.Encoding[_index];
@@ -169,7 +160,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string SourceLanguage
         {
             get => _table.SourceLanguage[_index];
@@ -177,7 +167,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "hashes", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IDictionary<string, string> Hashes
         {
             get => _table.Hashes[_index];
@@ -185,7 +174,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "lastModifiedTimeUtc", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime LastModifiedTimeUtc
         {
             get => _table.LastModifiedTimeUtc[_index];
@@ -193,7 +181,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         internal override IDictionary<string, string> Properties
         {
             get => _table.Properties[_index];

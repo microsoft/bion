@@ -77,7 +77,6 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int Id
         {
             get => _table.Id[_index];
@@ -85,7 +84,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "physicalLocation", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public PhysicalLocation PhysicalLocation
         {
             get => _table.Database.PhysicalLocation.Get(_table.PhysicalLocation[_index]);
@@ -93,7 +91,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "logicalLocations", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<LogicalLocation> LogicalLocations
         {
             get => _table.Database.LogicalLocation.List(_table.LogicalLocations[_index]);
@@ -101,7 +98,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
@@ -109,7 +105,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "annotations", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<Region> Annotations
         {
             get => _table.Database.Region.List(_table.Annotations[_index]);
@@ -117,7 +112,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "relationships", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<LocationRelationship> Relationships
         {
             get => _table.Database.LocationRelationship.List(_table.Relationships[_index]);
@@ -125,7 +119,6 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         internal override IDictionary<string, string> Properties
         {
             get => _table.Properties[_index];
