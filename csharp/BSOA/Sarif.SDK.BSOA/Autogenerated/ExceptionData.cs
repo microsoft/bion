@@ -70,7 +70,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "kind", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Kind
         {
             get => _table.Kind[_index];
@@ -78,7 +78,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Message
         {
             get => _table.Message[_index];
@@ -86,7 +86,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "stack", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Stack Stack
         {
             get => _table.Database.Stack.Get(_table.Stack[_index]);
@@ -94,7 +94,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "innerExceptions", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExceptionData> InnerExceptions
         {
             get => _table.Database.ExceptionData.List(_table.InnerExceptions[_index]);
@@ -102,7 +102,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         internal override IDictionary<string, string> Properties
         {
             get => _table.Properties[_index];

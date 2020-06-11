@@ -106,7 +106,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "conversion", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ExternalPropertyFileReference Conversion
         {
             get => _table.Database.ExternalPropertyFileReference.Get(_table.Conversion[_index]);
@@ -114,7 +114,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "graphs", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> Graphs
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.Graphs[_index]);
@@ -122,7 +122,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "externalizedProperties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ExternalPropertyFileReference ExternalizedProperties
         {
             get => _table.Database.ExternalPropertyFileReference.Get(_table.ExternalizedProperties[_index]);
@@ -130,7 +130,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "artifacts", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> Artifacts
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.Artifacts[_index]);
@@ -138,7 +138,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "invocations", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> Invocations
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.Invocations[_index]);
@@ -146,7 +146,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "logicalLocations", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> LogicalLocations
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.LogicalLocations[_index]);
@@ -154,7 +154,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "threadFlowLocations", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> ThreadFlowLocations
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.ThreadFlowLocations[_index]);
@@ -162,7 +162,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "results", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> Results
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.Results[_index]);
@@ -170,7 +170,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "taxonomies", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> Taxonomies
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.Taxonomies[_index]);
@@ -178,7 +178,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "addresses", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> Addresses
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.Addresses[_index]);
@@ -186,7 +186,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "driver", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ExternalPropertyFileReference Driver
         {
             get => _table.Database.ExternalPropertyFileReference.Get(_table.Driver[_index]);
@@ -194,7 +194,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "extensions", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> Extensions
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.Extensions[_index]);
@@ -202,7 +202,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "policies", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> Policies
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.Policies[_index]);
@@ -210,7 +210,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "translations", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> Translations
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.Translations[_index]);
@@ -218,7 +218,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "webRequests", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> WebRequests
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.WebRequests[_index]);
@@ -226,7 +226,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "webResponses", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<ExternalPropertyFileReference> WebResponses
         {
             get => _table.Database.ExternalPropertyFileReference.List(_table.WebResponses[_index]);
@@ -234,7 +234,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         internal override IDictionary<string, string> Properties
         {
             get => _table.Properties[_index];

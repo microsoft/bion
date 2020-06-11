@@ -8,24 +8,24 @@ namespace BSOA.Column
     ///  ConvertingColumn provides an IColumn&lt;T&gt; on an inner IColumn&lt;U&gt;
     ///  given functions to convert back and forth.
     /// </summary>
-    /// <typeparam name="T">Outer type exposed by the column (DateTime)</typeparam>
-    /// <typeparam name="U">Inner type actually stored (long)</typeparam>
-    public class ConvertingColumn<T, U> : WrappingColumn<T, U>
+    /// <typeparam name="TOuter">Outer type exposed by the column (DateTime)</typeparam>
+    /// <typeparam name="TInner">Inner type actually stored (long)</typeparam>
+    public class ConvertingColumn<TOuter, TInner> : WrappingColumn<TOuter, TInner>
     {
-        private Func<T, U> _toInner;
-        private Func<U, T> _toOuter;
+        private Func<TOuter, TInner> _toInner;
+        private Func<TInner, TOuter> _toOuter;
 
-        public ConvertingColumn(IColumn<U> inner, IConverter<T, U> converter)
+        public ConvertingColumn(IColumn<TInner> inner, IConverter<TOuter, TInner> converter)
             : this(inner, converter.Convert, converter.Convert)
         { }
 
-        public ConvertingColumn(IColumn<U> inner, Func<T, U> toInner, Func<U, T> toOuter) : base(inner)
+        public ConvertingColumn(IColumn<TInner> inner, Func<TOuter, TInner> toInner, Func<TInner, TOuter> toOuter) : base(inner)
         {
             _toInner = toInner;
             _toOuter = toOuter;
         }
 
-        public override T this[int index] 
+        public override TOuter this[int index] 
         {
             get => _toOuter(Inner[index]);
             set => Inner[index] = _toInner(value);
