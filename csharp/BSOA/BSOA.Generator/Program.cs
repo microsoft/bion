@@ -60,14 +60,13 @@ namespace BSOA.Generator
                 ["^[ \t]+\\[DefaultValue\\(\\)\\][ \t\r]*\n"] = "",
                 [Regex.Escape("PropertyBag : PropertyBagHolder, ")] = "PropertyBag : ",
                 [Regex.Escape(@"[DefaultValue(DateTime.MinValue)]")] = "[JsonConverter(typeof(DateTimeConverter))]",
+                
                 ["EnumConverter\\)\\)\\][^\n]*\n\\s+public SarifVersion"] = @"SarifVersionConverter))]
         public SarifVersion",
 
-                [Regex.Escape(@"[DataMember(Name = ""schemaUri"", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public Uri SchemaUri")] = @"[DataMember(Name = ""$schema"", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(UriConverter))]
+                [@"Name = ""schemaUri"""] = @"Name = ""$schema""",
+
+                ["public Uri SchemaUri"] = @"[JsonConverter(typeof(UriConverter))]
         public Uri SchemaUri",
 
                 ["public IDictionary<string, string> Properties"] = "internal override IDictionary<string, string> Properties",

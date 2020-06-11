@@ -12,59 +12,59 @@ namespace BSOA.Column
     /// <typeparam name="T"></typeparam>
     public class NullableColumn<T> : LimitedList<T>, IColumn<T> where T : class
     {
-        private BooleanColumn _isNull;
-        private IColumn<T> _values;
+        protected BooleanColumn IsNull;
+        protected IColumn<T> Values;
 
         public NullableColumn(IColumn<T> values)
         {
             // Default is Null
-            _isNull = new BooleanColumn(true);
-            _values = values;
+            IsNull = new BooleanColumn(true);
+            Values = values;
         }
 
-        public override int Count => _values.Count;
+        public override int Count => Values.Count;
 
         public override T this[int index]
         {
             get
             {
-                return (_isNull[index] ? null : _values[index]);
+                return (IsNull[index] ? null : Values[index]);
             }
 
             set
             {
-                _isNull[index] = (value == null);
-                _values[index] = value;
+                IsNull[index] = (value == null);
+                Values[index] = value;
             }
         }
 
         public override void Clear()
         {
-            _isNull.Clear();
-            _values.Clear();
+            IsNull.Clear();
+            Values.Clear();
         }
 
         public override void Swap(int index1, int index2)
         {
-            _isNull.Swap(index1, index2);
-            _values.Swap(index1, index2);
+            IsNull.Swap(index1, index2);
+            Values.Swap(index1, index2);
         }
 
         public override void RemoveFromEnd(int count)
         {
-            _isNull.RemoveFromEnd(count);
-            _values.RemoveFromEnd(count);
+            IsNull.RemoveFromEnd(count);
+            Values.RemoveFromEnd(count);
         }
 
         public void Trim()
         {
-            _values.Trim();
+            Values.Trim();
         }
 
         private static Dictionary<string, Setter<NullableColumn<T>>> setters = new Dictionary<string, Setter<NullableColumn<T>>>()
         {
-            [Names.IsNull] = (r, me) => me._isNull.Read(r),
-            [Names.Values] = (r, me) => me._values.Read(r)
+            [Names.IsNull] = (r, me) => me.IsNull.Read(r),
+            [Names.Values] = (r, me) => me.Values.Read(r)
         };
 
         public void Read(ITreeReader reader)
@@ -75,8 +75,8 @@ namespace BSOA.Column
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-            writer.Write(Names.IsNull, _isNull);
-            writer.Write(Names.Values, _values);
+            writer.Write(Names.IsNull, IsNull);
+            writer.Write(Names.Values, Values);
             writer.WriteEndObject();
         }
     }

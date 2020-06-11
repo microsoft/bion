@@ -80,8 +80,8 @@ namespace BSOA.Generator.Templates
         // <ColumnList>
         //   <SimpleColumn>
         [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [DefaultValue(99)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public long Id
         {
             get => _table.Id[_index];
@@ -91,7 +91,7 @@ namespace BSOA.Generator.Templates
         //   </SimpleColumn>
         //   <EnumColumn>
         [DataMember(Name = "joinPolicy", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public SecurityPolicy JoinPolicy
         {
@@ -102,7 +102,7 @@ namespace BSOA.Generator.Templates
         //   </EnumColumn>
         //   <RefColumn>
         [DataMember(Name = "owner", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Employee Owner
         {
             get => _table.Database.Employee.Get(_table.Owner[_index]);
@@ -112,7 +112,7 @@ namespace BSOA.Generator.Templates
         //   </RefColumn>
         //   <RefListColumn>
         [DataMember(Name = "members", IsRequired = false, EmitDefaultValue = false)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<Employee> Members
         {
             get => _table.Database.Employee.List(_table.Members[_index]);

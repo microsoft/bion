@@ -7,13 +7,13 @@ namespace BSOA.Column
     ///  WrappingColumn wraps a single inner column, and redirects all non-type-specific members to
     ///  the inner column.
     /// </summary>
-    public abstract class WrappingColumn<T, U> : LimitedList<T>, IColumn<T>
+    public abstract class WrappingColumn<TOuter, TInner> : LimitedList<TOuter>, IColumn<TOuter>
     {
-        protected IColumn<U> Inner { get; }
+        protected IColumn<TInner> Inner { get; }
 
         public override int Count => Inner.Count;
 
-        protected WrappingColumn(IColumn<U> inner)
+        protected WrappingColumn(IColumn<TInner> inner)
         {
             Inner = inner;
         }
