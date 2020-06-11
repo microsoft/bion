@@ -1,5 +1,6 @@
 ﻿using BSOA.Extensions;
 using BSOA.IO;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -169,7 +170,7 @@ namespace BSOA.Collections
             writer.WriteStartObject();
             writer.Write(Names.Capacity, Capacity);
             writer.WritePropertyName(Names.Array);
-            writer.WriteBlockArray(Array, 0, (Count + 31) >> 5);
+            writer.WriteBlockArray(Array);
             writer.WriteEndObject();
         }
     }
