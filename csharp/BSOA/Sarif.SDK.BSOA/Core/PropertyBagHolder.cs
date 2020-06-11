@@ -205,12 +205,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public virtual bool ShouldSerializeProperties()
         {
-            return PropertyBagHasAtLeastOneNonNullValue(this.Properties);
-        }
-
-        public static bool PropertyBagHasAtLeastOneNonNullValue(IDictionary<string, string> properties)
-        {
-            return properties != null && properties.Any();
+            return (this.Properties?.Count ?? 0) > 0;
         }
     }
 }

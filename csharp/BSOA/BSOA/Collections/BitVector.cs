@@ -169,7 +169,7 @@ namespace BSOA.Collections
             writer.WriteStartObject();
             writer.Write(Names.Capacity, Capacity);
             writer.WritePropertyName(Names.Array);
-            writer.WriteBlockArray(Array);
+            writer.WriteBlockArray(Array, 0, (Count + 31) >> 5);
             writer.WriteEndObject();
         }
     }

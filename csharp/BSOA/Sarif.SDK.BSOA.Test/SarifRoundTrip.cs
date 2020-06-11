@@ -35,7 +35,7 @@ namespace Sarif.SDK.BSOA.Test
             using (StreamWriter writer = File.CreateText(Path.ChangeExtension(bsoaFilePath, ".bsoa.diag.txt")))
             {
                 TreeDiagnostics diagnostics = Diagnostics(bsoaFilePath);
-                diagnostics.Write(writer, 3);
+                diagnostics.Write(writer, -1);
             }
 
             // Save back to JSON
