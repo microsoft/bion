@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Linq;
+
 using Microsoft.CodeAnalysis.Sarif.Readers;
 using Newtonsoft.Json;
 
@@ -6,6 +8,11 @@ namespace Microsoft.CodeAnalysis.Sarif
 {
     public partial class SarifLog
     {
+        public override string ToString()
+        {
+            return $"{Runs.Sum((run) => run?.Results?.Count ?? 0):n0} {nameof(Result)}s";
+        }
+
         /// <summary>
         ///  Load a SARIF file into a SarifLog object model instance using deferred loading.
         ///  [Less memory use, but slower; safe for large Sarif]

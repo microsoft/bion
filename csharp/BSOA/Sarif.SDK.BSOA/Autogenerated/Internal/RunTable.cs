@@ -51,7 +51,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Conversion = AddColumn(nameof(Conversion), new RefColumn(nameof(SarifLogDatabase.Conversion)));
             Language = AddColumn(nameof(Language), ColumnFactory.Build<string>("en-US"));
             VersionControlProvenance = AddColumn(nameof(VersionControlProvenance), new RefListColumn(nameof(SarifLogDatabase.VersionControlDetails)));
-//             OriginalUriBaseIds = AddColumn(nameof(OriginalUriBaseIds), ColumnFactory.Build<IDictionary<string, ArtifactLocation>>());
+            OriginalUriBaseIds = AddColumn(nameof(OriginalUriBaseIds), new DictionaryColumn<string, ArtifactLocation>(new StringColumn(), new ArtifactLocationColumn(this.Database)));
             Artifacts = AddColumn(nameof(Artifacts), new RefListColumn(nameof(SarifLogDatabase.Artifact)));
             LogicalLocations = AddColumn(nameof(LogicalLocations), new RefListColumn(nameof(SarifLogDatabase.LogicalLocation)));
             Graphs = AddColumn(nameof(Graphs), new RefListColumn(nameof(SarifLogDatabase.Graph)));

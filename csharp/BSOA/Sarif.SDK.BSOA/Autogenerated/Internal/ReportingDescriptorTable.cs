@@ -40,7 +40,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             DeprecatedNames = AddColumn(nameof(DeprecatedNames), ColumnFactory.Build<IList<string>>());
             ShortDescription = AddColumn(nameof(ShortDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
             FullDescription = AddColumn(nameof(FullDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
-//             MessageStrings = AddColumn(nameof(MessageStrings), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>());
+            MessageStrings = AddColumn(nameof(MessageStrings), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
             DefaultConfiguration = AddColumn(nameof(DefaultConfiguration), new RefColumn(nameof(SarifLogDatabase.ReportingConfiguration)));
             HelpUri = AddColumn(nameof(HelpUri), ColumnFactory.Build<Uri>());
             Help = AddColumn(nameof(Help), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));

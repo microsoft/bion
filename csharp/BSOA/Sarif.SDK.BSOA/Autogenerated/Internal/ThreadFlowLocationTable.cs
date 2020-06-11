@@ -38,7 +38,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<string>>());
             Taxa = AddColumn(nameof(Taxa), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
             Module = AddColumn(nameof(Module), ColumnFactory.Build<string>());
-//             State = AddColumn(nameof(State), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>());
+            State = AddColumn(nameof(State), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
             NestingLevel = AddColumn(nameof(NestingLevel), ColumnFactory.Build<int>());
             ExecutionOrder = AddColumn(nameof(ExecutionOrder), ColumnFactory.Build<int>(-1));
             ExecutionTimeUtc = AddColumn(nameof(ExecutionTimeUtc), ColumnFactory.Build<DateTime>());

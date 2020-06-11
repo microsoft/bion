@@ -59,12 +59,24 @@ namespace BSOA.Generator
                 ["^[ \t]+\\[DefaultValue\\(0\\)\\][ \t\r]*\n"] = "",
                 ["^[ \t]+\\[DefaultValue\\(\\)\\][ \t\r]*\n"] = "",
                 [Regex.Escape("PropertyBag : PropertyBagHolder, ")] = "PropertyBag : ",
-                [Regex.Escape(@"[DefaultValue(DateTime.MinValue)]")] = "[JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.DateTimeConverter))]",
+                [Regex.Escape(@"[DefaultValue(DateTime.MinValue)]")] = "[JsonConverter(typeof(DateTimeConverter))]",
                 ["EnumConverter\\)\\)\\][^\n]*\n\\s+public SarifVersion"] = @"SarifVersionConverter))]
         public SarifVersion",
-                [Regex.Escape("public IDictionary<string, string> Properties")] = "internal override IDictionary<string, string> Properties",
-                ["[^\n]+ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(\\)\\);"] = @"// $0",
-                ["[^\n]+ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(\\)\\);"] = @"// $0"
+
+                [Regex.Escape(@"[DataMember(Name = ""schemaUri"", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public Uri SchemaUri")] = @"[DataMember(Name = ""$schema"", IsRequired = false, EmitDefaultValue = false)]
+        [JsonConverter(typeof(UriConverter))]
+        public Uri SchemaUri",
+
+                ["public IDictionary<string, string> Properties"] = "internal override IDictionary<string, string> Properties",
+
+                [Regex.Escape(@"[DataMember(Name = ""properties"", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]")] = @"[DataMember(Name = ""properties"", IsRequired = false, EmitDefaultValue = false)]",
+
+                ["ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(\\)\\);"] = "new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));",
+                ["ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(\\)\\);"] = "new DictionaryColumn<string, ArtifactLocation>(new StringColumn(), new ArtifactLocationColumn(this.Database)));"
             };
 
             // Generate Database class

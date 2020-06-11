@@ -25,7 +25,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             EdgeId = AddColumn(nameof(EdgeId), ColumnFactory.Build<string>());
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
-//             FinalState = AddColumn(nameof(FinalState), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>());
+            FinalState = AddColumn(nameof(FinalState), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
             StepOverEdgeCount = AddColumn(nameof(StepOverEdgeCount), ColumnFactory.Build<int>());
             Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
         }

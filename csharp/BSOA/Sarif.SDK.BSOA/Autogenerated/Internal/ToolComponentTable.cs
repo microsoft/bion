@@ -60,7 +60,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ReleaseDateUtc = AddColumn(nameof(ReleaseDateUtc), ColumnFactory.Build<string>());
             DownloadUri = AddColumn(nameof(DownloadUri), ColumnFactory.Build<Uri>());
             InformationUri = AddColumn(nameof(InformationUri), ColumnFactory.Build<Uri>());
-//             GlobalMessageStrings = AddColumn(nameof(GlobalMessageStrings), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>());
+            GlobalMessageStrings = AddColumn(nameof(GlobalMessageStrings), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
             Notifications = AddColumn(nameof(Notifications), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptor)));
             Rules = AddColumn(nameof(Rules), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptor)));
             Taxa = AddColumn(nameof(Taxa), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptor)));

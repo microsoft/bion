@@ -26,8 +26,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             Id = AddColumn(nameof(Id), ColumnFactory.Build<string>());
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
-//             InitialState = AddColumn(nameof(InitialState), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>());
-//             ImmutableState = AddColumn(nameof(ImmutableState), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>());
+            InitialState = AddColumn(nameof(InitialState), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
+            ImmutableState = AddColumn(nameof(ImmutableState), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
             Locations = AddColumn(nameof(Locations), new RefListColumn(nameof(SarifLogDatabase.ThreadFlowLocation)));
             Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
         }
