@@ -4,6 +4,7 @@ using BSOA.Json;
 using Microsoft.CodeAnalysis.Sarif;
 
 using Newtonsoft.Json;
+
 using System;
 using System.Diagnostics;
 using System.IO;

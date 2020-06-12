@@ -2,14 +2,19 @@
 
 namespace BSOA.Column
 {
-    internal class ArtifactLocationColumn : ConvertingColumn<ArtifactLocation, int>
+    internal class ArtifactLocationColumn : WrappingColumn<ArtifactLocation, int>
     {
-        public ArtifactLocationColumn(SarifLogDatabase db)
-            : base(
-                  new RefColumn(nameof(ArtifactLocation)),
-                  (item) => db.ArtifactLocation.LocalIndex(item),
-                  (index) => new ArtifactLocation(db.ArtifactLocation, index)
-                  )
-        { }
+        private ArtifactLocationTable _table;
+
+        public ArtifactLocationColumn(SarifLogDatabase db) : base(new RefColumn(nameof(ArtifactLocation)))
+        {
+            _table = db.ArtifactLocation;
+        }
+
+        public override ArtifactLocation this[int index] 
+        { 
+            get => new ArtifactLocation(_table, Inner[index]);
+            set => Inner[index] = _table.LocalIndex(value);
+        }
     }
 }

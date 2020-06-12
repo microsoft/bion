@@ -13,11 +13,13 @@ namespace BSOA.Test.Model
 
             V1.PersonDatabase db = new V1.PersonDatabase();
             V1.PersonTable other = db.Person;
+            V1.Person defaultPerson = new Person(other);
+            V1.Person nonDefaultPerson = new Person(other) { Age = 39, Name = "Scott" };
 
             Column.Basics<V1.Person>(
                 () => new PersonTable(new PersonDatabase()),
-                new Person(other),
-                new Person(other) { Age = 39, Name = "Scott" },
+                defaultPerson,
+                nonDefaultPerson,
                 (i) => new Person(other) { Age = (byte)(i % byte.MaxValue) }
             );
 
