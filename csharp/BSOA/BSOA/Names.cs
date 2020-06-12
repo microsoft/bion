@@ -6,33 +6,33 @@
     public static class Names
     {
         // IColumn standard and wrapped columns
-        public const string Count = nameof(Count);
-        public const string Values = nameof(Values);
-
-        // Table
-        public const string Columns = nameof(Columns);
-
-        // NullableColumn
-        public const string IsNull = nameof(IsNull);
-
-        // BitVector
-        public const string Capacity = nameof(Capacity);
+        public const string Count = "c";
+        public const string Values = "v";
 
         // Columns containing direct arrays
-        public const string Array = nameof(Array);
+        public const string Array = "a";
 
         // Columns containing int indices to other rows
-        public const string Indices = nameof(Indices);
+        public const string Indices = "i";
+
+        // Table
+        public const string Columns = "o";
+
+        // NullableColumn
+        public const string IsNull = "n";
+
+        // BitVector
+        public const string Capacity = "y";
 
         // NumberListColumn
-        public const string Chapters = nameof(Chapters);
-        public const string PageStart = nameof(PageStart);
-        public const string ValueEnd = nameof(ValueEnd);
-        public const string SmallValues = nameof(SmallValues);
-        public const string LargeValues = nameof(LargeValues);
+        public const string Chapters = "C";
+        public const string PageStart = "P";
+        public const string ValueEnd = "V";
+        public const string SmallValues = "S";
+        public const string LargeValues = "L";
 
         // DictionaryColumn
-        public const string Keys = nameof(Keys);
-        public const string Pairs = nameof(Pairs);
+        public const string Keys = "k";
+        public const string Pairs = "p";
     }
 }

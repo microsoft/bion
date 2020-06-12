@@ -36,7 +36,7 @@ namespace BSOA.Test.Model
 
             // Verify Person has two columns, Write doesn't throw
             Assert.Equal("Person", diagnostics.Children[0].Name);
-            Assert.Equal("Columns", diagnostics.Children[0].Children[0].Name);
+            Assert.Equal(Names.Columns, diagnostics.Children[0].Children[0].Name);
             Assert.Equal(2, diagnostics.Children[0].Children[0].Children.Count);
             diagnostics.Write(Console.Out, 3);
 
