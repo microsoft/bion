@@ -37,10 +37,8 @@ namespace BSOA.Demo
         {
             SarifLog bsoa = null, unused = null;
 
-            bsoa = new SarifLog();
-
             // Convert SarifLog to JSON, SoA JSON, and SoA Binary forms
-            Convert(forceReconvert);
+            //Convert(forceReconvert);
 
             //// Load with diagnostics (see column sizes)
             //Console.WriteLine();

@@ -48,7 +48,7 @@ namespace BSOA.Collections
                 if (_array == null || _array.Length <= (index >> 5))
                 {
                     if (value == _defaultValue) { return; }
-                    ArrayExtensions.ResizeTo(ref _array, ((Capacity + 31) >> 5), (_defaultValue ? ~0U : 0U));
+                    ArrayExtensions.ResizeTo(ref _array, ((Capacity + 31) >> 5), (_defaultValue ? ~0U : 0U), minSize: 4);
                 }
 
                 if (value)
