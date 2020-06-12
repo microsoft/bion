@@ -35,6 +35,7 @@ namespace BSOA.Extensions
         public static void WriteBlockArray<T>(this BinaryWriter writer, T[] array, int index, int count, ref byte[] buffer) where T : unmanaged
         {
             // Negative count means write the rest of the array
+            if (array == null) { count = 0; }
             if (count < 0) { count = array?.Length - index ?? 0; }
 
             int elementSize = SizeOf(typeof(T));

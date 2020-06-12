@@ -71,6 +71,7 @@ namespace BSOA.Json
 
         public void WriteBlockArray<T>(T[] array, int index = 0, int count = -1) where T : unmanaged
         {
+            if (array == null) { count = 0; }
             if (count < 0) { count = array?.Length - index ?? 0; }
 
             _writer.WriteStartArray();

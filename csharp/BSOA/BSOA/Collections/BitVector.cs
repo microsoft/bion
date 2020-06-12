@@ -168,9 +168,14 @@ namespace BSOA.Collections
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-            writer.Write(Names.Capacity, Capacity);
-            writer.WritePropertyName(Names.Array);
-            writer.WriteBlockArray(Array);
+
+            if (Capacity > 0)
+            {
+                writer.Write(Names.Capacity, Capacity);
+                writer.WritePropertyName(Names.Array);
+                writer.WriteBlockArray(Array, 0, (Capacity + 31) >> 5);
+            }
+
             writer.WriteEndObject();
         }
     }
@@ -194,6 +199,8 @@ namespace BSOA.Collections
 
         public bool MoveNext()
         {
+            if (_vector == null) { return false; }
+
             Current++;
 
             // Look for the next set bit
