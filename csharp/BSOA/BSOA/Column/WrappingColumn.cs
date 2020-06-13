@@ -34,17 +34,17 @@ namespace BSOA.Column
             Inner.Clear();
         }
 
-        public void Trim()
+        public virtual void Trim()
         {
             Inner.Trim();
         }
 
-        public void Write(ITreeWriter writer)
+        public virtual void Write(ITreeWriter writer)
         {
             Inner.Write(writer);
         }
 
-        public void Read(ITreeReader reader)
+        public virtual void Read(ITreeReader reader)
         {
             Inner.Read(reader);
         }
