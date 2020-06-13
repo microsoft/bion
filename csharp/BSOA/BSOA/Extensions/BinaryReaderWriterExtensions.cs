@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BSOA.IO;
+
+using System;
 using System.IO;
 
 namespace BSOA.Extensions
@@ -7,7 +9,12 @@ namespace BSOA.Extensions
     {
         public static T[] ReadBlockArray<T>(this BinaryReader reader, ref byte[] buffer) where T : unmanaged
         {
-            int byteLength = reader.ReadInt32();
+            return reader.ReadBlockArray<T>((byte)(reader.ReadByte() >> 4), ref buffer);
+        }
+
+        public static T[] ReadBlockArray<T>(this BinaryReader reader, byte hint, ref byte[] buffer) where T : unmanaged
+        {
+            int byteLength = (int)reader.ReadLong(hint);
             if (byteLength == 0) { return Array.Empty<T>(); }
 
             int count = byteLength / SizeOf(typeof(T));
@@ -21,9 +28,9 @@ namespace BSOA.Extensions
             return array;
         }
 
-        public static void SkipBlockArray(this BinaryReader reader)
+        public static void SkipBlockArray(this BinaryReader reader, byte hint)
         {
-            int byteLength = reader.ReadInt32();
+            int byteLength = (int)reader.ReadLong(hint);
             reader.BaseStream.Seek(byteLength, SeekOrigin.Current);
         }
 
@@ -41,7 +48,8 @@ namespace BSOA.Extensions
             int elementSize = SizeOf(typeof(T));
             int byteOffset = index * elementSize;
             int byteLength = count * elementSize;
-            writer.Write(byteLength);
+
+            writer.WriteLong(TreeToken.BlockArray, byteLength);
 
             if (byteLength > 0)
             {
@@ -49,6 +57,62 @@ namespace BSOA.Extensions
                 Buffer.BlockCopy(array, byteOffset, buffer, 0, byteLength);
                 writer.Write(buffer, 0, byteLength);
             }
+        }
+
+        public static long ReadLong(this BinaryReader reader, byte hint)
+        {
+            switch (hint)
+            {
+                case 15:
+                    return reader.ReadInt64();
+                case 14:
+                    return reader.ReadUInt32();
+                case 13:
+                    return reader.ReadUInt16();
+                case 12:
+                    return reader.ReadByte();
+                default:
+                    return hint;
+            }
+        }
+
+        public static void WriteLong(this BinaryWriter writer, TreeToken token, long value)
+        {
+            if (value < 0 || value > uint.MaxValue)
+            {
+                // Hint 15: 8 byte value
+                writer.WriteMarker(token, 15);
+                writer.Write(value);
+            }
+            else if (value > ushort.MaxValue)
+            {
+                // Hint 14: 4 byte value
+                writer.WriteMarker(token, 14);
+                writer.Write((uint)value);
+            }
+            else if (value > byte.MaxValue)
+            {
+                // Hint 13: 2 byte value
+                writer.WriteMarker(token, 13);
+                writer.Write((ushort)value);
+            }
+            else if (value > 11)
+            {
+                // Hint 12: 1 byte value
+                writer.WriteMarker(token, 12);
+                writer.Write((byte)value);
+            }
+            else
+            {
+                // Hint 0-11 is value
+                writer.WriteMarker(token, (int)value);
+            }
+        }
+
+        public static void WriteMarker(this BinaryWriter writer, TreeToken token, int hint)
+        {
+            if (hint < 0 || hint > 15) { throw new ArgumentException(nameof(hint)); }
+            writer.Write((byte)((byte)(token) + (byte)(hint << 4)));
         }
 
         public static int SizeOf(Type t)

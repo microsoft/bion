@@ -1,4 +1,6 @@
 ﻿using BSOA.Extensions;
+
+using System;
 using System.IO;
 using System.Text;
 
@@ -51,8 +53,7 @@ namespace BSOA.IO
 
         public void WriteValue(bool value)
         {
-            _writer.Write((byte)TreeToken.Boolean);
-            _writer.Write(value);
+            _writer.WriteMarker(TreeToken.Boolean, (value ? 1 : 0));
         }
 
         public void WriteValue(string value)
@@ -68,16 +69,9 @@ namespace BSOA.IO
             }
         }
 
-        public void WriteValue(int value)
-        {
-            _writer.Write((byte)TreeToken.Integer);
-            _writer.Write(value);
-        }
-
         public void WriteValue(long value)
         {
-            _writer.Write((byte)TreeToken.Long);
-            _writer.Write(value);
+            _writer.WriteLong(TreeToken.Integer, value);
         }
 
         public void WriteValue(double value)
@@ -88,7 +82,6 @@ namespace BSOA.IO
 
         public void WriteBlockArray<T>(T[] array, int index, int count) where T : unmanaged
         {
-            _writer.Write((byte)TreeToken.BlockArray);
             _writer.WriteBlockArray<T>(array, index, count, ref Settings.Buffer);
         }
 

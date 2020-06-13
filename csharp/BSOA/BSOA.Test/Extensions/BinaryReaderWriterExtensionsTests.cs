@@ -55,7 +55,8 @@ namespace BSOA.Test.Extensions
                 stream.Seek(0, SeekOrigin.Begin);
                 using (BinaryReader reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true))
                 {
-                    reader.SkipBlockArray();
+                    byte hint = (byte)(reader.ReadByte() >> 4);
+                    reader.SkipBlockArray(hint);
 
                     // Ensure all bytes *except* guard boolean read
                     Assert.Equal(arrayLength, stream.Position);

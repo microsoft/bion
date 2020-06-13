@@ -40,11 +40,6 @@ namespace BSOA.Json
             return (string)_reader.Value;
         }
 
-        public int ReadAsInt32()
-        {
-            return (int)(long)_reader.Value;
-        }
-
         public long ReadAsInt64()
         {
             return (long)_reader.Value;

@@ -59,11 +59,6 @@ namespace BSOA.Json
             _writer.WriteValue(value);
         }
 
-        public void WriteValue(int value)
-        {
-            _writer.WriteValue(value);
-        }
-
         public void WriteValue(long value)
         {
             _writer.WriteValue(value);

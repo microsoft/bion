@@ -28,10 +28,10 @@ namespace BSOA.Test
             int count = 512;
             TreeDiagnostics diagnostics;
 
-            // Estimate column fixed cost; add 10 because column suppresses parts when < 32 rows.
+            // Estimate column fixed cost; add 16 because column suppresses parts when < 32 rows.
             column[0] = "A";
             diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
-            int fixedSizeCost = (int)diagnostics.Length + 10;
+            int fixedSizeCost = (int)diagnostics.Length + 16;
 
             // Set many non-empty values
             string value = "0123456789";

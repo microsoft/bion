@@ -1,7 +1,9 @@
 ﻿using BSOA.IO;
 using BSOA.Json;
+
 using System;
 using System.IO;
+
 using Xunit;
 
 namespace BSOA.Test.Components
@@ -43,6 +45,9 @@ namespace BSOA.Test.Components
         public static void Basics(TreeFormat format)
         {
             Random r = new Random();
+
+            // Test integers with specific values (for varying length encodings)
+            TestIntegers(format);
 
             // Test serialization of each primitive value type (bool, string, long, double)
             Sample sample = new Sample(new Random());
@@ -112,6 +117,47 @@ namespace BSOA.Test.Components
                     // Test reading back as wrong type (exception from ReadObject unexpected property name)
                     Assert.Throws<IOException>(() => new SingleContainer<Sample>().Read(reader));
                 }
+            }
+        }
+
+        private static void TestIntegers(TreeFormat format)
+        {
+            TreeSerializationSettings settings = new TreeSerializationSettings() { LeaveStreamOpen = true };
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                using (ITreeWriter writer = Writer(format, stream, settings))
+                {
+                    writer.WriteStartArray();
+
+                    for (int i = -1; i < 300; i += 7)
+                    {
+                        writer.WriteValue(i);
+                    }
+
+                    writer.WriteEndArray();
+                }
+
+                long bytesWritten = stream.Position;
+                stream.Seek(0, SeekOrigin.Begin);
+
+                using (ITreeReader reader = Reader(format, stream, settings))
+                {
+                    Assert.Equal(TreeToken.StartArray, reader.TokenType);
+
+                    for (int i = -1; i < 300; i += 7)
+                    {
+                        Assert.True(reader.Read());
+                        Assert.Equal(TreeToken.Integer, reader.TokenType);
+                        Assert.Equal(i, reader.ReadAsInt32());
+                    }
+
+                    Assert.True(reader.Read());
+                    Assert.Equal(TreeToken.EndArray, reader.TokenType);
+                    Assert.False(reader.Read());
+                }
+
+                Assert.Equal(bytesWritten, stream.Position);
             }
         }
 

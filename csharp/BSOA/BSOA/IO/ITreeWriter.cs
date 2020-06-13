@@ -36,11 +36,10 @@ namespace BSOA.IO
         // The Null literal is supported
         void WriteNull();
 
-        // Values of bool, string, int, long, and double must be directly supported.
+        // Values of bool, string, long, and double must be directly supported.
         // Extension methods will translate other types in a consistent way.
         void WriteValue(bool value);
         void WriteValue(string value);
-        void WriteValue(int value);
         void WriteValue(long value);
         void WriteValue(double value);
 
@@ -89,12 +88,6 @@ namespace BSOA.IO
         }
 
         public static void Write(this ITreeWriter writer, string name, string value)
-        {
-            writer.WritePropertyName(name);
-            writer.WriteValue(value);
-        }
-
-        public static void Write(this ITreeWriter writer, string name, int value)
         {
             writer.WritePropertyName(name);
             writer.WriteValue(value);
