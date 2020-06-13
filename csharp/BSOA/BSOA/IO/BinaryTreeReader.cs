@@ -53,6 +53,9 @@ namespace BSOA.IO
                     _valueBool = _reader.ReadBoolean();
                     break;
                 case TreeToken.Integer:
+                    _valueLong = _reader.ReadInt32();
+                    break;
+                case TreeToken.Long:
                     _valueLong = _reader.ReadInt64();
                     break;
                 case TreeToken.Float:
@@ -79,6 +82,11 @@ namespace BSOA.IO
         public bool ReadAsBoolean()
         {
             return _valueBool;
+        }
+
+        public int ReadAsInt32()
+        {
+            return (int)_valueLong;
         }
 
         public long ReadAsInt64()

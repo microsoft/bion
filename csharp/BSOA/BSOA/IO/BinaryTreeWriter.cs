@@ -68,9 +68,15 @@ namespace BSOA.IO
             }
         }
 
-        public void WriteValue(long value)
+        public void WriteValue(int value)
         {
             _writer.Write((byte)TreeToken.Integer);
+            _writer.Write(value);
+        }
+
+        public void WriteValue(long value)
+        {
+            _writer.Write((byte)TreeToken.Long);
             _writer.Write(value);
         }
 

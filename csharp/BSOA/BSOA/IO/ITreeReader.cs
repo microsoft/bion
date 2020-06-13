@@ -37,10 +37,11 @@ namespace BSOA.IO
         TreeToken TokenType { get; }
         long Position { get; }
 
-        // Return the current token as a typed valued - boolean, string, long, and double must be supported
+        // Return the current token as a typed valued - boolean, string, int, long, and double must be supported
         // Unlike JsonReader, this does not read the next token.
         bool ReadAsBoolean();
         string ReadAsString();
+        int ReadAsInt32();
         long ReadAsInt64();
         double ReadAsDouble();
 

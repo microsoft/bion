@@ -82,6 +82,11 @@ namespace BSOA.IO
             return value;
         }
 
+        public int ReadAsInt32()
+        {
+            return Inner.ReadAsInt32();
+        }
+
         public long ReadAsInt64()
         {
             return Inner.ReadAsInt64();
