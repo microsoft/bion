@@ -47,8 +47,7 @@ namespace BSOA.IO
 
         public void WritePropertyName(string name)
         {
-            _writer.Write((byte)TreeToken.PropertyName);
-            _writer.Write(name);
+            _writer.WriteString(TreeToken.PropertyName, name, ref Settings.Buffer);
         }
 
         public void WriteValue(bool value)
@@ -64,8 +63,7 @@ namespace BSOA.IO
             }
             else
             {
-                _writer.Write((byte)TreeToken.String);
-                _writer.Write(value);
+                _writer.WriteString(TreeToken.String, value, ref Settings.Buffer);
             }
         }
 

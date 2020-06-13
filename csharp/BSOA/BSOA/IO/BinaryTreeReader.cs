@@ -64,7 +64,7 @@ namespace BSOA.IO
                     break;
                 case TreeToken.String:
                 case TreeToken.PropertyName:
-                    _valueString = _reader.ReadString();
+                    _valueString = _reader.ReadString(_hint, ref Settings.Buffer);
                     break;
                 case TreeToken.Null:
                     _valueString = null;

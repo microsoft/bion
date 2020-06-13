@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 
 namespace BSOA.Extensions
 {
@@ -56,6 +57,44 @@ namespace BSOA.Extensions
                 if (buffer == null || buffer.Length < byteLength) { buffer = new byte[byteLength]; }
                 Buffer.BlockCopy(array, byteOffset, buffer, 0, byteLength);
                 writer.Write(buffer, 0, byteLength);
+            }
+        }
+
+        public static string ReadString(this BinaryReader reader, byte hint, ref byte[] buffer)
+        {
+            int byteLength = (int)reader.ReadLong(hint);
+
+            if (byteLength == 0)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                if (buffer == null || buffer.Length < byteLength) { buffer = new byte[byteLength]; }
+                reader.Read(buffer, 0, byteLength);
+
+                return Encoding.UTF8.GetString(buffer, 0, byteLength);
+            }
+        }
+
+        public static void WriteString(this BinaryWriter writer, TreeToken token, string value, ref byte[] buffer)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                writer.WriteMarker(token, 0);
+            }
+            else
+            {
+                // Ensure buffer long enough
+                int maxByteLength = 3 * value.Length;
+                if (buffer == null || buffer.Length < maxByteLength) { buffer = new byte[maxByteLength]; }
+
+                // Convert to UTF-8
+                int actualByteLength = Encoding.UTF8.GetBytes(value, 0, value.Length, buffer, 0);
+
+                // Write marker and length, then bytes
+                writer.WriteLong(token, actualByteLength);
+                writer.Write(buffer, 0, actualByteLength);
             }
         }
 
