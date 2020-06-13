@@ -1,5 +1,6 @@
 ﻿using BSOA.Collections;
 using BSOA.Column;
+using BSOA.IO;
 using BSOA.Test.Components;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,9 @@ namespace BSOA.Test
         {
             NumberListColumn<int> column = new NumberListColumn<int>();
             column[0].SetTo(new ArraySlice<int>(new int[] { 0, 1, 2 }));
+
+            TreeDiagnostics diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
+            int tinyColumnLength = (int)diagnostics.Length;
 
             Column.Basics(() => new NumberListColumn<int>(), NumberList<int>.Empty, column[0], (index) =>
             {

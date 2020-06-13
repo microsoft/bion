@@ -23,6 +23,8 @@ namespace BSOA.Column
     /// <typeparam name="T">Type of each part of Values (if each value is a string, this type is char)</typeparam>
     internal class ArraySliceChapter<T> : ITreeSerializable where T : unmanaged
     {
+        private static int[] PageStartDefault = new int[1] { 0 };
+
         public const int ChapterRowCount = 32768;
         public const int PageRowCount = 32;
         public const int MaximumSmallValueLength = 2047;
@@ -107,7 +109,7 @@ namespace BSOA.Column
 
         public void Clear()
         {
-            _pageStartInChapter = null;
+            _pageStartInChapter = PageStartDefault;
             _valueEndInPage = null;
 
             _smallValueArray = null;
@@ -182,7 +184,6 @@ namespace BSOA.Column
 
         private static Dictionary<string, Setter<ArraySliceChapter<T>>> setters = new Dictionary<string, Setter<ArraySliceChapter<T>>>()
         {
-            [Names.Count] = (r, me) => me.Count = r.ReadAsInt32(),
             [Names.PageStart] = (r, me) => me._pageStartInChapter = r.ReadBlockArray<int>(),
             [Names.ValueEnd] = (r, me) => me._valueEndInPage = r.ReadBlockArray<ushort>(),
             [Names.SmallValues] = (r, me) => me._smallValueArray = r.ReadBlockArray<T>(),
@@ -192,7 +193,9 @@ namespace BSOA.Column
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters);
+
             _lastNonEmptyIndex = (_valueEndInPage?.Length ?? 0) - 1;
+            Count = _lastNonEmptyIndex + 1;
         }
 
         public void Write(ITreeWriter writer)
@@ -202,13 +205,20 @@ namespace BSOA.Column
 
             writer.WriteStartObject();
 
-            writer.Write(Names.Count, Count);
-            writer.WriteBlockArray(Names.PageStart, _pageStartInChapter, 0, ((_lastNonEmptyIndex + 1) / PageRowCount) + 1);
             writer.WriteBlockArray(Names.ValueEnd, _valueEndInPage, 0, _lastNonEmptyIndex + 1);
             writer.WriteBlockArray(Names.SmallValues, _smallValueArray);
 
-            writer.WritePropertyName(Names.LargeValues);
-            writer.WriteDictionary(_largeValueDictionary);
+            int pages = ((_lastNonEmptyIndex + 1) / PageRowCount) + 1;
+            if (pages > 1)
+            {
+                writer.WriteBlockArray(Names.PageStart, _pageStartInChapter, 0, pages);
+            }
+
+            if (_largeValueDictionary?.Count > 0)
+            {
+                writer.WritePropertyName(Names.LargeValues);
+                writer.WriteDictionary(_largeValueDictionary);
+            }
 
             writer.WriteEndObject();
         }
