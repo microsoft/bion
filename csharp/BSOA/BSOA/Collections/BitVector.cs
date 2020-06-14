@@ -14,17 +14,17 @@ namespace BSOA.Collections
     public class BitVector : IEnumerable<int>, ITreeSerializable
     {
         private const uint FirstBit = 0x1U << 31;
-        private bool _defaultValue;
         private uint[] _array;
 
         public BitVector(bool defaultValue, int capacity)
         {
-            _defaultValue = defaultValue;
+            DefaultValue = defaultValue;
             _array = null;
             Capacity = capacity;
-            Count = (_defaultValue ? capacity : 0);
+            Count = (DefaultValue ? capacity : 0);
         }
 
+        public bool DefaultValue { get; private set; }
         public int Count { get; private set; }
         public int Capacity { get; private set; }
         public uint[] Array => _array;
@@ -34,21 +34,21 @@ namespace BSOA.Collections
             get
             {
                 if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
-                if (_array == null || _array.Length <= (index >> 5)) { return _defaultValue; }
+                if (_array == null || _array.Length <= (index >> 5)) { return DefaultValue; }
                 return (_array[index >> 5] & (FirstBit >> (index & 31))) != 0UL;
             }
             set
             {
                 if (index >= Capacity)
                 {
-                    if (_defaultValue) { Count += (index + 1 - Capacity); }
+                    if (DefaultValue) { Count += (index + 1 - Capacity); }
                     Capacity = index + 1;
                 }
 
                 if (_array == null || _array.Length <= (index >> 5))
                 {
-                    if (value == _defaultValue) { return; }
-                    ArrayExtensions.ResizeTo(ref _array, ((Capacity + 31) >> 5), (_defaultValue ? ~0U : 0U), minSize: 4);
+                    if (value == DefaultValue) { return; }
+                    ArrayExtensions.ResizeTo(ref _array, ((Capacity + 31) >> 5), (DefaultValue ? ~0U : 0U), minSize: 4);
                 }
 
                 if (value)
@@ -64,11 +64,37 @@ namespace BSOA.Collections
             }
         }
 
+        public void SetAll(bool value)
+        {
+            // Ensure array created
+            ArrayExtensions.ResizeTo(ref _array, ((Capacity + 31) >> 5), (DefaultValue ? ~0U : 0U), minSize: 4);
+            
+            // Set everything
+            uint toSet = (value ? ~0U : 0U);
+            int blocksToSet = ((Capacity + 31) >> 5);
+            for (int i = 0; i < blocksToSet; ++i)
+            {
+                _array[i] = toSet;
+            }
+
+            // Set values back to default on last segment, if needed
+            if (value != DefaultValue)
+            {
+                int edge = (Capacity & 31);
+                if (edge < 31)
+                {
+                    _array[blocksToSet - 1] ^= (~0U) >> edge;
+                }
+            }
+
+            Count = (value ? Capacity : 0);
+        }
+
         public void RemoveFromEnd(int count)
         {
             int newLastIndex = ((Capacity - 1) - count);
             int firstRemovedBlock = (newLastIndex >> 5) + 1;
-            uint defaultInt = (_defaultValue ? ~0U : 0U);
+            uint defaultInt = (DefaultValue ? ~0U : 0U);
 
             // Remove whole 32-bit chunks now out of range
             if (_array != null)
@@ -83,7 +109,7 @@ namespace BSOA.Collections
             int firstInvalidIndex = (firstRemovedBlock << 5);
             for (int i = newLastIndex + 1; i < firstInvalidIndex; ++i)
             {
-                this[i] = _defaultValue;
+                this[i] = DefaultValue;
             }
 
             // Track reduced size
@@ -155,6 +181,7 @@ namespace BSOA.Collections
 
         private static Dictionary<string, Setter<BitVector>> setters = new Dictionary<string, Setter<BitVector>>()
         {
+            [Names.Count] = (r, me) => me.Count = r.ReadAsInt32(),
             [Names.Capacity] = (r, me) => me.Capacity = r.ReadAsInt32(),
             [Names.Array] = (r, me) => me._array = r.ReadBlockArray<uint>()
 
@@ -169,8 +196,20 @@ namespace BSOA.Collections
         {
             writer.WriteStartObject();
 
-            if (Capacity > 0)
+            if (DefaultValue == false && Count == 0)
             {
+                // If all values are default false, only write Capacity; Count defaults back to zero on read
+                writer.Write(Names.Capacity, Capacity);
+            }
+            else if (DefaultValue == true && Count == Capacity)
+            {
+                // If all values are default true, only write Count+Capacity (Array will be re-created with all default)
+                writer.Write(Names.Count, Count);
+                writer.Write(Names.Capacity, Capacity);
+            }
+            else if (Capacity > 0)
+            {
+                writer.Write(Names.Count, Count);
                 writer.Write(Names.Capacity, Capacity);
                 writer.WritePropertyName(Names.Array);
                 writer.WriteBlockArray(Array, 0, (Capacity + 31) >> 5);

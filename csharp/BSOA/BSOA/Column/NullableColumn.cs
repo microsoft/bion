@@ -1,5 +1,6 @@
 ﻿using BSOA.IO;
 using BSOA.Model;
+
 using System.Collections.Generic;
 
 namespace BSOA.Column
@@ -70,13 +71,46 @@ namespace BSOA.Column
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters);
+
+            if (IsNull.Count == 0 && Values.Count > 0)
+            {
+                // Only wrote values means all values are non-null
+                IsNull[Values.Count - 1] = false;
+                IsNull.SetAll(false);
+            }
+            else if(IsNull.Count > 0 && Values.Count == 0)
+            {
+                // Only wrote nulls means all values are null
+                Values[IsNull.Count - 1] = default(T);
+            }
         }
 
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-            writer.Write(Names.IsNull, IsNull);
-            writer.Write(Names.Values, Values);
+
+            if (Count > 0)
+            {
+                int nullValueCount = IsNull.CountTrue;
+
+                if (nullValueCount == Count)
+                {
+                    // If all null, write IsNull only (default is already all null)
+                    writer.Write(Names.IsNull, IsNull);
+                }
+                else if (nullValueCount == 0)
+                {
+                    // If no nulls, write values only (will infer situation on read)
+                    writer.Write(Names.Values, Values);
+                }
+                else
+                {
+                    // If there are some nulls and some values, we must write both
+                    writer.Write(Names.IsNull, IsNull);
+                    writer.Write(Names.Values, Values);
+                }
+            }
+
             writer.WriteEndObject();
         }
     }

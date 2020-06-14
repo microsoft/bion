@@ -184,6 +184,7 @@ namespace BSOA.Column
 
         private static Dictionary<string, Setter<ArraySliceChapter<T>>> setters = new Dictionary<string, Setter<ArraySliceChapter<T>>>()
         {
+            [Names.Count] = (r, me) => me.Count = r.ReadAsInt32(),
             [Names.PageStart] = (r, me) => me._pageStartInChapter = r.ReadBlockArray<int>(),
             [Names.ValueEnd] = (r, me) => me._valueEndInPage = r.ReadBlockArray<ushort>(),
             [Names.SmallValues] = (r, me) => me._smallValueArray = r.ReadBlockArray<T>(),
@@ -194,8 +195,11 @@ namespace BSOA.Column
         {
             reader.ReadObject(this, setters);
 
-            _lastNonEmptyIndex = (_valueEndInPage?.Length ?? 0) - 1;
-            Count = _lastNonEmptyIndex + 1;
+            if (_valueEndInPage != null)
+            {
+                Count = _valueEndInPage.Length;
+                _lastNonEmptyIndex = Count - 1;
+            }
         }
 
         public void Write(ITreeWriter writer)
@@ -205,15 +209,26 @@ namespace BSOA.Column
 
             writer.WriteStartObject();
 
-            writer.WriteBlockArray(Names.ValueEnd, _valueEndInPage, 0, _lastNonEmptyIndex + 1);
-            writer.WriteBlockArray(Names.SmallValues, _smallValueArray);
+            if (_smallValueArray?.Length > 0)
+            {
+                // If there are any non-empty values, write the text and end positions
+                writer.WriteBlockArray(Names.ValueEnd, _valueEndInPage);
+                writer.WriteBlockArray(Names.SmallValues, _smallValueArray);
+            }
+            else if (Count > 0)
+            {
+                // If there is no text but a non-zero count, we must preserve the count
+                writer.Write(Names.Count, Count);
+            }
 
+            // If there is more than one page, write page starts
             int pages = ((_lastNonEmptyIndex + 1) / PageRowCount) + 1;
             if (pages > 1)
             {
                 writer.WriteBlockArray(Names.PageStart, _pageStartInChapter, 0, pages);
             }
 
+            // If there are any large values, write them
             if (_largeValueDictionary?.Count > 0)
             {
                 writer.WritePropertyName(Names.LargeValues);

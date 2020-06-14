@@ -114,26 +114,21 @@ namespace BSOA.Column
             }
         }
 
-        private static Dictionary<string, Setter<ArraySliceColumn<T>>> setters = new Dictionary<string, Setter<ArraySliceColumn<T>>>()
-        {
-            [Names.Count] = (r, me) => me._count = r.ReadAsInt32(),
-            [Names.Chapters] = (r, me) => me._chapters = r.ReadList<ArraySliceChapter<T>>(() => new ArraySliceChapter<T>())
-        };
-
         public void Read(ITreeReader reader)
         {
-            reader.ReadObject(this, setters);
+            _chapters = reader.ReadList<ArraySliceChapter<T>>(() => new ArraySliceChapter<T>());
+
+            int chapterCount = _chapters?.Count ?? 0;
+            if (chapterCount > 0)
+            {
+                // Infer count; N - 1 full chapters and the actual row count from the last
+                _count = ArraySliceChapter<T>.ChapterRowCount * (chapterCount - 1) + _chapters[chapterCount - 1].Count;
+            }
         }
 
         public void Write(ITreeWriter writer)
         {
-            writer.WriteStartObject();
-            writer.Write(Names.Count, Count);
-
-            writer.WritePropertyName(Names.Chapters);
             writer.WriteList(_chapters);
-
-            writer.WriteEndObject();
         }
     }
 }

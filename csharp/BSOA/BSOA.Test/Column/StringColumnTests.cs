@@ -1,7 +1,7 @@
 ﻿using BSOA.Column;
 using BSOA.IO;
 using BSOA.Test.Components;
-using System;
+
 using System.Collections.Generic;
 
 using Xunit;
@@ -22,68 +22,59 @@ namespace BSOA.Test
         }
 
         [Fact]
-        public void StringColumn_BackToEmpty()
+        public void StringColumn_EmptyCases()
         {
+            // StringColumns are extremely common in object models,
+            // so having very compact representations for common cases
+            // is really important to file size for small databases.
+
             StringColumn column = new StringColumn();
-            int count = 512;
             TreeDiagnostics diagnostics;
 
-            // Estimate column fixed cost; add 16 because column suppresses parts when < 32 rows.
-            column[0] = "A";
+            // Empty: { }
             diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
-            int fixedSizeCost = (int)diagnostics.Length + 16;
+            Assert.True(diagnostics.Length <= 2);
 
-            // Set many non-empty values
-            string value = "0123456789";
-            for (int i = 0; i < count; ++i)
+            // All null: { IsNull: { Count: 100, Capacity: 100 } }
+            for (int i = 0; i < 100; ++i)
             {
-                column[i] = value;
+                column[i] = null;
             }
 
-            // Expect size: value bytes, 2 byte lengths, 4 byte page starts, 1 bit IsNull
-            int sizeEstimate = fixedSizeCost + count * value.Length + count * 2 + ((count * 4) / 32) + (count / 8);
-            column.Trim();
+            CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, TreeFormat.Binary, testDoubleDispose: false));
             diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
-            Assert.True(diagnostics.Length < sizeEstimate);
+            Assert.True(1 == diagnostics.Children.Count);
+            Assert.True(diagnostics.Length <= 13); 
 
-            // Reload column
-            column = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
-
-            // Set almost all values empty
-            for (int i = 10; i < count; ++i)
-            {
-                column[i] = string.Empty;
-            }
-
-            // Expect size: 10 values, 10 lengths, normal page starts and IsNull
-            sizeEstimate = fixedSizeCost + 10 * value.Length + 10 * 2 + ((count * 4) / 32) + (count / 8);
-            column.Trim();
-            diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
-            Assert.True(diagnostics.Length < sizeEstimate);
-
-            // Clear column and round trip (verify Chapters created and then emptied serialize and restore properly)
-            column.Clear();
-            Assert.Empty(TreeSerializer.RoundTrip(column, TreeFormat.Binary));
-
-            // Make a multi-chapter column, then verify RemoveFromEnd cleans up whole chapters
+            // All empty: Only nulls false written
             for(int i = 0; i < 100; ++i)
             {
-                column[1024 * i] = "A";
+                column[i] = "";
             }
 
-            column.RemoveFromEnd(column.Count - 2049);
-            Assert.Equal(2049, column.Count);
-            Assert.Equal("A", column[0]);
-            Assert.Equal("A", column[1024]);
-            Assert.Equal("A", column[2048]);
+            CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, TreeFormat.Binary, testDoubleDispose: false));
+            diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
+            Assert.True(1 == diagnostics.Children.Count);
+            Assert.True(diagnostics.Length <= 13); // ??
 
-            for (int i = 3; i < 100; ++i)
+            // No nulls, No Empty: 3b / value (2b end + 1b text) + 4 pages x 4b + 20b overhead
+            for (int i = 0; i < 100; ++i)
             {
-                Assert.Null(column[1024 * i]);
+                column[i] = "-";
             }
 
-            // Bounds check for VariableLengthColumn
-            Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
+            CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, TreeFormat.Binary, testDoubleDispose: false));
+            diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
+            Assert.True(1 == diagnostics.Children.Count);
+            Assert.True(diagnostics.Length <= 336);
+
+            // Nulls and Non-Nulls; both parts must be written
+            column[50] = null;
+            
+            CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, TreeFormat.Binary, testDoubleDispose: false));
+            diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
+            Assert.True(2 == diagnostics.Children.Count);
+            Assert.True(diagnostics.Length <= 336 + 40);
         }
 
         [Fact]

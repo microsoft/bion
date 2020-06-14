@@ -25,6 +25,10 @@ namespace BSOA.Column
             set { _vector[index] = value; }
         }
 
+        // Exposed BitVector members
+        public int CountTrue => _vector.Count;
+        public void SetAll(bool value) => _vector.SetAll(value);
+
         public void Trim()
         {
             // Nothing to do

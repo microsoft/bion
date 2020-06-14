@@ -12,14 +12,14 @@ namespace BSOA.Test.Collections
         [Fact]
         public void BitVectorTests_Basics()
         {
-            BitVector vector = new BitVector(false, 256);
+            BitVector vector = new BitVector(false, 260);
             HashSet<int> expected = new HashSet<int>();
 
             // Empty vector
             vector.Trim();
             VerifySame(expected, vector);
             Assert.Null(vector.Array);
-            Assert.Equal(256, vector.Capacity);
+            Assert.Equal(260, vector.Capacity);
 
             // Add every third item
             for (int i = 0; i < vector.Capacity; i += 3)
@@ -90,6 +90,18 @@ namespace BSOA.Test.Collections
             vector.ExceptWith(expected);
             Assert.Empty(vector);
             Assert.Equal(0, vector.Count);
+
+            // SetAll
+            vector.Clear();
+            vector[100] = true;
+
+            vector.SetAll(true);
+            Assert.Equal(vector.Capacity, vector.Count);
+            Assert.False(vector[vector.Capacity]);
+
+            vector.SetAll(false);
+            Assert.Equal(0, vector.Count);
+            Assert.False(vector[vector.Capacity]);
         }
 
         [Fact]
@@ -117,6 +129,15 @@ namespace BSOA.Test.Collections
 
             expected.UnionWith(Enumerable.Range(32, 100 - 32));
             VerifySame(expected, vector);
+
+            // SetAll
+            vector.SetAll(true);
+            Assert.Equal(vector.Capacity, vector.Count);
+            Assert.True(vector[vector.Capacity]);
+
+            vector.SetAll(false);
+            Assert.Equal(0, vector.Count);
+            Assert.True(vector[vector.Capacity]);
         }
 
         private void VerifySame(HashSet<int> expected, BitVector actual)
