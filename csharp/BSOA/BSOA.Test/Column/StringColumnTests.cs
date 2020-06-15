@@ -58,7 +58,7 @@ namespace BSOA.Test
             CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, TreeFormat.Binary, testDoubleDispose: false));
             diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
             Assert.True(1 == diagnostics.Children.Count);
-            Assert.True(diagnostics.Length <= 13); // ??
+            Assert.True(diagnostics.Length <= 13);
 
             // No nulls, No Empty: 3b / value (2b end + 1b text) + 4 pages x 4b + 20b overhead
             for (int i = 0; i < 100; ++i)

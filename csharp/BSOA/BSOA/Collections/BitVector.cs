@@ -215,7 +215,7 @@ namespace BSOA.Collections
                 writer.Write(Names.Count, Count);
                 writer.Write(Names.Capacity, Capacity);
                 writer.WritePropertyName(Names.Array);
-                writer.WriteBlockArray(Array, 0, (Capacity + 31) >> 5);
+                writer.WriteBlockArray(Array, 0, Math.Min(Array.Length, (Capacity + 31) >> 5));
             }
 
             writer.WriteEndObject();

@@ -117,11 +117,6 @@ namespace BSOA.Test
                 Assert.Equal(value, column[i]);
             }
 
-            // Append a default value; verify the count tracks it correctly
-            column[101] = defaultValue;
-            Assert.Equal(102, column.Count);
-            Assert.Equal(defaultValue, column[101]);
-
             // Verify serialization round trip via all current serialization mechanisms
             CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary), quick: true);
             CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Json), quick: true);
@@ -167,6 +162,15 @@ namespace BSOA.Test
                 T value = (i < 10 ? valueProvider(i) : defaultValue);
                 Assert.Equal(value, column[i]);
             }
+
+            // Append a default value big enough another resize would be required
+            //  Verify the count is tracked correctly, previous items are initialized to default
+            column[201] = defaultValue;
+            Assert.Equal(202, column.Count);
+            Assert.Equal(defaultValue, column[200]);
+
+            // Verify serialization handles 'many defaults at end' properly
+            CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, builder, TreeFormat.Binary), quick: true);
 
             // Verify Trim doesn't throw
             column.Trim();
