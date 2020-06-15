@@ -1,8 +1,11 @@
-﻿using BSOA.Column;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System.Collections.Generic;
+
+using BSOA.Column;
 using BSOA.IO;
 using BSOA.Test.Components;
-using System;
-using System.Collections.Generic;
 
 using Xunit;
 
@@ -22,67 +25,59 @@ namespace BSOA.Test
         }
 
         [Fact]
-        public void StringColumn_BackToEmpty()
+        public void StringColumn_EmptyCases()
         {
+            // StringColumns are extremely common in object models,
+            // so having very compact representations for common cases
+            // is really important to file size for small databases.
+
             StringColumn column = new StringColumn();
-            int count = 512;
             TreeDiagnostics diagnostics;
 
-            column[0] = "A";
+            // Empty: { }
             diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
-            int fixedSizeCost = (int)diagnostics.Length;
+            Assert.True(diagnostics.Length <= 2);
 
-            // Set many non-empty values
-            string value = "0123456789";
-            for (int i = 0; i < count; ++i)
+            // All null: { IsNull: { Count: 100, Capacity: 100 } }
+            for (int i = 0; i < 100; ++i)
             {
-                column[i] = value;
+                column[i] = null;
             }
 
-            // Expect size: value bytes, 2 byte lengths, 4 byte page starts, 1 bit IsNull
-            int sizeEstimate = fixedSizeCost + count * value.Length + count * 2 + ((count * 4) / 32) + (count / 8);
-            column.Trim();
+            CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, TreeFormat.Binary, testDoubleDispose: false));
             diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
-            Assert.True(diagnostics.Length < sizeEstimate);
+            Assert.True(1 == diagnostics.Children.Count);
+            Assert.True(diagnostics.Length <= 13); 
 
-            // Reload column
-            column = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
-
-            // Set almost all values empty
-            for (int i = 10; i < count; ++i)
-            {
-                column[i] = string.Empty;
-            }
-
-            // Expect size: 10 values, 10 lengths, normal page starts and IsNull
-            sizeEstimate = fixedSizeCost + 10 * value.Length + 10 * 2 + ((count * 4) / 32) + (count / 8);
-            column.Trim();
-            diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
-            Assert.True(diagnostics.Length < sizeEstimate);
-
-            // Clear column and round trip (verify Chapters created and then emptied serialize and restore properly)
-            column.Clear();
-            Assert.Empty(TreeSerializer.RoundTrip(column, TreeFormat.Binary));
-
-            // Make a multi-chapter column, then verify RemoveFromEnd cleans up whole chapters
+            // All empty: Only nulls false written
             for(int i = 0; i < 100; ++i)
             {
-                column[1024 * i] = "A";
+                column[i] = "";
             }
 
-            column.RemoveFromEnd(column.Count - 2049);
-            Assert.Equal(2049, column.Count);
-            Assert.Equal("A", column[0]);
-            Assert.Equal("A", column[1024]);
-            Assert.Equal("A", column[2048]);
+            CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, TreeFormat.Binary, testDoubleDispose: false));
+            diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
+            Assert.True(1 == diagnostics.Children.Count);
+            Assert.True(diagnostics.Length <= 13); // ??
 
-            for (int i = 3; i < 100; ++i)
+            // No nulls, No Empty: 3b / value (2b end + 1b text) + 4 pages x 4b + 20b overhead
+            for (int i = 0; i < 100; ++i)
             {
-                Assert.Null(column[1024 * i]);
+                column[i] = "-";
             }
 
-            // Bounds check for VariableLengthColumn
-            Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
+            CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, TreeFormat.Binary, testDoubleDispose: false));
+            diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
+            Assert.True(1 == diagnostics.Children.Count);
+            Assert.True(diagnostics.Length <= 336);
+
+            // Nulls and Non-Nulls; both parts must be written
+            column[50] = null;
+            
+            CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, TreeFormat.Binary, testDoubleDispose: false));
+            diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
+            Assert.True(2 == diagnostics.Children.Count);
+            Assert.True(diagnostics.Length <= 336 + 40);
         }
 
         [Fact]
@@ -105,16 +100,16 @@ namespace BSOA.Test
             }
 
             // Verify values properly captured
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Proactively Trim (before serialization) and verify values not corrupted
             column.Trim();
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Verify roundtripped column and column not corrupted by serialization
             roundTripped = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
-            ReadOnlyList.VerifySame(expected, roundTripped);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, roundTripped);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Set a short value to long and a long value to short, and add another value
             expected[0] = new string(':', 2400);
@@ -127,12 +122,12 @@ namespace BSOA.Test
             }
 
             // Verify values read back correctly immediately
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Verify values re-roundtrip again properly (merging old and new immutable values)
             roundTripped = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
-            ReadOnlyList.VerifySame(expected, roundTripped);
-            ReadOnlyList.VerifySame(expected, column);
+            CollectionReadVerifier.VerifySame(expected, roundTripped);
+            CollectionReadVerifier.VerifySame(expected, column);
 
             // Add a value causing a gap; verify count, new value returned, values in gap defaulted properly
             column[100] = "Centennial";

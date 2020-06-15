@@ -1,4 +1,7 @@
-﻿namespace BSOA.IO
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace BSOA.IO
 {
     /// <summary>
     ///  Types implement ITreeSerializable to support agnostic serialization.

@@ -1,9 +1,14 @@
-﻿using BSOA.IO;
-using BSOA.Json;
-using BSOA.Test.Components;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.IO;
 using System.Text;
+
+using BSOA.IO;
+using BSOA.Json;
+using BSOA.Test.Components;
+
 using Xunit;
 
 namespace BSOA.Test.Model
@@ -21,7 +26,7 @@ namespace BSOA.Test.Model
             community.DB.Save("V1.Community.bsoa", TreeFormat.Binary);
             V1.Community roundTripped = new V1.Community();
             roundTripped.DB.Load("V1.Community.bsoa", TreeFormat.Binary);
-            ReadOnlyList.VerifySame(community.People, roundTripped.People);
+            CollectionReadVerifier.VerifySame(community.People, roundTripped.People);
 
             // Try loading database with size diagnostics
             TreeDiagnostics diagnostics = TreeSerializer.Diagnostics(community.DB, () => new V1.Community().DB, TreeFormat.Binary);
@@ -36,13 +41,13 @@ namespace BSOA.Test.Model
 
             // Verify Person has two columns, Write doesn't throw
             Assert.Equal("Person", diagnostics.Children[0].Name);
-            Assert.Equal("Columns", diagnostics.Children[0].Children[0].Name);
+            Assert.Equal(Names.Columns, diagnostics.Children[0].Children[0].Name);
             Assert.Equal(2, diagnostics.Children[0].Children[0].Children.Count);
             diagnostics.Write(Console.Out, 3);
 
             // Verify Trim doesn't throw (results not visible)
             community.DB.Trim();
-            ReadOnlyList.VerifySame(community.People, roundTripped.People);
+            CollectionReadVerifier.VerifySame(community.People, roundTripped.People);
 
             // Verify Database.Clear works
             community.DB.Clear();
@@ -81,7 +86,7 @@ namespace BSOA.Test.Model
             v2RoundTrip.DB.Load(filePath, TreeFormat.Binary);
 
             Assert.Equal(birthdate, v2RoundTrip.People[0].Birthdate);
-            ReadOnlyList.VerifySame(v2.People, v2RoundTrip.People);
+            CollectionReadVerifier.VerifySame(v2.People, v2RoundTrip.People);
 
             // Load *new format* into V1 object model
             V1.Community v1RoundTrip = new V1.Community();
@@ -118,11 +123,11 @@ namespace BSOA.Test.Model
             AsJson.Save(serializeToPath, v1);
 
             V1.Community roundTrip = AsJson.Load<V1.Community>(serializeToPath);
-            ReadOnlyList.VerifySame(v1.People, roundTrip.People);
+            CollectionReadVerifier.VerifySame(v1.People, roundTrip.People);
 
             AsJson.Save(serializeToPath, v1, verbose: true);
             roundTrip = AsJson.Load<V1.Community>(serializeToPath);
-            ReadOnlyList.VerifySame(v1.People, roundTrip.People);
+            CollectionReadVerifier.VerifySame(v1.People, roundTrip.People);
         }
     }
 }

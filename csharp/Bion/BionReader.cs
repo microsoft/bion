@@ -1,9 +1,13 @@
-﻿using Bion.IO;
-using Bion.Text;
-using Bion.Vector;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.IO;
 using System.Linq;
+
+using Bion.IO;
+using Bion.Text;
+using Bion.Vector;
 
 namespace Bion
 {

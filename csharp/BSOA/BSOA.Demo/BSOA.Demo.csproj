@@ -8,12 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BSOA.Json\BSOA.Json.csproj" />
     <ProjectReference Include="..\BSOA\BSOA.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Sarif">
-      <HintPath>..\..\Sarif\netstandard2.0\Sarif.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Sarif.SDK.BSOA\Sarif.SDK.BSOA.csproj" />
   </ItemGroup>
 
 </Project>

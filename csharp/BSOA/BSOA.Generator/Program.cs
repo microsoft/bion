@@ -1,11 +1,14 @@
-﻿using BSOA.Generator.Schema;
-using BSOA.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+
+using BSOA.Generator.Schema;
+using BSOA.Json;
 
 namespace BSOA.Generator
 {
@@ -59,7 +62,23 @@ namespace BSOA.Generator
                 ["^[ \t]+\\[DefaultValue\\(0\\)\\][ \t\r]*\n"] = "",
                 ["^[ \t]+\\[DefaultValue\\(\\)\\][ \t\r]*\n"] = "",
                 [Regex.Escape("PropertyBag : PropertyBagHolder, ")] = "PropertyBag : ",
-                [Regex.Escape(@"[DefaultValue(DateTime.MinValue)]")] = "[JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.DateTimeConverter))]"
+                [Regex.Escape(@"[DefaultValue(DateTime.MinValue)]")] = "[JsonConverter(typeof(DateTimeConverter))]",
+                
+                ["EnumConverter\\)\\)\\][^\n]*\n\\s+public SarifVersion"] = @"SarifVersionConverter))]
+        public SarifVersion",
+
+                [@"Name = ""schemaUri"""] = @"Name = ""$schema""",
+
+                ["public Uri SchemaUri"] = @"[JsonConverter(typeof(UriConverter))]
+        public Uri SchemaUri",
+
+                ["public IDictionary<string, string> Properties"] = "internal override IDictionary<string, string> Properties",
+
+                [Regex.Escape(@"[DataMember(Name = ""properties"", IsRequired = false, EmitDefaultValue = false)]
+        [DefaultValue(-1)]")] = @"[DataMember(Name = ""properties"", IsRequired = false, EmitDefaultValue = false)]",
+
+                ["ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(\\)\\);"] = "new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));",
+                ["ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(\\)\\);"] = "new DictionaryColumn<string, ArtifactLocation>(new StringColumn(), new ArtifactLocationColumn(this.Database)));"
             };
 
             // Generate Database class

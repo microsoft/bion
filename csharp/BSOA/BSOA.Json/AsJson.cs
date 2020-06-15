@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace BSOA.Json
@@ -22,9 +25,9 @@ namespace BSOA.Json
         {
             BuildSerializer();
 
-            using (JsonTextReader writer = new JsonTextReader(System.IO.File.OpenText(filePath)))
+            using (JsonTextReader reader = new JsonTextReader(System.IO.File.OpenText(filePath)))
             {
-                return _jsonSerializer.Deserialize<T>(writer);
+                return _jsonSerializer.Deserialize<T>(reader);
             }
         }
 

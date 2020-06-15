@@ -1,5 +1,11 @@
-﻿// Copyright (c) Microsoft.  All Rights Reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
 
 using BSOA.Model;
 
@@ -7,12 +13,6 @@ using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
-
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 namespace BSOA.Generator.Templates
 {
@@ -84,7 +84,6 @@ namespace BSOA.Generator.Templates
         //   <SimpleColumn>
         [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(99)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public long Id
         {
             get => _table.Id[_index];
@@ -93,7 +92,7 @@ namespace BSOA.Generator.Templates
 
         //   </SimpleColumn>
         //   <EnumColumn>
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [DataMember(Name = "joinPolicy", IsRequired = false, EmitDefaultValue = false)]
         [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public SecurityPolicy JoinPolicy
         {
@@ -103,7 +102,7 @@ namespace BSOA.Generator.Templates
 
         //   </EnumColumn>
         //   <RefColumn>
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [DataMember(Name = "owner", IsRequired = false, EmitDefaultValue = false)]
         public Employee Owner
         {
             get => _table.Database.Employee.Get(_table.Owner[_index]);
@@ -112,7 +111,7 @@ namespace BSOA.Generator.Templates
 
         //   </RefColumn>
         //   <RefListColumn>
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [DataMember(Name = "members", IsRequired = false, EmitDefaultValue = false)]
         public IList<Employee> Members
         {
             get => _table.Database.Employee.List(_table.Members[_index]);

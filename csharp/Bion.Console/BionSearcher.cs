@@ -1,9 +1,14 @@
-﻿using Bion.Core;
-using Bion.Json;
-using Bion.Text;
-using Newtonsoft.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.IO;
+
+using Bion.Core;
+using Bion.Json;
+using Bion.Text;
+
+using Newtonsoft.Json;
 
 namespace Bion.Console
 {

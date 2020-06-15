@@ -1,6 +1,10 @@
-﻿using BSOA.IO;
-using BSOA.Model;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System.Collections.Generic;
+
+using BSOA.IO;
+using BSOA.Model;
 
 namespace BSOA.Column
 {
@@ -12,71 +16,104 @@ namespace BSOA.Column
     /// <typeparam name="T"></typeparam>
     public class NullableColumn<T> : LimitedList<T>, IColumn<T> where T : class
     {
-        private BooleanColumn _isNull;
-        private IColumn<T> _values;
+        protected BooleanColumn IsNull;
+        protected IColumn<T> Values;
 
         public NullableColumn(IColumn<T> values)
         {
             // Default is Null
-            _isNull = new BooleanColumn(true);
-            _values = values;
+            IsNull = new BooleanColumn(true);
+            Values = values;
         }
 
-        public override int Count => _values.Count;
+        public override int Count => Values.Count;
 
         public override T this[int index]
         {
             get
             {
-                return (_isNull[index] ? null : _values[index]);
+                return (IsNull[index] ? null : Values[index]);
             }
 
             set
             {
-                _isNull[index] = (value == null);
-                _values[index] = value;
+                IsNull[index] = (value == null);
+                Values[index] = value;
             }
         }
 
         public override void Clear()
         {
-            _isNull.Clear();
-            _values.Clear();
+            IsNull.Clear();
+            Values.Clear();
         }
 
         public override void Swap(int index1, int index2)
         {
-            _isNull.Swap(index1, index2);
-            _values.Swap(index1, index2);
+            IsNull.Swap(index1, index2);
+            Values.Swap(index1, index2);
         }
 
         public override void RemoveFromEnd(int count)
         {
-            _isNull.RemoveFromEnd(count);
-            _values.RemoveFromEnd(count);
+            IsNull.RemoveFromEnd(count);
+            Values.RemoveFromEnd(count);
         }
 
         public void Trim()
         {
-            _values.Trim();
+            Values.Trim();
         }
 
         private static Dictionary<string, Setter<NullableColumn<T>>> setters = new Dictionary<string, Setter<NullableColumn<T>>>()
         {
-            [Names.IsNull] = (r, me) => me._isNull.Read(r),
-            [Names.Values] = (r, me) => me._values.Read(r)
+            [Names.IsNull] = (r, me) => me.IsNull.Read(r),
+            [Names.Values] = (r, me) => me.Values.Read(r)
         };
 
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters);
+
+            if (IsNull.Count == 0 && Values.Count > 0)
+            {
+                // Only wrote values means all values are non-null
+                IsNull[Values.Count - 1] = false;
+                IsNull.SetAll(false);
+            }
+            else if(IsNull.Count > 0 && Values.Count == 0)
+            {
+                // Only wrote nulls means all values are null
+                Values[IsNull.Count - 1] = default(T);
+            }
         }
 
         public void Write(ITreeWriter writer)
         {
             writer.WriteStartObject();
-            writer.Write(Names.IsNull, _isNull);
-            writer.Write(Names.Values, _values);
+
+            if (Count > 0)
+            {
+                int nullValueCount = IsNull.CountTrue;
+
+                if (nullValueCount == Count)
+                {
+                    // If all null, write IsNull only (default is already all null)
+                    writer.Write(Names.IsNull, IsNull);
+                }
+                else if (nullValueCount == 0)
+                {
+                    // If no nulls, write values only (will infer situation on read)
+                    writer.Write(Names.Values, Values);
+                }
+                else
+                {
+                    // If there are some nulls and some values, we must write both
+                    writer.Write(Names.IsNull, IsNull);
+                    writer.Write(Names.Values, Values);
+                }
+            }
+
             writer.WriteEndObject();
         }
     }

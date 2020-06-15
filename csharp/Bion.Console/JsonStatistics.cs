@@ -1,6 +1,10 @@
-﻿using Newtonsoft.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System.Collections.Generic;
 using System.IO;
+
+using Newtonsoft.Json;
 
 namespace Bion.Console
 {
@@ -42,7 +46,7 @@ namespace Bion.Console
                     if (reader.TokenType == JsonToken.StartArray || reader.TokenType == JsonToken.StartObject)
                     {
                         CurrentDepth++;
-                        if (CurrentDepth > MaxDepth) MaxDepth = CurrentDepth;
+                        if (CurrentDepth > MaxDepth) { MaxDepth = CurrentDepth; }
                     }
                     else if(reader.TokenType == JsonToken.EndArray || reader.TokenType == JsonToken.EndObject)
                     {

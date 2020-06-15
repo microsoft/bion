@@ -1,6 +1,10 @@
-﻿using Newtonsoft.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.IO;
+
+using Newtonsoft.Json;
 
 namespace Bion.Json
 {
@@ -71,7 +75,7 @@ namespace Bion.Json
                     }
 
                     position += expectedLength;
-                    if (expectedLength < expected.Length) break;
+                    if (expectedLength < expected.Length) { break; }
                 }
             }
 

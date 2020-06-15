@@ -313,6 +313,14 @@
           "name": "Guid",
           "type": "string",
           "default": "null"
+        },
+        { 
+          "name": "PartialFingerprints",
+          "type": "IDictionary<string, string>"
+        },
+        { 
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },

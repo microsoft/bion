@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System;
 
 /// <summary>
 ///  FlexString can contain a String (UTF-16), String8 (UTF-8), or both.

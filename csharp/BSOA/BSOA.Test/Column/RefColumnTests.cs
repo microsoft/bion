@@ -1,5 +1,9 @@
-﻿using BSOA.Column;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using BSOA.Column;
 using BSOA.Test.Components;
+
 using Xunit;
 
 namespace BSOA.Test

@@ -1,7 +1,12 @@
-﻿using BSOA.Extensions;
-using BSOA.IO;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections.Generic;
+
+using BSOA.Collections;
+using BSOA.Extensions;
+using BSOA.IO;
 
 namespace BSOA.Column
 {
@@ -22,6 +27,8 @@ namespace BSOA.Column
     /// <typeparam name="T">Type of each part of Values (if each value is a string, this type is char)</typeparam>
     internal class ArraySliceChapter<T> : ITreeSerializable where T : unmanaged
     {
+        private static int[] PageStartDefault = new int[1] { 0 };
+
         public const int ChapterRowCount = 32768;
         public const int PageRowCount = 32;
         public const int MaximumSmallValueLength = 2047;
@@ -106,7 +113,7 @@ namespace BSOA.Column
 
         public void Clear()
         {
-            _pageStartInChapter = null;
+            _pageStartInChapter = PageStartDefault;
             _valueEndInPage = null;
 
             _smallValueArray = null;
@@ -191,7 +198,12 @@ namespace BSOA.Column
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters);
-            _lastNonEmptyIndex = (_valueEndInPage?.Length ?? 0) - 1;
+
+            if (_valueEndInPage != null)
+            {
+                Count = _valueEndInPage.Length;
+                _lastNonEmptyIndex = Count - 1;
+            }
         }
 
         public void Write(ITreeWriter writer)
@@ -201,13 +213,31 @@ namespace BSOA.Column
 
             writer.WriteStartObject();
 
-            writer.Write(Names.Count, Count);
-            writer.WriteBlockArray(Names.PageStart, _pageStartInChapter, 0, ((_lastNonEmptyIndex + 1) / PageRowCount) + 1);
-            writer.WriteBlockArray(Names.ValueEnd, _valueEndInPage, 0, _lastNonEmptyIndex + 1);
-            writer.WriteBlockArray(Names.SmallValues, _smallValueArray);
+            if (_smallValueArray?.Length > 0)
+            {
+                // If there are any non-empty values, write the text and end positions
+                writer.WriteBlockArray(Names.ValueEnd, _valueEndInPage);
+                writer.WriteBlockArray(Names.SmallValues, _smallValueArray);
+            }
+            else if (Count > 0)
+            {
+                // If there is no text but a non-zero count, we must preserve the count
+                writer.Write(Names.Count, Count);
+            }
 
-            writer.WritePropertyName(Names.LargeValues);
-            writer.WriteDictionary(_largeValueDictionary);
+            // If there is more than one page, write page starts
+            int pages = ((_lastNonEmptyIndex + 1) / PageRowCount) + 1;
+            if (pages > 1)
+            {
+                writer.WriteBlockArray(Names.PageStart, _pageStartInChapter, 0, pages);
+            }
+
+            // If there are any large values, write them
+            if (_largeValueDictionary?.Count > 0)
+            {
+                writer.WritePropertyName(Names.LargeValues);
+                writer.WriteDictionary(_largeValueDictionary);
+            }
 
             writer.WriteEndObject();
         }

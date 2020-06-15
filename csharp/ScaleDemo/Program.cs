@@ -1,13 +1,20 @@
-﻿using Bion;
-using Bion.Json;
-using Microsoft.CodeAnalysis.Sarif;
-using Newtonsoft.Json;
-using ScaleDemo.Serializers;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+
+using Bion;
+using Bion.Json;
+
+using Microsoft.CodeAnalysis.Sarif;
+
+using Newtonsoft.Json;
+
+using ScaleDemo.Serializers;
 
 namespace ScaleDemo
 {

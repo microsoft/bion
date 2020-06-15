@@ -1,11 +1,6 @@
-﻿using Bion.Json;
-using K4os.Compression.LZ4;
-using K4os.Compression.LZ4.Streams;
-using Microsoft.CodeAnalysis.Sarif;
-using Microsoft.CodeAnalysis.Sarif.Map;
-using Microsoft.CodeAnalysis.Sarif.Writers;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,6 +8,18 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+
+using Bion.Json;
+
+using K4os.Compression.LZ4;
+using K4os.Compression.LZ4.Streams;
+
+using Microsoft.CodeAnalysis.Sarif;
+using Microsoft.CodeAnalysis.Sarif.Map;
+using Microsoft.CodeAnalysis.Sarif.Writers;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 
 namespace Map
 {

@@ -28,6 +28,10 @@
           "name": "InlineExternalProperties",
           "type": "IList<ExternalProperties>",
           "referencedTableName": "ExternalProperties"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -72,6 +76,10 @@
           "name": "ParentIndex",
           "type": "int",
           "default": "-1"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -136,6 +144,10 @@
         {
           "name": "LastModifiedTimeUtc",
           "type": "DateTime"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -153,6 +165,10 @@
           "name": "Replacements",
           "type": "IList<Replacement>",
           "referencedTableName": "Replacement"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -172,6 +188,10 @@
           "name": "Rendered",
           "type": "MultiformatMessageString",
           "referencedTableName": "MultiformatMessageString"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -196,6 +216,10 @@
           "name": "Description",
           "type": "Message",
           "referencedTableName": "Message"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -225,6 +249,10 @@
           "name": "Rectangles",
           "type": "IList<Rectangle>",
           "referencedTableName": "Rectangle"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -242,6 +270,10 @@
           "name": "ThreadFlows",
           "type": "IList<ThreadFlow>",
           "referencedTableName": "ThreadFlow"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -259,6 +291,10 @@
           "name": "Descriptor",
           "type": "ReportingDescriptorReference",
           "referencedTableName": "ReportingDescriptorReference"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -282,6 +318,10 @@
           "name": "AnalysisToolLogFiles",
           "type": "IList<ArtifactLocation>",
           "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -305,6 +345,10 @@
         {
           "name": "TargetNodeId",
           "type": "string"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -328,6 +372,10 @@
         {
           "name": "StepOverEdgeCount",
           "type": "int"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -353,6 +401,10 @@
           "name": "InnerExceptions",
           "type": "IList<ExceptionData>",
           "referencedTableName": "ExceptionData"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -473,6 +525,10 @@
           "name": "WebResponses",
           "type": "IList<WebResponse>",
           "referencedTableName": "WebResponse"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -493,6 +549,10 @@
           "name": "ItemCount",
           "type": "int",
           "default": "-1"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -594,6 +654,10 @@
           "name": "WebResponses",
           "type": "IList<ExternalPropertyFileReference>",
           "referencedTableName": "ExternalPropertyFileReference"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -611,6 +675,10 @@
           "name": "ArtifactChanges",
           "type": "IList<ArtifactChange>",
           "referencedTableName": "ArtifactChange"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -634,6 +702,10 @@
           "name": "Edges",
           "type": "IList<Edge>",
           "referencedTableName": "Edge"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -669,6 +741,10 @@
           "name": "EdgeTraversals",
           "type": "IList<EdgeTraversal>",
           "referencedTableName": "EdgeTraversal"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -796,6 +872,10 @@
           "name": "StdoutStderr",
           "type": "ArtifactLocation",
           "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -836,6 +916,10 @@
           "name": "Relationships",
           "type": "IList<LocationRelationship>",
           "referencedTableName": "LocationRelationship"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -855,6 +939,10 @@
           "name": "Description",
           "type": "Message",
           "referencedTableName": "Message"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -886,6 +974,10 @@
         {
           "name": "Kind",
           "type": "string"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -907,6 +999,10 @@
         {
           "name": "Arguments",
           "type": "IList<string>"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -920,6 +1016,10 @@
         {
           "name": "Markdown",
           "type": "string"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -947,6 +1047,10 @@
           "name": "Children",
           "type": "IList<Node>",
           "referencedTableName": "Node"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -997,6 +1101,10 @@
           "name": "AssociatedRule",
           "type": "ReportingDescriptorReference",
           "referencedTableName": "ReportingDescriptorReference"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1026,6 +1134,10 @@
           "name": "ContextRegion",
           "type": "Region",
           "referencedTableName": "Region"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1062,6 +1174,10 @@
           "name": "Message",
           "type": "Message",
           "referencedTableName": "Message"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1117,6 +1233,10 @@
         {
           "name": "SourceLanguage",
           "type": "string"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1134,6 +1254,10 @@
           "name": "InsertedContent",
           "type": "ArtifactContent",
           "referencedTableName": "ArtifactContent"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1201,6 +1325,10 @@
           "name": "Relationships",
           "type": "IList<ReportingDescriptorRelationship>",
           "referencedTableName": "ReportingDescriptorRelationship"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1229,6 +1357,10 @@
           "name": "Parameters",
           "type": "PropertyBag",
           "referencedTableName": "PropertyBag"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1253,6 +1385,10 @@
           "name": "ToolComponent",
           "type": "ToolComponentReference",
           "referencedTableName": "ToolComponentReference"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1274,6 +1410,10 @@
           "name": "Description",
           "type": "Message",
           "referencedTableName": "Message"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1438,6 +1578,10 @@
           "name": "WebResponse",
           "type": "WebResponse",
           "referencedTableName": "WebResponse"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1470,6 +1614,10 @@
           "name": "ConversionSources",
           "type": "IList<PhysicalLocation>",
           "referencedTableName": "PhysicalLocation"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1625,6 +1773,10 @@
           "name": "SpecialLocations",
           "type": "SpecialLocations",
           "referencedTableName": "SpecialLocations"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1648,6 +1800,10 @@
         {
           "name": "CorrelationGuid",
           "type": "string"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1659,6 +1815,10 @@
           "name": "DisplayBase",
           "type": "ArtifactLocation",
           "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1676,6 +1836,10 @@
           "name": "Frames",
           "type": "IList<StackFrame>",
           "referencedTableName": "StackFrame"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1699,6 +1863,10 @@
         {
           "name": "Parameters",
           "type": "IList<string>"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1732,6 +1900,10 @@
           "name": "Location",
           "type": "Location",
           "referencedTableName": "Location"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1761,6 +1933,10 @@
           "name": "Locations",
           "type": "IList<ThreadFlowLocation>",
           "referencedTableName": "ThreadFlowLocation"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1833,6 +2009,10 @@
           "name": "WebResponse",
           "type": "WebResponse",
           "referencedTableName": "WebResponse"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1850,6 +2030,10 @@
           "name": "Extensions",
           "type": "IList<ToolComponent>",
           "referencedTableName": "ToolComponent"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -1986,6 +2170,10 @@
           "name": "SupportedTaxonomies",
           "type": "IList<ToolComponentReference>",
           "referencedTableName": "ToolComponentReference"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -2004,6 +2192,10 @@
         {
           "name": "Guid",
           "type": "string"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -2037,6 +2229,10 @@
         {
           "name": "InformationUri",
           "type": "Uri"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -2068,6 +2264,10 @@
           "name": "MappedTo",
           "type": "ArtifactLocation",
           "referencedTableName": "ArtifactLocation"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -2108,6 +2308,10 @@
           "name": "Body",
           "type": "ArtifactContent",
           "referencedTableName": "ArtifactContent"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     },
@@ -2149,6 +2353,10 @@
           "name": "NoResponseReceived",
           "type": "bool",
           "default": "false"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<string, string>"
         }
       ]
     }

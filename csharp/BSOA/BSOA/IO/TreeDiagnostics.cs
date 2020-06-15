@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace BSOA.IO
 {
@@ -55,6 +59,18 @@ namespace BSOA.IO
             }
 
             return value;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder output = new StringBuilder();
+
+            using (StringWriter writer = new StringWriter(output))
+            {
+                Write(writer, -1);
+            }
+
+            return output.ToString();
         }
     }
 }

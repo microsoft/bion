@@ -1,8 +1,13 @@
-﻿using Bion.IO;
-using Bion.Json;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System.Diagnostics;
 using System.IO;
+
+using Bion.IO;
+using Bion.Json;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Bion.Test
 {

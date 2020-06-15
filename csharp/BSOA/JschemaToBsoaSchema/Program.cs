@@ -1,12 +1,15 @@
-﻿using BSOA.Generator.Extensions;
-using BSOA.Generator.Schema;
-using BSOA.Json;
-
-using Microsoft.Json.Schema;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
+
+using BSOA.Generator.Extensions;
+using BSOA.Generator.Schema;
+using BSOA.Json;
+
+using Microsoft.Json.Schema;
 
 namespace JschemaToBsoaSchema
 {
@@ -73,8 +76,6 @@ namespace JschemaToBsoaSchema
             foreach (KeyValuePair<string, JsonSchema> prop in schema.Properties)
             {
                 string columnName = prop.Key.ToPascalCase();
-                if (columnName == "Properties") { continue; }
-
                 table.Columns.Add(ToColumn(table.Name, columnName, prop.Value));
             }
         }
@@ -84,6 +85,11 @@ namespace JschemaToBsoaSchema
             SchemaType type = schema.SafeGetType();
             string defaultValue = schema.Default?.ToString();
             if (NameRenames.TryGetValue(columnName, out string columnRename)) { columnName = columnRename; }
+
+            if (columnName == "Properties")
+            {
+                return Column.Simple("Properties", "IDictionary<string, string>");
+            }
 
             switch (type)
             {

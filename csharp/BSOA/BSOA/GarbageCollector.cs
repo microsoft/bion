@@ -1,6 +1,11 @@
-﻿using BSOA.Column;
-using BSOA.Model;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System.Linq;
+
+using BSOA.Collections;
+using BSOA.Column;
+using BSOA.Model;
 
 namespace BSOA
 {

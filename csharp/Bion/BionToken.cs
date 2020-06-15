@@ -1,4 +1,7 @@
-﻿namespace Bion
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace Bion
 {
     public enum BionToken : byte
     {

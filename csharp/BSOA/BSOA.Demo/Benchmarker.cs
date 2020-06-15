@@ -1,10 +1,16 @@
-﻿using BSOA.Demo.Model;
-using BSOA.IO;
-using BSOA.Json;
-using Newtonsoft.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Diagnostics;
 using System.IO;
+
+using BSOA.IO;
+using BSOA.Json;
+
+using Microsoft.CodeAnalysis.Sarif;
+
+using Newtonsoft.Json;
 
 namespace BSOA.Demo
 {
@@ -33,7 +39,6 @@ namespace BSOA.Demo
 
         public void Run(bool forceReconvert)
         {
-            SarifLogFiltered filtered = null;
             SarifLog bsoa = null, unused = null;
 
             // Convert SarifLog to JSON, SoA JSON, and SoA Binary forms
@@ -45,15 +50,7 @@ namespace BSOA.Demo
 
             // Compare loading times
             bsoa = Measure(LoadBsoaBinary, BsoaBinPath, "BSOA Binary to SoA model", iterations: 10);
-            filtered = Measure(LoadNormalJson, NormalJsonPath, "JSON, Newtonsoft to Normal classes", iterations: 3);
             unused = Measure(LoadBsoaViaNewtonsoft, NormalJsonPath, "JSON, Newtonsoft to BSOA directly", iterations: 3);
-
-            // Verify logs match; change something to test verification logic
-            Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
-            ChangeSomething(bsoa);
-            Console.WriteLine();
-            Console.WriteLine($"Test difference detected:");
-            Console.WriteLine($" -> {(filtered.Equals(bsoa) ? "Identical" : "Different!")}");
         }
 
         private void ChangeSomething(SarifLog log)
@@ -78,7 +75,7 @@ namespace BSOA.Demo
             {
                 using (JsonTextWriter writer = new JsonTextWriter(File.CreateText(NormalJsonPath)))
                 {
-                    //writer.Formatting = Formatting.Indented;
+                    writer.Formatting = Formatting.Indented;
                     _jsonSerializer.Serialize(writer, bsoaLog);
                 }
             });
@@ -131,14 +128,6 @@ namespace BSOA.Demo
             Console.WriteLine($" -> Read {result} in {fileSizeMB:n1} MB at {loadMegabytesPerSecond:n1} MB/s into {(ramAfterMB - ramBeforeMB):n1} MB RAM");
 
             return result;
-        }
-
-        private SarifLogFiltered LoadNormalJson(string jsonPath)
-        {
-            using (JsonReader reader = new JsonTextReader(File.OpenText(jsonPath)))
-            {
-                return _jsonSerializer.Deserialize<SarifLogFiltered>(reader);
-            }
         }
 
         private SarifLog LoadBsoaViaNewtonsoft(string jsonPath)

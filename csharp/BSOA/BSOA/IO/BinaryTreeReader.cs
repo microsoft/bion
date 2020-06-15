@@ -1,6 +1,10 @@
-﻿using BSOA.Extensions;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System.IO;
 using System.Text;
+
+using BSOA.Extensions;
 
 namespace BSOA.IO
 {
@@ -12,6 +16,7 @@ namespace BSOA.IO
         public TreeToken TokenType { get; private set; }
         public long Position => _reader.BaseStream.Position;
 
+        private byte _hint;
         private bool _valueBool;
         private long _valueLong;
         private double _valueDouble;
@@ -35,7 +40,7 @@ namespace BSOA.IO
         {
             if (_wasBlockArrayRead == false && TokenType == TreeToken.BlockArray)
             {
-                _reader.SkipBlockArray();
+                _reader.SkipBlockArray(_hint);
                 _wasBlockArrayRead = true;
             }
 
@@ -45,22 +50,24 @@ namespace BSOA.IO
                 return false;
             }
 
-            TokenType = (TreeToken)_reader.ReadByte();
+            byte marker = _reader.ReadByte();
+            _hint = (byte)(marker >> 4);
+            TokenType = (TreeToken)(marker & 15);
 
             switch (TokenType)
             {
                 case TreeToken.Boolean:
-                    _valueBool = _reader.ReadBoolean();
+                    _valueBool = (_hint != 0);
                     break;
                 case TreeToken.Integer:
-                    _valueLong = _reader.ReadInt64();
+                    _valueLong = _reader.ReadLong(_hint);
                     break;
                 case TreeToken.Float:
                     _valueDouble = _reader.ReadDouble();
                     break;
                 case TreeToken.String:
                 case TreeToken.PropertyName:
-                    _valueString = _reader.ReadString();
+                    _valueString = _reader.ReadString(_hint, ref Settings.Buffer);
                     break;
                 case TreeToken.Null:
                     _valueString = null;
@@ -99,7 +106,7 @@ namespace BSOA.IO
         public T[] ReadBlockArray<T>() where T : unmanaged
         {
             _wasBlockArrayRead = true;
-            return _reader.ReadBlockArray<T>(ref Settings.Buffer);
+            return _reader.ReadBlockArray<T>(_hint, ref Settings.Buffer);
         }
 
         public void Dispose()

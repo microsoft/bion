@@ -1,6 +1,11 @@
-﻿using BSOA.Extensions;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System;
 using System.IO;
 using System.Text;
+
+using BSOA.Extensions;
 
 namespace BSOA.IO
 {
@@ -45,14 +50,12 @@ namespace BSOA.IO
 
         public void WritePropertyName(string name)
         {
-            _writer.Write((byte)TreeToken.PropertyName);
-            _writer.Write(name);
+            _writer.WriteString(TreeToken.PropertyName, name, ref Settings.Buffer);
         }
 
         public void WriteValue(bool value)
         {
-            _writer.Write((byte)TreeToken.Boolean);
-            _writer.Write(value);
+            _writer.WriteMarker(TreeToken.Boolean, (value ? 1 : 0));
         }
 
         public void WriteValue(string value)
@@ -63,15 +66,13 @@ namespace BSOA.IO
             }
             else
             {
-                _writer.Write((byte)TreeToken.String);
-                _writer.Write(value);
+                _writer.WriteString(TreeToken.String, value, ref Settings.Buffer);
             }
         }
 
         public void WriteValue(long value)
         {
-            _writer.Write((byte)TreeToken.Integer);
-            _writer.Write(value);
+            _writer.WriteLong(TreeToken.Integer, value);
         }
 
         public void WriteValue(double value)
@@ -82,7 +83,6 @@ namespace BSOA.IO
 
         public void WriteBlockArray<T>(T[] array, int index, int count) where T : unmanaged
         {
-            _writer.Write((byte)TreeToken.BlockArray);
             _writer.WriteBlockArray<T>(array, index, count, ref Settings.Buffer);
         }
 

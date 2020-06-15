@@ -1,6 +1,10 @@
-﻿using BSOA.Console.Extensions;
-using BSOA.Console.Model.Normal;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System.IO;
+
+using BSOA.Console.Extensions;
+using BSOA.Console.Model.Normal;
 
 namespace BSOA.Console.Model
 {

@@ -1,7 +1,12 @@
-﻿using BSOA.IO;
-using BSOA.Model;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System.Collections.Generic;
 using System.Linq;
+
+using BSOA.Collections;
+using BSOA.IO;
+using BSOA.Model;
 
 namespace BSOA.Column
 {
@@ -25,6 +30,10 @@ namespace BSOA.Column
             _values = values;
             Clear();
         }
+
+        // ColumnFactory untyped constructor
+        public DistinctColumn(IColumn values, object defaultValue) : this((IColumn<T>)values, (T)defaultValue)
+        { }
 
         public bool IsMappingValues => (_distinct != null);
         public int DistinctCount => (IsMappingValues ? _distinct.Count + 1 : -1);

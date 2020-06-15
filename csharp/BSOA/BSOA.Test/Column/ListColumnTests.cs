@@ -1,5 +1,10 @@
-﻿using BSOA.Column;
-using System.Security.Cryptography;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System.Collections.Generic;
+
+using BSOA.Column;
+
 using Xunit;
 
 namespace BSOA.Test
@@ -20,7 +25,7 @@ namespace BSOA.Test
             // Test the outer column
             Column.Basics(() => new ListColumn<int>(new NumberColumn<int>(-1)), ColumnList<int>.Empty, column[0], (index) =>
             {
-                ColumnList<int> other = column[column.Count];
+                IList<int> other = column[column.Count];
                 other.Add(index);
                 other.Add(index + 1);
                 other.Add(index + 2);
@@ -28,7 +33,7 @@ namespace BSOA.Test
             });
 
             // Test the ColumnList item members
-            IList.Basics(column[1], (index) => index % 20);
+            CollectionChangeVerifier.VerifyList(column[1], (index) => index % 20);
 
             // ColumnList.Empty handling
             ColumnList<int> empty = ColumnList<int>.Empty;
@@ -43,12 +48,12 @@ namespace BSOA.Test
             // ColumnList.GetHashCode and Equals w/nulls
             ListColumn<string> stringColumn = new ListColumn<string>(new StringColumn());
             
-            ColumnList<string> first = stringColumn[0];
+            ColumnList<string> first = (ColumnList<string>)stringColumn[0];
             first.Add("One");
             first.Add(null);
             first.Add("Two");
 
-            ColumnList<string> second = stringColumn[1];
+            ColumnList<string> second = (ColumnList<string>)stringColumn[1];
             second.Add("One");
             second.Add(null);
             second.Add("Two");

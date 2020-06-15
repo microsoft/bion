@@ -1,4 +1,8 @@
-﻿using BSOA.IO;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using BSOA.Collections;
+using BSOA.IO;
 using BSOA.Model;
 
 namespace BSOA.Column
@@ -23,6 +27,10 @@ namespace BSOA.Column
             get { return _vector[index]; }
             set { _vector[index] = value; }
         }
+
+        // Exposed BitVector members
+        public int CountTrue => _vector.Count;
+        public void SetAll(bool value) => _vector.SetAll(value);
 
         public void Trim()
         {
