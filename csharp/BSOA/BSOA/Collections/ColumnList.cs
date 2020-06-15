@@ -1,10 +1,14 @@
-﻿using BSOA.Collections;
-using BSOA.Column;
-using BSOA.Extensions;
-using BSOA.Model;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
+using BSOA.Collections;
+using BSOA.Column;
+using BSOA.Extensions;
+using BSOA.Model;
 
 namespace BSOA
 {

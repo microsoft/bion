@@ -1,4 +1,7 @@
-﻿namespace BSOA.Console.Extensions
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace BSOA.Console.Extensions
 {
     public static class LongExtensions
     {

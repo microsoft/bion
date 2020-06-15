@@ -1,11 +1,14 @@
-﻿using BSOA.IO;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System.IO;
+
+using BSOA.IO;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using Newtonsoft.Json;
-
-using System.IO;
 
 using Xunit;
 

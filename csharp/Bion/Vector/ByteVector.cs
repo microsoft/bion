@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
@@ -139,7 +142,7 @@ namespace Bion.Vector
                     // Depth +1 for 0xFF, 0xFE, -1 for 0xFD, 0xFC.
                     // Second to last bit is one for open, zero for close.
                     depth += (value & 0x2) - 1;
-                    if (depth == 0) break;
+                    if (depth == 0) { break; }
                 }
             }
 
@@ -186,7 +189,7 @@ namespace Bion.Vector
                     {
                         // If there are enough end containers here to reach the root, we have to check the order
                         int inner = SkipCs(content, i, i + 32, ref depth);
-                        if (inner < i + 32) return inner;
+                        if (inner < i + 32) { return inner; }
                     }
                     else
                     {
@@ -227,7 +230,7 @@ namespace Bion.Vector
             //return unchecked((int)Bmi1.TrailingZeroCount(bits));
 
             // http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup
-            if (bits == 0) return 32;
+            if (bits == 0) { return 32; }
             return DeBruijnTrailingZeroCount[(unchecked((uint)((int)bits & -(int)bits)) * DeBruijnSequence) >> 27];
         }
     }

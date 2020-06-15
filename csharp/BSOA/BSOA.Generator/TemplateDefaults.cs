@@ -1,5 +1,9 @@
-﻿using BSOA.Generator.Schema;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System.Collections.Generic;
+
+using BSOA.Generator.Schema;
 
 namespace BSOA.Generator
 {

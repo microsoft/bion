@@ -1,7 +1,12 @@
-﻿using BSOA.Collections;
-using BSOA.Test.Components;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Linq;
+
+using BSOA.Collections;
+using BSOA.Test.Components;
+
 using Xunit;
 
 namespace BSOA.Test.Collections

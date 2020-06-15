@@ -1,7 +1,12 @@
-﻿using Bion.Core;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections.Generic;
+
+using Bion.Core;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Bion.Test.Core
 {

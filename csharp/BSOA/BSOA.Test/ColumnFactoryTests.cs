@@ -1,7 +1,12 @@
-﻿using BSOA.Column;
-using BSOA.Model;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections.Generic;
+
+using BSOA.Column;
+using BSOA.Model;
+
 using Xunit;
 
 namespace BSOA.Test

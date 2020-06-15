@@ -1,9 +1,15 @@
-﻿using Bion.Json;
-using Microsoft.CodeAnalysis.Sarif;
-using Newtonsoft.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
+
+using Bion.Json;
+
+using Microsoft.CodeAnalysis.Sarif;
+
+using Newtonsoft.Json;
 
 namespace ScaleDemo
 {

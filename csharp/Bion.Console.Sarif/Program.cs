@@ -1,10 +1,16 @@
-﻿using Bion.Json;
-using Microsoft.CodeAnalysis.Sarif;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Diagnostics;
 using System.IO;
+
+using Bion.Json;
+
+using Microsoft.CodeAnalysis.Sarif;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 
 namespace Bion.Console.Sarif
 {

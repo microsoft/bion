@@ -1,4 +1,8 @@
-﻿using BSOA.Test.Model.V1;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using BSOA.Test.Model.V1;
+
 using Xunit;
 
 namespace BSOA.Test.Model

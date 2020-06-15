@@ -1,4 +1,7 @@
-﻿namespace BSOA.Column
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace BSOA.Column
 {
     /// <summary>
     ///  RefColumn provides a reference from an item in one table to an item

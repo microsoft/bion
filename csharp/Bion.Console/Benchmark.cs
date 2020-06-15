@@ -1,11 +1,15 @@
-﻿using Bion.Core;
-using Bion.IO;
-using Bion.Text;
-using Bion.Vector;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+
+using Bion.Core;
+using Bion.IO;
+using Bion.Text;
+using Bion.Vector;
 
 namespace Bion.Console
 {

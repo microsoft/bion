@@ -1,6 +1,10 @@
-﻿using BSOA.IO;
-using BSOA.Model;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System.Collections.Generic;
+
+using BSOA.IO;
+using BSOA.Model;
 
 namespace BSOA.Column
 {

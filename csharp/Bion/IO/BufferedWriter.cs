@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System;
 using System.IO;
 
 namespace Bion.IO
@@ -89,7 +92,7 @@ namespace Bion.IO
                 if (bytesLeft < length)
                 {
                     int newLength = Buffer.Length * 2;
-                    if (Index + length > newLength) newLength = Index + length;
+                    if (Index + length > newLength) { newLength = Index + length; }
 
                     byte[] newBuffer = new byte[newLength];
                     System.Buffer.BlockCopy(Buffer, 0, newBuffer, 0, Index);

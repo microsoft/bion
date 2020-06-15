@@ -1,8 +1,11 @@
-﻿using BSOA.IO;
-using BSOA.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.IO;
+
+using BSOA.IO;
+using BSOA.Json;
 
 using Xunit;
 

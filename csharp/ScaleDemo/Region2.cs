@@ -1,6 +1,11 @@
-﻿using Microsoft.CodeAnalysis.Sarif;
-using Newtonsoft.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System.Collections.Generic;
+
+using Microsoft.CodeAnalysis.Sarif;
+
+using Newtonsoft.Json;
 
 namespace ScaleDemo
 {

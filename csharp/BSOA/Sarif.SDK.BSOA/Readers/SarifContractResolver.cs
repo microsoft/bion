@@ -1,8 +1,9 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Collections.Generic;
+
 using Newtonsoft.Json.Serialization;
 
 namespace Microsoft.CodeAnalysis.Sarif.Readers
@@ -18,8 +19,7 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
             JsonContract contract = base.CreateContract(objectType);
 
             // this will only be called once and then cached
-            if (objectType == typeof(Uri))
-                contract.Converter = UriConverter.Instance;
+            if (objectType == typeof(Uri)) { contract.Converter = UriConverter.Instance; }
 
             else if (objectType == typeof(DateTime))
                 contract.Converter = DateTimeConverter.Instance;

@@ -1,6 +1,10 @@
-﻿using Bion.Core;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Text;
+
+using Bion.Core;
 
 namespace Bion.Text
 {

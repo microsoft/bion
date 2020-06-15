@@ -1,9 +1,12 @@
-﻿using BSOA.Extensions;
-using BSOA.IO;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
+using BSOA.Extensions;
+using BSOA.IO;
 
 namespace BSOA.Collections
 {

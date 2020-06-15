@@ -1,4 +1,7 @@
-﻿namespace BSOA.IO
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace BSOA.IO
 {
     /// <summary>
     ///  TreeToken identifies the type of the current token an ITreeReader

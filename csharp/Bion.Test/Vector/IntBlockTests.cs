@@ -1,9 +1,14 @@
-﻿using Bion.IO;
-using Bion.Vector;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.IO;
 using System.Linq;
+
+using Bion.IO;
+using Bion.Vector;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Bion.Test.Vector
 {

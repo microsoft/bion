@@ -1,12 +1,15 @@
-﻿using BSOA.Generator.Extensions;
-using BSOA.Generator.Schema;
-using BSOA.Json;
-
-using Microsoft.Json.Schema;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
+
+using BSOA.Generator.Extensions;
+using BSOA.Generator.Schema;
+using BSOA.Json;
+
+using Microsoft.Json.Schema;
 
 namespace JschemaToBsoaSchema
 {

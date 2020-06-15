@@ -1,4 +1,7 @@
-﻿using BSOA.IO;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using BSOA.IO;
 using BSOA.Model;
 
 namespace BSOA.Column
