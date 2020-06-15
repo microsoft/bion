@@ -88,7 +88,7 @@ namespace JschemaToBsoaSchema
 
             if (columnName == "Properties")
             {
-                return Column.Simple("Properties", "IDictionary<string, string>");
+                return Column.Simple("Properties", "IDictionary<string, SerializedPropertyInfo>");
             }
 
             switch (type)

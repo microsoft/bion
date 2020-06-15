@@ -72,13 +72,14 @@ namespace BSOA.Generator
                 ["public Uri SchemaUri"] = @"[JsonConverter(typeof(UriConverter))]
         public Uri SchemaUri",
 
-                ["public IDictionary<string, string> Properties"] = "internal override IDictionary<string, string> Properties",
+                ["public IDictionary<string, SerializedPropertyInfo> Properties"] = @"internal override IDictionary<string, SerializedPropertyInfo> Properties",
 
                 [Regex.Escape(@"[DataMember(Name = ""properties"", IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(-1)]")] = @"[DataMember(Name = ""properties"", IsRequired = false, EmitDefaultValue = false)]",
 
                 ["ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(\\)\\);"] = "new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));",
-                ["ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(\\)\\);"] = "new DictionaryColumn<string, ArtifactLocation>(new StringColumn(), new ArtifactLocationColumn(this.Database)));"
+                ["ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(\\)\\);"] = "new DictionaryColumn<string, ArtifactLocation>(new StringColumn(), new ArtifactLocationColumn(this.Database)));",
+                ["ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>\\(\\)\\);"] = "new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));"
             };
 
             // Generate Database class

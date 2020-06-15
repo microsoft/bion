@@ -73,7 +73,7 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
             }
 
             writer.WriteStartObject();
-            var propertyDictionary = (Dictionary<string, SerializedPropertyInfo>)value;
+            var propertyDictionary = (IDictionary<string, SerializedPropertyInfo>)value;
             foreach (string key in propertyDictionary.Keys)
             {
                 writer.WritePropertyName(key);

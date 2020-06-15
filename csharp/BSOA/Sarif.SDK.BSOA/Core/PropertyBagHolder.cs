@@ -1,14 +1,12 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-
 using Microsoft.CodeAnalysis.Sarif.Readers;
-
 using Newtonsoft.Json;
 
 namespace Microsoft.CodeAnalysis.Sarif
@@ -16,7 +14,7 @@ namespace Microsoft.CodeAnalysis.Sarif
     /// <summary>
     /// Base class for objects that can hold properties of arbitrary types.
     /// </summary>
-    public abstract class PropertyBagHolder : IPropertyBagHolder
+    public class PropertyBagHolder : IPropertyBagHolder
     {
         protected PropertyBagHolder()
         {
@@ -35,7 +33,9 @@ namespace Microsoft.CodeAnalysis.Sarif
         /// <summary>
         /// Key/value pairs that provide additional information about the run.
         /// </summary>
-        internal abstract IDictionary<string, string> Properties { get; set; }
+        [JsonConverter(typeof(PropertyBagConverter))]
+        [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        internal virtual IDictionary<string, SerializedPropertyInfo> Properties { get; set; }
 
         public bool TryGetProperty(string propertyName, out string value)
         {
@@ -51,7 +51,26 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public string GetProperty(string propertyName)
         {
-            return GetProperty<string>(propertyName);
+            if (Properties?.ContainsKey(propertyName) != true)
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        SdkResources.PropertyDoesNotExist,
+                        propertyName));
+            }
+
+            if (Properties[propertyName] == null) { return null; }
+
+            if (!Properties[propertyName].IsString)
+            {
+                throw new InvalidOperationException(SdkResources.CallGenericGetProperty);
+            }
+
+            string value = Properties[propertyName].SerializedValue;
+
+            // Remove the quotes around the serialized value ("x" => x).
+            return value.Substring(1, value.Length - 2);
         }
 
         public bool TryGetProperty<T>(string propertyName, out T value)
@@ -68,9 +87,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public T GetProperty<T>(string propertyName)
         {
-            string value = null;
-
-            if (!Properties.TryGetValue(propertyName, out value))
+            if (Properties?.ContainsKey(propertyName) != true)
             {
                 throw new InvalidOperationException(
                     string.Format(
@@ -79,7 +96,8 @@ namespace Microsoft.CodeAnalysis.Sarif
                         propertyName));
             }
 
-            if (value == null)
+            SerializedPropertyInfo propValue = Properties[propertyName];
+            if (propValue == null)
             {
                 if (typeof(T).IsValueType)
                 {
@@ -96,7 +114,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             }
             else
             {
-                return JsonConvert.DeserializeObject<T>(value);
+                return JsonConvert.DeserializeObject<T>(propValue.SerializedValue);
             }
         }
 
@@ -123,7 +141,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                         propertyName));
             }
 
-            return Properties[propertyName];
+            return Properties[propertyName]?.SerializedValue;
         }
 
         private static readonly JsonSerializerSettings s_settingsWithComprehensiveV2ContractResolver = new JsonSerializerSettings
@@ -134,6 +152,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public void SetProperty<T>(string propertyName, T value)
         {
+            Properties = Properties ?? new Dictionary<string, SerializedPropertyInfo>();
+
             bool isString = typeof(T) == typeof(string);
 
             if (value == null)
@@ -171,7 +191,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     serializedValue = JsonConvert.SerializeObject(value, settings);
                 }
 
-                Properties[propertyName] = serializedValue;
+                Properties[propertyName] = new SerializedPropertyInfo(serializedValue, isString);
             }
         }
 
@@ -187,11 +207,12 @@ namespace Microsoft.CodeAnalysis.Sarif
             PropertyBagHolder otherHolder = other as PropertyBagHolder;
             Debug.Assert(otherHolder != null);
 
-            Properties.Clear();
+            Properties = other.PropertyNames.Count > 0 ? new Dictionary<string, SerializedPropertyInfo>() : null;
 
             foreach (string propertyName in other.PropertyNames)
             {
-                Properties[propertyName] = otherHolder.Properties[propertyName];
+                SerializedPropertyInfo otherInfo = otherHolder.Properties[propertyName];
+                Properties[propertyName] = new SerializedPropertyInfo(otherInfo.SerializedValue, otherInfo.IsString);
             }
         }
 
@@ -205,7 +226,12 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public virtual bool ShouldSerializeProperties()
         {
-            return (this.Properties?.Count ?? 0) > 0;
+            return PropertyBagHasAtLeastOneNonNullValue(this.Properties);
+        }
+
+        public static bool PropertyBagHasAtLeastOneNonNullValue(IDictionary<string, SerializedPropertyInfo> properties)
+        {
+            return properties != null && properties.Any();
         }
     }
 }

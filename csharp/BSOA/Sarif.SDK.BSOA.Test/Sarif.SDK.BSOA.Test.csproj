@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BSOA.Test\BSOA.Test.csproj" />
     <ProjectReference Include="..\Sarif.SDK.BSOA\Sarif.SDK.BSOA.csproj" />
   </ItemGroup>
 
