@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using BSOA.Model;
 
@@ -30,17 +29,12 @@ namespace BSOA.Column
             [typeof(char)] = (defaultValue) => new NumberColumn<char>((char)(defaultValue ?? default(char))),
         };
 
-        public static IColumn<T> Build<T>()
-        {
-            return (IColumn<T>)Build(typeof(T), default(T));
-        }
-
-        public static IColumn<T> Build<T>(T defaultValue)
+        public static IColumn<T> Build<T>(T defaultValue = default(T))
         {
             return (IColumn<T>)Build(typeof(T), defaultValue);
         }
 
-        public static IColumn Build(Type type, object defaultValue)
+        public static IColumn Build(Type type, object defaultValue = null)
         {
             if (Builders.TryGetValue(type, out Func<object, IColumn> creator))
             {
