@@ -20,7 +20,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<int> Level;
         internal IColumn<double> Rank;
         internal RefColumn Parameters;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ReportingConfigurationTable(SarifLogDatabase database) : base()
         {
@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Level = AddColumn(nameof(Level), ColumnFactory.Build<int>((int)FailureLevel.Warning));
             Rank = AddColumn(nameof(Rank), ColumnFactory.Build<double>(-1));
             Parameters = AddColumn(nameof(Parameters), new RefColumn(nameof(SarifLogDatabase.PropertyBag)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ReportingConfiguration Get(int index)

@@ -29,7 +29,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<Uri> HelpUri;
         internal RefColumn Help;
         internal RefListColumn Relationships;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ReportingDescriptorTable(SarifLogDatabase database) : base()
         {
@@ -48,7 +48,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             HelpUri = AddColumn(nameof(HelpUri), ColumnFactory.Build<Uri>());
             Help = AddColumn(nameof(Help), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
             Relationships = AddColumn(nameof(Relationships), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptorRelationship)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ReportingDescriptor Get(int index)

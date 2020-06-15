@@ -18,7 +18,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         internal RefColumn ArtifactLocation;
         internal RefListColumn Replacements;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ArtifactChangeTable(SarifLogDatabase database) : base()
         {
@@ -26,7 +26,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             ArtifactLocation = AddColumn(nameof(ArtifactLocation), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             Replacements = AddColumn(nameof(Replacements), new RefListColumn(nameof(SarifLogDatabase.Replacement)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ArtifactChange Get(int index)

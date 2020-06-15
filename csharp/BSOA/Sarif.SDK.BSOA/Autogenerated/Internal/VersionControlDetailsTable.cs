@@ -22,7 +22,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<string> RevisionTag;
         internal IColumn<DateTime> AsOfTimeUtc;
         internal RefColumn MappedTo;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal VersionControlDetailsTable(SarifLogDatabase database) : base()
         {
@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             RevisionTag = AddColumn(nameof(RevisionTag), ColumnFactory.Build<string>());
             AsOfTimeUtc = AddColumn(nameof(AsOfTimeUtc), ColumnFactory.Build<DateTime>());
             MappedTo = AddColumn(nameof(MappedTo), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override VersionControlDetails Get(int index)

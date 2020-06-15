@@ -22,7 +22,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<string> LastDetectionRunGuid;
         internal IColumn<int> InvocationIndex;
         internal RefListColumn ConversionSources;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ResultProvenanceTable(SarifLogDatabase database) : base()
         {
@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             LastDetectionRunGuid = AddColumn(nameof(LastDetectionRunGuid), ColumnFactory.Build<string>());
             InvocationIndex = AddColumn(nameof(InvocationIndex), ColumnFactory.Build<int>(-1));
             ConversionSources = AddColumn(nameof(ConversionSources), new RefListColumn(nameof(SarifLogDatabase.PhysicalLocation)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ResultProvenance Get(int index)

@@ -49,7 +49,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             IDictionary<string, MultiformatMessageString> initialState,
             IDictionary<string, MultiformatMessageString> immutableState,
             IList<ThreadFlowLocation> locations,
-            IDictionary<string, string> properties
+            IDictionary<string, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ThreadFlow)
         {
@@ -108,7 +108,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        internal override IDictionary<string, string> Properties
+        internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -162,7 +162,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Locations.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, string>))
+                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

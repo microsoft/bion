@@ -43,7 +43,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefListColumn WebRequests;
         internal RefListColumn WebResponses;
         internal RefColumn SpecialLocations;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal RunTable(SarifLogDatabase database) : base()
         {
@@ -76,7 +76,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             WebRequests = AddColumn(nameof(WebRequests), new RefListColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponses = AddColumn(nameof(WebResponses), new RefListColumn(nameof(SarifLogDatabase.WebResponse)));
             SpecialLocations = AddColumn(nameof(SpecialLocations), new RefColumn(nameof(SarifLogDatabase.SpecialLocations)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Run Get(int index)

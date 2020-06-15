@@ -18,7 +18,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         internal RefColumn Driver;
         internal RefListColumn Extensions;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ToolTable(SarifLogDatabase database) : base()
         {
@@ -26,7 +26,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             Driver = AddColumn(nameof(Driver), new RefColumn(nameof(SarifLogDatabase.ToolComponent)));
             Extensions = AddColumn(nameof(Extensions), new RefListColumn(nameof(SarifLogDatabase.ToolComponent)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Tool Get(int index)

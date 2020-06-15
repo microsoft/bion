@@ -20,7 +20,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<int> Version;
         internal RefListColumn Runs;
         internal RefListColumn InlineExternalProperties;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal SarifLogTable(SarifLogDatabase database) : base()
         {
@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Version = AddColumn(nameof(Version), ColumnFactory.Build<int>((int)default(SarifVersion)));
             Runs = AddColumn(nameof(Runs), new RefListColumn(nameof(SarifLogDatabase.Run)));
             InlineExternalProperties = AddColumn(nameof(InlineExternalProperties), new RefListColumn(nameof(SarifLogDatabase.ExternalProperties)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override SarifLog Get(int index)

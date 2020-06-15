@@ -17,14 +17,14 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal SarifLogDatabase Database;
 
         internal RefColumn DisplayBase;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal SpecialLocationsTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
             DisplayBase = AddColumn(nameof(DisplayBase), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override SpecialLocations Get(int index)

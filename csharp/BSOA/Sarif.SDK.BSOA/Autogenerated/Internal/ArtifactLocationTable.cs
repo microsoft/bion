@@ -20,7 +20,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<string> UriBaseId;
         internal IColumn<int> Index;
         internal RefColumn Description;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ArtifactLocationTable(SarifLogDatabase database) : base()
         {
@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             UriBaseId = AddColumn(nameof(UriBaseId), ColumnFactory.Build<string>());
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ArtifactLocation Get(int index)

@@ -20,7 +20,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<string> Markdown;
         internal IColumn<string> Id;
         internal IColumn<IList<string>> Arguments;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal MessageTable(SarifLogDatabase database) : base()
         {
@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Markdown = AddColumn(nameof(Markdown), ColumnFactory.Build<string>());
             Id = AddColumn(nameof(Id), ColumnFactory.Build<string>());
             Arguments = AddColumn(nameof(Arguments), ColumnFactory.Build<IList<string>>());
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Message Get(int index)

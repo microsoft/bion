@@ -19,7 +19,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn Description;
         internal RefListColumn Nodes;
         internal RefListColumn Edges;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal GraphTable(SarifLogDatabase database) : base()
         {
@@ -28,7 +28,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
             Nodes = AddColumn(nameof(Nodes), new RefListColumn(nameof(SarifLogDatabase.Node)));
             Edges = AddColumn(nameof(Edges), new RefListColumn(nameof(SarifLogDatabase.Edge)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Graph Get(int index)

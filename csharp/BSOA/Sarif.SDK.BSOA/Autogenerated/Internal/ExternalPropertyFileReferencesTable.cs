@@ -32,7 +32,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefListColumn Translations;
         internal RefListColumn WebRequests;
         internal RefListColumn WebResponses;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ExternalPropertyFileReferencesTable(SarifLogDatabase database) : base()
         {
@@ -54,7 +54,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Translations = AddColumn(nameof(Translations), new RefListColumn(nameof(SarifLogDatabase.ExternalPropertyFileReference)));
             WebRequests = AddColumn(nameof(WebRequests), new RefListColumn(nameof(SarifLogDatabase.ExternalPropertyFileReference)));
             WebResponses = AddColumn(nameof(WebResponses), new RefListColumn(nameof(SarifLogDatabase.ExternalPropertyFileReference)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ExternalPropertyFileReferences Get(int index)

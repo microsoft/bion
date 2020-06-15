@@ -20,7 +20,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn Label;
         internal IColumn<string> SourceNodeId;
         internal IColumn<string> TargetNodeId;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal EdgeTable(SarifLogDatabase database) : base()
         {
@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Label = AddColumn(nameof(Label), new RefColumn(nameof(SarifLogDatabase.Message)));
             SourceNodeId = AddColumn(nameof(SourceNodeId), ColumnFactory.Build<string>());
             TargetNodeId = AddColumn(nameof(TargetNodeId), ColumnFactory.Build<string>());
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Edge Get(int index)

@@ -24,7 +24,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn Exception;
         internal RefColumn Descriptor;
         internal RefColumn AssociatedRule;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal NotificationTable(SarifLogDatabase database) : base()
         {
@@ -38,7 +38,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Exception = AddColumn(nameof(Exception), new RefColumn(nameof(SarifLogDatabase.ExceptionData)));
             Descriptor = AddColumn(nameof(Descriptor), new RefColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
             AssociatedRule = AddColumn(nameof(AssociatedRule), new RefColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Notification Get(int index)

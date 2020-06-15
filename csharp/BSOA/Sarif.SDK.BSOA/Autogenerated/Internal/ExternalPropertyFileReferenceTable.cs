@@ -19,7 +19,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn Location;
         internal IColumn<string> Guid;
         internal IColumn<int> ItemCount;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ExternalPropertyFileReferenceTable(SarifLogDatabase database) : base()
         {
@@ -28,7 +28,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>());
             ItemCount = AddColumn(nameof(ItemCount), ColumnFactory.Build<int>(-1));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ExternalPropertyFileReference Get(int index)

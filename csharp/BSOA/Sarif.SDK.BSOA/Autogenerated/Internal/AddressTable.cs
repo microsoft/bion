@@ -25,7 +25,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<int> OffsetFromParent;
         internal IColumn<int> Index;
         internal IColumn<int> ParentIndex;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal AddressTable(SarifLogDatabase database) : base()
         {
@@ -40,7 +40,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             OffsetFromParent = AddColumn(nameof(OffsetFromParent), ColumnFactory.Build<int>());
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             ParentIndex = AddColumn(nameof(ParentIndex), ColumnFactory.Build<int>(-1));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Address Get(int index)

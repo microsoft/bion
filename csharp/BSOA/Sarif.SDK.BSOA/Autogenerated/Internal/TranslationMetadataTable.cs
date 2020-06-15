@@ -22,7 +22,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn FullDescription;
         internal IColumn<Uri> DownloadUri;
         internal IColumn<Uri> InformationUri;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal TranslationMetadataTable(SarifLogDatabase database) : base()
         {
@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             FullDescription = AddColumn(nameof(FullDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
             DownloadUri = AddColumn(nameof(DownloadUri), ColumnFactory.Build<Uri>());
             InformationUri = AddColumn(nameof(InformationUri), ColumnFactory.Build<Uri>());
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override TranslationMetadata Get(int index)

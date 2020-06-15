@@ -24,7 +24,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<IDictionary<string, string>> Headers;
         internal IColumn<IDictionary<string, string>> Parameters;
         internal RefColumn Body;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal WebRequestTable(SarifLogDatabase database) : base()
         {
@@ -38,7 +38,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Headers = AddColumn(nameof(Headers), ColumnFactory.Build<IDictionary<string, string>>());
             Parameters = AddColumn(nameof(Parameters), ColumnFactory.Build<IDictionary<string, string>>());
             Body = AddColumn(nameof(Body), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override WebRequest Get(int index)

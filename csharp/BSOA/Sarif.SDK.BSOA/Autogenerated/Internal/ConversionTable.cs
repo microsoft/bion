@@ -19,7 +19,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn Tool;
         internal RefColumn Invocation;
         internal RefListColumn AnalysisToolLogFiles;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ConversionTable(SarifLogDatabase database) : base()
         {
@@ -28,7 +28,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Tool = AddColumn(nameof(Tool), new RefColumn(nameof(SarifLogDatabase.Tool)));
             Invocation = AddColumn(nameof(Invocation), new RefColumn(nameof(SarifLogDatabase.Invocation)));
             AnalysisToolLogFiles = AddColumn(nameof(AnalysisToolLogFiles), new RefListColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Conversion Get(int index)

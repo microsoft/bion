@@ -20,7 +20,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<string> Id;
         internal IColumn<string> Guid;
         internal IColumn<string> CorrelationGuid;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal RunAutomationDetailsTable(SarifLogDatabase database) : base()
         {
@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Id = AddColumn(nameof(Id), ColumnFactory.Build<string>());
             Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>());
             CorrelationGuid = AddColumn(nameof(CorrelationGuid), ColumnFactory.Build<string>());
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override RunAutomationDetails Get(int index)

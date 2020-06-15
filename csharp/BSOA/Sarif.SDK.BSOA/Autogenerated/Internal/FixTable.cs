@@ -18,7 +18,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         internal RefColumn Description;
         internal RefListColumn ArtifactChanges;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal FixTable(SarifLogDatabase database) : base()
         {
@@ -26,7 +26,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
             ArtifactChanges = AddColumn(nameof(ArtifactChanges), new RefListColumn(nameof(SarifLogDatabase.ArtifactChange)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Fix Get(int index)

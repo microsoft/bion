@@ -20,7 +20,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<string> Module;
         internal IColumn<int> ThreadId;
         internal IColumn<IList<string>> Parameters;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal StackFrameTable(SarifLogDatabase database) : base()
         {
@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Module = AddColumn(nameof(Module), ColumnFactory.Build<string>());
             ThreadId = AddColumn(nameof(ThreadId), ColumnFactory.Build<int>());
             Parameters = AddColumn(nameof(Parameters), ColumnFactory.Build<IList<string>>());
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override StackFrame Get(int index)

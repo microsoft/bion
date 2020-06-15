@@ -24,7 +24,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<IDictionary<string, string>> Headers;
         internal RefColumn Body;
         internal IColumn<bool> NoResponseReceived;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal WebResponseTable(SarifLogDatabase database) : base()
         {
@@ -38,7 +38,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Headers = AddColumn(nameof(Headers), ColumnFactory.Build<IDictionary<string, string>>());
             Body = AddColumn(nameof(Body), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
             NoResponseReceived = AddColumn(nameof(NoResponseReceived), ColumnFactory.Build<bool>(false));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override WebResponse Get(int index)

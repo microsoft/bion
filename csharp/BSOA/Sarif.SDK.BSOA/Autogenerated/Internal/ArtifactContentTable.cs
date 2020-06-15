@@ -19,7 +19,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<string> Text;
         internal IColumn<string> Binary;
         internal RefColumn Rendered;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ArtifactContentTable(SarifLogDatabase database) : base()
         {
@@ -28,7 +28,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Text = AddColumn(nameof(Text), ColumnFactory.Build<string>());
             Binary = AddColumn(nameof(Binary), ColumnFactory.Build<string>());
             Rendered = AddColumn(nameof(Rendered), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ArtifactContent Get(int index)

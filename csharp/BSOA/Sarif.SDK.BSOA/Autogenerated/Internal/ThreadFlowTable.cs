@@ -21,7 +21,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<IDictionary<string, MultiformatMessageString>> InitialState;
         internal IColumn<IDictionary<string, MultiformatMessageString>> ImmutableState;
         internal RefListColumn Locations;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ThreadFlowTable(SarifLogDatabase database) : base()
         {
@@ -32,7 +32,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             InitialState = AddColumn(nameof(InitialState), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
             ImmutableState = AddColumn(nameof(ImmutableState), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
             Locations = AddColumn(nameof(Locations), new RefListColumn(nameof(SarifLogDatabase.ThreadFlowLocation)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ThreadFlow Get(int index)

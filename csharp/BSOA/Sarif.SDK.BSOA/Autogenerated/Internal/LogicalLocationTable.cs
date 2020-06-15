@@ -22,7 +22,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<string> DecoratedName;
         internal IColumn<int> ParentIndex;
         internal IColumn<string> Kind;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal LogicalLocationTable(SarifLogDatabase database) : base()
         {
@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             DecoratedName = AddColumn(nameof(DecoratedName), ColumnFactory.Build<string>());
             ParentIndex = AddColumn(nameof(ParentIndex), ColumnFactory.Build<int>(-1));
             Kind = AddColumn(nameof(Kind), ColumnFactory.Build<string>());
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override LogicalLocation Get(int index)

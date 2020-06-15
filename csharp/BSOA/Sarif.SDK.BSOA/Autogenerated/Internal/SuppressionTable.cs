@@ -21,7 +21,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<int> Status;
         internal IColumn<string> Justification;
         internal RefColumn Location;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal SuppressionTable(SarifLogDatabase database) : base()
         {
@@ -32,7 +32,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Status = AddColumn(nameof(Status), ColumnFactory.Build<int>((int)default(SuppressionStatus)));
             Justification = AddColumn(nameof(Justification), ColumnFactory.Build<string>());
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.Location)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Suppression Get(int index)

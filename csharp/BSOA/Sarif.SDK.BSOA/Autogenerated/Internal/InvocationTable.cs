@@ -41,7 +41,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn Stdout;
         internal RefColumn Stderr;
         internal RefColumn StdoutStderr;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal InvocationTable(SarifLogDatabase database) : base()
         {
@@ -72,7 +72,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Stdout = AddColumn(nameof(Stdout), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             Stderr = AddColumn(nameof(Stderr), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             StdoutStderr = AddColumn(nameof(StdoutStderr), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Invocation Get(int index)

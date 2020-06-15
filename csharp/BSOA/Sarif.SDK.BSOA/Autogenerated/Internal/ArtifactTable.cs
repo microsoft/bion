@@ -28,7 +28,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<string> SourceLanguage;
         internal IColumn<IDictionary<string, string>> Hashes;
         internal IColumn<DateTime> LastModifiedTimeUtc;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ArtifactTable(SarifLogDatabase database) : base()
         {
@@ -46,7 +46,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             SourceLanguage = AddColumn(nameof(SourceLanguage), ColumnFactory.Build<string>());
             Hashes = AddColumn(nameof(Hashes), ColumnFactory.Build<IDictionary<string, string>>());
             LastModifiedTimeUtc = AddColumn(nameof(LastModifiedTimeUtc), ColumnFactory.Build<DateTime>());
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Artifact Get(int index)

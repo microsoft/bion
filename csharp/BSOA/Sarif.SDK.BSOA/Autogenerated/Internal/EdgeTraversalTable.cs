@@ -20,7 +20,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn Message;
         internal IColumn<IDictionary<string, MultiformatMessageString>> FinalState;
         internal IColumn<int> StepOverEdgeCount;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal EdgeTraversalTable(SarifLogDatabase database) : base()
         {
@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
             FinalState = AddColumn(nameof(FinalState), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
             StepOverEdgeCount = AddColumn(nameof(StepOverEdgeCount), ColumnFactory.Build<int>());
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override EdgeTraversal Get(int index)

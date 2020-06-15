@@ -27,7 +27,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn Snippet;
         internal RefColumn Message;
         internal IColumn<string> SourceLanguage;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal RegionTable(SarifLogDatabase database) : base()
         {
@@ -44,7 +44,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Snippet = AddColumn(nameof(Snippet), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
             SourceLanguage = AddColumn(nameof(SourceLanguage), ColumnFactory.Build<string>());
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Region Get(int index)

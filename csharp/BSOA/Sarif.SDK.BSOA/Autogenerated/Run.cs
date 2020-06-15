@@ -71,7 +71,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             IList<WebRequest> webRequests,
             IList<WebResponse> webResponses,
             SpecialLocations specialLocations,
-            IDictionary<string, string> properties
+            IDictionary<string, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Run)
         {
@@ -330,7 +330,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        internal override IDictionary<string, string> Properties
+        internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -516,7 +516,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + SpecialLocations.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, string>))
+                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

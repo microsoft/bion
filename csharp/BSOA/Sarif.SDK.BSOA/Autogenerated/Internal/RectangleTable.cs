@@ -21,7 +21,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<double> Bottom;
         internal IColumn<double> Right;
         internal RefColumn Message;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal RectangleTable(SarifLogDatabase database) : base()
         {
@@ -32,7 +32,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Bottom = AddColumn(nameof(Bottom), ColumnFactory.Build<double>());
             Right = AddColumn(nameof(Right), ColumnFactory.Build<double>());
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Rectangle Get(int index)

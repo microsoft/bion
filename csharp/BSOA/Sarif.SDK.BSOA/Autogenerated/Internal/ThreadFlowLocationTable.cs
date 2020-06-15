@@ -29,7 +29,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<int> Importance;
         internal RefColumn WebRequest;
         internal RefColumn WebResponse;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ThreadFlowLocationTable(SarifLogDatabase database) : base()
         {
@@ -48,7 +48,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Importance = AddColumn(nameof(Importance), ColumnFactory.Build<int>((int)ThreadFlowLocationImportance.Important));
             WebRequest = AddColumn(nameof(WebRequest), new RefColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponse = AddColumn(nameof(WebResponse), new RefColumn(nameof(SarifLogDatabase.WebResponse)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ThreadFlowLocation Get(int index)

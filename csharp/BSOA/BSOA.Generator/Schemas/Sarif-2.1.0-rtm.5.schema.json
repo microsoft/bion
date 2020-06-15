@@ -31,7 +31,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -79,7 +79,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -147,7 +147,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -168,7 +168,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -191,7 +191,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -219,7 +219,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -252,7 +252,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -273,7 +273,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -294,7 +294,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -321,7 +321,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -348,7 +348,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -375,7 +375,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -404,7 +404,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -528,7 +528,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -552,7 +552,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -657,7 +657,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -678,7 +678,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -705,7 +705,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -744,7 +744,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -875,7 +875,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -919,7 +919,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -942,7 +942,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -977,7 +977,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1002,7 +1002,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1019,7 +1019,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1050,7 +1050,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1104,7 +1104,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1137,7 +1137,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1177,7 +1177,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1236,7 +1236,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1257,7 +1257,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1328,7 +1328,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1360,7 +1360,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1388,7 +1388,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1413,7 +1413,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1581,7 +1581,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1617,7 +1617,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1776,7 +1776,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1803,7 +1803,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1818,7 +1818,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1839,7 +1839,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1866,7 +1866,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1903,7 +1903,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1936,7 +1936,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2012,7 +2012,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2033,7 +2033,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2173,7 +2173,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2195,7 +2195,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2232,7 +2232,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2267,7 +2267,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2311,7 +2311,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2356,7 +2356,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<string, SerializedPropertyInfo>"
         }
       ]
     }

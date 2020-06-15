@@ -19,7 +19,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<int> Target;
         internal IColumn<IList<string>> Kinds;
         internal RefColumn Description;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal LocationRelationshipTable(SarifLogDatabase database) : base()
         {
@@ -28,7 +28,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Target = AddColumn(nameof(Target), ColumnFactory.Build<int>());
             Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<string>>());
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override LocationRelationship Get(int index)

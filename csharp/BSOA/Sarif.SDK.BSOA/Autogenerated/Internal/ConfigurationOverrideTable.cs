@@ -18,7 +18,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         internal RefColumn Configuration;
         internal RefColumn Descriptor;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ConfigurationOverrideTable(SarifLogDatabase database) : base()
         {
@@ -26,7 +26,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             Configuration = AddColumn(nameof(Configuration), new RefColumn(nameof(SarifLogDatabase.ReportingConfiguration)));
             Descriptor = AddColumn(nameof(Descriptor), new RefColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ConfigurationOverride Get(int index)

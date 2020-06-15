@@ -43,7 +43,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn AssociatedComponent;
         internal RefColumn TranslationMetadata;
         internal RefListColumn SupportedTaxonomies;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ToolComponentTable(SarifLogDatabase database) : base()
         {
@@ -76,7 +76,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             AssociatedComponent = AddColumn(nameof(AssociatedComponent), new RefColumn(nameof(SarifLogDatabase.ToolComponentReference)));
             TranslationMetadata = AddColumn(nameof(TranslationMetadata), new RefColumn(nameof(SarifLogDatabase.TranslationMetadata)));
             SupportedTaxonomies = AddColumn(nameof(SupportedTaxonomies), new RefListColumn(nameof(SarifLogDatabase.ToolComponentReference)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ToolComponent Get(int index)

@@ -46,7 +46,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         public ConfigurationOverride(
             ReportingConfiguration configuration,
             ReportingDescriptorReference descriptor,
-            IDictionary<string, string> properties
+            IDictionary<string, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ConfigurationOverride)
         {
@@ -78,7 +78,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
-        internal override IDictionary<string, string> Properties
+        internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -114,7 +114,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Descriptor.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, string>))
+                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

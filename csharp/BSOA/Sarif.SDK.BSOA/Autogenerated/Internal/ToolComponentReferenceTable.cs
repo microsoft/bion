@@ -19,7 +19,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<string> Name;
         internal IColumn<int> Index;
         internal IColumn<string> Guid;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ToolComponentReferenceTable(SarifLogDatabase database) : base()
         {
@@ -28,7 +28,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Name = AddColumn(nameof(Name), ColumnFactory.Build<string>());
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>());
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ToolComponentReference Get(int index)

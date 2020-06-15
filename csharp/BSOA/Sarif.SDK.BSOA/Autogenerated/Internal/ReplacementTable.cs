@@ -18,7 +18,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         internal RefColumn DeletedRegion;
         internal RefColumn InsertedContent;
-        internal IColumn<IDictionary<string, string>> Properties;
+        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
 
         internal ReplacementTable(SarifLogDatabase database) : base()
         {
@@ -26,7 +26,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             DeletedRegion = AddColumn(nameof(DeletedRegion), new RefColumn(nameof(SarifLogDatabase.Region)));
             InsertedContent = AddColumn(nameof(InsertedContent), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, string>>());
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Replacement Get(int index)
