@@ -71,12 +71,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             if (format == SarifFormat.BSOA)
             {
-                using (BinaryTreeReader reader = new BinaryTreeReader(source))
-                {
-                    SarifLog log = new SarifLog();
-                    log.DB.Read(reader);
-                    return log;
-                }
+                return SarifLog.ReadBsoa(source);
             }
             else
             {
@@ -111,10 +106,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             if (format == SarifFormat.BSOA)
             {
-                using (BinaryTreeWriter writer = new BinaryTreeWriter(stream))
-                {
-                    this.DB.Write(writer);
-                }
+                this.WriteBsoa(stream);
             }
             else
             {

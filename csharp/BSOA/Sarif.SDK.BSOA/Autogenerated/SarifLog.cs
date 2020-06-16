@@ -5,6 +5,7 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.Serialization;
 
 using BSOA.IO;
@@ -26,6 +27,9 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         private SarifLogTable _table;
         private int _index;
+
+        internal SarifLogDatabase Database => _table.Database;
+        public ITreeSerializable DB => _table.Database;
 
         public SarifLog() : this(new SarifLogDatabase().SarifLog)
         { }
@@ -213,11 +217,38 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
         #endregion
 
+        #region Easy Serialization
+        public void WriteBsoa(Stream stream)
+        {
+            using (BinaryTreeWriter writer = new BinaryTreeWriter(stream))
+            {
+                DB.Write(writer);
+            }
+        }
+
+        public void WriteBsoa(string filePath)
+        {
+            WriteBsoa(File.Create(filePath));
+        }
+
+        public static SarifLog ReadBsoa(Stream stream)
+        {
+            using (BinaryTreeReader reader = new BinaryTreeReader(stream))
+            {
+                SarifLog result = new SarifLog();
+                result.DB.Read(reader);
+                return result;
+            }
+        }
+
+        public static SarifLog ReadBsoa(string filePath)
+        {
+            return ReadBsoa(File.OpenRead(filePath));
+        }
+        #endregion
+
         public static IEqualityComparer<SarifLog> ValueComparer => EqualityComparer<SarifLog>.Default;
         public bool ValueEquals(SarifLog other) => Equals(other);
         public int ValueGetHashCode() => GetHashCode();
-
-        internal SarifLogDatabase Database => _table.Database;
-        public ITreeSerializable DB => _table.Database;
     }
 }

@@ -8,6 +8,9 @@ ECHO Generating Unit Test models...
 %BSOAGenerator% "Schemas\Person.UnitTest.V1.schema.json" "..\BSOA.Test\Model\V1"
 %BSOAGenerator% "Schemas\Person.UnitTest.V2.schema.json" "..\BSOA.Test\Model\V2"
 
+ECHO Generating Tiny model...
+%BSOAGenerator% "Schemas\TinyDemo.json" "..\RegionDemo\Model"
+
 ECHO Generating Sarif SDK model...
 %JSchemaToBsoaSchema% "..\..\..\..\sarif-sdk-bsoa\src\Sarif\Schemata\sarif-2.1.0-rtm.5.json" "..\BSOA.Generator\Schemas\Sarif-2.1.0-rtm.5.schema.json"
 

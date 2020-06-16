@@ -5,6 +5,7 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.Serialization;
 
 using BSOA.IO;
@@ -26,6 +27,9 @@ namespace BSOA.Generator.Templates
     {
         private CompanyTable _table;
         private int _index;
+
+        internal CompanyDatabase Database => _table.Database;
+        public ITreeSerializable DB => _table.Database;
 
         public Company() : this(new CompanyDatabase().Company)
         { }
@@ -231,11 +235,38 @@ namespace BSOA.Generator.Templates
         }
         #endregion
 
+        #region Easy Serialization
+        public void WriteBsoa(Stream stream)
+        {
+            using (BinaryTreeWriter writer = new BinaryTreeWriter(stream))
+            {
+                DB.Write(writer);
+            }
+        }
+
+        public void WriteBsoa(string filePath)
+        {
+            WriteBsoa(File.Create(filePath));
+        }
+
+        public static Company ReadBsoa(Stream stream)
+        {
+            using (BinaryTreeReader reader = new BinaryTreeReader(stream))
+            {
+                Company result = new Company();
+                result.DB.Read(reader);
+                return result;
+            }
+        }
+
+        public static Company ReadBsoa(string filePath)
+        {
+            return ReadBsoa(File.OpenRead(filePath));
+        }
+        #endregion
+
         public static IEqualityComparer<Company> ValueComparer => EqualityComparer<Company>.Default;
         public bool ValueEquals(Company other) => Equals(other);
         public int ValueGetHashCode() => GetHashCode();
-
-        internal CompanyDatabase Database => _table.Database;
-        public ITreeSerializable DB => _table.Database;
     }
 }

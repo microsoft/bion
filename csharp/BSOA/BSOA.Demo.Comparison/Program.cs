@@ -1,8 +1,10 @@
 ﻿using BSOA.Diagnostics;
+using BSOA.Json;
 
 using Microsoft.CodeAnalysis.Sarif;
 
 using System;
+using System.Collections.Generic;
 
 namespace BSOA.Demo.Comparison
 {
@@ -12,10 +14,13 @@ namespace BSOA.Demo.Comparison
         {
             string filePath = (args.Length > 0 ? args[0] : @"C:\Download\Demo\V2\Inputs\CodeAsData.sarif");
 
-            SarifLog log = Measure.LoadPerformance<SarifLog>(SarifLog.Load, filePath, "SARIF JSON to Normal object model", iterations: 1);
+            //SarifLog log = Measure.LoadPerformance<SarifLog>(SarifLog.Load, filePath, "SARIF JSON to Normal object model", iterations: 1);
 
-            long lineTotal = LineTotal(log);
-            Console.WriteLine($"Line Sum: {lineTotal:n0}");
+            //long lineTotal = LineTotal(log);
+            //Console.WriteLine($"Line Sum: {lineTotal:n0}");
+
+
+            RegionDemoBuilder.Build(SarifLog.Load(filePath), @"C:\Download\Demo\V2\Inputs\Regions.json");
         }
 
         private static long LineTotal(SarifLog log)

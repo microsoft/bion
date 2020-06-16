@@ -8,46 +8,46 @@ using System.IO;
 using BSOA.IO;
 using BSOA.Model;
 
-namespace BSOA.Test.Model.V1
+namespace BSOA.Demo.Model
 {
     /// <summary>
-    ///  BSOA GENERATED Root Entity for 'Community'
+    ///  BSOA GENERATED Root Entity for 'TinyLog'
     /// </summary>
-    public partial class Community : IRow
+    public partial class TinyLog : IRow
     {
-        private CommunityTable _table;
+        private TinyLogTable _table;
         private int _index;
 
-        internal PersonDatabase Database => _table.Database;
+        internal TinyDatabase Database => _table.Database;
         public ITreeSerializable DB => _table.Database;
 
-        public Community() : this(new PersonDatabase().Community)
+        public TinyLog() : this(new TinyDatabase().TinyLog)
         { }
 
-        internal Community(CommunityTable table) : this(table, table.Count)
+        internal TinyLog(TinyLogTable table) : this(table, table.Count)
         {
             table.Add();
         }
 
-        internal Community(CommunityTable table, int index)
+        internal TinyLog(TinyLogTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
 
-        public IList<Person> People
+        public IList<Region> Regions
         {
-            get => _table.Database.Person.List(_table.People[_index]);
-            set => _table.Database.Person.List(_table.People[_index]).SetTo(value);
+            get => _table.Database.Region.List(_table.Regions[_index]);
+            set => _table.Database.Region.List(_table.Regions[_index]).SetTo(value);
         }
 
 
-        #region IEquatable<Community>
-        public bool Equals(Community other)
+        #region IEquatable<TinyLog>
+        public bool Equals(TinyLog other)
         {
             if (other == null) { return false; }
 
-            if (this.People != other.People) { return false; }
+            if (this.Regions != other.Regions) { return false; }
 
             return true;
         }
@@ -60,9 +60,9 @@ namespace BSOA.Test.Model.V1
 
             unchecked
             {
-                if (People != default(IList<Person>))
+                if (Regions != default(IList<Region>))
                 {
-                    result = (result * 31) + People.GetHashCode();
+                    result = (result * 31) + Regions.GetHashCode();
                 }
             }
 
@@ -71,10 +71,10 @@ namespace BSOA.Test.Model.V1
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as Community);
+            return Equals(obj as TinyLog);
         }
 
-        public static bool operator ==(Community left, Community right)
+        public static bool operator ==(TinyLog left, TinyLog right)
         {
             if (object.ReferenceEquals(left, null))
             {
@@ -84,7 +84,7 @@ namespace BSOA.Test.Model.V1
             return left.Equals(right);
         }
 
-        public static bool operator !=(Community left, Community right)
+        public static bool operator !=(TinyLog left, TinyLog right)
         {
             if (object.ReferenceEquals(left, null))
             {
@@ -101,7 +101,7 @@ namespace BSOA.Test.Model.V1
 
         void IRow.Reset(ITable table, int index)
         {
-            _table = (CommunityTable)table;
+            _table = (TinyLogTable)table;
             _index = index;
         }
         #endregion
@@ -120,17 +120,17 @@ namespace BSOA.Test.Model.V1
             WriteBsoa(File.Create(filePath));
         }
 
-        public static Community ReadBsoa(Stream stream)
+        public static TinyLog ReadBsoa(Stream stream)
         {
             using (BinaryTreeReader reader = new BinaryTreeReader(stream))
             {
-                Community result = new Community();
+                TinyLog result = new TinyLog();
                 result.DB.Read(reader);
                 return result;
             }
         }
 
-        public static Community ReadBsoa(string filePath)
+        public static TinyLog ReadBsoa(string filePath)
         {
             return ReadBsoa(File.OpenRead(filePath));
         }

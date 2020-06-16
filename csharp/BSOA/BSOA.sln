@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sarif.SDK.BSOA.Test", "Sari
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSOA.Demo.Comparison", "BSOA.Demo.Comparison\BSOA.Demo.Comparison.csproj", "{5923C23E-584F-4545-8C4A-12D30C01FAA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegionDemo", "RegionDemo\RegionDemo.csproj", "{89D74E8E-CA81-4CFA-9906-F480D9F848F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{5923C23E-584F-4545-8C4A-12D30C01FAA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5923C23E-584F-4545-8C4A-12D30C01FAA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5923C23E-584F-4545-8C4A-12D30C01FAA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89D74E8E-CA81-4CFA-9906-F480D9F848F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89D74E8E-CA81-4CFA-9906-F480D9F848F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89D74E8E-CA81-4CFA-9906-F480D9F848F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89D74E8E-CA81-4CFA-9906-F480D9F848F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

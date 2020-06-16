@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 using BSOA.IO;
 using BSOA.Model;
@@ -17,9 +18,12 @@ namespace BSOA.Test.Model.V2
         private CommunityTable _table;
         private int _index;
 
+        internal PersonDatabase Database => _table.Database;
+        public ITreeSerializable DB => _table.Database;
+
         public Community() : this(new PersonDatabase().Community)
         { }
-        
+
         internal Community(CommunityTable table) : this(table, table.Count)
         {
             table.Add();
@@ -102,7 +106,34 @@ namespace BSOA.Test.Model.V2
         }
         #endregion
 
-        internal PersonDatabase Database => _table.Database;
-        public ITreeSerializable DB => _table.Database;
+        #region Easy Serialization
+        public void WriteBsoa(Stream stream)
+        {
+            using (BinaryTreeWriter writer = new BinaryTreeWriter(stream))
+            {
+                DB.Write(writer);
+            }
+        }
+
+        public void WriteBsoa(string filePath)
+        {
+            WriteBsoa(File.Create(filePath));
+        }
+
+        public static Community ReadBsoa(Stream stream)
+        {
+            using (BinaryTreeReader reader = new BinaryTreeReader(stream))
+            {
+                Community result = new Community();
+                result.DB.Read(reader);
+                return result;
+            }
+        }
+
+        public static Community ReadBsoa(string filePath)
+        {
+            return ReadBsoa(File.OpenRead(filePath));
+        }
+        #endregion
     }
 }
