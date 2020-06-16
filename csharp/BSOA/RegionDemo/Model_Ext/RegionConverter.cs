@@ -5,43 +5,27 @@ using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    [JsonConverter(typeof(RegionConverter))]
-    public partial class Region
-    { }
-
-    public class RegionConverter : JsonConverter
+    internal static class RegionJsonExtensions
     {
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType.Equals(typeof(Region));
-        }
-
         private static Dictionary<string, Action<JsonReader, TinyLog, Region>> setters = new Dictionary<string, Action<JsonReader, TinyLog, Region>>()
         {
-            ["startLine"] = (reader, root, me) => me.StartLine = (int)(long)reader.Value,
-            ["startColumn"] = (reader, root, me) => me.StartColumn = (int)(long)reader.Value,
-            ["endLine"] = (reader, root, me) => me.EndLine = (int)(long)reader.Value,
-            ["endColumn"] = (reader, root, me) => me.EndColumn = (int)(long)reader.Value,
-            ["message"] = (reader, root, me) => me.Message = MessageConverter.ReadJson(reader, root),
-            ["snippet"] = (reader, root, me) => me.Snippet = ArtifactContentConverter.ReadJson(reader, root)
+            ["startLine"] = (reader, root, me) => me.StartLine = reader.ReadInt(root),
+            ["startColumn"] = (reader, root, me) => me.StartColumn = reader.ReadInt(root),
+            ["endLine"] = (reader, root, me) => me.EndLine = reader.ReadInt(root),
+            ["endColumn"] = (reader, root, me) => me.EndColumn = reader.ReadInt(root),
+            ["message"] = (reader, root, me) => me.Message = reader.ReadMessage(root),
+            ["snippet"] = (reader, root, me) => me.Snippet = reader.ReadArtifactContent(root)
         };
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            return ReadJson(reader, null);
-        }
-
-        public static Region ReadJson(JsonReader reader, TinyLog root)
+        public static Region ReadRegion(this JsonReader reader, TinyLog root = null)
         {
             Region item = (root == null ? new Region() : new Region(root));
             reader.ReadObject(root, item, setters);
             return item;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public static void Write(this JsonWriter writer, Region item)
         {
-            Region item = (Region)value;
-
             if (item == null)
             {
                 writer.WriteNull();
@@ -59,4 +43,26 @@ namespace BSOA.Demo.Model
             }
         }
     }
+
+    internal class RegionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType.Equals(typeof(Region));
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            return reader.ReadRegion();
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            writer.Write((Region)value);
+        }
+    }
+
+    [JsonConverter(typeof(RegionConverter))]
+    public partial class Region
+    { }
 }

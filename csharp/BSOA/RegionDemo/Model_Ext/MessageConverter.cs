@@ -5,39 +5,23 @@ using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    [JsonConverter(typeof(MessageConverter))]
-    public partial class Message
-    { }
-
-    public class MessageConverter : JsonConverter
+    internal static class MessageJsonExtensions
     {
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType.Equals(typeof(Message));
-        }
-
         private static Dictionary<string, Action<JsonReader, TinyLog, Message>> setters = new Dictionary<string, Action<JsonReader, TinyLog, Message>>()
         {
-            ["text"] = (reader, root, me) => me.Text = (string)reader.Value,
-            ["markdown"] = (reader, root, me) => me.Markdown = (string)reader.Value,
+            ["text"] = (reader, root, me) => me.Text = reader.ReadString(root),
+            ["markdown"] = (reader, root, me) => me.Markdown = reader.ReadString(root),
         };
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            return ReadJson(reader, null);
-        }
-
-        public static Message ReadJson(JsonReader reader, TinyLog root)
+        public static Message ReadMessage(this JsonReader reader, TinyLog root = null)
         {
             Message item = (root == null ? new Message() : new Message(root));
             reader.ReadObject(root, item, setters);
             return item;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public static void Write(this JsonWriter writer, Message item)
         {
-            Message item = (Message)value;
-
             if (item == null)
             {
                 writer.WriteNull();
@@ -51,4 +35,26 @@ namespace BSOA.Demo.Model
             }
         }
     }
+
+    public class MessageConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType.Equals(typeof(Message));
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            return reader.ReadMessage();
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            writer.Write((Message)value);
+        }
+    }
+
+    [JsonConverter(typeof(MessageConverter))]
+    public partial class Message
+    { }
 }

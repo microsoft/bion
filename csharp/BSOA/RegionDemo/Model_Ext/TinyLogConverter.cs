@@ -5,38 +5,22 @@ using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    [JsonConverter(typeof(TinyLogConverter))]
-    public partial class TinyLog
-    { }
-
-    public class TinyLogConverter : JsonConverter
+    internal static class TinyLogJsonExtensions
     {
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType.Equals(typeof(TinyLog));
-        }
-
         private static Dictionary<string, Action<JsonReader, TinyLog, TinyLog>> setters = new Dictionary<string, Action<JsonReader, TinyLog, TinyLog>>()
         {
-            ["regions"] = (reader, root, me) => reader.ReadList(root, me.Regions, RegionConverter.ReadJson),
+            ["regions"] = (reader, root, me) => reader.ReadList(root, me.Regions, RegionJsonExtensions.ReadRegion),
         };
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public static TinyLog ReadTinyLog(this JsonReader reader, TinyLog root = null)
         {
-            return ReadJson(reader, null);
-        }
-
-        public static TinyLog ReadJson(JsonReader reader, TinyLog root)
-        {
-            TinyLog item = (root == null ? new TinyLog() : root);
+            TinyLog item = new TinyLog();
             reader.ReadObject(item, item, setters);
             return item;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public static void Write(this JsonWriter writer, TinyLog item)
         {
-            TinyLog item = (TinyLog)value;
-
             if (item == null)
             {
                 writer.WriteNull();
@@ -49,4 +33,26 @@ namespace BSOA.Demo.Model
             }
         }
     }
+
+    public class TinyLogConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType.Equals(typeof(TinyLog));
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            return reader.ReadTinyLog();
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            writer.Write((TinyLog)value);
+        }
+    }
+
+    [JsonConverter(typeof(TinyLogConverter))]
+    public partial class TinyLog
+    { }
 }

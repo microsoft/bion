@@ -73,5 +73,15 @@ namespace Newtonsoft.Json
 
             reader.Expect(JsonToken.EndObject);
         }
+
+        public static int ReadInt<TRoot>(this JsonReader reader, TRoot root)
+        {
+            return (int)(long)reader.Value;
+        }
+
+        public static string ReadString<TRoot>(this JsonReader reader, TRoot root)
+        {
+            return (string)reader.Value;
+        }
     }
 }
