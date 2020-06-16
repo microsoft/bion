@@ -5,36 +5,9 @@ using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    internal static class ArtifactContentJsonExtensions
-    {
-        private static Dictionary<string, Action<JsonReader, TinyLog, ArtifactContent>> setters = new Dictionary<string, Action<JsonReader, TinyLog, ArtifactContent>>()
-        {
-            ["text"] = (reader, root, me) => me.Text = (string)reader.Value,
-            ["binary"] = (reader, root, me) => me.Binary = (string)reader.Value,
-        };
-
-        public static ArtifactContent ReadArtifactContent(this JsonReader reader, TinyLog root = null)
-        {
-            ArtifactContent item = (root == null ? new ArtifactContent() : new ArtifactContent(root));
-            reader.ReadObject(root, item, setters);
-            return item;
-        }
-
-        public static void Write(this JsonWriter writer, ArtifactContent item)
-        {
-            if (item == null)
-            {
-                writer.WriteNull();
-            }
-            else
-            {
-                writer.WriteStartObject();
-                writer.Write("text", item.Text, default(string));
-                writer.Write("binary", item.Binary, default(string));
-                writer.WriteEndObject();
-            }
-        }
-    }
+    [JsonConverter(typeof(ArtifactContentConverter))]
+    public partial class ArtifactContent
+    { }
 
     public class ArtifactContentConverter : JsonConverter
     {
@@ -54,7 +27,43 @@ namespace BSOA.Demo.Model
         }
     }
 
-    [JsonConverter(typeof(ArtifactContentConverter))]
-    public partial class ArtifactContent
-    { }
+    internal static class ArtifactContentJsonExtensions
+    {
+        private static Dictionary<string, Action<JsonReader, TinyLog, ArtifactContent>> setters = new Dictionary<string, Action<JsonReader, TinyLog, ArtifactContent>>()
+        {
+            ["text"] = (reader, root, me) => me.Text = reader.ReadString(root),
+            ["binary"] = (reader, root, me) => me.Binary = reader.ReadString(root),
+        };
+
+        public static ArtifactContent ReadArtifactContent(this JsonReader reader, TinyLog root = null)
+        {
+            ArtifactContent item = (root == null ? new ArtifactContent() : new ArtifactContent(root));
+            reader.ReadObject(root, item, setters);
+            return item;
+        }
+
+        public static void Write(this JsonWriter writer, string propertyName, ArtifactContent item)
+        {
+            if (item != null)
+            {
+                writer.WritePropertyName(propertyName);
+                writer.Write(item);
+            }
+        }
+
+        public static void Write(this JsonWriter writer, ArtifactContent item)
+        {
+            if (item == null)
+            {
+                writer.WriteNull();
+            }
+            else
+            {
+                writer.WriteStartObject();
+                writer.Write("text", item.Text);
+                writer.Write("binary", item.Binary);
+                writer.WriteEndObject();
+            }
+        }
+    }
 }

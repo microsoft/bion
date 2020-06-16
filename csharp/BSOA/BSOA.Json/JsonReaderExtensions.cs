@@ -79,9 +79,39 @@ namespace Newtonsoft.Json
             return (int)(long)reader.Value;
         }
 
+        public static long ReadLong<TRoot>(this JsonReader reader, TRoot root)
+        {
+            return (long)reader.Value;
+        }
+
+        public static float ReadFloat<TRoot>(this JsonReader reader, TRoot root)
+        {
+            return (float)(double)reader.Value;
+        }
+
+        public static double ReadDouble<TRoot>(this JsonReader reader, TRoot root)
+        {
+            return (double)reader.Value;
+        }
+
+        public static bool ReadBool<TRoot>(this JsonReader reader, TRoot root)
+        {
+            return (bool)reader.Value;
+        }
+
         public static string ReadString<TRoot>(this JsonReader reader, TRoot root)
         {
             return (string)reader.Value;
+        }
+
+        public static DateTime ReadDateTime<TRoot>(this JsonReader reader, TRoot root)
+        {
+            return DateTime.Parse((string)reader.Value);
+        }
+
+        public static Uri ReadUri<TRoot>(this JsonReader reader, TRoot root)
+        {
+            return new Uri((string)reader.Value);
         }
     }
 }

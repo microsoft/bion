@@ -5,34 +5,9 @@ using System.Collections.Generic;
 
 namespace BSOA.Demo.Model
 {
-    internal static class TinyLogJsonExtensions
-    {
-        private static Dictionary<string, Action<JsonReader, TinyLog, TinyLog>> setters = new Dictionary<string, Action<JsonReader, TinyLog, TinyLog>>()
-        {
-            ["regions"] = (reader, root, me) => reader.ReadList(root, me.Regions, RegionJsonExtensions.ReadRegion),
-        };
-
-        public static TinyLog ReadTinyLog(this JsonReader reader, TinyLog root = null)
-        {
-            TinyLog item = new TinyLog();
-            reader.ReadObject(item, item, setters);
-            return item;
-        }
-
-        public static void Write(this JsonWriter writer, TinyLog item)
-        {
-            if (item == null)
-            {
-                writer.WriteNull();
-            }
-            else
-            {
-                writer.WriteStartObject();
-                writer.Write("regions", item.Regions, default(IList<Region>));
-                writer.WriteEndObject();
-            }
-        }
-    }
+    [JsonConverter(typeof(TinyLogConverter))]
+    public partial class TinyLog
+    { }
 
     public class TinyLogConverter : JsonConverter
     {
@@ -52,7 +27,34 @@ namespace BSOA.Demo.Model
         }
     }
 
-    [JsonConverter(typeof(TinyLogConverter))]
-    public partial class TinyLog
-    { }
+    internal static class TinyLogJsonExtensions
+    {
+        private static Dictionary<string, Action<JsonReader, TinyLog, TinyLog>> setters = new Dictionary<string, Action<JsonReader, TinyLog, TinyLog>>()
+        {
+            ["regions"] = (reader, root, me) => reader.ReadList(root, me.Regions, RegionJsonExtensions.ReadRegion),
+        };
+
+        public static TinyLog ReadTinyLog(this JsonReader reader, TinyLog root = null)
+        {
+            TinyLog item = new TinyLog();
+            root = item;
+
+            reader.ReadObject(root, item, setters);
+            return item;
+        }
+
+        public static void Write(this JsonWriter writer, TinyLog item)
+        {
+            if (item == null)
+            {
+                writer.WriteNull();
+            }
+            else
+            {
+                writer.WriteStartObject();
+                writer.WriteList("regions", item.Regions, RegionJsonExtensions.Write);
+                writer.WriteEndObject();
+            }
+        }
+    }
 }
