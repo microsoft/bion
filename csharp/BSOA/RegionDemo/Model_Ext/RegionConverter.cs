@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 
-using RegionDemo.Model_Ext;
-
 using System;
 using System.Collections.Generic;
 
@@ -36,7 +34,7 @@ namespace BSOA.Demo.Model
         public static Region ReadJson(JsonReader reader, TinyLog root)
         {
             Region item = (root == null ? new Region() : new Region(root));
-            Converters.ReadObject(reader, root, item, setters);
+            reader.ReadObject(root, item, setters);
             return item;
         }
 
@@ -44,45 +42,21 @@ namespace BSOA.Demo.Model
         {
             Region item = (Region)value;
 
-            writer.WriteStartObject();
-
-            if (item.StartLine != -1)
+            if (item == null)
             {
-                writer.WritePropertyName("startLine");
-                writer.WriteValue(item.StartLine);
+                writer.WriteNull();
             }
-
-            if (item.StartColumn != -1)
+            else
             {
-                writer.WritePropertyName("startColumn");
-                writer.WriteValue(item.StartColumn);
+                writer.WriteStartObject();
+                writer.Write("startLine", item.StartLine, -1);
+                writer.Write("startColumn", item.StartColumn, -1);
+                writer.Write("endLine", item.EndLine, -1);
+                writer.Write("endColumn", item.EndColumn, -1);
+                writer.Write("message", item.Message, default(Message));
+                writer.Write("snippet", item.Snippet, default(ArtifactContent));
+                writer.WriteEndObject();
             }
-
-            if (item.EndLine != -1)
-            {
-                writer.WritePropertyName("endLine");
-                writer.WriteValue(item.EndLine);
-            }
-
-            if (item.EndColumn != -1)
-            {
-                writer.WritePropertyName("endColumn");
-                writer.WriteValue(item.EndColumn);
-            }
-
-            if (item.Message != default(Message))
-            {
-                writer.WritePropertyName("message");
-                writer.WriteValue(item.Message);
-            }
-
-            if (item.Snippet != default(ArtifactContent))
-            {
-                writer.WritePropertyName("snippet");
-                writer.WriteValue(item.Snippet);
-            }
-
-            writer.WriteEndObject();
         }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 
-using RegionDemo.Model_Ext;
-
 using System;
 using System.Collections.Generic;
 
@@ -32,7 +30,7 @@ namespace BSOA.Demo.Model
         public static ArtifactContent ReadJson(JsonReader reader, TinyLog root)
         {
             ArtifactContent item = (root == null ? new ArtifactContent() : new ArtifactContent(root));
-            Converters.ReadObject(reader, root, item, setters);
+            reader.ReadObject(root, item, setters);
             return item;
         }
 
@@ -40,21 +38,17 @@ namespace BSOA.Demo.Model
         {
             ArtifactContent item = (ArtifactContent)value;
 
-            writer.WriteStartObject();
-
-            if (item.Text != default(string))
+            if (item == null)
             {
-                writer.WritePropertyName("text");
-                writer.WriteValue(item.Text);
+                writer.WriteNull();
             }
-
-            if (item.Binary != default(string))
+            else
             {
-                writer.WritePropertyName("binary");
-                writer.WriteValue(item.Binary);
+                writer.WriteStartObject();
+                writer.Write("text", item.Text, default(string));
+                writer.Write("binary", item.Binary, default(string));
+                writer.WriteEndObject();
             }
-
-            writer.WriteEndObject();
         }
     }
 }

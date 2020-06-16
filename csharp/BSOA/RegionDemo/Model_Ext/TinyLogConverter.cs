@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 
-using RegionDemo.Model_Ext;
-
 using System;
 using System.Collections.Generic;
 
@@ -20,7 +18,7 @@ namespace BSOA.Demo.Model
 
         private static Dictionary<string, Action<JsonReader, TinyLog, TinyLog>> setters = new Dictionary<string, Action<JsonReader, TinyLog, TinyLog>>()
         {
-            ["regions"] = (reader, root, me) => Converters.ReadList(reader, root, me.Regions, RegionConverter.ReadJson),
+            ["regions"] = (reader, root, me) => reader.ReadList(root, me.Regions, RegionConverter.ReadJson),
         };
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -31,7 +29,7 @@ namespace BSOA.Demo.Model
         public static TinyLog ReadJson(JsonReader reader, TinyLog root)
         {
             TinyLog item = (root == null ? new TinyLog() : root);
-            Converters.ReadObject(reader, item, item, setters);
+            reader.ReadObject(item, item, setters);
             return item;
         }
 
@@ -39,15 +37,16 @@ namespace BSOA.Demo.Model
         {
             TinyLog item = (TinyLog)value;
 
-            writer.WriteStartObject();
-
-            if (item.Regions?.Count > 0)
+            if (item == null)
             {
-                writer.WritePropertyName("regions");
-                writer.WriteValue(item.Regions);
+                writer.WriteNull();
             }
-
-            writer.WriteEndObject();
+            else
+            {
+                writer.WriteStartObject();
+                writer.Write("regions", item.Regions, default(IList<Region>));
+                writer.WriteEndObject();
+            }
         }
     }
 }
