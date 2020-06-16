@@ -13,7 +13,7 @@ namespace BSOA.Demo
 
             // Tiny demo file
             //inputFilePath = @"C:\Download\Demo\V2\Inputs\elfie-arriba.sarif";
-            forceReconvert = true;
+            forceReconvert = false;
 
             Benchmarker benchmarker = new Benchmarker(inputFilePath, workingFolderPath);
             benchmarker.Run(forceReconvert);
