@@ -47,7 +47,7 @@ namespace BSOA.Collections
                 int index = InternalIndexOfKey(key);
                 if (index == -1)
                 {
-                    Add(key, value);
+                    AddInternal(key, value);
                 }
                 else
                 {
@@ -67,7 +67,7 @@ namespace BSOA.Collections
             {
                 foreach (KeyValuePair<TKey, TValue> pair in other)
                 {
-                    this.Add(pair);
+                    this.AddInternal(pair.Key, pair.Value);
                 }
             }
         }
@@ -75,16 +75,20 @@ namespace BSOA.Collections
         public void Add(TKey key, TValue value)
         {
             if (this.ContainsKey(key)) { throw new ArgumentException(nameof(key)); }
-
-            int newPairIndex = _column._values.Count;
-            _column._keys[newPairIndex] = key;
-            _column._values[newPairIndex] = value;
-            Pairs.Add(newPairIndex);
+            AddInternal(key, value);
         }
 
         public void Add(KeyValuePair<TKey, TValue> item)
         {
             Add(item.Key, item.Value);
+        }
+
+        private void AddInternal(TKey key, TValue value)
+        {
+            int newPairIndex = _column._values.Count;
+            _column._keys[newPairIndex] = key;
+            _column._values[newPairIndex] = value;
+            Pairs.Add(newPairIndex);
         }
 
         public void Clear()
