@@ -73,14 +73,14 @@ namespace BSOA.Test.Collections
             Assert.Empty(slice);
         }
 
-        internal static void VerifyRoundTrip<T>(ArraySlice<T> slice, T[] copyToTargetArray) where T : unmanaged
+        internal static void VerifyRoundTrip<T>(ArraySlice<T> slice, T[] copyToTargetArray) where T : unmanaged, IEquatable<T>
         {
             ArraySlice<T> roundTripped = TreeSerializer.RoundTrip(slice, TreeFormat.Binary);
             CollectionReadVerifier.VerifySame<T>(slice, roundTripped);
             VerifyCopyTo<T>(roundTripped, copyToTargetArray);
         }
 
-        internal static void VerifyCopyTo<T>(ArraySlice<T> slice, T[] copyToTargetArray) where T : unmanaged
+        internal static void VerifyCopyTo<T>(ArraySlice<T> slice, T[] copyToTargetArray) where T : unmanaged, IEquatable<T>
         {
             slice.CopyTo(copyToTargetArray, 1);
             for (int i = 0; i < slice.Count; ++i)

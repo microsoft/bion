@@ -25,7 +25,7 @@ namespace BSOA.Column
     ///  The overall column uses longs for large values and chapter positions, allowing the column to be over 4 GB.
     /// </remarks>
     /// <typeparam name="T">Type of each part of Values (if each value is a string, this type is char)</typeparam>
-    internal class ArraySliceChapter<T> : ITreeSerializable where T : unmanaged
+    internal class ArraySliceChapter<T> : ITreeSerializable where T : unmanaged, IEquatable<T>
     {
         private static int[] PageStartDefault = new int[1] { 0 };
 

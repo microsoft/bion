@@ -12,7 +12,7 @@ namespace BSOA.Column
     ///  NumberListColumn adds mutability to the lists in an ArraySliceColumn by returning
     ///  NumberLists, which remember the column and row they represent and update the value on changes.
     /// </summary>
-    public class NumberListColumn<T> : WrappingColumn<NumberList<T>, ArraySlice<T>>, INumberColumn<T> where T : unmanaged
+    public class NumberListColumn<T> : WrappingColumn<NumberList<T>, ArraySlice<T>>, INumberColumn<T> where T : unmanaged, IEquatable<T>
     {
         public NumberListColumn() : base(new ArraySliceColumn<T>())
         { }

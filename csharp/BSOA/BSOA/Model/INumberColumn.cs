@@ -7,7 +7,7 @@ using BSOA.Collections;
 
 namespace BSOA.Model
 {
-    public interface INumberColumn<T> : IColumn where T : unmanaged
+    public interface INumberColumn<T> : IColumn where T : unmanaged, IEquatable<T>
     {
         // Expose an action on each slice of values.
         // This is used to facilitate garbage collection.
