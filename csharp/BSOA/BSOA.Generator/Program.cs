@@ -94,8 +94,16 @@ namespace BSOA.Generator
             new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Team.cs"), "{0}.cs") { PostReplacements = postReplacements }
                 .Generate(outputFolder, db);
 
+            // Generate Entity Json Converters
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Json\TeamConverter.cs"), @"Json\{0}Converter.cs") { PostReplacements = postReplacements }
+                .Generate(outputFolder, db);
+
             // Generate Root Entity (overwrite normal style)
             new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Company.cs"), @"{0}.cs") { PostReplacements = postReplacements }
+                .Generate(outputFolder, db.Tables.Where((table) => table.Name.Equals(db.RootTableName)).First(), db);
+
+            // Generate Root Entity Json Converters
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Json\CompanyConverter.cs"), @"Json\{0}Converter.cs") { PostReplacements = postReplacements }
                 .Generate(outputFolder, db.Tables.Where((table) => table.Name.Equals(db.RootTableName)).First(), db);
 
             Console.WriteLine("Done.");

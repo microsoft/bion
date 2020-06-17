@@ -127,6 +127,9 @@ namespace BSOA.Generator
             populated = ReplaceTerm(populated, columnInTemplate.Name, column.Name);
             populated = ReplaceTerm(populated, columnInTemplate.Name.ToCamelCase(), column.Name.ToCamelCase());
 
+            // Doesn't work because "ReadLong(" doesn't have a boundary in front
+            populated = ReplaceTerm(populated, columnInTemplate.Type.ToPascalCase(), column.Type.ToPascalCase());
+
             return populated;
         }
 
