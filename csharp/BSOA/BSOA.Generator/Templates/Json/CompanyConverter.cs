@@ -39,7 +39,7 @@ namespace BSOA.Generator.Templates
             ["joinPolicy"] = (reader, root, me) => me.JoinPolicy = (JoinPolicy)reader.ReadLong(root),
             //   </EnumSetter>
             //   <RefSetter>
-            ["owner"] = (reader, root, me) => me.Owner = EmployeeJsonExtensions.ReadEmployee,
+            ["owner"] = (reader, root, me) => me.Owner = EmployeeJsonExtensions.ReadEmployee(reader, root),
             //   </RefSetter>
             //   <RefListSetter>
             ["members"] = (reader, root, me) => reader.ReadList(root, me.Members, EmployeeJsonExtensions.ReadEmployee),

@@ -31,7 +31,7 @@ namespace BSOA.Demo.Model
     {
         private static Dictionary<string, Action<JsonReader, TinyLog, TinyLog>> setters = new Dictionary<string, Action<JsonReader, TinyLog, TinyLog>>()
         {
-            ["regions"] = (reader, root, me) => reader.ReadList(root, me.Regions, EmployeeJsonExtensions.ReadEmployee)
+            ["regions"] = (reader, root, me) => reader.ReadList(root, me.Regions, RegionJsonExtensions.ReadRegion)
         };
 
         public static TinyLog ReadTinyLog(this JsonReader reader, TinyLog root = null)
@@ -52,7 +52,7 @@ namespace BSOA.Demo.Model
             else
             {
                 writer.WriteStartObject();
-                writer.WriteList("regions", item.Regions, EmployeeJsonExtensions.Write);
+                writer.WriteList("regions", item.Regions, RegionJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

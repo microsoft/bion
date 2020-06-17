@@ -31,9 +31,9 @@ namespace BSOA.Demo.Model
     {
         private static Dictionary<string, Action<JsonReader, TinyLog, Message>> setters = new Dictionary<string, Action<JsonReader, TinyLog, Message>>()
         {
-            ["text"] = (reader, root, me) => me.Text = reader.ReadLong(root),
-            ["markdown"] = (reader, root, me) => me.Markdown = reader.ReadLong(root),
-            ["id"] = (reader, root, me) => me.Id = reader.ReadLong(root)
+            ["text"] = (reader, root, me) => me.Text = reader.ReadString(root),
+            ["markdown"] = (reader, root, me) => me.Markdown = reader.ReadString(root),
+            ["id"] = (reader, root, me) => me.Id = reader.ReadString(root)
         };
 
         public static Message ReadMessage(this JsonReader reader, TinyLog root = null)

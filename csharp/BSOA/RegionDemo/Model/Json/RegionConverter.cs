@@ -31,12 +31,12 @@ namespace BSOA.Demo.Model
     {
         private static Dictionary<string, Action<JsonReader, TinyLog, Region>> setters = new Dictionary<string, Action<JsonReader, TinyLog, Region>>()
         {
-            ["startLine"] = (reader, root, me) => me.StartLine = reader.ReadLong(root),
-            ["startColumn"] = (reader, root, me) => me.StartColumn = reader.ReadLong(root),
-            ["endLine"] = (reader, root, me) => me.EndLine = reader.ReadLong(root),
-            ["endColumn"] = (reader, root, me) => me.EndColumn = reader.ReadLong(root),
-            ["snippet"] = (reader, root, me) => me.Snippet = EmployeeJsonExtensions.ReadEmployee,
-            ["message"] = (reader, root, me) => me.Message = EmployeeJsonExtensions.ReadEmployee
+            ["startLine"] = (reader, root, me) => me.StartLine = reader.ReadInt(root),
+            ["startColumn"] = (reader, root, me) => me.StartColumn = reader.ReadInt(root),
+            ["endLine"] = (reader, root, me) => me.EndLine = reader.ReadInt(root),
+            ["endColumn"] = (reader, root, me) => me.EndColumn = reader.ReadInt(root),
+            ["snippet"] = (reader, root, me) => me.Snippet = ArtifactContentJsonExtensions.ReadArtifactContent(reader, root),
+            ["message"] = (reader, root, me) => me.Message = MessageJsonExtensions.ReadMessage(reader, root)
         };
 
         public static Region ReadRegion(this JsonReader reader, TinyLog root = null)

@@ -31,8 +31,8 @@ namespace BSOA.Demo.Model
     {
         private static Dictionary<string, Action<JsonReader, TinyLog, ArtifactContent>> setters = new Dictionary<string, Action<JsonReader, TinyLog, ArtifactContent>>()
         {
-            ["text"] = (reader, root, me) => me.Text = reader.ReadLong(root),
-            ["binary"] = (reader, root, me) => me.Binary = reader.ReadLong(root)
+            ["text"] = (reader, root, me) => me.Text = reader.ReadString(root),
+            ["binary"] = (reader, root, me) => me.Binary = reader.ReadString(root)
         };
 
         public static ArtifactContent ReadArtifactContent(this JsonReader reader, TinyLog root = null)
