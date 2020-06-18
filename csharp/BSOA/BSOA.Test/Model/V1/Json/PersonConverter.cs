@@ -60,8 +60,8 @@ namespace BSOA.Test.Model.V1
             else
             {
                 writer.WriteStartObject();
-                writer.Write("age", item.Age, default(byte));
-                writer.Write("name", item.Name, default(string));
+                writer.Write("age", item.Age, default);
+                writer.Write("name", item.Name, default);
                 writer.WriteEndObject();
             }
         }

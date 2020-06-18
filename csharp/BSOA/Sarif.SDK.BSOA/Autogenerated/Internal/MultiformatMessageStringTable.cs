@@ -24,9 +24,9 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Text = AddColumn(nameof(Text), ColumnFactory.Build<string>(default(string)));
-            Markdown = AddColumn(nameof(Markdown), ColumnFactory.Build<string>(default(string)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Text = AddColumn(nameof(Text), ColumnFactory.Build<string>(default));
+            Markdown = AddColumn(nameof(Markdown), ColumnFactory.Build<string>(default));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override MultiformatMessageString Get(int index)

@@ -31,10 +31,10 @@ namespace Microsoft.CodeAnalysis.Sarif
             RunGraphIndex = AddColumn(nameof(RunGraphIndex), ColumnFactory.Build<int>(-1));
             ResultGraphIndex = AddColumn(nameof(ResultGraphIndex), ColumnFactory.Build<int>(-1));
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            InitialState = AddColumn(nameof(InitialState), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>(default(IDictionary<string, MultiformatMessageString>)));
-            ImmutableState = AddColumn(nameof(ImmutableState), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>(default(IDictionary<string, MultiformatMessageString>)));
+            InitialState = AddColumn(nameof(InitialState), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
+            ImmutableState = AddColumn(nameof(ImmutableState), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
             EdgeTraversals = AddColumn(nameof(EdgeTraversals), new RefListColumn(nameof(SarifLogDatabase.EdgeTraversal)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override GraphTraversal Get(int index)

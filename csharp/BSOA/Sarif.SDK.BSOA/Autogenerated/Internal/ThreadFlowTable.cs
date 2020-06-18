@@ -27,12 +27,12 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default(string)));
+            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
-            InitialState = AddColumn(nameof(InitialState), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>(default(IDictionary<string, MultiformatMessageString>)));
-            ImmutableState = AddColumn(nameof(ImmutableState), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>(default(IDictionary<string, MultiformatMessageString>)));
+            InitialState = AddColumn(nameof(InitialState), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
+            ImmutableState = AddColumn(nameof(ImmutableState), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
             Locations = AddColumn(nameof(Locations), new RefListColumn(nameof(SarifLogDatabase.ThreadFlowLocation)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ThreadFlow Get(int index)

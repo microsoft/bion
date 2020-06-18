@@ -64,10 +64,10 @@ namespace Microsoft.CodeAnalysis.Sarif
             {
                 writer.WriteStartObject();
                 writer.Write("location", item.Location);
-                writer.Write("module", item.Module, default(string));
-                writer.Write("threadId", item.ThreadId, default(int));
-                writer.Write("parameters", item.Parameters, default(IList<string>));
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("module", item.Module, default);
+                writer.Write("threadId", item.ThreadId, default);
+                writer.Write("parameters", item.Parameters, default);
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

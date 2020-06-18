@@ -72,20 +72,20 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("id", item.Id, default(string));
-                writer.Write("deprecatedIds", item.DeprecatedIds, default(IList<string>));
-                writer.Write("guid", item.Guid, default(string));
-                writer.Write("deprecatedGuids", item.DeprecatedGuids, default(IList<string>));
-                writer.Write("name", item.Name, default(string));
-                writer.Write("deprecatedNames", item.DeprecatedNames, default(IList<string>));
+                writer.Write("id", item.Id, default);
+                writer.Write("deprecatedIds", item.DeprecatedIds, default);
+                writer.Write("guid", item.Guid, default);
+                writer.Write("deprecatedGuids", item.DeprecatedGuids, default);
+                writer.Write("name", item.Name, default);
+                writer.Write("deprecatedNames", item.DeprecatedNames, default);
                 writer.Write("shortDescription", item.ShortDescription);
                 writer.Write("fullDescription", item.FullDescription);
-                writer.Write("messageStrings", item.MessageStrings, default(IDictionary<string, MultiformatMessageString>));
+                writer.Write("messageStrings", item.MessageStrings, default);
                 writer.Write("defaultConfiguration", item.DefaultConfiguration);
-                writer.Write("helpUri", item.HelpUri, default(Uri));
+                writer.Write("helpUri", item.HelpUri, default);
                 writer.Write("help", item.Help);
                 writer.WriteList("relationships", item.Relationships, ReportingDescriptorRelationshipJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

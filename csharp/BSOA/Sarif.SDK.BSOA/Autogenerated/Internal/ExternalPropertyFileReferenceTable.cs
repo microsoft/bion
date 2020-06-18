@@ -26,9 +26,9 @@ namespace Microsoft.CodeAnalysis.Sarif
             Database = database;
 
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default(string)));
+            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default));
             ItemCount = AddColumn(nameof(ItemCount), ColumnFactory.Build<int>(-1));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ExternalPropertyFileReference Get(int index)

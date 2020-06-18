@@ -69,15 +69,15 @@ namespace Microsoft.CodeAnalysis.Sarif
             {
                 writer.WriteStartObject();
                 writer.Write("absoluteAddress", item.AbsoluteAddress, -1);
-                writer.Write("relativeAddress", item.RelativeAddress, default(int));
-                writer.Write("length", item.Length, default(int));
-                writer.Write("kind", item.Kind, default(string));
-                writer.Write("name", item.Name, default(string));
-                writer.Write("fullyQualifiedName", item.FullyQualifiedName, default(string));
-                writer.Write("offsetFromParent", item.OffsetFromParent, default(int));
+                writer.Write("relativeAddress", item.RelativeAddress, default);
+                writer.Write("length", item.Length, default);
+                writer.Write("kind", item.Kind, default);
+                writer.Write("name", item.Name, default);
+                writer.Write("fullyQualifiedName", item.FullyQualifiedName, default);
+                writer.Write("offsetFromParent", item.OffsetFromParent, default);
                 writer.Write("index", item.Index, -1);
                 writer.Write("parentIndex", item.ParentIndex, -1);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

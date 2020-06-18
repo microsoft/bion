@@ -32,15 +32,15 @@ namespace Microsoft.CodeAnalysis.Sarif
             Database = database;
 
             AbsoluteAddress = AddColumn(nameof(AbsoluteAddress), ColumnFactory.Build<int>(-1));
-            RelativeAddress = AddColumn(nameof(RelativeAddress), ColumnFactory.Build<int>(default(int)));
-            Length = AddColumn(nameof(Length), ColumnFactory.Build<int>(default(int)));
-            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<string>(default(string)));
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default(string)));
-            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), ColumnFactory.Build<string>(default(string)));
-            OffsetFromParent = AddColumn(nameof(OffsetFromParent), ColumnFactory.Build<int>(default(int)));
+            RelativeAddress = AddColumn(nameof(RelativeAddress), ColumnFactory.Build<int>(default));
+            Length = AddColumn(nameof(Length), ColumnFactory.Build<int>(default));
+            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<string>(default));
+            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default));
+            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), ColumnFactory.Build<string>(default));
+            OffsetFromParent = AddColumn(nameof(OffsetFromParent), ColumnFactory.Build<int>(default));
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             ParentIndex = AddColumn(nameof(ParentIndex), ColumnFactory.Build<int>(-1));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Address Get(int index)

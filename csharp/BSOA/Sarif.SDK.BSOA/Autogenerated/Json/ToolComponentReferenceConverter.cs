@@ -62,10 +62,10 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("name", item.Name, default(string));
+                writer.Write("name", item.Name, default);
                 writer.Write("index", item.Index, -1);
-                writer.Write("guid", item.Guid, default(string));
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("guid", item.Guid, default);
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

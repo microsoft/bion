@@ -65,7 +65,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("description", item.Description);
                 writer.WriteList("nodes", item.Nodes, NodeJsonExtensions.Write);
                 writer.WriteList("edges", item.Edges, EdgeJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

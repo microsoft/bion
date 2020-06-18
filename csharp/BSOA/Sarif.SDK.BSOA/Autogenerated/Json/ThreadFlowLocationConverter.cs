@@ -75,17 +75,17 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("index", item.Index, -1);
                 writer.Write("location", item.Location);
                 writer.Write("stack", item.Stack);
-                writer.Write("kinds", item.Kinds, default(IList<string>));
+                writer.Write("kinds", item.Kinds, default);
                 writer.WriteList("taxa", item.Taxa, ReportingDescriptorReferenceJsonExtensions.Write);
-                writer.Write("module", item.Module, default(string));
-                writer.Write("state", item.State, default(IDictionary<string, MultiformatMessageString>));
-                writer.Write("nestingLevel", item.NestingLevel, default(int));
+                writer.Write("module", item.Module, default);
+                writer.Write("state", item.State, default);
+                writer.Write("nestingLevel", item.NestingLevel, default);
                 writer.Write("executionOrder", item.ExecutionOrder, -1);
-                writer.Write("executionTimeUtc", item.ExecutionTimeUtc, default(DateTime));
+                writer.Write("executionTimeUtc", item.ExecutionTimeUtc, default);
                 writer.Write("importance", item.Importance);
                 writer.Write("webRequest", item.WebRequest);
                 writer.Write("webResponse", item.WebResponse);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

@@ -63,9 +63,9 @@ namespace Microsoft.CodeAnalysis.Sarif
             {
                 writer.WriteStartObject();
                 writer.Write("target", item.Target);
-                writer.Write("kinds", item.Kinds, default(IList<string>));
+                writer.Write("kinds", item.Kinds, default);
                 writer.Write("description", item.Description);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

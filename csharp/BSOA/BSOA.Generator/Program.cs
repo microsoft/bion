@@ -61,15 +61,17 @@ namespace BSOA.Generator
                 [Regex.Escape("PropertyBag : PropertyBagHolder, ")] = "PropertyBag : ",
                 ["public IDictionary<string, SerializedPropertyInfo> Properties"] = @"internal override IDictionary<string, SerializedPropertyInfo> Properties",
 
+                ["\"schemaUri\""] = "\"$schema\"",
+
                 ["me.([^ ]+) = reader.ReadIList<string>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadString)",
                 ["me.([^ ]+) = reader.ReadIList<Uri>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadUri)",
 
                 ["me.([^ ]+) = reader.ReadIDictionary<string, string>\\(root\\)"] = "reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString)",
                 ["me.([^ ]+) = reader.ReadIDictionary<string, ([^>]+)>\\(root\\)"] = @"reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, $2JsonExtensions.Read$2)",
 
-                ["ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(\\)\\);"] = "new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));",
-                ["ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(\\)\\);"] = "new DictionaryColumn<string, ArtifactLocation>(new StringColumn(), new ArtifactLocationColumn(this.Database)));",
-                ["ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>\\(\\)\\);"] = "new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));"
+                ["ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(default\\)\\);"] = "new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));",
+                ["ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(default\\)\\);"] = "new DictionaryColumn<string, ArtifactLocation>(new StringColumn(), new ArtifactLocationColumn(this.Database)));",
+                ["ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>\\(default\\)\\);"] = "new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));"
             };
 
             // Generate Database class

@@ -26,11 +26,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            EdgeId = AddColumn(nameof(EdgeId), ColumnFactory.Build<string>(default(string)));
+            EdgeId = AddColumn(nameof(EdgeId), ColumnFactory.Build<string>(default));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
-            FinalState = AddColumn(nameof(FinalState), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>(default(IDictionary<string, MultiformatMessageString>)));
-            StepOverEdgeCount = AddColumn(nameof(StepOverEdgeCount), ColumnFactory.Build<int>(default(int)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            FinalState = AddColumn(nameof(FinalState), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
+            StepOverEdgeCount = AddColumn(nameof(StepOverEdgeCount), ColumnFactory.Build<int>(default));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override EdgeTraversal Get(int index)

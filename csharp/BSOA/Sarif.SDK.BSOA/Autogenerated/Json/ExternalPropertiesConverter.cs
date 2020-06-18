@@ -79,10 +79,10 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("schema", item.Schema, default(Uri));
+                writer.Write("schema", item.Schema, default);
                 writer.Write("version", item.Version);
-                writer.Write("guid", item.Guid, default(string));
-                writer.Write("runGuid", item.RunGuid, default(string));
+                writer.Write("guid", item.Guid, default);
+                writer.Write("runGuid", item.RunGuid, default);
                 writer.Write("conversion", item.Conversion);
                 writer.WriteList("graphs", item.Graphs, GraphJsonExtensions.Write);
                 writer.Write("externalizedProperties", item.ExternalizedProperties);
@@ -99,7 +99,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteList("addresses", item.Addresses, AddressJsonExtensions.Write);
                 writer.WriteList("webRequests", item.WebRequests, WebRequestJsonExtensions.Write);
                 writer.WriteList("webResponses", item.WebResponses, WebResponseJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

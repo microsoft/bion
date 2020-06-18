@@ -67,7 +67,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("artifactLocation", item.ArtifactLocation);
                 writer.Write("region", item.Region);
                 writer.Write("contextRegion", item.ContextRegion);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

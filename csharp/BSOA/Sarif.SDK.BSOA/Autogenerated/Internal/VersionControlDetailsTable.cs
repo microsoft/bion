@@ -28,13 +28,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            RepositoryUri = AddColumn(nameof(RepositoryUri), ColumnFactory.Build<Uri>(default(Uri)));
-            RevisionId = AddColumn(nameof(RevisionId), ColumnFactory.Build<string>(default(string)));
-            Branch = AddColumn(nameof(Branch), ColumnFactory.Build<string>(default(string)));
-            RevisionTag = AddColumn(nameof(RevisionTag), ColumnFactory.Build<string>(default(string)));
-            AsOfTimeUtc = AddColumn(nameof(AsOfTimeUtc), ColumnFactory.Build<DateTime>(default(DateTime)));
+            RepositoryUri = AddColumn(nameof(RepositoryUri), ColumnFactory.Build<Uri>(default));
+            RevisionId = AddColumn(nameof(RevisionId), ColumnFactory.Build<string>(default));
+            Branch = AddColumn(nameof(Branch), ColumnFactory.Build<string>(default));
+            RevisionTag = AddColumn(nameof(RevisionTag), ColumnFactory.Build<string>(default));
+            AsOfTimeUtc = AddColumn(nameof(AsOfTimeUtc), ColumnFactory.Build<DateTime>(default));
             MappedTo = AddColumn(nameof(MappedTo), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override VersionControlDetails Get(int index)

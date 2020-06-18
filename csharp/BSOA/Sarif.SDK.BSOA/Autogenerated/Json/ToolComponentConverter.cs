@@ -86,21 +86,21 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("guid", item.Guid, default(string));
-                writer.Write("name", item.Name, default(string));
-                writer.Write("organization", item.Organization, default(string));
-                writer.Write("product", item.Product, default(string));
-                writer.Write("productSuite", item.ProductSuite, default(string));
+                writer.Write("guid", item.Guid, default);
+                writer.Write("name", item.Name, default);
+                writer.Write("organization", item.Organization, default);
+                writer.Write("product", item.Product, default);
+                writer.Write("productSuite", item.ProductSuite, default);
                 writer.Write("shortDescription", item.ShortDescription);
                 writer.Write("fullDescription", item.FullDescription);
-                writer.Write("fullName", item.FullName, default(string));
-                writer.Write("version", item.Version, default(string));
-                writer.Write("semanticVersion", item.SemanticVersion, default(string));
-                writer.Write("dottedQuadFileVersion", item.DottedQuadFileVersion, default(string));
-                writer.Write("releaseDateUtc", item.ReleaseDateUtc, default(string));
-                writer.Write("downloadUri", item.DownloadUri, default(Uri));
-                writer.Write("informationUri", item.InformationUri, default(Uri));
-                writer.Write("globalMessageStrings", item.GlobalMessageStrings, default(IDictionary<string, MultiformatMessageString>));
+                writer.Write("fullName", item.FullName, default);
+                writer.Write("version", item.Version, default);
+                writer.Write("semanticVersion", item.SemanticVersion, default);
+                writer.Write("dottedQuadFileVersion", item.DottedQuadFileVersion, default);
+                writer.Write("releaseDateUtc", item.ReleaseDateUtc, default);
+                writer.Write("downloadUri", item.DownloadUri, default);
+                writer.Write("informationUri", item.InformationUri, default);
+                writer.Write("globalMessageStrings", item.GlobalMessageStrings, default);
                 writer.WriteList("notifications", item.Notifications, ReportingDescriptorJsonExtensions.Write);
                 writer.WriteList("rules", item.Rules, ReportingDescriptorJsonExtensions.Write);
                 writer.WriteList("taxa", item.Taxa, ReportingDescriptorJsonExtensions.Write);
@@ -108,12 +108,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("language", item.Language, "en-US");
                 writer.Write("contents", item.Contents);
                 writer.Write("isComprehensive", item.IsComprehensive, false);
-                writer.Write("localizedDataSemanticVersion", item.LocalizedDataSemanticVersion, default(string));
-                writer.Write("minimumRequiredLocalizedDataSemanticVersion", item.MinimumRequiredLocalizedDataSemanticVersion, default(string));
+                writer.Write("localizedDataSemanticVersion", item.LocalizedDataSemanticVersion, default);
+                writer.Write("minimumRequiredLocalizedDataSemanticVersion", item.MinimumRequiredLocalizedDataSemanticVersion, default);
                 writer.Write("associatedComponent", item.AssociatedComponent);
                 writer.Write("translationMetadata", item.TranslationMetadata);
                 writer.WriteList("supportedTaxonomies", item.SupportedTaxonomies, ToolComponentReferenceJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

@@ -84,32 +84,32 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("commandLine", item.CommandLine, default(string));
-                writer.Write("arguments", item.Arguments, default(IList<string>));
+                writer.Write("commandLine", item.CommandLine, default);
+                writer.Write("arguments", item.Arguments, default);
                 writer.WriteList("responseFiles", item.ResponseFiles, ArtifactLocationJsonExtensions.Write);
-                writer.Write("startTimeUtc", item.StartTimeUtc, default(DateTime));
-                writer.Write("endTimeUtc", item.EndTimeUtc, default(DateTime));
-                writer.Write("exitCode", item.ExitCode, default(int));
+                writer.Write("startTimeUtc", item.StartTimeUtc, default);
+                writer.Write("endTimeUtc", item.EndTimeUtc, default);
+                writer.Write("exitCode", item.ExitCode, default);
                 writer.WriteList("ruleConfigurationOverrides", item.RuleConfigurationOverrides, ConfigurationOverrideJsonExtensions.Write);
                 writer.WriteList("notificationConfigurationOverrides", item.NotificationConfigurationOverrides, ConfigurationOverrideJsonExtensions.Write);
                 writer.WriteList("toolExecutionNotifications", item.ToolExecutionNotifications, NotificationJsonExtensions.Write);
                 writer.WriteList("toolConfigurationNotifications", item.ToolConfigurationNotifications, NotificationJsonExtensions.Write);
-                writer.Write("exitCodeDescription", item.ExitCodeDescription, default(string));
-                writer.Write("exitSignalName", item.ExitSignalName, default(string));
-                writer.Write("exitSignalNumber", item.ExitSignalNumber, default(int));
-                writer.Write("processStartFailureMessage", item.ProcessStartFailureMessage, default(string));
-                writer.Write("executionSuccessful", item.ExecutionSuccessful, default(bool));
-                writer.Write("machine", item.Machine, default(string));
-                writer.Write("account", item.Account, default(string));
-                writer.Write("processId", item.ProcessId, default(int));
+                writer.Write("exitCodeDescription", item.ExitCodeDescription, default);
+                writer.Write("exitSignalName", item.ExitSignalName, default);
+                writer.Write("exitSignalNumber", item.ExitSignalNumber, default);
+                writer.Write("processStartFailureMessage", item.ProcessStartFailureMessage, default);
+                writer.Write("executionSuccessful", item.ExecutionSuccessful, default);
+                writer.Write("machine", item.Machine, default);
+                writer.Write("account", item.Account, default);
+                writer.Write("processId", item.ProcessId, default);
                 writer.Write("executableLocation", item.ExecutableLocation);
                 writer.Write("workingDirectory", item.WorkingDirectory);
-                writer.Write("environmentVariables", item.EnvironmentVariables, default(IDictionary<string, string>));
+                writer.Write("environmentVariables", item.EnvironmentVariables, default);
                 writer.Write("stdin", item.Stdin);
                 writer.Write("stdout", item.Stdout);
                 writer.Write("stderr", item.Stderr);
                 writer.Write("stdoutStderr", item.StdoutStderr);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

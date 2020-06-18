@@ -70,12 +70,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteList("locations", item.Locations, LocationJsonExtensions.Write);
                 writer.Write("message", item.Message);
                 writer.Write("level", item.Level);
-                writer.Write("threadId", item.ThreadId, default(int));
-                writer.Write("timeUtc", item.TimeUtc, default(DateTime));
+                writer.Write("threadId", item.ThreadId, default);
+                writer.Write("timeUtc", item.TimeUtc, default);
                 writer.Write("exception", item.Exception);
                 writer.Write("descriptor", item.Descriptor);
                 writer.Write("associatedRule", item.AssociatedRule);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

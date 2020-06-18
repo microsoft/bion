@@ -30,19 +30,19 @@ namespace BSOA.Demo
         {
             SarifLog bsoa = null, unused = null;
 
-            //// Convert SarifLog to JSON, SoA JSON, and SoA Binary forms
-            //Convert(forceReconvert);
+            // Convert SarifLog to JSON, SoA JSON, and SoA Binary forms
+            Convert(forceReconvert);
 
-            //// Load with diagnostics (see column sizes)
-            //TreeDiagnostics diagnostics = SarifLog.Diagnostics(BsoaBinPath);
-            //Console.WriteLine();
-            //diagnostics.Write(Console.Out, logToDepth: 3);
+            // Load with diagnostics (see column sizes)
+            TreeDiagnostics diagnostics = SarifLog.Diagnostics(BsoaBinPath);
+            Console.WriteLine();
+            diagnostics.Write(Console.Out, logToDepth: 3);
 
-            //// Compare loading times
-            //bsoa = Measure.LoadPerformance<SarifLog>(SarifLog.Load, BsoaBinPath, "BSOA Binary to SoA model", iterations: 5);
-            //Console.WriteLine($"Line Sum: {LineTotal(bsoa):n0}");
+            // Compare loading times
+            bsoa = Measure.LoadPerformance<SarifLog>(SarifLog.Load, BsoaBinPath, "BSOA Binary to SoA model", iterations: 5);
+            Console.WriteLine($"Line Sum: {LineTotal(bsoa):n0}");
 
-            //unused = Measure.LoadPerformance(SarifLog.Load, InputFilePath, "JSON, Newtonsoft to BSOA directly", iterations: 5);
+            unused = Measure.LoadPerformance(SarifLog.Load, InputFilePath, "JSON, Newtonsoft to BSOA directly", iterations: 5);
         }
 
         private void Convert(bool force)

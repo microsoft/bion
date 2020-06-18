@@ -64,12 +64,12 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("top", item.Top, default(double));
-                writer.Write("left", item.Left, default(double));
-                writer.Write("bottom", item.Bottom, default(double));
-                writer.Write("right", item.Right, default(double));
+                writer.Write("top", item.Top, default);
+                writer.Write("left", item.Left, default);
+                writer.Write("bottom", item.Bottom, default);
+                writer.Write("right", item.Right, default);
                 writer.Write("message", item.Message);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

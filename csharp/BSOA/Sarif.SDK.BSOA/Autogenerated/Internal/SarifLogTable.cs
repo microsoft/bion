@@ -26,11 +26,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            SchemaUri = AddColumn(nameof(SchemaUri), ColumnFactory.Build<Uri>(default(Uri)));
+            SchemaUri = AddColumn(nameof(SchemaUri), ColumnFactory.Build<Uri>(default));
             Version = AddColumn(nameof(Version), ColumnFactory.Build<int>((int)default(SarifVersion)));
             Runs = AddColumn(nameof(Runs), new RefListColumn(nameof(SarifLogDatabase.Run)));
             InlineExternalProperties = AddColumn(nameof(InlineExternalProperties), new RefListColumn(nameof(SarifLogDatabase.ExternalProperties)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override SarifLog Get(int index)

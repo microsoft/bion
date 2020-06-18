@@ -33,18 +33,18 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            StartLine = AddColumn(nameof(StartLine), ColumnFactory.Build<int>(default(int)));
-            StartColumn = AddColumn(nameof(StartColumn), ColumnFactory.Build<int>(default(int)));
-            EndLine = AddColumn(nameof(EndLine), ColumnFactory.Build<int>(default(int)));
-            EndColumn = AddColumn(nameof(EndColumn), ColumnFactory.Build<int>(default(int)));
+            StartLine = AddColumn(nameof(StartLine), ColumnFactory.Build<int>(default));
+            StartColumn = AddColumn(nameof(StartColumn), ColumnFactory.Build<int>(default));
+            EndLine = AddColumn(nameof(EndLine), ColumnFactory.Build<int>(default));
+            EndColumn = AddColumn(nameof(EndColumn), ColumnFactory.Build<int>(default));
             CharOffset = AddColumn(nameof(CharOffset), ColumnFactory.Build<int>(-1));
-            CharLength = AddColumn(nameof(CharLength), ColumnFactory.Build<int>(default(int)));
+            CharLength = AddColumn(nameof(CharLength), ColumnFactory.Build<int>(default));
             ByteOffset = AddColumn(nameof(ByteOffset), ColumnFactory.Build<int>(-1));
-            ByteLength = AddColumn(nameof(ByteLength), ColumnFactory.Build<int>(default(int)));
+            ByteLength = AddColumn(nameof(ByteLength), ColumnFactory.Build<int>(default));
             Snippet = AddColumn(nameof(Snippet), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
-            SourceLanguage = AddColumn(nameof(SourceLanguage), ColumnFactory.Build<string>(default(string)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            SourceLanguage = AddColumn(nameof(SourceLanguage), ColumnFactory.Build<string>(default));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Region Get(int index)

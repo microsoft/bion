@@ -88,7 +88,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("ruleId", item.RuleId, default(string));
+                writer.Write("ruleId", item.RuleId, default);
                 writer.Write("ruleIndex", item.RuleIndex, -1);
                 writer.Write("rule", item.Rule);
                 writer.Write("kind", item.Kind);
@@ -96,11 +96,11 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("message", item.Message);
                 writer.Write("analysisTarget", item.AnalysisTarget);
                 writer.WriteList("locations", item.Locations, LocationJsonExtensions.Write);
-                writer.Write("guid", item.Guid, default(string));
-                writer.Write("correlationGuid", item.CorrelationGuid, default(string));
-                writer.Write("occurrenceCount", item.OccurrenceCount, default(int));
-                writer.Write("partialFingerprints", item.PartialFingerprints, default(IDictionary<string, string>));
-                writer.Write("fingerprints", item.Fingerprints, default(IDictionary<string, string>));
+                writer.Write("guid", item.Guid, default);
+                writer.Write("correlationGuid", item.CorrelationGuid, default);
+                writer.Write("occurrenceCount", item.OccurrenceCount, default);
+                writer.Write("partialFingerprints", item.PartialFingerprints, default);
+                writer.Write("fingerprints", item.Fingerprints, default);
                 writer.WriteList("stacks", item.Stacks, StackJsonExtensions.Write);
                 writer.WriteList("codeFlows", item.CodeFlows, CodeFlowJsonExtensions.Write);
                 writer.WriteList("graphs", item.Graphs, GraphJsonExtensions.Write);
@@ -110,14 +110,14 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("baselineState", item.BaselineState);
                 writer.Write("rank", item.Rank, -1);
                 writer.WriteList("attachments", item.Attachments, AttachmentJsonExtensions.Write);
-                writer.Write("hostedViewerUri", item.HostedViewerUri, default(Uri));
-                writer.Write("workItemUris", item.WorkItemUris, default(IList<Uri>));
+                writer.Write("hostedViewerUri", item.HostedViewerUri, default);
+                writer.Write("workItemUris", item.WorkItemUris, default);
                 writer.Write("provenance", item.Provenance);
                 writer.WriteList("fixes", item.Fixes, FixJsonExtensions.Write);
                 writer.WriteList("taxa", item.Taxa, ReportingDescriptorReferenceJsonExtensions.Write);
                 writer.Write("webRequest", item.WebRequest);
                 writer.Write("webResponse", item.WebResponse);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

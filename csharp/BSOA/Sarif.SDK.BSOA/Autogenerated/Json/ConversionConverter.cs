@@ -65,7 +65,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("tool", item.Tool);
                 writer.Write("invocation", item.Invocation);
                 writer.WriteList("analysisToolLogFiles", item.AnalysisToolLogFiles, ArtifactLocationJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

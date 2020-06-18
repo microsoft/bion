@@ -65,13 +65,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("firstDetectionTimeUtc", item.FirstDetectionTimeUtc, default(DateTime));
-                writer.Write("lastDetectionTimeUtc", item.LastDetectionTimeUtc, default(DateTime));
-                writer.Write("firstDetectionRunGuid", item.FirstDetectionRunGuid, default(string));
-                writer.Write("lastDetectionRunGuid", item.LastDetectionRunGuid, default(string));
+                writer.Write("firstDetectionTimeUtc", item.FirstDetectionTimeUtc, default);
+                writer.Write("lastDetectionTimeUtc", item.LastDetectionTimeUtc, default);
+                writer.Write("firstDetectionRunGuid", item.FirstDetectionRunGuid, default);
+                writer.Write("lastDetectionRunGuid", item.LastDetectionRunGuid, default);
                 writer.Write("invocationIndex", item.InvocationIndex, -1);
                 writer.WriteList("conversionSources", item.ConversionSources, PhysicalLocationJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

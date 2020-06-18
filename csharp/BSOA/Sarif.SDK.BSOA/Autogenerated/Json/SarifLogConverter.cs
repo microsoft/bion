@@ -31,7 +31,7 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         private static Dictionary<string, Action<JsonReader, SarifLog, SarifLog>> setters = new Dictionary<string, Action<JsonReader, SarifLog, SarifLog>>()
         {
-            ["schemaUri"] = (reader, root, me) => me.SchemaUri = reader.ReadUri(root),
+            ["$schema"] = (reader, root, me) => me.SchemaUri = reader.ReadUri(root),
             ["version"] = (reader, root, me) => me.Version = reader.ReadEnum<SarifVersion, SarifLog>(root),
             ["runs"] = (reader, root, me) => reader.ReadList(root, me.Runs, RunJsonExtensions.ReadRun),
             ["inlineExternalProperties"] = (reader, root, me) => reader.ReadList(root, me.InlineExternalProperties, ExternalPropertiesJsonExtensions.ReadExternalProperties),
@@ -56,11 +56,11 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("schemaUri", item.SchemaUri, default(Uri));
+                writer.Write("$schema", item.SchemaUri, default);
                 writer.Write("version", item.Version);
                 writer.WriteList("runs", item.Runs, RunJsonExtensions.Write);
                 writer.WriteList("inlineExternalProperties", item.InlineExternalProperties, ExternalPropertiesJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

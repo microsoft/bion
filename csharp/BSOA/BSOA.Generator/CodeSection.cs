@@ -114,7 +114,7 @@ namespace BSOA.Generator
 
             if (columnInTemplate.Default != null)
             {
-                replacements.Add(new Tuple<string, string>(columnInTemplate.Default, column.Default ?? $"default({column.Type})"));
+                replacements.Add(new Tuple<string, string>(columnInTemplate.Default, column.Default ?? "default"));
             }
 
             if (columnInTemplate.ReferencedTableName != null)

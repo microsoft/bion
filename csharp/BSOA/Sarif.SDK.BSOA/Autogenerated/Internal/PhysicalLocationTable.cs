@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ArtifactLocation = AddColumn(nameof(ArtifactLocation), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             Region = AddColumn(nameof(Region), new RefColumn(nameof(SarifLogDatabase.Region)));
             ContextRegion = AddColumn(nameof(ContextRegion), new RefColumn(nameof(SarifLogDatabase.Region)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override PhysicalLocation Get(int index)

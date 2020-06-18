@@ -26,11 +26,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default(string)));
+            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default));
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default(string)));
+            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default));
             ToolComponent = AddColumn(nameof(ToolComponent), new RefColumn(nameof(SarifLogDatabase.ToolComponentReference)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ReportingDescriptorReference Get(int index)

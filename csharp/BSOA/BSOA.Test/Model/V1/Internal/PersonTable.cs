@@ -23,8 +23,8 @@ namespace BSOA.Test.Model.V1
         {
             Database = database;
 
-            Age = AddColumn(nameof(Age), ColumnFactory.Build<byte>(default(byte)));
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default(string)));
+            Age = AddColumn(nameof(Age), ColumnFactory.Build<byte>(default));
+            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default));
         }
 
         public override Person Get(int index)

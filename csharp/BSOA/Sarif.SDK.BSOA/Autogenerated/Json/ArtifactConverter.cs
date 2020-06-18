@@ -74,16 +74,16 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("description", item.Description);
                 writer.Write("location", item.Location);
                 writer.Write("parentIndex", item.ParentIndex, -1);
-                writer.Write("offset", item.Offset, default(int));
+                writer.Write("offset", item.Offset, default);
                 writer.Write("length", item.Length, -1);
                 writer.Write("roles", item.Roles);
-                writer.Write("mimeType", item.MimeType, default(string));
+                writer.Write("mimeType", item.MimeType, default);
                 writer.Write("contents", item.Contents);
-                writer.Write("encoding", item.Encoding, default(string));
-                writer.Write("sourceLanguage", item.SourceLanguage, default(string));
-                writer.Write("hashes", item.Hashes, default(IDictionary<string, string>));
-                writer.Write("lastModifiedTimeUtc", item.LastModifiedTimeUtc, default(DateTime));
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("encoding", item.Encoding, default);
+                writer.Write("sourceLanguage", item.SourceLanguage, default);
+                writer.Write("hashes", item.Hashes, default);
+                writer.Write("lastModifiedTimeUtc", item.LastModifiedTimeUtc, default);
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

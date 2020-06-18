@@ -65,13 +65,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("repositoryUri", item.RepositoryUri, default(Uri));
-                writer.Write("revisionId", item.RevisionId, default(string));
-                writer.Write("branch", item.Branch, default(string));
-                writer.Write("revisionTag", item.RevisionTag, default(string));
-                writer.Write("asOfTimeUtc", item.AsOfTimeUtc, default(DateTime));
+                writer.Write("repositoryUri", item.RepositoryUri, default);
+                writer.Write("revisionId", item.RevisionId, default);
+                writer.Write("branch", item.Branch, default);
+                writer.Write("revisionTag", item.RevisionTag, default);
+                writer.Write("asOfTimeUtc", item.AsOfTimeUtc, default);
                 writer.Write("mappedTo", item.MappedTo);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

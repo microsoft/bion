@@ -22,7 +22,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Tags = AddColumn(nameof(Tags), ColumnFactory.Build<IList<string>>(default(IList<string>)));
+            Tags = AddColumn(nameof(Tags), ColumnFactory.Build<IList<string>>(default));
         }
 
         public override PropertyBag Get(int index)

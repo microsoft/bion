@@ -26,11 +26,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Text = AddColumn(nameof(Text), ColumnFactory.Build<string>(default(string)));
-            Markdown = AddColumn(nameof(Markdown), ColumnFactory.Build<string>(default(string)));
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default(string)));
-            Arguments = AddColumn(nameof(Arguments), ColumnFactory.Build<IList<string>>(default(IList<string>)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Text = AddColumn(nameof(Text), ColumnFactory.Build<string>(default));
+            Markdown = AddColumn(nameof(Markdown), ColumnFactory.Build<string>(default));
+            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default));
+            Arguments = AddColumn(nameof(Arguments), ColumnFactory.Build<IList<string>>(default));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Message Get(int index)

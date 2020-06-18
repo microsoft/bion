@@ -65,13 +65,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("name", item.Name, default(string));
-                writer.Write("fullName", item.FullName, default(string));
+                writer.Write("name", item.Name, default);
+                writer.Write("fullName", item.FullName, default);
                 writer.Write("shortDescription", item.ShortDescription);
                 writer.Write("fullDescription", item.FullDescription);
-                writer.Write("downloadUri", item.DownloadUri, default(Uri));
-                writer.Write("informationUri", item.InformationUri, default(Uri));
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("downloadUri", item.DownloadUri, default);
+                writer.Write("informationUri", item.InformationUri, default);
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

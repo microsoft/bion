@@ -25,10 +25,10 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default(string)));
+            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default));
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default(string)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ToolComponentReference Get(int index)

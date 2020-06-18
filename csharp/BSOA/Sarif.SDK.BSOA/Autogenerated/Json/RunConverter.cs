@@ -91,18 +91,18 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("conversion", item.Conversion);
                 writer.Write("language", item.Language, "en-US");
                 writer.WriteList("versionControlProvenance", item.VersionControlProvenance, VersionControlDetailsJsonExtensions.Write);
-                writer.Write("originalUriBaseIds", item.OriginalUriBaseIds, default(IDictionary<string, ArtifactLocation>));
+                writer.Write("originalUriBaseIds", item.OriginalUriBaseIds, default);
                 writer.WriteList("artifacts", item.Artifacts, ArtifactJsonExtensions.Write);
                 writer.WriteList("logicalLocations", item.LogicalLocations, LogicalLocationJsonExtensions.Write);
                 writer.WriteList("graphs", item.Graphs, GraphJsonExtensions.Write);
                 writer.WriteList("results", item.Results, ResultJsonExtensions.Write);
                 writer.Write("automationDetails", item.AutomationDetails);
                 writer.WriteList("runAggregates", item.RunAggregates, RunAutomationDetailsJsonExtensions.Write);
-                writer.Write("baselineGuid", item.BaselineGuid, default(string));
-                writer.Write("redactionTokens", item.RedactionTokens, default(IList<string>));
-                writer.Write("defaultEncoding", item.DefaultEncoding, default(string));
-                writer.Write("defaultSourceLanguage", item.DefaultSourceLanguage, default(string));
-                writer.Write("newlineSequences", item.NewlineSequences, default(IList<string>));
+                writer.Write("baselineGuid", item.BaselineGuid, default);
+                writer.Write("redactionTokens", item.RedactionTokens, default);
+                writer.Write("defaultEncoding", item.DefaultEncoding, default);
+                writer.Write("defaultSourceLanguage", item.DefaultSourceLanguage, default);
+                writer.Write("newlineSequences", item.NewlineSequences, default);
                 writer.Write("columnKind", item.ColumnKind);
                 writer.Write("externalPropertyFileReferences", item.ExternalPropertyFileReferences);
                 writer.WriteList("threadFlowLocations", item.ThreadFlowLocations, ThreadFlowLocationJsonExtensions.Write);
@@ -113,7 +113,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteList("webRequests", item.WebRequests, WebRequestJsonExtensions.Write);
                 writer.WriteList("webResponses", item.WebResponses, WebResponseJsonExtensions.Write);
                 writer.Write("specialLocations", item.SpecialLocations);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

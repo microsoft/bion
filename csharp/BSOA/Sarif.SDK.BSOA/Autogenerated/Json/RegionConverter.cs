@@ -70,18 +70,18 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("startLine", item.StartLine, default(int));
-                writer.Write("startColumn", item.StartColumn, default(int));
-                writer.Write("endLine", item.EndLine, default(int));
-                writer.Write("endColumn", item.EndColumn, default(int));
+                writer.Write("startLine", item.StartLine, default);
+                writer.Write("startColumn", item.StartColumn, default);
+                writer.Write("endLine", item.EndLine, default);
+                writer.Write("endColumn", item.EndColumn, default);
                 writer.Write("charOffset", item.CharOffset, -1);
-                writer.Write("charLength", item.CharLength, default(int));
+                writer.Write("charLength", item.CharLength, default);
                 writer.Write("byteOffset", item.ByteOffset, -1);
-                writer.Write("byteLength", item.ByteLength, default(int));
+                writer.Write("byteLength", item.ByteLength, default);
                 writer.Write("snippet", item.Snippet);
                 writer.Write("message", item.Message);
-                writer.Write("sourceLanguage", item.SourceLanguage, default(string));
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("sourceLanguage", item.SourceLanguage, default);
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

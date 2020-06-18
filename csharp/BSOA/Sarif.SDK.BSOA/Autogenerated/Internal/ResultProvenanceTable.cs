@@ -28,13 +28,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            FirstDetectionTimeUtc = AddColumn(nameof(FirstDetectionTimeUtc), ColumnFactory.Build<DateTime>(default(DateTime)));
-            LastDetectionTimeUtc = AddColumn(nameof(LastDetectionTimeUtc), ColumnFactory.Build<DateTime>(default(DateTime)));
-            FirstDetectionRunGuid = AddColumn(nameof(FirstDetectionRunGuid), ColumnFactory.Build<string>(default(string)));
-            LastDetectionRunGuid = AddColumn(nameof(LastDetectionRunGuid), ColumnFactory.Build<string>(default(string)));
+            FirstDetectionTimeUtc = AddColumn(nameof(FirstDetectionTimeUtc), ColumnFactory.Build<DateTime>(default));
+            LastDetectionTimeUtc = AddColumn(nameof(LastDetectionTimeUtc), ColumnFactory.Build<DateTime>(default));
+            FirstDetectionRunGuid = AddColumn(nameof(FirstDetectionRunGuid), ColumnFactory.Build<string>(default));
+            LastDetectionRunGuid = AddColumn(nameof(LastDetectionRunGuid), ColumnFactory.Build<string>(default));
             InvocationIndex = AddColumn(nameof(InvocationIndex), ColumnFactory.Build<int>(-1));
             ConversionSources = AddColumn(nameof(ConversionSources), new RefListColumn(nameof(SarifLogDatabase.PhysicalLocation)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override ResultProvenance Get(int index)

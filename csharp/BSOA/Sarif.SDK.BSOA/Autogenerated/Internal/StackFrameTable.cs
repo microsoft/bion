@@ -27,10 +27,10 @@ namespace Microsoft.CodeAnalysis.Sarif
             Database = database;
 
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.Location)));
-            Module = AddColumn(nameof(Module), ColumnFactory.Build<string>(default(string)));
-            ThreadId = AddColumn(nameof(ThreadId), ColumnFactory.Build<int>(default(int)));
-            Parameters = AddColumn(nameof(Parameters), ColumnFactory.Build<IList<string>>(default(IList<string>)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Module = AddColumn(nameof(Module), ColumnFactory.Build<string>(default));
+            ThreadId = AddColumn(nameof(ThreadId), ColumnFactory.Build<int>(default));
+            Parameters = AddColumn(nameof(Parameters), ColumnFactory.Build<IList<string>>(default));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override StackFrame Get(int index)

@@ -28,13 +28,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default(string)));
+            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default));
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
-            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), ColumnFactory.Build<string>(default(string)));
-            DecoratedName = AddColumn(nameof(DecoratedName), ColumnFactory.Build<string>(default(string)));
+            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), ColumnFactory.Build<string>(default));
+            DecoratedName = AddColumn(nameof(DecoratedName), ColumnFactory.Build<string>(default));
             ParentIndex = AddColumn(nameof(ParentIndex), ColumnFactory.Build<int>(-1));
-            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<string>(default(string)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<string>(default));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override LogicalLocation Get(int index)

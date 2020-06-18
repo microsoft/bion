@@ -63,11 +63,11 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("id", item.Id, default(string));
+                writer.Write("id", item.Id, default);
                 writer.Write("label", item.Label);
                 writer.Write("location", item.Location);
                 writer.WriteList("children", item.Children, NodeJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

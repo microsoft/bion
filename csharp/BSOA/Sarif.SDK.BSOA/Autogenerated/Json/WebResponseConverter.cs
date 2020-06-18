@@ -68,14 +68,14 @@ namespace Microsoft.CodeAnalysis.Sarif
             {
                 writer.WriteStartObject();
                 writer.Write("index", item.Index, -1);
-                writer.Write("protocol", item.Protocol, default(string));
-                writer.Write("version", item.Version, default(string));
-                writer.Write("statusCode", item.StatusCode, default(int));
-                writer.Write("reasonPhrase", item.ReasonPhrase, default(string));
-                writer.Write("headers", item.Headers, default(IDictionary<string, string>));
+                writer.Write("protocol", item.Protocol, default);
+                writer.Write("version", item.Version, default);
+                writer.Write("statusCode", item.StatusCode, default);
+                writer.Write("reasonPhrase", item.ReasonPhrase, default);
+                writer.Write("headers", item.Headers, default);
                 writer.Write("body", item.Body);
                 writer.Write("noResponseReceived", item.NoResponseReceived, false);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

@@ -64,10 +64,10 @@ namespace Microsoft.CodeAnalysis.Sarif
             {
                 writer.WriteStartObject();
                 writer.Write("description", item.Description);
-                writer.Write("id", item.Id, default(string));
-                writer.Write("guid", item.Guid, default(string));
-                writer.Write("correlationGuid", item.CorrelationGuid, default(string));
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("id", item.Id, default);
+                writer.Write("guid", item.Guid, default);
+                writer.Write("correlationGuid", item.CorrelationGuid, default);
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

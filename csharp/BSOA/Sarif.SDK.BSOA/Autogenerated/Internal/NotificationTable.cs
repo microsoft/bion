@@ -33,12 +33,12 @@ namespace Microsoft.CodeAnalysis.Sarif
             Locations = AddColumn(nameof(Locations), new RefListColumn(nameof(SarifLogDatabase.Location)));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
             Level = AddColumn(nameof(Level), ColumnFactory.Build<int>((int)FailureLevel.Warning));
-            ThreadId = AddColumn(nameof(ThreadId), ColumnFactory.Build<int>(default(int)));
-            TimeUtc = AddColumn(nameof(TimeUtc), ColumnFactory.Build<DateTime>(default(DateTime)));
+            ThreadId = AddColumn(nameof(ThreadId), ColumnFactory.Build<int>(default));
+            TimeUtc = AddColumn(nameof(TimeUtc), ColumnFactory.Build<DateTime>(default));
             Exception = AddColumn(nameof(Exception), new RefColumn(nameof(SarifLogDatabase.ExceptionData)));
             Descriptor = AddColumn(nameof(Descriptor), new RefColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
             AssociatedRule = AddColumn(nameof(AssociatedRule), new RefColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
-            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
         }
 
         public override Notification Get(int index)

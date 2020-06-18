@@ -64,12 +64,12 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("id", item.Id, default(string));
+                writer.Write("id", item.Id, default);
                 writer.Write("message", item.Message);
-                writer.Write("initialState", item.InitialState, default(IDictionary<string, MultiformatMessageString>));
-                writer.Write("immutableState", item.ImmutableState, default(IDictionary<string, MultiformatMessageString>));
+                writer.Write("initialState", item.InitialState, default);
+                writer.Write("immutableState", item.ImmutableState, default);
                 writer.WriteList("locations", item.Locations, ThreadFlowLocationJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }

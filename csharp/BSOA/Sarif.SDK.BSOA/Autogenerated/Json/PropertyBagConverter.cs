@@ -59,7 +59,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("tags", item.Tags, default(IList<string>));
+                writer.Write("tags", item.Tags, default);
                 writer.WriteEndObject();
             }
         }

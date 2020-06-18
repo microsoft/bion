@@ -63,11 +63,11 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.Write("edgeId", item.EdgeId, default(string));
+                writer.Write("edgeId", item.EdgeId, default);
                 writer.Write("message", item.Message);
-                writer.Write("finalState", item.FinalState, default(IDictionary<string, MultiformatMessageString>));
-                writer.Write("stepOverEdgeCount", item.StepOverEdgeCount, default(int));
-                writer.Write("properties", item.Properties, default(IDictionary<string, SerializedPropertyInfo>));
+                writer.Write("finalState", item.FinalState, default);
+                writer.Write("stepOverEdgeCount", item.StepOverEdgeCount, default);
+                writer.Write("properties", item.Properties, default);
                 writer.WriteEndObject();
             }
         }
