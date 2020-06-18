@@ -58,24 +58,14 @@ namespace BSOA.Generator
 
             Dictionary<string, string> postReplacements = new Dictionary<string, string>()
             {
-                ["^[ \t]+\\[DefaultValue\\(null\\)\\][ \t\r]*\n"] = "",
-                ["^[ \t]+\\[DefaultValue\\(0\\)\\][ \t\r]*\n"] = "",
-                ["^[ \t]+\\[DefaultValue\\(\\)\\][ \t\r]*\n"] = "",
                 [Regex.Escape("PropertyBag : PropertyBagHolder, ")] = "PropertyBag : ",
-                [Regex.Escape(@"[DefaultValue(DateTime.MinValue)]")] = "[JsonConverter(typeof(DateTimeConverter))]",
-                
-                ["EnumConverter\\)\\)\\][^\n]*\n\\s+public SarifVersion"] = @"SarifVersionConverter))]
-        public SarifVersion",
-
-                [@"Name = ""schemaUri"""] = @"Name = ""$schema""",
-
-                ["public Uri SchemaUri"] = @"[JsonConverter(typeof(UriConverter))]
-        public Uri SchemaUri",
-
                 ["public IDictionary<string, SerializedPropertyInfo> Properties"] = @"internal override IDictionary<string, SerializedPropertyInfo> Properties",
 
-                [Regex.Escape(@"[DataMember(Name = ""properties"", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]")] = @"[DataMember(Name = ""properties"", IsRequired = false, EmitDefaultValue = false)]",
+                ["me.([^ ]+) = reader.ReadIList<string>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadString)",
+                ["me.([^ ]+) = reader.ReadIList<Uri>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadUri)",
+
+                ["me.([^ ]+) = reader.ReadIDictionary<string, string>\\(root\\)"] = "reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString)",
+                ["me.([^ ]+) = reader.ReadIDictionary<string, ([^>]+)>\\(root\\)"] = @"reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, $2JsonExtensions.Read$2)",
 
                 ["ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(\\)\\);"] = "new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));",
                 ["ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(\\)\\);"] = "new DictionaryColumn<string, ArtifactLocation>(new StringColumn(), new ArtifactLocationColumn(this.Database)));",

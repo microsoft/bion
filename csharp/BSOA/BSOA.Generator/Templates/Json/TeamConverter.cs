@@ -36,10 +36,10 @@ namespace BSOA.Generator.Templates
             ["id"] = (reader, root, me) => me.Id = reader.ReadLong(root),
             //  </SimpleSetter>
             //   <EnumSetter>
-            ["joinPolicy"] = (reader, root, me) => me.JoinPolicy = (JoinPolicy)reader.ReadLong(root),
+            ["joinPolicy"] = (reader, root, me) => me.JoinPolicy = reader.ReadEnum<SecurityPolicy, Company>(root),
             //   </EnumSetter>
             //   <RefSetter>
-            ["owner"] = (reader, root, me) => me.Owner = EmployeeJsonExtensions.ReadEmployee(reader, root),
+            ["owner"] = (reader, root, me) => me.Owner = reader.ReadEmployee(root),
             //   </RefSetter>
             //   <RefListSetter>
             ["members"] = (reader, root, me) => reader.ReadList(root, me.Members, EmployeeJsonExtensions.ReadEmployee),
@@ -77,7 +77,7 @@ namespace BSOA.Generator.Templates
                 writer.Write("id", item.Id, 99);
                 //  </SimpleWriter>
                 //   <EnumWriter>
-                writer.Write("joinPolicy", (int)item.JoinPolicy);
+                writer.Write("joinPolicy", item.JoinPolicy);
                 //   </EnumWriter>
                 //   <RefWriter>
                 writer.Write("owner", item.Owner);

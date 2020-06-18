@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Converters;
+
+using System;
 using System.Collections.Generic;
 
 namespace Newtonsoft.Json
@@ -72,6 +74,17 @@ namespace Newtonsoft.Json
             }
 
             reader.Expect(JsonToken.EndObject);
+        }
+
+        private static StringEnumConverter _enumConverter = new StringEnumConverter(camelCaseText: true);
+        public static TEnum ReadEnum<TEnum, TRoot>(this JsonReader reader, TRoot root) where TEnum : System.Enum
+        {
+            return (TEnum)_enumConverter.ReadJson(reader, typeof(TEnum), null, null);
+        }
+
+        public static byte ReadByte<TRoot>(this JsonReader reader, TRoot root)
+        {
+            return (byte)(long)reader.Value;
         }
 
         public static int ReadInt<TRoot>(this JsonReader reader, TRoot root)

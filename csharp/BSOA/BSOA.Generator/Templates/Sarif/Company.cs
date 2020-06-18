@@ -4,9 +4,7 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Runtime.Serialization;
 
 using BSOA.IO;
 using BSOA.Model;
@@ -14,14 +12,11 @@ using BSOA.Model;
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace BSOA.Generator.Templates
 {
     /// <summary>
     ///  GENERATED: BSOA Root Entity for 'Company'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Company : PropertyBagHolder, ISarifNode, IRow
     {
@@ -83,8 +78,6 @@ namespace BSOA.Generator.Templates
 
         // <ColumnList>
         //   <SimpleColumn>
-        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(99)]
         public long Id
         {
             get => _table.Id[_index];
@@ -93,8 +86,6 @@ namespace BSOA.Generator.Templates
 
         //   </SimpleColumn>
         //   <EnumColumn>
-        [DataMember(Name = "joinPolicy", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public SecurityPolicy JoinPolicy
         {
             get => (SecurityPolicy)_table.JoinPolicy[_index];
@@ -103,7 +94,6 @@ namespace BSOA.Generator.Templates
 
         //   </EnumColumn>
         //   <RefColumn>
-        [DataMember(Name = "owner", IsRequired = false, EmitDefaultValue = false)]
         public Employee Owner
         {
             get => _table.Database.Employee.Get(_table.Owner[_index]);
@@ -112,7 +102,6 @@ namespace BSOA.Generator.Templates
 
         //   </RefColumn>
         //   <RefListColumn>
-        [DataMember(Name = "members", IsRequired = false, EmitDefaultValue = false)]
         public IList<Employee> Members
         {
             get => _table.Database.Employee.List(_table.Members[_index]);
