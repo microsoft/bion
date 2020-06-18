@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Graph'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Graph : PropertyBagHolder, ISarifNode, IRow
     {
@@ -66,28 +61,24 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "description", IsRequired = false, EmitDefaultValue = false)]
         public Message Description
         {
             get => _table.Database.Message.Get(_table.Description[_index]);
             set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "nodes", IsRequired = false, EmitDefaultValue = false)]
         public IList<Node> Nodes
         {
             get => _table.Database.Node.List(_table.Nodes[_index]);
             set => _table.Database.Node.List(_table.Nodes[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "edges", IsRequired = false, EmitDefaultValue = false)]
         public IList<Edge> Edges
         {
             get => _table.Database.Edge.List(_table.Edges[_index]);
             set => _table.Database.Edge.List(_table.Edges[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

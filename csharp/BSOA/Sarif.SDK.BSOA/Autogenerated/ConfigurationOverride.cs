@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ConfigurationOverride'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ConfigurationOverride : PropertyBagHolder, ISarifNode, IRow
     {
@@ -63,21 +58,18 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "configuration", IsRequired = false, EmitDefaultValue = false)]
         public ReportingConfiguration Configuration
         {
             get => _table.Database.ReportingConfiguration.Get(_table.Configuration[_index]);
             set => _table.Configuration[_index] = _table.Database.ReportingConfiguration.LocalIndex(value);
         }
 
-        [DataMember(Name = "descriptor", IsRequired = false, EmitDefaultValue = false)]
         public ReportingDescriptorReference Descriptor
         {
             get => _table.Database.ReportingDescriptorReference.Get(_table.Descriptor[_index]);
             set => _table.Descriptor[_index] = _table.Database.ReportingDescriptorReference.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

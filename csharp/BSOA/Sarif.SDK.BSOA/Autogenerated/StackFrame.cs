@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'StackFrame'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class StackFrame : PropertyBagHolder, ISarifNode, IRow
     {
@@ -69,35 +64,30 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "location", IsRequired = false, EmitDefaultValue = false)]
         public Location Location
         {
             get => _table.Database.Location.Get(_table.Location[_index]);
             set => _table.Location[_index] = _table.Database.Location.LocalIndex(value);
         }
 
-        [DataMember(Name = "module", IsRequired = false, EmitDefaultValue = false)]
         public string Module
         {
             get => _table.Module[_index];
             set => _table.Module[_index] = value;
         }
 
-        [DataMember(Name = "threadId", IsRequired = false, EmitDefaultValue = false)]
         public int ThreadId
         {
             get => _table.ThreadId[_index];
             set => _table.ThreadId[_index] = value;
         }
 
-        [DataMember(Name = "parameters", IsRequired = false, EmitDefaultValue = false)]
         public IList<string> Parameters
         {
             get => _table.Parameters[_index];
             set => _table.Parameters[_index] = value;
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

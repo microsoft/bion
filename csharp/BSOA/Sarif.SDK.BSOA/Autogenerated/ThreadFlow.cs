@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ThreadFlow'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ThreadFlow : PropertyBagHolder, ISarifNode, IRow
     {
@@ -72,42 +67,36 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
         public string Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
-        [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "initialState", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, MultiformatMessageString> InitialState
         {
             get => _table.InitialState[_index];
             set => _table.InitialState[_index] = value;
         }
 
-        [DataMember(Name = "immutableState", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, MultiformatMessageString> ImmutableState
         {
             get => _table.ImmutableState[_index];
             set => _table.ImmutableState[_index] = value;
         }
 
-        [DataMember(Name = "locations", IsRequired = false, EmitDefaultValue = false)]
         public IList<ThreadFlowLocation> Locations
         {
             get => _table.Database.ThreadFlowLocation.List(_table.Locations[_index]);
             set => _table.Database.ThreadFlowLocation.List(_table.Locations[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

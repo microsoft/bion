@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'RunAutomationDetails'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class RunAutomationDetails : PropertyBagHolder, ISarifNode, IRow
     {
@@ -69,35 +64,30 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "description", IsRequired = false, EmitDefaultValue = false)]
         public Message Description
         {
             get => _table.Database.Message.Get(_table.Description[_index]);
             set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
         public string Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
-        [DataMember(Name = "guid", IsRequired = false, EmitDefaultValue = false)]
         public string Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
         }
 
-        [DataMember(Name = "correlationGuid", IsRequired = false, EmitDefaultValue = false)]
         public string CorrelationGuid
         {
             get => _table.CorrelationGuid[_index];
             set => _table.CorrelationGuid[_index] = value;
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

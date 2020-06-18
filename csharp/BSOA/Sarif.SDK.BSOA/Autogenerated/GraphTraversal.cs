@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'GraphTraversal'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class GraphTraversal : PropertyBagHolder, ISarifNode, IRow
     {
@@ -75,51 +70,42 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "runGraphIndex", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int RunGraphIndex
         {
             get => _table.RunGraphIndex[_index];
             set => _table.RunGraphIndex[_index] = value;
         }
 
-        [DataMember(Name = "resultGraphIndex", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int ResultGraphIndex
         {
             get => _table.ResultGraphIndex[_index];
             set => _table.ResultGraphIndex[_index] = value;
         }
 
-        [DataMember(Name = "description", IsRequired = false, EmitDefaultValue = false)]
         public Message Description
         {
             get => _table.Database.Message.Get(_table.Description[_index]);
             set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "initialState", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, MultiformatMessageString> InitialState
         {
             get => _table.InitialState[_index];
             set => _table.InitialState[_index] = value;
         }
 
-        [DataMember(Name = "immutableState", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, MultiformatMessageString> ImmutableState
         {
             get => _table.ImmutableState[_index];
             set => _table.ImmutableState[_index] = value;
         }
 
-        [DataMember(Name = "edgeTraversals", IsRequired = false, EmitDefaultValue = false)]
         public IList<EdgeTraversal> EdgeTraversals
         {
             get => _table.Database.EdgeTraversal.List(_table.EdgeTraversals[_index]);
             set => _table.Database.EdgeTraversal.List(_table.EdgeTraversals[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

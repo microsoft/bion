@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Suppression'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Suppression : PropertyBagHolder, ISarifNode, IRow
     {
@@ -72,44 +67,36 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "guid", IsRequired = false, EmitDefaultValue = false)]
         public string Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
         }
 
-        [DataMember(Name = "kind", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public SuppressionKind Kind
         {
             get => (SuppressionKind)_table.Kind[_index];
             set => _table.Kind[_index] = (int)value;
         }
 
-        [DataMember(Name = "status", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public SuppressionStatus Status
         {
             get => (SuppressionStatus)_table.Status[_index];
             set => _table.Status[_index] = (int)value;
         }
 
-        [DataMember(Name = "justification", IsRequired = false, EmitDefaultValue = false)]
         public string Justification
         {
             get => _table.Justification[_index];
             set => _table.Justification[_index] = value;
         }
 
-        [DataMember(Name = "location", IsRequired = false, EmitDefaultValue = false)]
         public Location Location
         {
             get => _table.Database.Location.Get(_table.Location[_index]);
             set => _table.Location[_index] = _table.Database.Location.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

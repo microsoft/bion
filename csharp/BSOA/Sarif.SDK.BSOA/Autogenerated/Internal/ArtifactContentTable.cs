@@ -25,10 +25,10 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Text = AddColumn(nameof(Text), ColumnFactory.Build<string>());
-            Binary = AddColumn(nameof(Binary), ColumnFactory.Build<string>());
+            Text = AddColumn(nameof(Text), ColumnFactory.Build<string>(default(string)));
+            Binary = AddColumn(nameof(Binary), ColumnFactory.Build<string>(default(string)));
             Rendered = AddColumn(nameof(Rendered), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
         }
 
         public override ArtifactContent Get(int index)

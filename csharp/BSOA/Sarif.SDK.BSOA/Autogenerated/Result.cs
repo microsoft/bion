@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Result'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Result : PropertyBagHolder, ISarifNode, IRow
     {
@@ -144,215 +139,180 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "ruleId", IsRequired = false, EmitDefaultValue = false)]
         public string RuleId
         {
             get => _table.RuleId[_index];
             set => _table.RuleId[_index] = value;
         }
 
-        [DataMember(Name = "ruleIndex", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int RuleIndex
         {
             get => _table.RuleIndex[_index];
             set => _table.RuleIndex[_index] = value;
         }
 
-        [DataMember(Name = "rule", IsRequired = false, EmitDefaultValue = false)]
         public ReportingDescriptorReference Rule
         {
             get => _table.Database.ReportingDescriptorReference.Get(_table.Rule[_index]);
             set => _table.Rule[_index] = _table.Database.ReportingDescriptorReference.LocalIndex(value);
         }
 
-        [DataMember(Name = "kind", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public ResultKind Kind
         {
             get => (ResultKind)_table.Kind[_index];
             set => _table.Kind[_index] = (int)value;
         }
 
-        [DataMember(Name = "level", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public FailureLevel Level
         {
             get => (FailureLevel)_table.Level[_index];
             set => _table.Level[_index] = (int)value;
         }
 
-        [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "analysisTarget", IsRequired = false, EmitDefaultValue = false)]
         public ArtifactLocation AnalysisTarget
         {
             get => _table.Database.ArtifactLocation.Get(_table.AnalysisTarget[_index]);
             set => _table.AnalysisTarget[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
-        [DataMember(Name = "locations", IsRequired = false, EmitDefaultValue = false)]
         public IList<Location> Locations
         {
             get => _table.Database.Location.List(_table.Locations[_index]);
             set => _table.Database.Location.List(_table.Locations[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "guid", IsRequired = false, EmitDefaultValue = false)]
         public string Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
         }
 
-        [DataMember(Name = "correlationGuid", IsRequired = false, EmitDefaultValue = false)]
         public string CorrelationGuid
         {
             get => _table.CorrelationGuid[_index];
             set => _table.CorrelationGuid[_index] = value;
         }
 
-        [DataMember(Name = "occurrenceCount", IsRequired = false, EmitDefaultValue = false)]
         public int OccurrenceCount
         {
             get => _table.OccurrenceCount[_index];
             set => _table.OccurrenceCount[_index] = value;
         }
 
-        [DataMember(Name = "partialFingerprints", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, string> PartialFingerprints
         {
             get => _table.PartialFingerprints[_index];
             set => _table.PartialFingerprints[_index] = value;
         }
 
-        [DataMember(Name = "fingerprints", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, string> Fingerprints
         {
             get => _table.Fingerprints[_index];
             set => _table.Fingerprints[_index] = value;
         }
 
-        [DataMember(Name = "stacks", IsRequired = false, EmitDefaultValue = false)]
         public IList<Stack> Stacks
         {
             get => _table.Database.Stack.List(_table.Stacks[_index]);
             set => _table.Database.Stack.List(_table.Stacks[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "codeFlows", IsRequired = false, EmitDefaultValue = false)]
         public IList<CodeFlow> CodeFlows
         {
             get => _table.Database.CodeFlow.List(_table.CodeFlows[_index]);
             set => _table.Database.CodeFlow.List(_table.CodeFlows[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "graphs", IsRequired = false, EmitDefaultValue = false)]
         public IList<Graph> Graphs
         {
             get => _table.Database.Graph.List(_table.Graphs[_index]);
             set => _table.Database.Graph.List(_table.Graphs[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "graphTraversals", IsRequired = false, EmitDefaultValue = false)]
         public IList<GraphTraversal> GraphTraversals
         {
             get => _table.Database.GraphTraversal.List(_table.GraphTraversals[_index]);
             set => _table.Database.GraphTraversal.List(_table.GraphTraversals[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "relatedLocations", IsRequired = false, EmitDefaultValue = false)]
         public IList<Location> RelatedLocations
         {
             get => _table.Database.Location.List(_table.RelatedLocations[_index]);
             set => _table.Database.Location.List(_table.RelatedLocations[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "suppressions", IsRequired = false, EmitDefaultValue = false)]
         public IList<Suppression> Suppressions
         {
             get => _table.Database.Suppression.List(_table.Suppressions[_index]);
             set => _table.Database.Suppression.List(_table.Suppressions[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "baselineState", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public BaselineState BaselineState
         {
             get => (BaselineState)_table.BaselineState[_index];
             set => _table.BaselineState[_index] = (int)value;
         }
 
-        [DataMember(Name = "rank", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public double Rank
         {
             get => _table.Rank[_index];
             set => _table.Rank[_index] = value;
         }
 
-        [DataMember(Name = "attachments", IsRequired = false, EmitDefaultValue = false)]
         public IList<Attachment> Attachments
         {
             get => _table.Database.Attachment.List(_table.Attachments[_index]);
             set => _table.Database.Attachment.List(_table.Attachments[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "hostedViewerUri", IsRequired = false, EmitDefaultValue = false)]
         public Uri HostedViewerUri
         {
             get => _table.HostedViewerUri[_index];
             set => _table.HostedViewerUri[_index] = value;
         }
 
-        [DataMember(Name = "workItemUris", IsRequired = false, EmitDefaultValue = false)]
         public IList<Uri> WorkItemUris
         {
             get => _table.WorkItemUris[_index];
             set => _table.WorkItemUris[_index] = value;
         }
 
-        [DataMember(Name = "provenance", IsRequired = false, EmitDefaultValue = false)]
         public ResultProvenance Provenance
         {
             get => _table.Database.ResultProvenance.Get(_table.Provenance[_index]);
             set => _table.Provenance[_index] = _table.Database.ResultProvenance.LocalIndex(value);
         }
 
-        [DataMember(Name = "fixes", IsRequired = false, EmitDefaultValue = false)]
         public IList<Fix> Fixes
         {
             get => _table.Database.Fix.List(_table.Fixes[_index]);
             set => _table.Database.Fix.List(_table.Fixes[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "taxa", IsRequired = false, EmitDefaultValue = false)]
         public IList<ReportingDescriptorReference> Taxa
         {
             get => _table.Database.ReportingDescriptorReference.List(_table.Taxa[_index]);
             set => _table.Database.ReportingDescriptorReference.List(_table.Taxa[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "webRequest", IsRequired = false, EmitDefaultValue = false)]
         public WebRequest WebRequest
         {
             get => _table.Database.WebRequest.Get(_table.WebRequest[_index]);
             set => _table.WebRequest[_index] = _table.Database.WebRequest.LocalIndex(value);
         }
 
-        [DataMember(Name = "webResponse", IsRequired = false, EmitDefaultValue = false)]
         public WebResponse WebResponse
         {
             get => _table.Database.WebResponse.Get(_table.WebResponse[_index]);
             set => _table.WebResponse[_index] = _table.Database.WebResponse.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

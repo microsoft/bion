@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Edge'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Edge : PropertyBagHolder, ISarifNode, IRow
     {
@@ -69,35 +64,30 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
         public string Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
-        [DataMember(Name = "label", IsRequired = false, EmitDefaultValue = false)]
         public Message Label
         {
             get => _table.Database.Message.Get(_table.Label[_index]);
             set => _table.Label[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "sourceNodeId", IsRequired = false, EmitDefaultValue = false)]
         public string SourceNodeId
         {
             get => _table.SourceNodeId[_index];
             set => _table.SourceNodeId[_index] = value;
         }
 
-        [DataMember(Name = "targetNodeId", IsRequired = false, EmitDefaultValue = false)]
         public string TargetNodeId
         {
             get => _table.TargetNodeId[_index];
             set => _table.TargetNodeId[_index] = value;
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

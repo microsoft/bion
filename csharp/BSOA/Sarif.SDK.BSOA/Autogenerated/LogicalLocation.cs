@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'LogicalLocation'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class LogicalLocation : PropertyBagHolder, ISarifNode, IRow
     {
@@ -75,51 +70,42 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]
         public string Name
         {
             get => _table.Name[_index];
             set => _table.Name[_index] = value;
         }
 
-        [DataMember(Name = "index", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int Index
         {
             get => _table.Index[_index];
             set => _table.Index[_index] = value;
         }
 
-        [DataMember(Name = "fullyQualifiedName", IsRequired = false, EmitDefaultValue = false)]
         public string FullyQualifiedName
         {
             get => _table.FullyQualifiedName[_index];
             set => _table.FullyQualifiedName[_index] = value;
         }
 
-        [DataMember(Name = "decoratedName", IsRequired = false, EmitDefaultValue = false)]
         public string DecoratedName
         {
             get => _table.DecoratedName[_index];
             set => _table.DecoratedName[_index] = value;
         }
 
-        [DataMember(Name = "parentIndex", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int ParentIndex
         {
             get => _table.ParentIndex[_index];
             set => _table.ParentIndex[_index] = value;
         }
 
-        [DataMember(Name = "kind", IsRequired = false, EmitDefaultValue = false)]
         public string Kind
         {
             get => _table.Kind[_index];
             set => _table.Kind[_index] = value;
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

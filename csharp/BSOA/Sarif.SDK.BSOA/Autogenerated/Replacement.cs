@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Replacement'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Replacement : PropertyBagHolder, ISarifNode, IRow
     {
@@ -63,21 +58,18 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "deletedRegion", IsRequired = false, EmitDefaultValue = false)]
         public Region DeletedRegion
         {
             get => _table.Database.Region.Get(_table.DeletedRegion[_index]);
             set => _table.DeletedRegion[_index] = _table.Database.Region.LocalIndex(value);
         }
 
-        [DataMember(Name = "insertedContent", IsRequired = false, EmitDefaultValue = false)]
         public ArtifactContent InsertedContent
         {
             get => _table.Database.ArtifactContent.Get(_table.InsertedContent[_index]);
             set => _table.InsertedContent[_index] = _table.Database.ArtifactContent.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

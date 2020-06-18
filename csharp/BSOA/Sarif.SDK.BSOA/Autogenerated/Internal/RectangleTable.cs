@@ -27,12 +27,12 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Top = AddColumn(nameof(Top), ColumnFactory.Build<double>());
-            Left = AddColumn(nameof(Left), ColumnFactory.Build<double>());
-            Bottom = AddColumn(nameof(Bottom), ColumnFactory.Build<double>());
-            Right = AddColumn(nameof(Right), ColumnFactory.Build<double>());
+            Top = AddColumn(nameof(Top), ColumnFactory.Build<double>(default(double)));
+            Left = AddColumn(nameof(Left), ColumnFactory.Build<double>(default(double)));
+            Bottom = AddColumn(nameof(Bottom), ColumnFactory.Build<double>(default(double)));
+            Right = AddColumn(nameof(Right), ColumnFactory.Build<double>(default(double)));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
         }
 
         public override Rectangle Get(int index)

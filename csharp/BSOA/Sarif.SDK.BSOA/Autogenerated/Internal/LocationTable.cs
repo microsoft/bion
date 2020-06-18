@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
             Annotations = AddColumn(nameof(Annotations), new RefListColumn(nameof(SarifLogDatabase.Region)));
             Relationships = AddColumn(nameof(Relationships), new RefListColumn(nameof(SarifLogDatabase.LocationRelationship)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
         }
 
         public override Location Get(int index)

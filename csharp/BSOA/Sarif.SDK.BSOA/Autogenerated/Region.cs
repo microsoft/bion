@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Region'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Region : PropertyBagHolder, ISarifNode, IRow
     {
@@ -90,86 +85,72 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "startLine", IsRequired = false, EmitDefaultValue = false)]
         public int StartLine
         {
             get => _table.StartLine[_index];
             set => _table.StartLine[_index] = value;
         }
 
-        [DataMember(Name = "startColumn", IsRequired = false, EmitDefaultValue = false)]
         public int StartColumn
         {
             get => _table.StartColumn[_index];
             set => _table.StartColumn[_index] = value;
         }
 
-        [DataMember(Name = "endLine", IsRequired = false, EmitDefaultValue = false)]
         public int EndLine
         {
             get => _table.EndLine[_index];
             set => _table.EndLine[_index] = value;
         }
 
-        [DataMember(Name = "endColumn", IsRequired = false, EmitDefaultValue = false)]
         public int EndColumn
         {
             get => _table.EndColumn[_index];
             set => _table.EndColumn[_index] = value;
         }
 
-        [DataMember(Name = "charOffset", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int CharOffset
         {
             get => _table.CharOffset[_index];
             set => _table.CharOffset[_index] = value;
         }
 
-        [DataMember(Name = "charLength", IsRequired = false, EmitDefaultValue = false)]
         public int CharLength
         {
             get => _table.CharLength[_index];
             set => _table.CharLength[_index] = value;
         }
 
-        [DataMember(Name = "byteOffset", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int ByteOffset
         {
             get => _table.ByteOffset[_index];
             set => _table.ByteOffset[_index] = value;
         }
 
-        [DataMember(Name = "byteLength", IsRequired = false, EmitDefaultValue = false)]
         public int ByteLength
         {
             get => _table.ByteLength[_index];
             set => _table.ByteLength[_index] = value;
         }
 
-        [DataMember(Name = "snippet", IsRequired = false, EmitDefaultValue = false)]
         public ArtifactContent Snippet
         {
             get => _table.Database.ArtifactContent.Get(_table.Snippet[_index]);
             set => _table.Snippet[_index] = _table.Database.ArtifactContent.LocalIndex(value);
         }
 
-        [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
         public string SourceLanguage
         {
             get => _table.SourceLanguage[_index];
             set => _table.SourceLanguage[_index] = value;
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

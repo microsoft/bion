@@ -4,9 +4,7 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Runtime.Serialization;
 
 using BSOA.IO;
 using BSOA.Model;
@@ -14,14 +12,11 @@ using BSOA.Model;
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Root Entity for 'SarifLog'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class SarifLog : PropertyBagHolder, ISarifNode, IRow
     {
@@ -33,7 +28,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public SarifLog() : this(new SarifLogDatabase().SarifLog)
         { }
-
+        
         internal SarifLog(SarifLogTable table) : this(table, table.Count)
         {
             table.Add();
@@ -70,37 +65,30 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "$schema", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(UriConverter))]
         public Uri SchemaUri
         {
             get => _table.SchemaUri[_index];
             set => _table.SchemaUri[_index] = value;
         }
 
-        [DataMember(Name = "version", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.SarifVersionConverter))]
         public SarifVersion Version
         {
             get => (SarifVersion)_table.Version[_index];
             set => _table.Version[_index] = (int)value;
         }
 
-        [DataMember(Name = "runs", IsRequired = false, EmitDefaultValue = false)]
         public IList<Run> Runs
         {
             get => _table.Database.Run.List(_table.Runs[_index]);
             set => _table.Database.Run.List(_table.Runs[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "inlineExternalProperties", IsRequired = false, EmitDefaultValue = false)]
         public IList<ExternalProperties> InlineExternalProperties
         {
             get => _table.Database.ExternalProperties.List(_table.InlineExternalProperties[_index]);
             set => _table.Database.ExternalProperties.List(_table.InlineExternalProperties[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

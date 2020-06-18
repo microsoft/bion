@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Location'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Location : PropertyBagHolder, ISarifNode, IRow
     {
@@ -75,50 +70,42 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
-        [DataMember(Name = "physicalLocation", IsRequired = false, EmitDefaultValue = false)]
         public PhysicalLocation PhysicalLocation
         {
             get => _table.Database.PhysicalLocation.Get(_table.PhysicalLocation[_index]);
             set => _table.PhysicalLocation[_index] = _table.Database.PhysicalLocation.LocalIndex(value);
         }
 
-        [DataMember(Name = "logicalLocations", IsRequired = false, EmitDefaultValue = false)]
         public IList<LogicalLocation> LogicalLocations
         {
             get => _table.Database.LogicalLocation.List(_table.LogicalLocations[_index]);
             set => _table.Database.LogicalLocation.List(_table.LogicalLocations[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "annotations", IsRequired = false, EmitDefaultValue = false)]
         public IList<Region> Annotations
         {
             get => _table.Database.Region.List(_table.Annotations[_index]);
             set => _table.Database.Region.List(_table.Annotations[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "relationships", IsRequired = false, EmitDefaultValue = false)]
         public IList<LocationRelationship> Relationships
         {
             get => _table.Database.LocationRelationship.List(_table.Relationships[_index]);
             set => _table.Database.LocationRelationship.List(_table.Relationships[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

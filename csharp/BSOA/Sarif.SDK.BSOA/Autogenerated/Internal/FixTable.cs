@@ -26,7 +26,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
             ArtifactChanges = AddColumn(nameof(ArtifactChanges), new RefListColumn(nameof(SarifLogDatabase.ArtifactChange)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
         }
 
         public override Fix Get(int index)

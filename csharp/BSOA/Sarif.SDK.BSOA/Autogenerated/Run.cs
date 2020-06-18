@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Run'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Run : PropertyBagHolder, ISarifNode, IRow
     {
@@ -138,198 +133,168 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "tool", IsRequired = false, EmitDefaultValue = false)]
         public Tool Tool
         {
             get => _table.Database.Tool.Get(_table.Tool[_index]);
             set => _table.Tool[_index] = _table.Database.Tool.LocalIndex(value);
         }
 
-        [DataMember(Name = "invocations", IsRequired = false, EmitDefaultValue = false)]
         public IList<Invocation> Invocations
         {
             get => _table.Database.Invocation.List(_table.Invocations[_index]);
             set => _table.Database.Invocation.List(_table.Invocations[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "conversion", IsRequired = false, EmitDefaultValue = false)]
         public Conversion Conversion
         {
             get => _table.Database.Conversion.Get(_table.Conversion[_index]);
             set => _table.Conversion[_index] = _table.Database.Conversion.LocalIndex(value);
         }
 
-        [DataMember(Name = "language", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue("en-US")]
         public string Language
         {
             get => _table.Language[_index];
             set => _table.Language[_index] = value;
         }
 
-        [DataMember(Name = "versionControlProvenance", IsRequired = false, EmitDefaultValue = false)]
         public IList<VersionControlDetails> VersionControlProvenance
         {
             get => _table.Database.VersionControlDetails.List(_table.VersionControlProvenance[_index]);
             set => _table.Database.VersionControlDetails.List(_table.VersionControlProvenance[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "originalUriBaseIds", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, ArtifactLocation> OriginalUriBaseIds
         {
             get => _table.OriginalUriBaseIds[_index];
             set => _table.OriginalUriBaseIds[_index] = value;
         }
 
-        [DataMember(Name = "artifacts", IsRequired = false, EmitDefaultValue = false)]
         public IList<Artifact> Artifacts
         {
             get => _table.Database.Artifact.List(_table.Artifacts[_index]);
             set => _table.Database.Artifact.List(_table.Artifacts[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "logicalLocations", IsRequired = false, EmitDefaultValue = false)]
         public IList<LogicalLocation> LogicalLocations
         {
             get => _table.Database.LogicalLocation.List(_table.LogicalLocations[_index]);
             set => _table.Database.LogicalLocation.List(_table.LogicalLocations[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "graphs", IsRequired = false, EmitDefaultValue = false)]
         public IList<Graph> Graphs
         {
             get => _table.Database.Graph.List(_table.Graphs[_index]);
             set => _table.Database.Graph.List(_table.Graphs[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "results", IsRequired = false, EmitDefaultValue = false)]
         public IList<Result> Results
         {
             get => _table.Database.Result.List(_table.Results[_index]);
             set => _table.Database.Result.List(_table.Results[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "automationDetails", IsRequired = false, EmitDefaultValue = false)]
         public RunAutomationDetails AutomationDetails
         {
             get => _table.Database.RunAutomationDetails.Get(_table.AutomationDetails[_index]);
             set => _table.AutomationDetails[_index] = _table.Database.RunAutomationDetails.LocalIndex(value);
         }
 
-        [DataMember(Name = "runAggregates", IsRequired = false, EmitDefaultValue = false)]
         public IList<RunAutomationDetails> RunAggregates
         {
             get => _table.Database.RunAutomationDetails.List(_table.RunAggregates[_index]);
             set => _table.Database.RunAutomationDetails.List(_table.RunAggregates[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "baselineGuid", IsRequired = false, EmitDefaultValue = false)]
         public string BaselineGuid
         {
             get => _table.BaselineGuid[_index];
             set => _table.BaselineGuid[_index] = value;
         }
 
-        [DataMember(Name = "redactionTokens", IsRequired = false, EmitDefaultValue = false)]
         public IList<string> RedactionTokens
         {
             get => _table.RedactionTokens[_index];
             set => _table.RedactionTokens[_index] = value;
         }
 
-        [DataMember(Name = "defaultEncoding", IsRequired = false, EmitDefaultValue = false)]
         public string DefaultEncoding
         {
             get => _table.DefaultEncoding[_index];
             set => _table.DefaultEncoding[_index] = value;
         }
 
-        [DataMember(Name = "defaultSourceLanguage", IsRequired = false, EmitDefaultValue = false)]
         public string DefaultSourceLanguage
         {
             get => _table.DefaultSourceLanguage[_index];
             set => _table.DefaultSourceLanguage[_index] = value;
         }
 
-        [DataMember(Name = "newlineSequences", IsRequired = false, EmitDefaultValue = false)]
         public IList<string> NewlineSequences
         {
             get => _table.NewlineSequences[_index];
             set => _table.NewlineSequences[_index] = value;
         }
 
-        [DataMember(Name = "columnKind", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public ColumnKind ColumnKind
         {
             get => (ColumnKind)_table.ColumnKind[_index];
             set => _table.ColumnKind[_index] = (int)value;
         }
 
-        [DataMember(Name = "externalPropertyFileReferences", IsRequired = false, EmitDefaultValue = false)]
         public ExternalPropertyFileReferences ExternalPropertyFileReferences
         {
             get => _table.Database.ExternalPropertyFileReferences.Get(_table.ExternalPropertyFileReferences[_index]);
             set => _table.ExternalPropertyFileReferences[_index] = _table.Database.ExternalPropertyFileReferences.LocalIndex(value);
         }
 
-        [DataMember(Name = "threadFlowLocations", IsRequired = false, EmitDefaultValue = false)]
         public IList<ThreadFlowLocation> ThreadFlowLocations
         {
             get => _table.Database.ThreadFlowLocation.List(_table.ThreadFlowLocations[_index]);
             set => _table.Database.ThreadFlowLocation.List(_table.ThreadFlowLocations[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "taxonomies", IsRequired = false, EmitDefaultValue = false)]
         public IList<ToolComponent> Taxonomies
         {
             get => _table.Database.ToolComponent.List(_table.Taxonomies[_index]);
             set => _table.Database.ToolComponent.List(_table.Taxonomies[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "addresses", IsRequired = false, EmitDefaultValue = false)]
         public IList<Address> Addresses
         {
             get => _table.Database.Address.List(_table.Addresses[_index]);
             set => _table.Database.Address.List(_table.Addresses[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "translations", IsRequired = false, EmitDefaultValue = false)]
         public IList<ToolComponent> Translations
         {
             get => _table.Database.ToolComponent.List(_table.Translations[_index]);
             set => _table.Database.ToolComponent.List(_table.Translations[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "policies", IsRequired = false, EmitDefaultValue = false)]
         public IList<ToolComponent> Policies
         {
             get => _table.Database.ToolComponent.List(_table.Policies[_index]);
             set => _table.Database.ToolComponent.List(_table.Policies[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "webRequests", IsRequired = false, EmitDefaultValue = false)]
         public IList<WebRequest> WebRequests
         {
             get => _table.Database.WebRequest.List(_table.WebRequests[_index]);
             set => _table.Database.WebRequest.List(_table.WebRequests[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "webResponses", IsRequired = false, EmitDefaultValue = false)]
         public IList<WebResponse> WebResponses
         {
             get => _table.Database.WebResponse.List(_table.WebResponses[_index]);
             set => _table.Database.WebResponse.List(_table.WebResponses[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "specialLocations", IsRequired = false, EmitDefaultValue = false)]
         public SpecialLocations SpecialLocations
         {
             get => _table.Database.SpecialLocations.Get(_table.SpecialLocations[_index]);
             set => _table.SpecialLocations[_index] = _table.Database.SpecialLocations.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

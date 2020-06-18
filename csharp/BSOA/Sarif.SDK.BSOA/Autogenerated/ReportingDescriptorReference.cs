@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ReportingDescriptorReference'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ReportingDescriptorReference : PropertyBagHolder, ISarifNode, IRow
     {
@@ -69,36 +64,30 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
         public string Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
-        [DataMember(Name = "index", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int Index
         {
             get => _table.Index[_index];
             set => _table.Index[_index] = value;
         }
 
-        [DataMember(Name = "guid", IsRequired = false, EmitDefaultValue = false)]
         public string Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
         }
 
-        [DataMember(Name = "toolComponent", IsRequired = false, EmitDefaultValue = false)]
         public ToolComponentReference ToolComponent
         {
             get => _table.Database.ToolComponentReference.Get(_table.ToolComponent[_index]);
             set => _table.ToolComponent[_index] = _table.Database.ToolComponentReference.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

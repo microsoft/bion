@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Artifact'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Artifact : PropertyBagHolder, ISarifNode, IRow
     {
@@ -93,94 +88,78 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "description", IsRequired = false, EmitDefaultValue = false)]
         public Message Description
         {
             get => _table.Database.Message.Get(_table.Description[_index]);
             set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "location", IsRequired = false, EmitDefaultValue = false)]
         public ArtifactLocation Location
         {
             get => _table.Database.ArtifactLocation.Get(_table.Location[_index]);
             set => _table.Location[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
-        [DataMember(Name = "parentIndex", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int ParentIndex
         {
             get => _table.ParentIndex[_index];
             set => _table.ParentIndex[_index] = value;
         }
 
-        [DataMember(Name = "offset", IsRequired = false, EmitDefaultValue = false)]
         public int Offset
         {
             get => _table.Offset[_index];
             set => _table.Offset[_index] = value;
         }
 
-        [DataMember(Name = "length", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int Length
         {
             get => _table.Length[_index];
             set => _table.Length[_index] = value;
         }
 
-        [DataMember(Name = "roles", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public ArtifactRoles Roles
         {
             get => (ArtifactRoles)_table.Roles[_index];
             set => _table.Roles[_index] = (int)value;
         }
 
-        [DataMember(Name = "mimeType", IsRequired = false, EmitDefaultValue = false)]
         public string MimeType
         {
             get => _table.MimeType[_index];
             set => _table.MimeType[_index] = value;
         }
 
-        [DataMember(Name = "contents", IsRequired = false, EmitDefaultValue = false)]
         public ArtifactContent Contents
         {
             get => _table.Database.ArtifactContent.Get(_table.Contents[_index]);
             set => _table.Contents[_index] = _table.Database.ArtifactContent.LocalIndex(value);
         }
 
-        [DataMember(Name = "encoding", IsRequired = false, EmitDefaultValue = false)]
         public string Encoding
         {
             get => _table.Encoding[_index];
             set => _table.Encoding[_index] = value;
         }
 
-        [DataMember(Name = "sourceLanguage", IsRequired = false, EmitDefaultValue = false)]
         public string SourceLanguage
         {
             get => _table.SourceLanguage[_index];
             set => _table.SourceLanguage[_index] = value;
         }
 
-        [DataMember(Name = "hashes", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, string> Hashes
         {
             get => _table.Hashes[_index];
             set => _table.Hashes[_index] = value;
         }
 
-        [DataMember(Name = "lastModifiedTimeUtc", IsRequired = false, EmitDefaultValue = false)]
         public DateTime LastModifiedTimeUtc
         {
             get => _table.LastModifiedTimeUtc[_index];
             set => _table.LastModifiedTimeUtc[_index] = value;
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

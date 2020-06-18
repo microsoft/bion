@@ -38,17 +38,17 @@ namespace Microsoft.CodeAnalysis.Sarif
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.Location)));
             Stack = AddColumn(nameof(Stack), new RefColumn(nameof(SarifLogDatabase.Stack)));
-            Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<string>>());
+            Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<string>>(default(IList<string>)));
             Taxa = AddColumn(nameof(Taxa), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
-            Module = AddColumn(nameof(Module), ColumnFactory.Build<string>());
-            State = AddColumn(nameof(State), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
-            NestingLevel = AddColumn(nameof(NestingLevel), ColumnFactory.Build<int>());
+            Module = AddColumn(nameof(Module), ColumnFactory.Build<string>(default(string)));
+            State = AddColumn(nameof(State), ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>(default(IDictionary<string, MultiformatMessageString>)));
+            NestingLevel = AddColumn(nameof(NestingLevel), ColumnFactory.Build<int>(default(int)));
             ExecutionOrder = AddColumn(nameof(ExecutionOrder), ColumnFactory.Build<int>(-1));
-            ExecutionTimeUtc = AddColumn(nameof(ExecutionTimeUtc), ColumnFactory.Build<DateTime>());
+            ExecutionTimeUtc = AddColumn(nameof(ExecutionTimeUtc), ColumnFactory.Build<DateTime>(default(DateTime)));
             Importance = AddColumn(nameof(Importance), ColumnFactory.Build<int>((int)ThreadFlowLocationImportance.Important));
             WebRequest = AddColumn(nameof(WebRequest), new RefColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponse = AddColumn(nameof(WebResponse), new RefColumn(nameof(SarifLogDatabase.WebResponse)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
         }
 
         public override ThreadFlowLocation Get(int index)

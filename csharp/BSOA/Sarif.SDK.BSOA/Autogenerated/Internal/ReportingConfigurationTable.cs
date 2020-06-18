@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Level = AddColumn(nameof(Level), ColumnFactory.Build<int>((int)FailureLevel.Warning));
             Rank = AddColumn(nameof(Rank), ColumnFactory.Build<double>(-1));
             Parameters = AddColumn(nameof(Parameters), new RefColumn(nameof(SarifLogDatabase.PropertyBag)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
         }
 
         public override ReportingConfiguration Get(int index)

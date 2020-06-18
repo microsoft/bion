@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ArtifactLocation = AddColumn(nameof(ArtifactLocation), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             Regions = AddColumn(nameof(Regions), new RefListColumn(nameof(SarifLogDatabase.Region)));
             Rectangles = AddColumn(nameof(Rectangles), new RefListColumn(nameof(SarifLogDatabase.Rectangle)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
         }
 
         public override Attachment Get(int index)

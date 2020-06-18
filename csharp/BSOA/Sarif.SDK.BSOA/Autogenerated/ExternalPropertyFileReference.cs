@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ExternalPropertyFileReference'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ExternalPropertyFileReference : PropertyBagHolder, ISarifNode, IRow
     {
@@ -66,29 +61,24 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "location", IsRequired = false, EmitDefaultValue = false)]
         public ArtifactLocation Location
         {
             get => _table.Database.ArtifactLocation.Get(_table.Location[_index]);
             set => _table.Location[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
-        [DataMember(Name = "guid", IsRequired = false, EmitDefaultValue = false)]
         public string Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
         }
 
-        [DataMember(Name = "itemCount", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int ItemCount
         {
             get => _table.ItemCount[_index];
             set => _table.ItemCount[_index] = value;
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

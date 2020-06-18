@@ -35,8 +35,8 @@ namespace BSOA.Demo.Model
             ["startColumn"] = (reader, root, me) => me.StartColumn = reader.ReadInt(root),
             ["endLine"] = (reader, root, me) => me.EndLine = reader.ReadInt(root),
             ["endColumn"] = (reader, root, me) => me.EndColumn = reader.ReadInt(root),
-            ["snippet"] = (reader, root, me) => me.Snippet = ArtifactContentJsonExtensions.ReadArtifactContent(reader, root),
-            ["message"] = (reader, root, me) => me.Message = MessageJsonExtensions.ReadMessage(reader, root)
+            ["snippet"] = (reader, root, me) => me.Snippet = reader.ReadArtifactContent(root),
+            ["message"] = (reader, root, me) => me.Message = reader.ReadMessage(root)
         };
 
         public static Region ReadRegion(this JsonReader reader, TinyLog root = null)

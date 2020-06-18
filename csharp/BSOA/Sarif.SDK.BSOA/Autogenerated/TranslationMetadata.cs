@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'TranslationMetadata'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class TranslationMetadata : PropertyBagHolder, ISarifNode, IRow
     {
@@ -75,49 +70,42 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]
         public string Name
         {
             get => _table.Name[_index];
             set => _table.Name[_index] = value;
         }
 
-        [DataMember(Name = "fullName", IsRequired = false, EmitDefaultValue = false)]
         public string FullName
         {
             get => _table.FullName[_index];
             set => _table.FullName[_index] = value;
         }
 
-        [DataMember(Name = "shortDescription", IsRequired = false, EmitDefaultValue = false)]
         public MultiformatMessageString ShortDescription
         {
             get => _table.Database.MultiformatMessageString.Get(_table.ShortDescription[_index]);
             set => _table.ShortDescription[_index] = _table.Database.MultiformatMessageString.LocalIndex(value);
         }
 
-        [DataMember(Name = "fullDescription", IsRequired = false, EmitDefaultValue = false)]
         public MultiformatMessageString FullDescription
         {
             get => _table.Database.MultiformatMessageString.Get(_table.FullDescription[_index]);
             set => _table.FullDescription[_index] = _table.Database.MultiformatMessageString.LocalIndex(value);
         }
 
-        [DataMember(Name = "downloadUri", IsRequired = false, EmitDefaultValue = false)]
         public Uri DownloadUri
         {
             get => _table.DownloadUri[_index];
             set => _table.DownloadUri[_index] = value;
         }
 
-        [DataMember(Name = "informationUri", IsRequired = false, EmitDefaultValue = false)]
         public Uri InformationUri
         {
             get => _table.InformationUri[_index];
             set => _table.InformationUri[_index] = value;
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

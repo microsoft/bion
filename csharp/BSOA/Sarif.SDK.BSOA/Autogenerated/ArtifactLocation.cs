@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ArtifactLocation'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ArtifactLocation : PropertyBagHolder, ISarifNode, IRow
     {
@@ -69,36 +64,30 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "uri", IsRequired = false, EmitDefaultValue = false)]
         public Uri Uri
         {
             get => _table.Uri[_index];
             set => _table.Uri[_index] = value;
         }
 
-        [DataMember(Name = "uriBaseId", IsRequired = false, EmitDefaultValue = false)]
         public string UriBaseId
         {
             get => _table.UriBaseId[_index];
             set => _table.UriBaseId[_index] = value;
         }
 
-        [DataMember(Name = "index", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int Index
         {
             get => _table.Index[_index];
             set => _table.Index[_index] = value;
         }
 
-        [DataMember(Name = "description", IsRequired = false, EmitDefaultValue = false)]
         public Message Description
         {
             get => _table.Database.Message.Get(_table.Description[_index]);
             set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ArtifactChange'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ArtifactChange : PropertyBagHolder, ISarifNode, IRow
     {
@@ -63,21 +58,18 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "artifactLocation", IsRequired = false, EmitDefaultValue = false)]
         public ArtifactLocation ArtifactLocation
         {
             get => _table.Database.ArtifactLocation.Get(_table.ArtifactLocation[_index]);
             set => _table.ArtifactLocation[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
-        [DataMember(Name = "replacements", IsRequired = false, EmitDefaultValue = false)]
         public IList<Replacement> Replacements
         {
             get => _table.Database.Replacement.List(_table.Replacements[_index]);
             set => _table.Database.Replacement.List(_table.Replacements[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

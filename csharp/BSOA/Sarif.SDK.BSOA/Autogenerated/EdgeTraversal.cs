@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'EdgeTraversal'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class EdgeTraversal : PropertyBagHolder, ISarifNode, IRow
     {
@@ -69,35 +64,30 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "edgeId", IsRequired = false, EmitDefaultValue = false)]
         public string EdgeId
         {
             get => _table.EdgeId[_index];
             set => _table.EdgeId[_index] = value;
         }
 
-        [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "finalState", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, MultiformatMessageString> FinalState
         {
             get => _table.FinalState[_index];
             set => _table.FinalState[_index] = value;
         }
 
-        [DataMember(Name = "stepOverEdgeCount", IsRequired = false, EmitDefaultValue = false)]
         public int StepOverEdgeCount
         {
             get => _table.StepOverEdgeCount[_index];
             set => _table.StepOverEdgeCount[_index] = value;
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

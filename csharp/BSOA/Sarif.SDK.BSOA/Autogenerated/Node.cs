@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Node'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Node : PropertyBagHolder, ISarifNode, IRow
     {
@@ -69,35 +64,30 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
         public string Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
-        [DataMember(Name = "label", IsRequired = false, EmitDefaultValue = false)]
         public Message Label
         {
             get => _table.Database.Message.Get(_table.Label[_index]);
             set => _table.Label[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "location", IsRequired = false, EmitDefaultValue = false)]
         public Location Location
         {
             get => _table.Database.Location.Get(_table.Location[_index]);
             set => _table.Location[_index] = _table.Database.Location.LocalIndex(value);
         }
 
-        [DataMember(Name = "children", IsRequired = false, EmitDefaultValue = false)]
         public IList<Node> Children
         {
             get => _table.Database.Node.List(_table.Children[_index]);
             set => _table.Database.Node.List(_table.Children[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

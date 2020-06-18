@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'WebResponse'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class WebResponse : PropertyBagHolder, ISarifNode, IRow
     {
@@ -81,65 +76,54 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "index", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int Index
         {
             get => _table.Index[_index];
             set => _table.Index[_index] = value;
         }
 
-        [DataMember(Name = "protocol", IsRequired = false, EmitDefaultValue = false)]
         public string Protocol
         {
             get => _table.Protocol[_index];
             set => _table.Protocol[_index] = value;
         }
 
-        [DataMember(Name = "version", IsRequired = false, EmitDefaultValue = false)]
         public string Version
         {
             get => _table.Version[_index];
             set => _table.Version[_index] = value;
         }
 
-        [DataMember(Name = "statusCode", IsRequired = false, EmitDefaultValue = false)]
         public int StatusCode
         {
             get => _table.StatusCode[_index];
             set => _table.StatusCode[_index] = value;
         }
 
-        [DataMember(Name = "reasonPhrase", IsRequired = false, EmitDefaultValue = false)]
         public string ReasonPhrase
         {
             get => _table.ReasonPhrase[_index];
             set => _table.ReasonPhrase[_index] = value;
         }
 
-        [DataMember(Name = "headers", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, string> Headers
         {
             get => _table.Headers[_index];
             set => _table.Headers[_index] = value;
         }
 
-        [DataMember(Name = "body", IsRequired = false, EmitDefaultValue = false)]
         public ArtifactContent Body
         {
             get => _table.Database.ArtifactContent.Get(_table.Body[_index]);
             set => _table.Body[_index] = _table.Database.ArtifactContent.LocalIndex(value);
         }
 
-        [DataMember(Name = "noResponseReceived", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(false)]
         public bool NoResponseReceived
         {
             get => _table.NoResponseReceived[_index];
             set => _table.NoResponseReceived[_index] = value;
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

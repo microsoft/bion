@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Address'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Address : PropertyBagHolder, ISarifNode, IRow
     {
@@ -84,73 +79,60 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "absoluteAddress", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int AbsoluteAddress
         {
             get => _table.AbsoluteAddress[_index];
             set => _table.AbsoluteAddress[_index] = value;
         }
 
-        [DataMember(Name = "relativeAddress", IsRequired = false, EmitDefaultValue = false)]
         public int RelativeAddress
         {
             get => _table.RelativeAddress[_index];
             set => _table.RelativeAddress[_index] = value;
         }
 
-        [DataMember(Name = "length", IsRequired = false, EmitDefaultValue = false)]
         public int Length
         {
             get => _table.Length[_index];
             set => _table.Length[_index] = value;
         }
 
-        [DataMember(Name = "kind", IsRequired = false, EmitDefaultValue = false)]
         public string Kind
         {
             get => _table.Kind[_index];
             set => _table.Kind[_index] = value;
         }
 
-        [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]
         public string Name
         {
             get => _table.Name[_index];
             set => _table.Name[_index] = value;
         }
 
-        [DataMember(Name = "fullyQualifiedName", IsRequired = false, EmitDefaultValue = false)]
         public string FullyQualifiedName
         {
             get => _table.FullyQualifiedName[_index];
             set => _table.FullyQualifiedName[_index] = value;
         }
 
-        [DataMember(Name = "offsetFromParent", IsRequired = false, EmitDefaultValue = false)]
         public int OffsetFromParent
         {
             get => _table.OffsetFromParent[_index];
             set => _table.OffsetFromParent[_index] = value;
         }
 
-        [DataMember(Name = "index", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int Index
         {
             get => _table.Index[_index];
             set => _table.Index[_index] = value;
         }
 
-        [DataMember(Name = "parentIndex", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int ParentIndex
         {
             get => _table.ParentIndex[_index];
             set => _table.ParentIndex[_index] = value;
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

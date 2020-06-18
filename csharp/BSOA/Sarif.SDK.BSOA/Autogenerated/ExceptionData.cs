@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ExceptionData'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ExceptionData : PropertyBagHolder, ISarifNode, IRow
     {
@@ -69,35 +64,30 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "kind", IsRequired = false, EmitDefaultValue = false)]
         public string Kind
         {
             get => _table.Kind[_index];
             set => _table.Kind[_index] = value;
         }
 
-        [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
         public string Message
         {
             get => _table.Message[_index];
             set => _table.Message[_index] = value;
         }
 
-        [DataMember(Name = "stack", IsRequired = false, EmitDefaultValue = false)]
         public Stack Stack
         {
             get => _table.Database.Stack.Get(_table.Stack[_index]);
             set => _table.Stack[_index] = _table.Database.Stack.LocalIndex(value);
         }
 
-        [DataMember(Name = "innerExceptions", IsRequired = false, EmitDefaultValue = false)]
         public IList<ExceptionData> InnerExceptions
         {
             get => _table.Database.ExceptionData.List(_table.InnerExceptions[_index]);
             set => _table.Database.ExceptionData.List(_table.InnerExceptions[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

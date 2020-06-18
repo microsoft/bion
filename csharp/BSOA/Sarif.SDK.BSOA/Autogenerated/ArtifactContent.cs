@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ArtifactContent'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ArtifactContent : PropertyBagHolder, ISarifNode, IRow
     {
@@ -66,28 +61,24 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "text", IsRequired = false, EmitDefaultValue = false)]
         public string Text
         {
             get => _table.Text[_index];
             set => _table.Text[_index] = value;
         }
 
-        [DataMember(Name = "binary", IsRequired = false, EmitDefaultValue = false)]
         public string Binary
         {
             get => _table.Binary[_index];
             set => _table.Binary[_index] = value;
         }
 
-        [DataMember(Name = "rendered", IsRequired = false, EmitDefaultValue = false)]
         public MultiformatMessageString Rendered
         {
             get => _table.Database.MultiformatMessageString.Get(_table.Rendered[_index]);
             set => _table.Rendered[_index] = _table.Database.MultiformatMessageString.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

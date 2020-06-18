@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ReportingConfiguration'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ReportingConfiguration : PropertyBagHolder, ISarifNode, IRow
     {
@@ -69,38 +64,30 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "enabled", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(true)]
         public bool Enabled
         {
             get => _table.Enabled[_index];
             set => _table.Enabled[_index] = value;
         }
 
-        [DataMember(Name = "level", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public FailureLevel Level
         {
             get => (FailureLevel)_table.Level[_index];
             set => _table.Level[_index] = (int)value;
         }
 
-        [DataMember(Name = "rank", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public double Rank
         {
             get => _table.Rank[_index];
             set => _table.Rank[_index] = value;
         }
 
-        [DataMember(Name = "parameters", IsRequired = false, EmitDefaultValue = false)]
         public PropertyBag Parameters
         {
             get => _table.Database.PropertyBag.Get(_table.Parameters[_index]);
             set => _table.Parameters[_index] = _table.Database.PropertyBag.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'PropertyBag'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class PropertyBag : ISarifNode, IRow
     {
@@ -57,7 +52,6 @@ namespace Microsoft.CodeAnalysis.Sarif
             Tags = other.Tags;
         }
 
-        [DataMember(Name = "tags", IsRequired = false, EmitDefaultValue = false)]
         public IList<string> Tags
         {
             get => _table.Tags[_index];

@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ResultProvenance'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ResultProvenance : PropertyBagHolder, ISarifNode, IRow
     {
@@ -75,50 +70,42 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "firstDetectionTimeUtc", IsRequired = false, EmitDefaultValue = false)]
         public DateTime FirstDetectionTimeUtc
         {
             get => _table.FirstDetectionTimeUtc[_index];
             set => _table.FirstDetectionTimeUtc[_index] = value;
         }
 
-        [DataMember(Name = "lastDetectionTimeUtc", IsRequired = false, EmitDefaultValue = false)]
         public DateTime LastDetectionTimeUtc
         {
             get => _table.LastDetectionTimeUtc[_index];
             set => _table.LastDetectionTimeUtc[_index] = value;
         }
 
-        [DataMember(Name = "firstDetectionRunGuid", IsRequired = false, EmitDefaultValue = false)]
         public string FirstDetectionRunGuid
         {
             get => _table.FirstDetectionRunGuid[_index];
             set => _table.FirstDetectionRunGuid[_index] = value;
         }
 
-        [DataMember(Name = "lastDetectionRunGuid", IsRequired = false, EmitDefaultValue = false)]
         public string LastDetectionRunGuid
         {
             get => _table.LastDetectionRunGuid[_index];
             set => _table.LastDetectionRunGuid[_index] = value;
         }
 
-        [DataMember(Name = "invocationIndex", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int InvocationIndex
         {
             get => _table.InvocationIndex[_index];
             set => _table.InvocationIndex[_index] = value;
         }
 
-        [DataMember(Name = "conversionSources", IsRequired = false, EmitDefaultValue = false)]
         public IList<PhysicalLocation> ConversionSources
         {
             get => _table.Database.PhysicalLocation.List(_table.ConversionSources[_index]);
             set => _table.Database.PhysicalLocation.List(_table.ConversionSources[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

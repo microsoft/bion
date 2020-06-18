@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ThreadFlowLocation'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ThreadFlowLocation : PropertyBagHolder, ISarifNode, IRow
     {
@@ -96,101 +91,84 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "index", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int Index
         {
             get => _table.Index[_index];
             set => _table.Index[_index] = value;
         }
 
-        [DataMember(Name = "location", IsRequired = false, EmitDefaultValue = false)]
         public Location Location
         {
             get => _table.Database.Location.Get(_table.Location[_index]);
             set => _table.Location[_index] = _table.Database.Location.LocalIndex(value);
         }
 
-        [DataMember(Name = "stack", IsRequired = false, EmitDefaultValue = false)]
         public Stack Stack
         {
             get => _table.Database.Stack.Get(_table.Stack[_index]);
             set => _table.Stack[_index] = _table.Database.Stack.LocalIndex(value);
         }
 
-        [DataMember(Name = "kinds", IsRequired = false, EmitDefaultValue = false)]
         public IList<string> Kinds
         {
             get => _table.Kinds[_index];
             set => _table.Kinds[_index] = value;
         }
 
-        [DataMember(Name = "taxa", IsRequired = false, EmitDefaultValue = false)]
         public IList<ReportingDescriptorReference> Taxa
         {
             get => _table.Database.ReportingDescriptorReference.List(_table.Taxa[_index]);
             set => _table.Database.ReportingDescriptorReference.List(_table.Taxa[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "module", IsRequired = false, EmitDefaultValue = false)]
         public string Module
         {
             get => _table.Module[_index];
             set => _table.Module[_index] = value;
         }
 
-        [DataMember(Name = "state", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, MultiformatMessageString> State
         {
             get => _table.State[_index];
             set => _table.State[_index] = value;
         }
 
-        [DataMember(Name = "nestingLevel", IsRequired = false, EmitDefaultValue = false)]
         public int NestingLevel
         {
             get => _table.NestingLevel[_index];
             set => _table.NestingLevel[_index] = value;
         }
 
-        [DataMember(Name = "executionOrder", IsRequired = false, EmitDefaultValue = false)]
-        [DefaultValue(-1)]
         public int ExecutionOrder
         {
             get => _table.ExecutionOrder[_index];
             set => _table.ExecutionOrder[_index] = value;
         }
 
-        [DataMember(Name = "executionTimeUtc", IsRequired = false, EmitDefaultValue = false)]
         public DateTime ExecutionTimeUtc
         {
             get => _table.ExecutionTimeUtc[_index];
             set => _table.ExecutionTimeUtc[_index] = value;
         }
 
-        [DataMember(Name = "importance", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public ThreadFlowLocationImportance Importance
         {
             get => (ThreadFlowLocationImportance)_table.Importance[_index];
             set => _table.Importance[_index] = (int)value;
         }
 
-        [DataMember(Name = "webRequest", IsRequired = false, EmitDefaultValue = false)]
         public WebRequest WebRequest
         {
             get => _table.Database.WebRequest.Get(_table.WebRequest[_index]);
             set => _table.WebRequest[_index] = _table.Database.WebRequest.LocalIndex(value);
         }
 
-        [DataMember(Name = "webResponse", IsRequired = false, EmitDefaultValue = false)]
         public WebResponse WebResponse
         {
             get => _table.Database.WebResponse.Get(_table.WebResponse[_index]);
             set => _table.WebResponse[_index] = _table.Database.WebResponse.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

@@ -42,10 +42,10 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Schema = AddColumn(nameof(Schema), ColumnFactory.Build<Uri>());
+            Schema = AddColumn(nameof(Schema), ColumnFactory.Build<Uri>(default(Uri)));
             Version = AddColumn(nameof(Version), ColumnFactory.Build<int>((int)default(SarifVersion)));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>());
-            RunGuid = AddColumn(nameof(RunGuid), ColumnFactory.Build<string>());
+            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default(string)));
+            RunGuid = AddColumn(nameof(RunGuid), ColumnFactory.Build<string>(default(string)));
             Conversion = AddColumn(nameof(Conversion), new RefColumn(nameof(SarifLogDatabase.Conversion)));
             Graphs = AddColumn(nameof(Graphs), new RefListColumn(nameof(SarifLogDatabase.Graph)));
             ExternalizedProperties = AddColumn(nameof(ExternalizedProperties), new RefColumn(nameof(SarifLogDatabase.PropertyBag)));
@@ -62,7 +62,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Addresses = AddColumn(nameof(Addresses), new RefListColumn(nameof(SarifLogDatabase.Address)));
             WebRequests = AddColumn(nameof(WebRequests), new RefListColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponses = AddColumn(nameof(WebResponses), new RefListColumn(nameof(SarifLogDatabase.WebResponse)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
         }
 
         public override ExternalProperties Get(int index)

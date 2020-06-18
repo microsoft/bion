@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Rectangle'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Rectangle : PropertyBagHolder, ISarifNode, IRow
     {
@@ -72,42 +67,36 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "top", IsRequired = false, EmitDefaultValue = false)]
         public double Top
         {
             get => _table.Top[_index];
             set => _table.Top[_index] = value;
         }
 
-        [DataMember(Name = "left", IsRequired = false, EmitDefaultValue = false)]
         public double Left
         {
             get => _table.Left[_index];
             set => _table.Left[_index] = value;
         }
 
-        [DataMember(Name = "bottom", IsRequired = false, EmitDefaultValue = false)]
         public double Bottom
         {
             get => _table.Bottom[_index];
             set => _table.Bottom[_index] = value;
         }
 
-        [DataMember(Name = "right", IsRequired = false, EmitDefaultValue = false)]
         public double Right
         {
             get => _table.Right[_index];
             set => _table.Right[_index] = value;
         }
 
-        [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

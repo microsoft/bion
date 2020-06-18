@@ -134,6 +134,22 @@ namespace BSOA.Test.Model.V2
         {
             return ReadBsoa(File.OpenRead(filePath));
         }
+
+        public static TreeDiagnostics Diagnostics(string filePath)
+        {
+            return Diagnostics(File.OpenRead(filePath));
+        }
+
+        public static TreeDiagnostics Diagnostics(Stream stream)
+        {
+            using (BinaryTreeReader btr = new BinaryTreeReader(stream))
+            using (TreeDiagnosticsReader reader = new TreeDiagnosticsReader(btr))
+            {
+                Community result = new Community();
+                result.DB.Read(reader);
+                return reader.Tree;
+            }
+        }
         #endregion
     }
 }

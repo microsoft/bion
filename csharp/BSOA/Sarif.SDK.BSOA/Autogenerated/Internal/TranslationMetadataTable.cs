@@ -28,13 +28,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>());
-            FullName = AddColumn(nameof(FullName), ColumnFactory.Build<string>());
+            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default(string)));
+            FullName = AddColumn(nameof(FullName), ColumnFactory.Build<string>(default(string)));
             ShortDescription = AddColumn(nameof(ShortDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
             FullDescription = AddColumn(nameof(FullDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
-            DownloadUri = AddColumn(nameof(DownloadUri), ColumnFactory.Build<Uri>());
-            InformationUri = AddColumn(nameof(InformationUri), ColumnFactory.Build<Uri>());
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            DownloadUri = AddColumn(nameof(DownloadUri), ColumnFactory.Build<Uri>(default(Uri)));
+            InformationUri = AddColumn(nameof(InformationUri), ColumnFactory.Build<Uri>(default(Uri)));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
         }
 
         public override TranslationMetadata Get(int index)

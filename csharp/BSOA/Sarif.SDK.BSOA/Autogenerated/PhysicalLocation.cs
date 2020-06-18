@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'PhysicalLocation'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class PhysicalLocation : PropertyBagHolder, ISarifNode, IRow
     {
@@ -69,35 +64,30 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "address", IsRequired = false, EmitDefaultValue = false)]
         public Address Address
         {
             get => _table.Database.Address.Get(_table.Address[_index]);
             set => _table.Address[_index] = _table.Database.Address.LocalIndex(value);
         }
 
-        [DataMember(Name = "artifactLocation", IsRequired = false, EmitDefaultValue = false)]
         public ArtifactLocation ArtifactLocation
         {
             get => _table.Database.ArtifactLocation.Get(_table.ArtifactLocation[_index]);
             set => _table.ArtifactLocation[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
-        [DataMember(Name = "region", IsRequired = false, EmitDefaultValue = false)]
         public Region Region
         {
             get => _table.Database.Region.Get(_table.Region[_index]);
             set => _table.Region[_index] = _table.Database.Region.LocalIndex(value);
         }
 
-        [DataMember(Name = "contextRegion", IsRequired = false, EmitDefaultValue = false)]
         public Region ContextRegion
         {
             get => _table.Database.Region.Get(_table.ContextRegion[_index]);
             set => _table.ContextRegion[_index] = _table.Database.Region.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

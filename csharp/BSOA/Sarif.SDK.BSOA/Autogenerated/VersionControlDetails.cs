@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'VersionControlDetails'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class VersionControlDetails : PropertyBagHolder, ISarifNode, IRow
     {
@@ -75,49 +70,42 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "repositoryUri", IsRequired = false, EmitDefaultValue = false)]
         public Uri RepositoryUri
         {
             get => _table.RepositoryUri[_index];
             set => _table.RepositoryUri[_index] = value;
         }
 
-        [DataMember(Name = "revisionId", IsRequired = false, EmitDefaultValue = false)]
         public string RevisionId
         {
             get => _table.RevisionId[_index];
             set => _table.RevisionId[_index] = value;
         }
 
-        [DataMember(Name = "branch", IsRequired = false, EmitDefaultValue = false)]
         public string Branch
         {
             get => _table.Branch[_index];
             set => _table.Branch[_index] = value;
         }
 
-        [DataMember(Name = "revisionTag", IsRequired = false, EmitDefaultValue = false)]
         public string RevisionTag
         {
             get => _table.RevisionTag[_index];
             set => _table.RevisionTag[_index] = value;
         }
 
-        [DataMember(Name = "asOfTimeUtc", IsRequired = false, EmitDefaultValue = false)]
         public DateTime AsOfTimeUtc
         {
             get => _table.AsOfTimeUtc[_index];
             set => _table.AsOfTimeUtc[_index] = value;
         }
 
-        [DataMember(Name = "mappedTo", IsRequired = false, EmitDefaultValue = false)]
         public ArtifactLocation MappedTo
         {
             get => _table.Database.ArtifactLocation.Get(_table.MappedTo[_index]);
             set => _table.MappedTo[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

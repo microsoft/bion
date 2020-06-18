@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Conversion'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Conversion : PropertyBagHolder, ISarifNode, IRow
     {
@@ -66,28 +61,24 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "tool", IsRequired = false, EmitDefaultValue = false)]
         public Tool Tool
         {
             get => _table.Database.Tool.Get(_table.Tool[_index]);
             set => _table.Tool[_index] = _table.Database.Tool.LocalIndex(value);
         }
 
-        [DataMember(Name = "invocation", IsRequired = false, EmitDefaultValue = false)]
         public Invocation Invocation
         {
             get => _table.Database.Invocation.Get(_table.Invocation[_index]);
             set => _table.Invocation[_index] = _table.Database.Invocation.LocalIndex(value);
         }
 
-        [DataMember(Name = "analysisToolLogFiles", IsRequired = false, EmitDefaultValue = false)]
         public IList<ArtifactLocation> AnalysisToolLogFiles
         {
             get => _table.Database.ArtifactLocation.List(_table.AnalysisToolLogFiles[_index]);
             set => _table.Database.ArtifactLocation.List(_table.AnalysisToolLogFiles[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

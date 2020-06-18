@@ -31,14 +31,14 @@ namespace Microsoft.CodeAnalysis.Sarif
             Database = database;
 
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
-            Protocol = AddColumn(nameof(Protocol), ColumnFactory.Build<string>());
-            Version = AddColumn(nameof(Version), ColumnFactory.Build<string>());
-            StatusCode = AddColumn(nameof(StatusCode), ColumnFactory.Build<int>());
-            ReasonPhrase = AddColumn(nameof(ReasonPhrase), ColumnFactory.Build<string>());
-            Headers = AddColumn(nameof(Headers), ColumnFactory.Build<IDictionary<string, string>>());
+            Protocol = AddColumn(nameof(Protocol), ColumnFactory.Build<string>(default(string)));
+            Version = AddColumn(nameof(Version), ColumnFactory.Build<string>(default(string)));
+            StatusCode = AddColumn(nameof(StatusCode), ColumnFactory.Build<int>(default(int)));
+            ReasonPhrase = AddColumn(nameof(ReasonPhrase), ColumnFactory.Build<string>(default(string)));
+            Headers = AddColumn(nameof(Headers), ColumnFactory.Build<IDictionary<string, string>>(default(IDictionary<string, string>)));
             Body = AddColumn(nameof(Body), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
             NoResponseReceived = AddColumn(nameof(NoResponseReceived), ColumnFactory.Build<bool>(false));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
         }
 
         public override WebResponse Get(int index)

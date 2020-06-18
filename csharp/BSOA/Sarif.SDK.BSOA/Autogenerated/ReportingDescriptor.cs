@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'ReportingDescriptor'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class ReportingDescriptor : PropertyBagHolder, ISarifNode, IRow
     {
@@ -96,98 +91,84 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "id", IsRequired = false, EmitDefaultValue = false)]
         public string Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
-        [DataMember(Name = "deprecatedIds", IsRequired = false, EmitDefaultValue = false)]
         public IList<string> DeprecatedIds
         {
             get => _table.DeprecatedIds[_index];
             set => _table.DeprecatedIds[_index] = value;
         }
 
-        [DataMember(Name = "guid", IsRequired = false, EmitDefaultValue = false)]
         public string Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
         }
 
-        [DataMember(Name = "deprecatedGuids", IsRequired = false, EmitDefaultValue = false)]
         public IList<string> DeprecatedGuids
         {
             get => _table.DeprecatedGuids[_index];
             set => _table.DeprecatedGuids[_index] = value;
         }
 
-        [DataMember(Name = "name", IsRequired = false, EmitDefaultValue = false)]
         public string Name
         {
             get => _table.Name[_index];
             set => _table.Name[_index] = value;
         }
 
-        [DataMember(Name = "deprecatedNames", IsRequired = false, EmitDefaultValue = false)]
         public IList<string> DeprecatedNames
         {
             get => _table.DeprecatedNames[_index];
             set => _table.DeprecatedNames[_index] = value;
         }
 
-        [DataMember(Name = "shortDescription", IsRequired = false, EmitDefaultValue = false)]
         public MultiformatMessageString ShortDescription
         {
             get => _table.Database.MultiformatMessageString.Get(_table.ShortDescription[_index]);
             set => _table.ShortDescription[_index] = _table.Database.MultiformatMessageString.LocalIndex(value);
         }
 
-        [DataMember(Name = "fullDescription", IsRequired = false, EmitDefaultValue = false)]
         public MultiformatMessageString FullDescription
         {
             get => _table.Database.MultiformatMessageString.Get(_table.FullDescription[_index]);
             set => _table.FullDescription[_index] = _table.Database.MultiformatMessageString.LocalIndex(value);
         }
 
-        [DataMember(Name = "messageStrings", IsRequired = false, EmitDefaultValue = false)]
         public IDictionary<string, MultiformatMessageString> MessageStrings
         {
             get => _table.MessageStrings[_index];
             set => _table.MessageStrings[_index] = value;
         }
 
-        [DataMember(Name = "defaultConfiguration", IsRequired = false, EmitDefaultValue = false)]
         public ReportingConfiguration DefaultConfiguration
         {
             get => _table.Database.ReportingConfiguration.Get(_table.DefaultConfiguration[_index]);
             set => _table.DefaultConfiguration[_index] = _table.Database.ReportingConfiguration.LocalIndex(value);
         }
 
-        [DataMember(Name = "helpUri", IsRequired = false, EmitDefaultValue = false)]
         public Uri HelpUri
         {
             get => _table.HelpUri[_index];
             set => _table.HelpUri[_index] = value;
         }
 
-        [DataMember(Name = "help", IsRequired = false, EmitDefaultValue = false)]
         public MultiformatMessageString Help
         {
             get => _table.Database.MultiformatMessageString.Get(_table.Help[_index]);
             set => _table.Help[_index] = _table.Database.MultiformatMessageString.LocalIndex(value);
         }
 
-        [DataMember(Name = "relationships", IsRequired = false, EmitDefaultValue = false)]
         public IList<ReportingDescriptorRelationship> Relationships
         {
             get => _table.Database.ReportingDescriptorRelationship.List(_table.Relationships[_index]);
             set => _table.Database.ReportingDescriptorRelationship.List(_table.Relationships[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

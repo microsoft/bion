@@ -4,22 +4,17 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 
 using BSOA.Model;
 
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
-using Newtonsoft.Json;
-
 namespace Microsoft.CodeAnalysis.Sarif
 {
     /// <summary>
     ///  GENERATED: BSOA Entity for 'Notification'
     /// </summary>
-    [DataContract]
     [GeneratedCode("BSOA.Generator", "0.5.0")]
     public partial class Notification : PropertyBagHolder, ISarifNode, IRow
     {
@@ -81,64 +76,54 @@ namespace Microsoft.CodeAnalysis.Sarif
             Properties = other.Properties;
         }
 
-        [DataMember(Name = "locations", IsRequired = false, EmitDefaultValue = false)]
         public IList<Location> Locations
         {
             get => _table.Database.Location.List(_table.Locations[_index]);
             set => _table.Database.Location.List(_table.Locations[_index]).SetTo(value);
         }
 
-        [DataMember(Name = "message", IsRequired = false, EmitDefaultValue = false)]
         public Message Message
         {
             get => _table.Database.Message.Get(_table.Message[_index]);
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        [DataMember(Name = "level", IsRequired = false, EmitDefaultValue = false)]
-        [JsonConverter(typeof(Microsoft.CodeAnalysis.Sarif.Readers.EnumConverter))]
         public FailureLevel Level
         {
             get => (FailureLevel)_table.Level[_index];
             set => _table.Level[_index] = (int)value;
         }
 
-        [DataMember(Name = "threadId", IsRequired = false, EmitDefaultValue = false)]
         public int ThreadId
         {
             get => _table.ThreadId[_index];
             set => _table.ThreadId[_index] = value;
         }
 
-        [DataMember(Name = "timeUtc", IsRequired = false, EmitDefaultValue = false)]
         public DateTime TimeUtc
         {
             get => _table.TimeUtc[_index];
             set => _table.TimeUtc[_index] = value;
         }
 
-        [DataMember(Name = "exception", IsRequired = false, EmitDefaultValue = false)]
         public ExceptionData Exception
         {
             get => _table.Database.ExceptionData.Get(_table.Exception[_index]);
             set => _table.Exception[_index] = _table.Database.ExceptionData.LocalIndex(value);
         }
 
-        [DataMember(Name = "descriptor", IsRequired = false, EmitDefaultValue = false)]
         public ReportingDescriptorReference Descriptor
         {
             get => _table.Database.ReportingDescriptorReference.Get(_table.Descriptor[_index]);
             set => _table.Descriptor[_index] = _table.Database.ReportingDescriptorReference.LocalIndex(value);
         }
 
-        [DataMember(Name = "associatedRule", IsRequired = false, EmitDefaultValue = false)]
         public ReportingDescriptorReference AssociatedRule
         {
             get => _table.Database.ReportingDescriptorReference.Get(_table.AssociatedRule[_index]);
             set => _table.AssociatedRule[_index] = _table.Database.ReportingDescriptorReference.LocalIndex(value);
         }
 
-        [DataMember(Name = "properties", IsRequired = false, EmitDefaultValue = false)]
         internal override IDictionary<string, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];

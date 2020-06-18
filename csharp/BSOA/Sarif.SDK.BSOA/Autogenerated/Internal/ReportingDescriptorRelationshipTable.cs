@@ -26,9 +26,9 @@ namespace Microsoft.CodeAnalysis.Sarif
             Database = database;
 
             Target = AddColumn(nameof(Target), new RefColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
-            Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<string>>());
+            Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<string>>(default(IList<string>)));
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>(default(IDictionary<string, SerializedPropertyInfo>)));
         }
 
         public override ReportingDescriptorRelationship Get(int index)
