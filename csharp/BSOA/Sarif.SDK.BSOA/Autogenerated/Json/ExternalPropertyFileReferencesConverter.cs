@@ -91,7 +91,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteList("translations", item.Translations, ExternalPropertyFileReferenceJsonExtensions.Write);
                 writer.WriteList("webRequests", item.WebRequests, ExternalPropertyFileReferenceJsonExtensions.Write);
                 writer.WriteList("webResponses", item.WebResponses, ExternalPropertyFileReferenceJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

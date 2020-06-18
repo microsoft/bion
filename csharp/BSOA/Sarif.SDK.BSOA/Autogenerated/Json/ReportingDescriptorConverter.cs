@@ -85,7 +85,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("helpUri", item.HelpUri, default);
                 writer.Write("help", item.Help);
                 writer.WriteList("relationships", item.Relationships, ReportingDescriptorRelationshipJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

@@ -4,7 +4,17 @@
 using System;
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+
+namespace Microsoft.CodeAnalysis.Sarif
+{
+    public static class SerializedPropertyInfoJsonExtensions
+    {
+        public static void Write(this JsonWriter writer, SerializedPropertyInfo item)
+        {
+            Readers.SerializedPropertyInfoConverter.Instance.WriteJson(writer, item, null);
+        }
+    }
+}
 
 namespace Microsoft.CodeAnalysis.Sarif.Readers
 {

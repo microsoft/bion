@@ -71,7 +71,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("initialState", item.InitialState, default);
                 writer.Write("immutableState", item.ImmutableState, default);
                 writer.WriteList("edgeTraversals", item.EdgeTraversals, EdgeTraversalJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

@@ -77,7 +77,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("offsetFromParent", item.OffsetFromParent, default);
                 writer.Write("index", item.Index, -1);
                 writer.Write("parentIndex", item.ParentIndex, -1);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

@@ -81,7 +81,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("snippet", item.Snippet);
                 writer.Write("message", item.Message);
                 writer.Write("sourceLanguage", item.SourceLanguage, default);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

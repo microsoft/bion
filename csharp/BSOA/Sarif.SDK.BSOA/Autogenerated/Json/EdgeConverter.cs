@@ -67,7 +67,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("label", item.Label);
                 writer.Write("sourceNodeId", item.SourceNodeId, default);
                 writer.Write("targetNodeId", item.TargetNodeId, default);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

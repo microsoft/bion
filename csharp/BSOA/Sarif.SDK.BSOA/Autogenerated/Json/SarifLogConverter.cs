@@ -60,7 +60,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteEnum("version", item.Version, default(SarifVersion));
                 writer.WriteList("runs", item.Runs, RunJsonExtensions.Write);
                 writer.WriteList("inlineExternalProperties", item.InlineExternalProperties, ExternalPropertiesJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

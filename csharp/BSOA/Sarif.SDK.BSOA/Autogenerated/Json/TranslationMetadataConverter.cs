@@ -71,7 +71,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("fullDescription", item.FullDescription);
                 writer.Write("downloadUri", item.DownloadUri, default);
                 writer.Write("informationUri", item.InformationUri, default);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

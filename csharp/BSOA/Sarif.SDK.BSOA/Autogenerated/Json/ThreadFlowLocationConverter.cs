@@ -85,7 +85,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteEnum("importance", item.Importance, ThreadFlowLocationImportance.Important);
                 writer.Write("webRequest", item.WebRequest);
                 writer.Write("webResponse", item.WebResponse);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

@@ -67,7 +67,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("message", item.Message);
                 writer.Write("finalState", item.FinalState, default);
                 writer.Write("stepOverEdgeCount", item.StepOverEdgeCount, default);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

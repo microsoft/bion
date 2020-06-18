@@ -67,7 +67,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("artifactLocation", item.ArtifactLocation);
                 writer.WriteList("regions", item.Regions, RegionJsonExtensions.Write);
                 writer.WriteList("rectangles", item.Rectangles, RectangleJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

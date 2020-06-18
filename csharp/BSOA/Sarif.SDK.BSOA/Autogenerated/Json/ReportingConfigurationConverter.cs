@@ -67,7 +67,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteEnum("level", item.Level, FailureLevel.Warning);
                 writer.Write("rank", item.Rank, -1);
                 writer.Write("parameters", item.Parameters);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

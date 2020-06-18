@@ -71,7 +71,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("lastDetectionRunGuid", item.LastDetectionRunGuid, default);
                 writer.Write("invocationIndex", item.InvocationIndex, -1);
                 writer.WriteList("conversionSources", item.ConversionSources, PhysicalLocationJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

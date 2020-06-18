@@ -109,7 +109,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("stdout", item.Stdout);
                 writer.Write("stderr", item.Stderr);
                 writer.Write("stdoutStderr", item.StdoutStderr);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

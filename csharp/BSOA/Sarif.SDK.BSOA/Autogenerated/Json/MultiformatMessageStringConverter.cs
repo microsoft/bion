@@ -63,7 +63,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteStartObject();
                 writer.Write("text", item.Text, default);
                 writer.Write("markdown", item.Markdown, default);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

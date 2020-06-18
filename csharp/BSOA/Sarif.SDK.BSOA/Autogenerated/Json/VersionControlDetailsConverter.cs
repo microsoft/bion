@@ -71,7 +71,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("revisionTag", item.RevisionTag, default);
                 writer.Write("asOfTimeUtc", item.AsOfTimeUtc, default);
                 writer.Write("mappedTo", item.MappedTo);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

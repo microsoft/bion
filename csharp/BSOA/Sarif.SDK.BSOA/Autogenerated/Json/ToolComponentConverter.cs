@@ -113,7 +113,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("associatedComponent", item.AssociatedComponent);
                 writer.Write("translationMetadata", item.TranslationMetadata);
                 writer.WriteList("supportedTaxonomies", item.SupportedTaxonomies, ToolComponentReferenceJsonExtensions.Write);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

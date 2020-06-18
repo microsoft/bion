@@ -75,7 +75,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("exception", item.Exception);
                 writer.Write("descriptor", item.Descriptor);
                 writer.Write("associatedRule", item.AssociatedRule);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

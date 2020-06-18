@@ -69,7 +69,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("bottom", item.Bottom, default);
                 writer.Write("right", item.Right, default);
                 writer.Write("message", item.Message);
-                writer.Write("properties", item.Properties, default);
+                writer.WriteDictionary("properties", item.Properties, SerializedPropertyInfoJsonExtensions.Write);
                 writer.WriteEndObject();
             }
         }

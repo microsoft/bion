@@ -37,7 +37,7 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
             var objectDictionary = new Dictionary<string, object>();
             serializer.Populate(reader, objectDictionary);
 
-            var propertyDictionary = new Dictionary<string, SerializedPropertyInfo>();
+            var propertyDictionary = existingValue as IDictionary<string, SerializedPropertyInfo> ?? new Dictionary<string, SerializedPropertyInfo>();
             foreach (string key in objectDictionary.Keys)
             {
                 object value = objectDictionary[key];
