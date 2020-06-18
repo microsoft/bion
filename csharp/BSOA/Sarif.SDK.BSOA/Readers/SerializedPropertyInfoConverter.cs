@@ -45,9 +45,13 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
                 throw new ArgumentNullException(nameof(writer));
             }
 
-            string serializedValue = ((SerializedPropertyInfo)value).SerializedValue;
+            string serializedValue = ((SerializedPropertyInfo)value)?.SerializedValue;
 
-            if (serializedValue.StartsWith("\""))
+            if (serializedValue == null)
+            {
+                writer.WriteNull();
+            }
+            else if (serializedValue.StartsWith("\""))
             {
                 writer.WriteRawValue(serializedValue);
             }
