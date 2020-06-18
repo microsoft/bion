@@ -1,10 +1,8 @@
 ﻿using BSOA.Diagnostics;
-using BSOA.Json;
 
 using Microsoft.CodeAnalysis.Sarif;
 
 using System;
-using System.Collections.Generic;
 
 namespace BSOA.Demo.Comparison
 {
@@ -12,15 +10,22 @@ namespace BSOA.Demo.Comparison
     {
         static void Main(string[] args)
         {
-            string filePath = (args.Length > 0 ? args[0] : @"C:\Download\Demo\V2\Inputs\CodeAsData.sarif");
+            string mode = (args.Length > 0 ? args[0].ToLowerInvariant() : "load");
+            string filePath = (args.Length > 1 ? args[1] : @"C:\Download\Demo\V2\Inputs\CodeAsData.sarif");
 
-            //SarifLog log = Measure.LoadPerformance<SarifLog>(SarifLog.Load, filePath, "SARIF JSON to Normal object model", iterations: 1);
-
-            //long lineTotal = LineTotal(log);
-            //Console.WriteLine($"Line Sum: {lineTotal:n0}");
-
-
-            RegionDemoBuilder.Build(SarifLog.Load(filePath), @"C:\Download\Demo\V2\Inputs\Regions.json");
+            switch(mode)
+            {
+                case "load":
+                    SarifLog log = Measure.LoadPerformance<SarifLog>(SarifLog.Load, filePath, "SARIF JSON to Normal object model", iterations: 8);
+                    Console.WriteLine($"Line Sum: {LineTotal(log):n0}");
+                    break;
+                case "build":
+                    RegionDemoBuilder.Build(SarifLog.Load(filePath), @"C:\Download\Demo\V2\Inputs\Regions.json");
+                    break;
+                default:
+                    Console.WriteLine($"Unknown mode '{mode}'. Usage: BSOA.Demo.Comparison <load/build> <filePath>");
+                    break;
+            }
         }
 
         private static long LineTotal(SarifLog log)

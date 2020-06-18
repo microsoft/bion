@@ -33,7 +33,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public SarifLog() : this(new SarifLogDatabase().SarifLog)
         { }
-        
+
         internal SarifLog(SarifLogTable table) : this(table, table.Count)
         {
             table.Add();
@@ -244,6 +244,22 @@ namespace Microsoft.CodeAnalysis.Sarif
         public static SarifLog ReadBsoa(string filePath)
         {
             return ReadBsoa(File.OpenRead(filePath));
+        }
+
+        public static TreeDiagnostics Diagnostics(string filePath)
+        {
+            return Diagnostics(File.OpenRead(filePath));
+        }
+
+        public static TreeDiagnostics Diagnostics(Stream stream)
+        {
+            using (BinaryTreeReader btr = new BinaryTreeReader(stream))
+            using (TreeDiagnosticsReader reader = new TreeDiagnosticsReader(btr))
+            {
+                SarifLog result = new SarifLog();
+                result.DB.Read(reader);
+                return reader.Tree;
+            }
         }
         #endregion
 

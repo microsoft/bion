@@ -263,6 +263,22 @@ namespace BSOA.Generator.Templates
         {
             return ReadBsoa(File.OpenRead(filePath));
         }
+
+        public static TreeDiagnostics Diagnostics(string filePath)
+        {
+            return Diagnostics(File.OpenRead(filePath));
+        }
+
+        public static TreeDiagnostics Diagnostics(Stream stream)
+        {
+            using (BinaryTreeReader btr = new BinaryTreeReader(stream))
+            using (TreeDiagnosticsReader reader = new TreeDiagnosticsReader(btr))
+            {
+                Company result = new Company();
+                result.DB.Read(reader);
+                return reader.Tree;
+            }
+        }
         #endregion
 
         public static IEqualityComparer<Company> ValueComparer => EqualityComparer<Company>.Default;
