@@ -71,7 +71,7 @@ namespace BSOA.Generator
                 ["\"schemaUri\""] = "\"$schema\"",
 
                 // Use PropertyBagConverter to read and write Properties. SerializedPropertyInfoConverter.ReadJson doesn't actually work.
-                ["me.([^ ]+) = reader.ReadIDictionary<string, SerializedPropertyInfo>\\(root\\)"] = "Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.$1, null)",
+                ["me.([^ ]+) = reader.ReadIDictionary<string, SerializedPropertyInfo>\\(root\\)"] = "me.$1 = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)",
                 [Regex.Escape("writer.Write(\"properties\", item.Properties, default);")] = "writer.WriteDictionary(\"properties\", item.Properties, SerializedPropertyInfoJsonExtensions.Write);",
 
                 // Dictionaries don't generate correct read methods

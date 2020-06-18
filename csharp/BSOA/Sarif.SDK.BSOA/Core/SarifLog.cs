@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.IO;
 using System.Linq;
 
@@ -19,6 +20,12 @@ namespace Microsoft.CodeAnalysis.Sarif
 
     public partial class SarifLog
     {
+        partial void Init()
+        {
+            Version = SarifVersion.Current;
+            SchemaUri = new Uri(SarifUtilities.SarifSchemaUri);
+        }
+
         public override string ToString()
         {
             return $"{Runs.Sum((run) => run?.Results?.Count ?? 0):n0} {nameof(Result)}s";
