@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ThreadFlowLocation(ThreadFlowLocationTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ThreadFlowLocation(ThreadFlowLocationTable table, int index)
@@ -90,6 +91,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             WebResponse = other.WebResponse;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public int Index
         {

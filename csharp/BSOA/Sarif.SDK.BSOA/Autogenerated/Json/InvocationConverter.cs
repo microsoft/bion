@@ -56,7 +56,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["stdout"] = (reader, root, me) => me.Stdout = reader.ReadArtifactLocation(root),
             ["stderr"] = (reader, root, me) => me.Stderr = reader.ReadArtifactLocation(root),
             ["stdoutStderr"] = (reader, root, me) => me.StdoutStderr = reader.ReadArtifactLocation(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static Invocation ReadInvocation(this JsonReader reader, SarifLog root = null)

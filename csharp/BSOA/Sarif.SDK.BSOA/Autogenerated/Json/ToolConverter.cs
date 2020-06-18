@@ -33,7 +33,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             ["driver"] = (reader, root, me) => me.Driver = reader.ReadToolComponent(root),
             ["extensions"] = (reader, root, me) => reader.ReadList(root, me.Extensions, ToolComponentJsonExtensions.ReadToolComponent),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static Tool ReadTool(this JsonReader reader, SarifLog root = null)

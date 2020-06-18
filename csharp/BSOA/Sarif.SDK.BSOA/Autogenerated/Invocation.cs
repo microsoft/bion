@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Invocation(InvocationTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Invocation(InvocationTable table, int index)
@@ -126,6 +127,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             StdoutStderr = other.StdoutStderr;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string CommandLine
         {

@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ConfigurationOverride(ConfigurationOverrideTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ConfigurationOverride(ConfigurationOverrideTable table, int index)
@@ -57,6 +58,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Descriptor = other.Descriptor;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public ReportingConfiguration Configuration
         {

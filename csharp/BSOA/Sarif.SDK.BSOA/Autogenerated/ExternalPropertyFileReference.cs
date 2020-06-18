@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ExternalPropertyFileReference(ExternalPropertyFileReferenceTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ExternalPropertyFileReference(ExternalPropertyFileReferenceTable table, int index)
@@ -60,6 +61,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             ItemCount = other.ItemCount;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public ArtifactLocation Location
         {

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.CodeAnalysis.Sarif
 {
-    [JsonConverter(typeof(PropertyBagConverter))]
+    // [JsonConverter(typeof(PropertyBagConverter))]
     public partial class PropertyBag
     { }
     

@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["index"] = (reader, root, me) => me.Index = reader.ReadInt(root),
             ["guid"] = (reader, root, me) => me.Guid = reader.ReadString(root),
             ["toolComponent"] = (reader, root, me) => me.ToolComponent = reader.ReadToolComponentReference(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static ReportingDescriptorReference ReadReportingDescriptorReference(this JsonReader reader, SarifLog root = null)

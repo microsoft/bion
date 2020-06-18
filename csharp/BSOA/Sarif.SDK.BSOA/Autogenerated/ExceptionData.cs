@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ExceptionData(ExceptionDataTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ExceptionData(ExceptionDataTable table, int index)
@@ -63,6 +64,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             InnerExceptions = other.InnerExceptions;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string Kind
         {

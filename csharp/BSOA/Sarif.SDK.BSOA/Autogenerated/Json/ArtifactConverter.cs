@@ -43,7 +43,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["sourceLanguage"] = (reader, root, me) => me.SourceLanguage = reader.ReadString(root),
             ["hashes"] = (reader, root, me) => reader.ReadDictionary(root, me.Hashes, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString),
             ["lastModifiedTimeUtc"] = (reader, root, me) => me.LastModifiedTimeUtc = reader.ReadDateTime(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static Artifact ReadArtifact(this JsonReader reader, SarifLog root = null)
@@ -76,7 +76,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("parentIndex", item.ParentIndex, -1);
                 writer.Write("offset", item.Offset, default);
                 writer.Write("length", item.Length, -1);
-                writer.Write("roles", item.Roles);
+                writer.WriteEnum("roles", item.Roles, default(ArtifactRoles));
                 writer.Write("mimeType", item.MimeType, default);
                 writer.Write("contents", item.Contents);
                 writer.Write("encoding", item.Encoding, default);

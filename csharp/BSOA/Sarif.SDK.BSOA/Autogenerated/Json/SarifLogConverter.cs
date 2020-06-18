@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["version"] = (reader, root, me) => me.Version = reader.ReadEnum<SarifVersion, SarifLog>(root),
             ["runs"] = (reader, root, me) => reader.ReadList(root, me.Runs, RunJsonExtensions.ReadRun),
             ["inlineExternalProperties"] = (reader, root, me) => reader.ReadList(root, me.InlineExternalProperties, ExternalPropertiesJsonExtensions.ReadExternalProperties),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static SarifLog ReadSarifLog(this JsonReader reader, SarifLog root = null)
@@ -57,7 +57,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             {
                 writer.WriteStartObject();
                 writer.Write("$schema", item.SchemaUri, default);
-                writer.Write("version", item.Version);
+                writer.WriteEnum("version", item.Version, default(SarifVersion));
                 writer.WriteList("runs", item.Runs, RunJsonExtensions.Write);
                 writer.WriteList("inlineExternalProperties", item.InlineExternalProperties, ExternalPropertiesJsonExtensions.Write);
                 writer.Write("properties", item.Properties, default);

@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Fix(FixTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Fix(FixTable table, int index)
@@ -57,6 +58,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             ArtifactChanges = other.ArtifactChanges;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Message Description
         {

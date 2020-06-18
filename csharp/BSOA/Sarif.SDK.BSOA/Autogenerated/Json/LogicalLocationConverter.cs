@@ -37,7 +37,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["decoratedName"] = (reader, root, me) => me.DecoratedName = reader.ReadString(root),
             ["parentIndex"] = (reader, root, me) => me.ParentIndex = reader.ReadInt(root),
             ["kind"] = (reader, root, me) => me.Kind = reader.ReadString(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static LogicalLocation ReadLogicalLocation(this JsonReader reader, SarifLog root = null)

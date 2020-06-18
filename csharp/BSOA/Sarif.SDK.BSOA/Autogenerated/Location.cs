@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Location(LocationTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Location(LocationTable table, int index)
@@ -69,6 +70,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Relationships = other.Relationships;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public int Id
         {

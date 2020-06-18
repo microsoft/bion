@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ThreadFlow(ThreadFlowTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ThreadFlow(ThreadFlowTable table, int index)
@@ -66,6 +67,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Locations = other.Locations;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string Id
         {

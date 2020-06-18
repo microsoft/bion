@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Run(RunTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Run(RunTable table, int index)
@@ -132,6 +133,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             SpecialLocations = other.SpecialLocations;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Tool Tool
         {

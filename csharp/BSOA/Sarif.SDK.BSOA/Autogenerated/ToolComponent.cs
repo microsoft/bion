@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ToolComponent(ToolComponentTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ToolComponent(ToolComponentTable table, int index)
@@ -132,6 +133,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             SupportedTaxonomies = other.SupportedTaxonomies;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string Guid
         {

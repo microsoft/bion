@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ResultProvenance(ResultProvenanceTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ResultProvenance(ResultProvenanceTable table, int index)
@@ -69,6 +70,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             ConversionSources = other.ConversionSources;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public DateTime FirstDetectionTimeUtc
         {

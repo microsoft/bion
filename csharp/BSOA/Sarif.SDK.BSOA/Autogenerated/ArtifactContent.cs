@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ArtifactContent(ArtifactContentTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ArtifactContent(ArtifactContentTable table, int index)
@@ -60,6 +61,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Rendered = other.Rendered;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string Text
         {

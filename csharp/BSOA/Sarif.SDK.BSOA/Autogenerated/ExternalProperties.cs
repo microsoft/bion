@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ExternalProperties(ExternalPropertiesTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ExternalProperties(ExternalPropertiesTable table, int index)
@@ -111,6 +112,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             WebResponses = other.WebResponses;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Uri Schema
         {

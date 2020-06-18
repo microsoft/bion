@@ -37,7 +37,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["fullDescription"] = (reader, root, me) => me.FullDescription = reader.ReadMultiformatMessageString(root),
             ["downloadUri"] = (reader, root, me) => me.DownloadUri = reader.ReadUri(root),
             ["informationUri"] = (reader, root, me) => me.InformationUri = reader.ReadUri(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static TranslationMetadata ReadTranslationMetadata(this JsonReader reader, SarifLog root = null)

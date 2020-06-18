@@ -33,7 +33,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             ["description"] = (reader, root, me) => me.Description = reader.ReadMessage(root),
             ["artifactChanges"] = (reader, root, me) => reader.ReadList(root, me.ArtifactChanges, ArtifactChangeJsonExtensions.ReadArtifactChange),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static Fix ReadFix(this JsonReader reader, SarifLog root = null)

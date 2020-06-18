@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RunAutomationDetails(RunAutomationDetailsTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal RunAutomationDetails(RunAutomationDetailsTable table, int index)
@@ -63,6 +64,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             CorrelationGuid = other.CorrelationGuid;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Message Description
         {

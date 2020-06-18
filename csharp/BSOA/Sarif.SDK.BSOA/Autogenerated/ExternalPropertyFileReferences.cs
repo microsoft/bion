@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ExternalPropertyFileReferences(ExternalPropertyFileReferencesTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ExternalPropertyFileReferences(ExternalPropertyFileReferencesTable table, int index)
@@ -99,6 +100,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             WebResponses = other.WebResponses;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public ExternalPropertyFileReference Conversion
         {

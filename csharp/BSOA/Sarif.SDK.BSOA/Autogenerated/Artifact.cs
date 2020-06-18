@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Artifact(ArtifactTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Artifact(ArtifactTable table, int index)
@@ -87,6 +88,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             LastModifiedTimeUtc = other.LastModifiedTimeUtc;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Message Description
         {

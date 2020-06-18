@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Stack(StackTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Stack(StackTable table, int index)
@@ -57,6 +58,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Frames = other.Frames;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Message Message
         {

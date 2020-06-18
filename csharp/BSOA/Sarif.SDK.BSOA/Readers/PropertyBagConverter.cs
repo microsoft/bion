@@ -6,6 +6,13 @@ using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
+namespace Microsoft.CodeAnalysis.Sarif
+{
+    [JsonConverter(typeof(Readers.PropertyBagConverter))]
+    public partial class PropertyBag
+    { }
+}
+
 namespace Microsoft.CodeAnalysis.Sarif.Readers
 {
     /// <summary>
@@ -15,6 +22,7 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
     /// </summary>
     internal class PropertyBagConverter : JsonConverter
     {
+        private static JsonSerializer _serializer = JsonSerializer.CreateDefault();
         internal static readonly JsonConverter Instance = new PropertyBagConverter();
 
         public override bool CanConvert(Type objectType)
@@ -24,10 +32,7 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (serializer == null)
-            {
-                throw new ArgumentNullException(nameof(serializer));
-            }
+            serializer = serializer ?? _serializer;
 
             var objectDictionary = new Dictionary<string, object>();
             serializer.Populate(reader, objectDictionary);

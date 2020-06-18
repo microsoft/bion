@@ -60,7 +60,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["taxa"] = (reader, root, me) => reader.ReadList(root, me.Taxa, ReportingDescriptorReferenceJsonExtensions.ReadReportingDescriptorReference),
             ["webRequest"] = (reader, root, me) => me.WebRequest = reader.ReadWebRequest(root),
             ["webResponse"] = (reader, root, me) => me.WebResponse = reader.ReadWebResponse(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static Result ReadResult(this JsonReader reader, SarifLog root = null)
@@ -91,8 +91,8 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("ruleId", item.RuleId, default);
                 writer.Write("ruleIndex", item.RuleIndex, -1);
                 writer.Write("rule", item.Rule);
-                writer.Write("kind", item.Kind);
-                writer.Write("level", item.Level);
+                writer.WriteEnum("kind", item.Kind, ResultKind.Fail);
+                writer.WriteEnum("level", item.Level, FailureLevel.Warning);
                 writer.Write("message", item.Message);
                 writer.Write("analysisTarget", item.AnalysisTarget);
                 writer.WriteList("locations", item.Locations, LocationJsonExtensions.Write);
@@ -107,7 +107,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteList("graphTraversals", item.GraphTraversals, GraphTraversalJsonExtensions.Write);
                 writer.WriteList("relatedLocations", item.RelatedLocations, LocationJsonExtensions.Write);
                 writer.WriteList("suppressions", item.Suppressions, SuppressionJsonExtensions.Write);
-                writer.Write("baselineState", item.BaselineState);
+                writer.WriteEnum("baselineState", item.BaselineState, default(BaselineState));
                 writer.Write("rank", item.Rank, -1);
                 writer.WriteList("attachments", item.Attachments, AttachmentJsonExtensions.Write);
                 writer.Write("hostedViewerUri", item.HostedViewerUri, default);

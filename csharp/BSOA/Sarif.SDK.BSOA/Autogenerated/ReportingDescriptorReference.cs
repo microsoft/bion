@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ReportingDescriptorReference(ReportingDescriptorReferenceTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ReportingDescriptorReference(ReportingDescriptorReferenceTable table, int index)
@@ -63,6 +64,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             ToolComponent = other.ToolComponent;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string Id
         {

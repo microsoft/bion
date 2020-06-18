@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Notification(NotificationTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Notification(NotificationTable table, int index)
@@ -75,6 +76,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             AssociatedRule = other.AssociatedRule;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public IList<Location> Locations
         {

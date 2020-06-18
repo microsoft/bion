@@ -33,7 +33,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             ["configuration"] = (reader, root, me) => me.Configuration = reader.ReadReportingConfiguration(root),
             ["descriptor"] = (reader, root, me) => me.Descriptor = reader.ReadReportingDescriptorReference(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static ConfigurationOverride ReadConfigurationOverride(this JsonReader reader, SarifLog root = null)

@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["uriBaseId"] = (reader, root, me) => me.UriBaseId = reader.ReadString(root),
             ["index"] = (reader, root, me) => me.Index = reader.ReadInt(root),
             ["description"] = (reader, root, me) => me.Description = reader.ReadMessage(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static ArtifactLocation ReadArtifactLocation(this JsonReader reader, SarifLog root = null)

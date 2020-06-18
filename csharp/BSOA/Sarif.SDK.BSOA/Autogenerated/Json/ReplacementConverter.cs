@@ -33,7 +33,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             ["deletedRegion"] = (reader, root, me) => me.DeletedRegion = reader.ReadRegion(root),
             ["insertedContent"] = (reader, root, me) => me.InsertedContent = reader.ReadArtifactContent(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static Replacement ReadReplacement(this JsonReader reader, SarifLog root = null)

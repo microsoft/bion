@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["module"] = (reader, root, me) => me.Module = reader.ReadString(root),
             ["threadId"] = (reader, root, me) => me.ThreadId = reader.ReadInt(root),
             ["parameters"] = (reader, root, me) => reader.ReadList(root, me.Parameters, JsonReaderExtensions.ReadString),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static StackFrame ReadStackFrame(this JsonReader reader, SarifLog root = null)

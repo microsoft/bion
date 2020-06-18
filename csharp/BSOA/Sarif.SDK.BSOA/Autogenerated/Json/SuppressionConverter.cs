@@ -36,7 +36,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["status"] = (reader, root, me) => me.Status = reader.ReadEnum<SuppressionStatus, SarifLog>(root),
             ["justification"] = (reader, root, me) => me.Justification = reader.ReadString(root),
             ["location"] = (reader, root, me) => me.Location = reader.ReadLocation(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static Suppression ReadSuppression(this JsonReader reader, SarifLog root = null)
@@ -65,8 +65,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             {
                 writer.WriteStartObject();
                 writer.Write("guid", item.Guid, default);
-                writer.Write("kind", item.Kind);
-                writer.Write("status", item.Status);
+                writer.WriteEnum("kind", item.Kind, default(SuppressionKind));
+                writer.WriteEnum("status", item.Status, default(SuppressionStatus));
                 writer.Write("justification", item.Justification, default);
                 writer.Write("location", item.Location);
                 writer.Write("properties", item.Properties, default);

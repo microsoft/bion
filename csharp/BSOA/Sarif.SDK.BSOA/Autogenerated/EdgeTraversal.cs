@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal EdgeTraversal(EdgeTraversalTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal EdgeTraversal(EdgeTraversalTable table, int index)
@@ -63,6 +64,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             StepOverEdgeCount = other.StepOverEdgeCount;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string EdgeId
         {

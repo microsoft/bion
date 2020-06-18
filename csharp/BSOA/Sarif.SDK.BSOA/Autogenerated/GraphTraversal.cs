@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal GraphTraversal(GraphTraversalTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal GraphTraversal(GraphTraversalTable table, int index)
@@ -69,6 +70,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             EdgeTraversals = other.EdgeTraversals;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public int RunGraphIndex
         {

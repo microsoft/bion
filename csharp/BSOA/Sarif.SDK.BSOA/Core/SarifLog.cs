@@ -4,8 +4,6 @@
 using System.IO;
 using System.Linq;
 
-using BSOA.IO;
-
 using Microsoft.CodeAnalysis.Sarif.Readers;
 
 using Newtonsoft.Json;
@@ -14,8 +12,9 @@ namespace Microsoft.CodeAnalysis.Sarif
 {
     public enum SarifFormat
     {
+        BSOA,
         JSON,
-        BSOA
+        IndentedJSON,
     }
 
     public partial class SarifLog
@@ -113,6 +112,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 JsonSerializer serializer = new JsonSerializer();
+                serializer.Formatting = (format == SarifFormat.IndentedJSON ? Formatting.Indented : Formatting.None);
 
                 using (StreamWriter sw = new StreamWriter(stream))
                 using (JsonTextWriter jtw = new JsonTextWriter(sw))

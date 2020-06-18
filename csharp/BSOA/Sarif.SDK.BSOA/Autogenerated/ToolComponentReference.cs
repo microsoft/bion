@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ToolComponentReference(ToolComponentReferenceTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ToolComponentReference(ToolComponentReferenceTable table, int index)
@@ -60,6 +61,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Guid = other.Guid;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string Name
         {

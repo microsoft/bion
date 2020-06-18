@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ReportingDescriptorRelationship(ReportingDescriptorRelationshipTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ReportingDescriptorRelationship(ReportingDescriptorRelationshipTable table, int index)
@@ -60,6 +61,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Description = other.Description;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public ReportingDescriptorReference Target
         {

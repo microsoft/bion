@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal WebRequest(WebRequestTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal WebRequest(WebRequestTable table, int index)
@@ -75,6 +76,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Body = other.Body;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public int Index
         {

@@ -37,7 +37,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["lastDetectionRunGuid"] = (reader, root, me) => me.LastDetectionRunGuid = reader.ReadString(root),
             ["invocationIndex"] = (reader, root, me) => me.InvocationIndex = reader.ReadInt(root),
             ["conversionSources"] = (reader, root, me) => reader.ReadList(root, me.ConversionSources, PhysicalLocationJsonExtensions.ReadPhysicalLocation),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static ResultProvenance ReadResultProvenance(this JsonReader reader, SarifLog root = null)

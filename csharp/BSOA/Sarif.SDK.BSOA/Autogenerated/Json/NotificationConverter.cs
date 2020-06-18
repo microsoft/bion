@@ -39,7 +39,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["exception"] = (reader, root, me) => me.Exception = reader.ReadExceptionData(root),
             ["descriptor"] = (reader, root, me) => me.Descriptor = reader.ReadReportingDescriptorReference(root),
             ["associatedRule"] = (reader, root, me) => me.AssociatedRule = reader.ReadReportingDescriptorReference(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static Notification ReadNotification(this JsonReader reader, SarifLog root = null)
@@ -69,7 +69,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteStartObject();
                 writer.WriteList("locations", item.Locations, LocationJsonExtensions.Write);
                 writer.Write("message", item.Message);
-                writer.Write("level", item.Level);
+                writer.WriteEnum("level", item.Level, FailureLevel.Warning);
                 writer.Write("threadId", item.ThreadId, default);
                 writer.Write("timeUtc", item.TimeUtc, default);
                 writer.Write("exception", item.Exception);

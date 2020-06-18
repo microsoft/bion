@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal ArtifactLocation(ArtifactLocationTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal ArtifactLocation(ArtifactLocationTable table, int index)
@@ -63,6 +64,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Description = other.Description;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Uri Uri
         {

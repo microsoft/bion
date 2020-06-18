@@ -36,7 +36,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["bottom"] = (reader, root, me) => me.Bottom = reader.ReadDouble(root),
             ["right"] = (reader, root, me) => me.Right = reader.ReadDouble(root),
             ["message"] = (reader, root, me) => me.Message = reader.ReadMessage(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static Rectangle ReadRectangle(this JsonReader reader, SarifLog root = null)

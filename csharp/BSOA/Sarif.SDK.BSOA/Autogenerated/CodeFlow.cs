@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal CodeFlow(CodeFlowTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal CodeFlow(CodeFlowTable table, int index)
@@ -57,6 +58,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             ThreadFlows = other.ThreadFlows;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Message Message
         {

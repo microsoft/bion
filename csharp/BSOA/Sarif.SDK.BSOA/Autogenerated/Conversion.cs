@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Conversion(ConversionTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Conversion(ConversionTable table, int index)
@@ -60,6 +61,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             AnalysisToolLogFiles = other.AnalysisToolLogFiles;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Tool Tool
         {

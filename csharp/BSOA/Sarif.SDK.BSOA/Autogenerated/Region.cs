@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Region(RegionTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Region(RegionTable table, int index)
@@ -84,6 +85,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             SourceLanguage = other.SourceLanguage;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public int StartLine
         {

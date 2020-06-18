@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal MultiformatMessageString(MultiformatMessageStringTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal MultiformatMessageString(MultiformatMessageStringTable table, int index)
@@ -57,6 +58,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Markdown = other.Markdown;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string Text
         {

@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Attachment(AttachmentTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Attachment(AttachmentTable table, int index)
@@ -63,6 +64,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Rectangles = other.Rectangles;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Message Description
         {

@@ -58,7 +58,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["webRequests"] = (reader, root, me) => reader.ReadList(root, me.WebRequests, WebRequestJsonExtensions.ReadWebRequest),
             ["webResponses"] = (reader, root, me) => reader.ReadList(root, me.WebResponses, WebResponseJsonExtensions.ReadWebResponse),
             ["specialLocations"] = (reader, root, me) => me.SpecialLocations = reader.ReadSpecialLocations(root),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static Run ReadRun(this JsonReader reader, SarifLog root = null)
@@ -103,7 +103,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.Write("defaultEncoding", item.DefaultEncoding, default);
                 writer.Write("defaultSourceLanguage", item.DefaultSourceLanguage, default);
                 writer.Write("newlineSequences", item.NewlineSequences, default);
-                writer.Write("columnKind", item.ColumnKind);
+                writer.WriteEnum("columnKind", item.ColumnKind, default(ColumnKind));
                 writer.Write("externalPropertyFileReferences", item.ExternalPropertyFileReferences);
                 writer.WriteList("threadFlowLocations", item.ThreadFlowLocations, ThreadFlowLocationJsonExtensions.Write);
                 writer.WriteList("taxonomies", item.Taxonomies, ToolComponentJsonExtensions.Write);

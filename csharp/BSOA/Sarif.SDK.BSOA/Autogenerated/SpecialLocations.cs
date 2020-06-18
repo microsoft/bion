@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal SpecialLocations(SpecialLocationsTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal SpecialLocations(SpecialLocationsTable table, int index)
@@ -54,6 +55,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             DisplayBase = other.DisplayBase;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public ArtifactLocation DisplayBase
         {

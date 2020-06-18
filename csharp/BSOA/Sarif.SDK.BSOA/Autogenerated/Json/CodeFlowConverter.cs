@@ -33,7 +33,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             ["message"] = (reader, root, me) => me.Message = reader.ReadMessage(root),
             ["threadFlows"] = (reader, root, me) => reader.ReadList(root, me.ThreadFlows, ThreadFlowJsonExtensions.ReadThreadFlow),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static CodeFlow ReadCodeFlow(this JsonReader reader, SarifLog root = null)

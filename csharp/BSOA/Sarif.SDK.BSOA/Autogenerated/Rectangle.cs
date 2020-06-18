@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Rectangle(RectangleTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Rectangle(RectangleTable table, int index)
@@ -66,6 +67,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Message = other.Message;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public double Top
         {

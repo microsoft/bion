@@ -32,6 +32,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal SarifLog(SarifLogTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal SarifLog(SarifLogTable table, int index)
@@ -64,6 +65,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             InlineExternalProperties = other.InlineExternalProperties;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Uri SchemaUri
         {

@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal WebResponse(WebResponseTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal WebResponse(WebResponseTable table, int index)
@@ -75,6 +76,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             NoResponseReceived = other.NoResponseReceived;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public int Index
         {

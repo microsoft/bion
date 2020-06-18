@@ -51,7 +51,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["addresses"] = (reader, root, me) => reader.ReadList(root, me.Addresses, AddressJsonExtensions.ReadAddress),
             ["webRequests"] = (reader, root, me) => reader.ReadList(root, me.WebRequests, WebRequestJsonExtensions.ReadWebRequest),
             ["webResponses"] = (reader, root, me) => reader.ReadList(root, me.WebResponses, WebResponseJsonExtensions.ReadWebResponse),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static ExternalProperties ReadExternalProperties(this JsonReader reader, SarifLog root = null)
@@ -80,7 +80,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             {
                 writer.WriteStartObject();
                 writer.Write("schema", item.Schema, default);
-                writer.Write("version", item.Version);
+                writer.WriteEnum("version", item.Version, default(SarifVersion));
                 writer.Write("guid", item.Guid, default);
                 writer.Write("runGuid", item.RunGuid, default);
                 writer.Write("conversion", item.Conversion);

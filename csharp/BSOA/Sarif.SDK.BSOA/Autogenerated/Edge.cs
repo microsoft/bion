@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Edge(EdgeTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Edge(EdgeTable table, int index)
@@ -63,6 +64,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             TargetNodeId = other.TargetNodeId;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string Id
         {

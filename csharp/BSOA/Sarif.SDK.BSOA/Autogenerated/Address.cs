@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Address(AddressTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Address(AddressTable table, int index)
@@ -78,6 +79,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             ParentIndex = other.ParentIndex;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public int AbsoluteAddress
         {

@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Replacement(ReplacementTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Replacement(ReplacementTable table, int index)
@@ -57,6 +58,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             InsertedContent = other.InsertedContent;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Region DeletedRegion
         {

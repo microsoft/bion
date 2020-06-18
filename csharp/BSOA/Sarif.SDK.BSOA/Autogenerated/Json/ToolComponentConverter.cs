@@ -58,7 +58,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["associatedComponent"] = (reader, root, me) => me.AssociatedComponent = reader.ReadToolComponentReference(root),
             ["translationMetadata"] = (reader, root, me) => me.TranslationMetadata = reader.ReadTranslationMetadata(root),
             ["supportedTaxonomies"] = (reader, root, me) => reader.ReadList(root, me.SupportedTaxonomies, ToolComponentReferenceJsonExtensions.ReadToolComponentReference),
-            ["properties"] = (reader, root, me) => reader.ReadDictionary(root, me.Properties, JsonReaderExtensions.ReadString, SerializedPropertyInfoJsonExtensions.ReadSerializedPropertyInfo)
+            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
         };
 
         public static ToolComponent ReadToolComponent(this JsonReader reader, SarifLog root = null)
@@ -106,7 +106,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteList("taxa", item.Taxa, ReportingDescriptorJsonExtensions.Write);
                 writer.WriteList("locations", item.Locations, ArtifactLocationJsonExtensions.Write);
                 writer.Write("language", item.Language, "en-US");
-                writer.Write("contents", item.Contents);
+                writer.WriteEnum("contents", item.Contents, default(ToolComponentContents));
                 writer.Write("isComprehensive", item.IsComprehensive, false);
                 writer.Write("localizedDataSemanticVersion", item.LocalizedDataSemanticVersion, default);
                 writer.Write("minimumRequiredLocalizedDataSemanticVersion", item.MinimumRequiredLocalizedDataSemanticVersion, default);

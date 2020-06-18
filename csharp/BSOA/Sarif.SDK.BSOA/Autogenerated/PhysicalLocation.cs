@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal PhysicalLocation(PhysicalLocationTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal PhysicalLocation(PhysicalLocationTable table, int index)
@@ -63,6 +64,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             ContextRegion = other.ContextRegion;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Address Address
         {

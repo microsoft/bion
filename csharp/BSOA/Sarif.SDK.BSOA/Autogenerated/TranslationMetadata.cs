@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal TranslationMetadata(TranslationMetadataTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal TranslationMetadata(TranslationMetadataTable table, int index)
@@ -69,6 +70,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             InformationUri = other.InformationUri;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string Name
         {

@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Message(MessageTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Message(MessageTable table, int index)
@@ -63,6 +64,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Arguments = other.Arguments;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string Text
         {

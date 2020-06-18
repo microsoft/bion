@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal PropertyBag(PropertyBagTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal PropertyBag(PropertyBagTable table, int index)
@@ -51,6 +52,8 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Tags = other.Tags;
         }
+
+        partial void Init();
 
         public IList<string> Tags
         {

@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal StackFrame(StackFrameTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal StackFrame(StackFrameTable table, int index)
@@ -63,6 +64,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Parameters = other.Parameters;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public Location Location
         {

@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Suppression(SuppressionTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Suppression(SuppressionTable table, int index)
@@ -66,6 +67,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             Location = other.Location;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string Guid
         {

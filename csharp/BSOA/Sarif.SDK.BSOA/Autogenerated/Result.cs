@@ -30,6 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal Result(ResultTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Result(ResultTable table, int index)
@@ -138,6 +139,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             WebResponse = other.WebResponse;
             Properties = other.Properties;
         }
+
+        partial void Init();
 
         public string RuleId
         {
