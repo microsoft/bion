@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["artifactLocation"] = (reader, root, me) => me.ArtifactLocation = reader.ReadArtifactLocation(root),
             ["regions"] = (reader, root, me) => reader.ReadList(root, me.Regions, RegionJsonExtensions.ReadRegion),
             ["rectangles"] = (reader, root, me) => reader.ReadList(root, me.Rectangles, RectangleJsonExtensions.ReadRectangle),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Attachment ReadAttachment(this JsonReader reader, SarifLog root = null)

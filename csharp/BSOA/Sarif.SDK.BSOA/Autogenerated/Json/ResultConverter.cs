@@ -60,7 +60,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["taxa"] = (reader, root, me) => reader.ReadList(root, me.Taxa, ReportingDescriptorReferenceJsonExtensions.ReadReportingDescriptorReference),
             ["webRequest"] = (reader, root, me) => me.WebRequest = reader.ReadWebRequest(root),
             ["webResponse"] = (reader, root, me) => me.WebResponse = reader.ReadWebResponse(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Result ReadResult(this JsonReader reader, SarifLog root = null)

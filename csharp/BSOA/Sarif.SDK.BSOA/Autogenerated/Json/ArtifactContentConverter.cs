@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["text"] = (reader, root, me) => me.Text = reader.ReadString(root),
             ["binary"] = (reader, root, me) => me.Binary = reader.ReadString(root),
             ["rendered"] = (reader, root, me) => me.Rendered = reader.ReadMultiformatMessageString(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static ArtifactContent ReadArtifactContent(this JsonReader reader, SarifLog root = null)

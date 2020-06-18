@@ -44,7 +44,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["importance"] = (reader, root, me) => me.Importance = reader.ReadEnum<ThreadFlowLocationImportance, SarifLog>(root),
             ["webRequest"] = (reader, root, me) => me.WebRequest = reader.ReadWebRequest(root),
             ["webResponse"] = (reader, root, me) => me.WebResponse = reader.ReadWebResponse(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static ThreadFlowLocation ReadThreadFlowLocation(this JsonReader reader, SarifLog root = null)

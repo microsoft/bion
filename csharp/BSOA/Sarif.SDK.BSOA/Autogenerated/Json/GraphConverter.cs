@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["description"] = (reader, root, me) => me.Description = reader.ReadMessage(root),
             ["nodes"] = (reader, root, me) => reader.ReadList(root, me.Nodes, NodeJsonExtensions.ReadNode),
             ["edges"] = (reader, root, me) => reader.ReadList(root, me.Edges, EdgeJsonExtensions.ReadEdge),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Graph ReadGraph(this JsonReader reader, SarifLog root = null)

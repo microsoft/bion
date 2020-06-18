@@ -37,7 +37,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["message"] = (reader, root, me) => me.Message = reader.ReadMessage(root),
             ["annotations"] = (reader, root, me) => reader.ReadList(root, me.Annotations, RegionJsonExtensions.ReadRegion),
             ["relationships"] = (reader, root, me) => reader.ReadList(root, me.Relationships, LocationRelationshipJsonExtensions.ReadLocationRelationship),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Location ReadLocation(this JsonReader reader, SarifLog root = null)

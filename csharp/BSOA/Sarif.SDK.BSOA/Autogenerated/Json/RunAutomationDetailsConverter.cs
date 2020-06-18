@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["id"] = (reader, root, me) => me.Id = reader.ReadString(root),
             ["guid"] = (reader, root, me) => me.Guid = reader.ReadString(root),
             ["correlationGuid"] = (reader, root, me) => me.CorrelationGuid = reader.ReadString(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static RunAutomationDetails ReadRunAutomationDetails(this JsonReader reader, SarifLog root = null)

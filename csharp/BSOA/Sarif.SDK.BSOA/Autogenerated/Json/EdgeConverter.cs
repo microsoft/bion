@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["label"] = (reader, root, me) => me.Label = reader.ReadMessage(root),
             ["sourceNodeId"] = (reader, root, me) => me.SourceNodeId = reader.ReadString(root),
             ["targetNodeId"] = (reader, root, me) => me.TargetNodeId = reader.ReadString(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Edge ReadEdge(this JsonReader reader, SarifLog root = null)

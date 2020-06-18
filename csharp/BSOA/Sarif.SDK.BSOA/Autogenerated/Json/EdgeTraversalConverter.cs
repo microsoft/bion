@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["message"] = (reader, root, me) => me.Message = reader.ReadMessage(root),
             ["finalState"] = (reader, root, me) => reader.ReadDictionary(root, me.FinalState, JsonReaderExtensions.ReadString, MultiformatMessageStringJsonExtensions.ReadMultiformatMessageString),
             ["stepOverEdgeCount"] = (reader, root, me) => me.StepOverEdgeCount = reader.ReadInt(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static EdgeTraversal ReadEdgeTraversal(this JsonReader reader, SarifLog root = null)

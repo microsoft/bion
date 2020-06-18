@@ -39,7 +39,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["headers"] = (reader, root, me) => reader.ReadDictionary(root, me.Headers, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString),
             ["parameters"] = (reader, root, me) => reader.ReadDictionary(root, me.Parameters, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString),
             ["body"] = (reader, root, me) => me.Body = reader.ReadArtifactContent(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static WebRequest ReadWebRequest(this JsonReader reader, SarifLog root = null)

@@ -32,7 +32,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         private static Dictionary<string, Action<JsonReader, SarifLog, SpecialLocations>> setters = new Dictionary<string, Action<JsonReader, SarifLog, SpecialLocations>>()
         {
             ["displayBase"] = (reader, root, me) => me.DisplayBase = reader.ReadArtifactLocation(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static SpecialLocations ReadSpecialLocations(this JsonReader reader, SarifLog root = null)

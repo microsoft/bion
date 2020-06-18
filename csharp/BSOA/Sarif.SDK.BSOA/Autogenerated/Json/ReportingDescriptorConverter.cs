@@ -44,7 +44,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["helpUri"] = (reader, root, me) => me.HelpUri = reader.ReadUri(root),
             ["help"] = (reader, root, me) => me.Help = reader.ReadMultiformatMessageString(root),
             ["relationships"] = (reader, root, me) => reader.ReadList(root, me.Relationships, ReportingDescriptorRelationshipJsonExtensions.ReadReportingDescriptorRelationship),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static ReportingDescriptor ReadReportingDescriptor(this JsonReader reader, SarifLog root = null)

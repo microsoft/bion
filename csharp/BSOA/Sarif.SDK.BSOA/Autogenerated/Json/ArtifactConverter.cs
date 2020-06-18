@@ -43,7 +43,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["sourceLanguage"] = (reader, root, me) => me.SourceLanguage = reader.ReadString(root),
             ["hashes"] = (reader, root, me) => reader.ReadDictionary(root, me.Hashes, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString),
             ["lastModifiedTimeUtc"] = (reader, root, me) => me.LastModifiedTimeUtc = reader.ReadDateTime(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Artifact ReadArtifact(this JsonReader reader, SarifLog root = null)

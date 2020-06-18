@@ -36,7 +36,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["status"] = (reader, root, me) => me.Status = reader.ReadEnum<SuppressionStatus, SarifLog>(root),
             ["justification"] = (reader, root, me) => me.Justification = reader.ReadString(root),
             ["location"] = (reader, root, me) => me.Location = reader.ReadLocation(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Suppression ReadSuppression(this JsonReader reader, SarifLog root = null)

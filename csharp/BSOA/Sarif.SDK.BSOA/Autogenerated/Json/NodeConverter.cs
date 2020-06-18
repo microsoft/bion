@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["label"] = (reader, root, me) => me.Label = reader.ReadMessage(root),
             ["location"] = (reader, root, me) => me.Location = reader.ReadLocation(root),
             ["children"] = (reader, root, me) => reader.ReadList(root, me.Children, NodeJsonExtensions.ReadNode),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Node ReadNode(this JsonReader reader, SarifLog root = null)

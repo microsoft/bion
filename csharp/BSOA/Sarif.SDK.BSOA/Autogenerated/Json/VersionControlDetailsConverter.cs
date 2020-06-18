@@ -37,7 +37,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["revisionTag"] = (reader, root, me) => me.RevisionTag = reader.ReadString(root),
             ["asOfTimeUtc"] = (reader, root, me) => me.AsOfTimeUtc = reader.ReadDateTime(root),
             ["mappedTo"] = (reader, root, me) => me.MappedTo = reader.ReadArtifactLocation(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static VersionControlDetails ReadVersionControlDetails(this JsonReader reader, SarifLog root = null)

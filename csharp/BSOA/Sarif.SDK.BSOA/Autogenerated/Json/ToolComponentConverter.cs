@@ -58,7 +58,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["associatedComponent"] = (reader, root, me) => me.AssociatedComponent = reader.ReadToolComponentReference(root),
             ["translationMetadata"] = (reader, root, me) => me.TranslationMetadata = reader.ReadTranslationMetadata(root),
             ["supportedTaxonomies"] = (reader, root, me) => reader.ReadList(root, me.SupportedTaxonomies, ToolComponentReferenceJsonExtensions.ReadToolComponentReference),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static ToolComponent ReadToolComponent(this JsonReader reader, SarifLog root = null)

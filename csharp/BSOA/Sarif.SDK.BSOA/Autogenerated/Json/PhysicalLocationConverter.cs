@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["artifactLocation"] = (reader, root, me) => me.ArtifactLocation = reader.ReadArtifactLocation(root),
             ["region"] = (reader, root, me) => me.Region = reader.ReadRegion(root),
             ["contextRegion"] = (reader, root, me) => me.ContextRegion = reader.ReadRegion(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static PhysicalLocation ReadPhysicalLocation(this JsonReader reader, SarifLog root = null)

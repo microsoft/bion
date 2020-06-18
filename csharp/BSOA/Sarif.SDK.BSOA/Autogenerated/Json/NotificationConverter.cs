@@ -39,7 +39,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["exception"] = (reader, root, me) => me.Exception = reader.ReadExceptionData(root),
             ["descriptor"] = (reader, root, me) => me.Descriptor = reader.ReadReportingDescriptorReference(root),
             ["associatedRule"] = (reader, root, me) => me.AssociatedRule = reader.ReadReportingDescriptorReference(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Notification ReadNotification(this JsonReader reader, SarifLog root = null)

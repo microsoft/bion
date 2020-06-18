@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["level"] = (reader, root, me) => me.Level = reader.ReadEnum<FailureLevel, SarifLog>(root),
             ["rank"] = (reader, root, me) => me.Rank = reader.ReadDouble(root),
             ["parameters"] = (reader, root, me) => me.Parameters = reader.ReadPropertyBag(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static ReportingConfiguration ReadReportingConfiguration(this JsonReader reader, SarifLog root = null)

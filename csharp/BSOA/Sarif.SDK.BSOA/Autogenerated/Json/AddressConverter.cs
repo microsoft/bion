@@ -40,7 +40,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["offsetFromParent"] = (reader, root, me) => me.OffsetFromParent = reader.ReadInt(root),
             ["index"] = (reader, root, me) => me.Index = reader.ReadInt(root),
             ["parentIndex"] = (reader, root, me) => me.ParentIndex = reader.ReadInt(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Address ReadAddress(this JsonReader reader, SarifLog root = null)

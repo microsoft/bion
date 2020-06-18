@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["tool"] = (reader, root, me) => me.Tool = reader.ReadTool(root),
             ["invocation"] = (reader, root, me) => me.Invocation = reader.ReadInvocation(root),
             ["analysisToolLogFiles"] = (reader, root, me) => reader.ReadList(root, me.AnalysisToolLogFiles, ArtifactLocationJsonExtensions.ReadArtifactLocation),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Conversion ReadConversion(this JsonReader reader, SarifLog root = null)

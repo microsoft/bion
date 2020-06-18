@@ -51,7 +51,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["addresses"] = (reader, root, me) => reader.ReadList(root, me.Addresses, AddressJsonExtensions.ReadAddress),
             ["webRequests"] = (reader, root, me) => reader.ReadList(root, me.WebRequests, WebRequestJsonExtensions.ReadWebRequest),
             ["webResponses"] = (reader, root, me) => reader.ReadList(root, me.WebResponses, WebResponseJsonExtensions.ReadWebResponse),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static ExternalProperties ReadExternalProperties(this JsonReader reader, SarifLog root = null)

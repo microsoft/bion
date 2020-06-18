@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["location"] = (reader, root, me) => me.Location = reader.ReadArtifactLocation(root),
             ["guid"] = (reader, root, me) => me.Guid = reader.ReadString(root),
             ["itemCount"] = (reader, root, me) => me.ItemCount = reader.ReadInt(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static ExternalPropertyFileReference ReadExternalPropertyFileReference(this JsonReader reader, SarifLog root = null)

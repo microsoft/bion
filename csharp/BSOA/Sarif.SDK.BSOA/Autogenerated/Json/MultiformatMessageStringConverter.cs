@@ -33,7 +33,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             ["text"] = (reader, root, me) => me.Text = reader.ReadString(root),
             ["markdown"] = (reader, root, me) => me.Markdown = reader.ReadString(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static MultiformatMessageString ReadMultiformatMessageString(this JsonReader reader, SarifLog root = null)

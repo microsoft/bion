@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["message"] = (reader, root, me) => me.Message = reader.ReadString(root),
             ["stack"] = (reader, root, me) => me.Stack = reader.ReadStack(root),
             ["innerExceptions"] = (reader, root, me) => reader.ReadList(root, me.InnerExceptions, ExceptionDataJsonExtensions.ReadExceptionData),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static ExceptionData ReadExceptionData(this JsonReader reader, SarifLog root = null)

@@ -35,7 +35,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["markdown"] = (reader, root, me) => me.Markdown = reader.ReadString(root),
             ["id"] = (reader, root, me) => me.Id = reader.ReadString(root),
             ["arguments"] = (reader, root, me) => reader.ReadList(root, me.Arguments, JsonReaderExtensions.ReadString),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Message ReadMessage(this JsonReader reader, SarifLog root = null)

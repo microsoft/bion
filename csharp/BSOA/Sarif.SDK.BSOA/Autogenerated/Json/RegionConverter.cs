@@ -42,7 +42,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ["snippet"] = (reader, root, me) => me.Snippet = reader.ReadArtifactContent(root),
             ["message"] = (reader, root, me) => me.Message = reader.ReadMessage(root),
             ["sourceLanguage"] = (reader, root, me) => me.SourceLanguage = reader.ReadString(root),
-            ["properties"] = (reader, root, me) => Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.Properties, null)
+            ["properties"] = (reader, root, me) => me.Properties = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)
         };
 
         public static Region ReadRegion(this JsonReader reader, SarifLog root = null)
