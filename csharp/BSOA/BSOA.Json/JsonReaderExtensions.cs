@@ -72,6 +72,8 @@ namespace Newtonsoft.Json
 
                 TValue value = readValue(reader, root);
                 reader.Read();
+
+                dictionary.Add(new KeyValuePair<TKey, TValue>(key, value));
             }
 
             reader.Expect(JsonToken.EndObject);

@@ -58,24 +58,38 @@ namespace BSOA.Generator
 
             Dictionary<string, string> postReplacements = new Dictionary<string, string>()
             {
+                // Generate PropertyBag, but it shouldn't inherit from PropertyBagHolder
                 [Regex.Escape("PropertyBag : PropertyBagHolder, ")] = "PropertyBag : ",
+
+                // Properties has to be internal and override the PropertyBagHolder copy to work properly
                 ["public IDictionary<string, SerializedPropertyInfo> Properties"] = @"internal override IDictionary<string, SerializedPropertyInfo> Properties",
 
+                // The Generated PropertyBagConverter is wrong; disable it
                 [Regex.Escape("[JsonConverter(typeof(PropertyBagConverter))]")] = "// [JsonConverter(typeof(PropertyBagConverter))]",
 
+                // "schemaUri" is written to the JSON as "$schema"
                 ["\"schemaUri\""] = "\"$schema\"",
 
+                // Use PropertyBagConverter to read and write Properties. SerializedPropertyInfoConverter.ReadJson doesn't actually work.
+                ["me.([^ ]+) = reader.ReadIDictionary<string, SerializedPropertyInfo>\\(root\\)"] = "Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.$1, null)",
+                [Regex.Escape("writer.Write(\"properties\", item.Properties, default);")] = "writer.WriteDictionary(\"properties\", item.Properties, SerializedPropertyInfoJsonExtensions.Write);",
+
+                // Dictionaries don't generate correct read methods
+                ["me.([^ ]+) = reader.ReadIDictionary<string, string>\\(root\\)"] = "reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString)",
+                ["me.([^ ]+) = reader.ReadIDictionary<string, ([^>]+)>\\(root\\)"] = @"reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, $2JsonExtensions.Read$2)",
+
+                // Lists don't generate correct read methods; need to generate the item reading method correctly.
                 ["me.([^ ]+) = reader.ReadIList<string>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadString)",
                 ["me.([^ ]+) = reader.ReadIList<Uri>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadUri)",
 
-                ["me.([^ ]+) = reader.ReadIDictionary<string, SerializedPropertyInfo>\\(root\\)"] = "Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.$1, null)",
-                ["me.([^ ]+) = reader.ReadIDictionary<string, string>\\(root\\)"] = "reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString)",
-
-                ["me.([^ ]+) = reader.ReadIDictionary<string, ([^>]+)>\\(root\\)"] = @"reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, $2JsonExtensions.Read$2)",
-
+                // Override column construction for Dictionaries of other table types
                 ["ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(default\\)\\);"] = "new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));",
                 ["ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(default\\)\\);"] = "new DictionaryColumn<string, ArtifactLocation>(new StringColumn(), new ArtifactLocationColumn(this.Database)));",
-                ["ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>\\(default\\)\\);"] = "new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));"
+                ["ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>\\(default\\)\\);"] = "new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));",
+
+                // Get Run to write Results array first
+                ["writer.WriteStartObject\\(\\);(.*)writer.WriteList\\(\"results\", item.Results, ResultJsonExtensions.Write\\);"] = @"writer.WriteStartObject();
+                writer.WriteList(""results"", item.Results, ResultJsonExtensions.Write);$1",
             };
 
             // Generate Database class
