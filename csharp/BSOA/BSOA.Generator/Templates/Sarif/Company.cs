@@ -32,6 +32,7 @@ namespace BSOA.Generator.Templates
         internal Company(CompanyTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Company(CompanyTable table, int index)
@@ -75,6 +76,8 @@ namespace BSOA.Generator.Templates
             Members = other.Members;
             // </OtherAssignmentList>
         }
+
+        partial void Init();
 
         // <ColumnList>
         //   <SimpleColumn>

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Newtonsoft.Json
 {
@@ -119,7 +120,14 @@ namespace Newtonsoft.Json
 
         public static DateTime ReadDateTime<TRoot>(this JsonReader reader, TRoot root)
         {
-            return DateTime.Parse((string)reader.Value);
+            if (reader.Value is DateTime)
+            {
+                return (DateTime)reader.Value;
+            }
+            else
+            {
+                return DateTime.Parse((string)reader.Value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+            }
         }
 
         public static Uri ReadUri<TRoot>(this JsonReader reader, TRoot root)

@@ -7,6 +7,8 @@ namespace Newtonsoft.Json
 {
     public static class JsonWriterExtensions
     {
+        public const string DateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fff'Z'";
+
         public static void Write<T>(this JsonWriter writer, string propertyName, IList<T> list, IList<T> defaultList = null)
         {
             if (list?.Count > 0)
@@ -118,10 +120,11 @@ namespace Newtonsoft.Json
         }
 
         private static StringEnumConverter _enumConverter = new StringEnumConverter(camelCaseText: true);
-        public static void Write<TEnum>(this JsonWriter writer, string propertyName, TEnum value) where TEnum : System.Enum
+        public static void WriteEnum<TEnum>(this JsonWriter writer, string propertyName, TEnum value, TEnum defaultValue = default(TEnum)) where TEnum : System.Enum
         {
-            if (!value.Equals(default))
+            if (!value.Equals(defaultValue))
             {
+                writer.WritePropertyName(propertyName);
                 _enumConverter.WriteJson(writer, value, null);
             }
         }
@@ -155,10 +158,10 @@ namespace Newtonsoft.Json
 
         public static void Write(this JsonWriter writer, string propertyName, DateTime item, DateTime defaultValue = default(DateTime))
         {
-            if (item != defaultValue)
+            if (item.ToUniversalTime() != defaultValue.ToUniversalTime())
             {
                 writer.WritePropertyName(propertyName);
-                writer.WriteValue(item.ToUniversalTime().ToString("u"));
+                writer.WriteValue(item.ToUniversalTime().ToString(DateTimeFormat));
             }
         }
 

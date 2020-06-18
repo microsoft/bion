@@ -15,6 +15,7 @@ namespace BSOA.Demo
     {
         public string InputFilePath { get; set; }
         public string BsoaBinPath { get; set; }
+        public string JsonOutPath { get; set; }
         public string WorkingFolderPath { get; set; }
 
         public Benchmarker(string inputFilePath, string workingFolderPath)
@@ -24,6 +25,7 @@ namespace BSOA.Demo
 
             string fileName = Path.GetFileName(inputFilePath);
             BsoaBinPath = Path.Combine(WorkingFolderPath, Path.ChangeExtension(fileName, ".bsoa"));
+            JsonOutPath = Path.Combine(WorkingFolderPath, Path.ChangeExtension(fileName, "Out.json"));
         }
 
         public void Run(bool forceReconvert)
@@ -55,6 +57,11 @@ namespace BSOA.Demo
             Measure.Time($"Writing as BSOA Binary to '{BsoaBinPath}'...", () =>
             {
                 bsoaLog.Save(BsoaBinPath);
+            });
+
+            Measure.Time($"Writing as SARIF JSON to '{JsonOutPath}'...", () =>
+            {
+                bsoaLog.Save(File.Create(JsonOutPath), SarifFormat.IndentedJSON);
             });
         }
 

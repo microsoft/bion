@@ -61,12 +61,16 @@ namespace BSOA.Generator
                 [Regex.Escape("PropertyBag : PropertyBagHolder, ")] = "PropertyBag : ",
                 ["public IDictionary<string, SerializedPropertyInfo> Properties"] = @"internal override IDictionary<string, SerializedPropertyInfo> Properties",
 
+                [Regex.Escape("[JsonConverter(typeof(PropertyBagConverter))]")] = "// [JsonConverter(typeof(PropertyBagConverter))]",
+
                 ["\"schemaUri\""] = "\"$schema\"",
 
                 ["me.([^ ]+) = reader.ReadIList<string>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadString)",
                 ["me.([^ ]+) = reader.ReadIList<Uri>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadUri)",
 
+                ["me.([^ ]+) = reader.ReadIDictionary<string, SerializedPropertyInfo>\\(root\\)"] = "Readers.PropertyBagConverter.Instance.ReadJson(reader, null, me.$1, null)",
                 ["me.([^ ]+) = reader.ReadIDictionary<string, string>\\(root\\)"] = "reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString)",
+
                 ["me.([^ ]+) = reader.ReadIDictionary<string, ([^>]+)>\\(root\\)"] = @"reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, $2JsonExtensions.Read$2)",
 
                 ["ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(default\\)\\);"] = "new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));",

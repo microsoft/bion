@@ -30,6 +30,7 @@ namespace BSOA.Generator.Templates
         internal Team(TeamTable table) : this(table, table.Count)
         {
             table.Add();
+            Init();
         }
 
         internal Team(TeamTable table, int index)
@@ -74,6 +75,8 @@ namespace BSOA.Generator.Templates
             Employees = other.Employees;
             // </OtherAssignmentList>
         }
+
+        partial void Init();
 
         // <ColumnList>
         //   <SimpleColumn>

@@ -70,7 +70,7 @@ namespace BSOA.Generator.Templates
                 writer.Write("id", item.Id, 99);
                 //  </SimpleWriter>
                 //   <EnumWriter>
-                writer.Write("joinPolicy", item.JoinPolicy);
+                writer.WriteEnum("joinPolicy", item.JoinPolicy, SecurityPolicy.Open);
                 //   </EnumWriter>
                 //   <RefWriter>
                 writer.Write("owner", item.Owner);
