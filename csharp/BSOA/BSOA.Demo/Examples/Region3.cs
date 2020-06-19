@@ -60,10 +60,9 @@ namespace ScaleDemo
             set => (Ex ??= new RegionEx()).SourceLanguage = value;
         }
 
-        public TagsCollection Tags
+        public TagsCollection? Tags
         {
             get => Ex?.Tags;
-            set => (Ex ??= new RegionEx()).Tags = value;
         }
 
         public IDictionary<string, SerializedPropertyInfo> Properties

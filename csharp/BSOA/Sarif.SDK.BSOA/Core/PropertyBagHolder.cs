@@ -16,11 +16,6 @@ namespace Microsoft.CodeAnalysis.Sarif
     /// </summary>
     public class PropertyBagHolder : IPropertyBagHolder
     {
-        protected PropertyBagHolder()
-        {
-            Tags = new TagsCollection(this);
-        }
-
         [JsonIgnore]
         public IList<string> PropertyNames
         {
@@ -222,7 +217,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         [JsonIgnore]
-        public TagsCollection Tags { get; }
+        public TagsCollection Tags => new TagsCollection(this);
 
         public virtual bool ShouldSerializeProperties()
         {
