@@ -83,9 +83,9 @@ namespace BSOA.Generator
                 ["me.([^ ]+) = reader.ReadIList<Uri>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadUri)",
 
                 // Override column construction for Dictionaries of other table types
-                ["ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(default\\)\\);"] = "new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));",
-                ["ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(default\\)\\);"] = "new DictionaryColumn<string, ArtifactLocation>(new StringColumn(), new ArtifactLocationColumn(this.Database)));",
-                ["ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>\\(default\\)\\);"] = "new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));",
+                ["ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(default\\)\\);"] = "new DictionaryColumn<string, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));",
+                ["ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(default\\)\\);"] = "new DictionaryColumn<string, ArtifactLocation>(new DistinctColumn<string>(new StringColumn()), new ArtifactLocationColumn(this.Database)));",
+                ["ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>\\(default\\)\\);"] = "new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));",
 
                 // Get Run to write Results array first
                 ["writer.WriteStartObject\\(\\);(.*)writer.WriteList\\(\"results\", item.Results, ResultJsonExtensions.Write\\);"] = @"writer.WriteStartObject();
