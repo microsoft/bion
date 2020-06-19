@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
+
 using BSOA.Model;
 
 namespace Microsoft.CodeAnalysis.Sarif
@@ -10,7 +12,10 @@ namespace Microsoft.CodeAnalysis.Sarif
     /// </summary>
     internal partial class SarifLogDatabase : Database
     {
-        internal static SarifLogDatabase Current { get; private set; }
+        [ThreadStatic]
+        private static WeakReference<SarifLogDatabase> _lastCreated;
+
+        internal static SarifLogDatabase Current => (_lastCreated.TryGetTarget(out SarifLogDatabase value) ? value : new SarifLogDatabase());
         
         internal SarifLogTable SarifLog { get; }
         internal AddressTable Address { get; }
@@ -68,7 +73,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public SarifLogDatabase()
         {
-            Current = this;
+            _lastCreated = new WeakReference<SarifLogDatabase>(this);
 
             SarifLog = AddTable(nameof(SarifLog), new SarifLogTable(this));
             Address = AddTable(nameof(Address), new AddressTable(this));
