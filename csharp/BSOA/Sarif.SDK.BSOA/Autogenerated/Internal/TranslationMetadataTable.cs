@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             FullDescription = AddColumn(nameof(FullDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
             DownloadUri = AddColumn(nameof(DownloadUri), ColumnFactory.Build<Uri>(default));
             InformationUri = AddColumn(nameof(InformationUri), ColumnFactory.Build<Uri>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override TranslationMetadata Get(int index)

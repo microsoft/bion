@@ -41,14 +41,14 @@ namespace Microsoft.CodeAnalysis.Sarif
             Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<string>>(default));
             Taxa = AddColumn(nameof(Taxa), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
             Module = AddColumn(nameof(Module), ColumnFactory.Build<string>(default));
-            State = AddColumn(nameof(State), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
+            State = AddColumn(nameof(State), new DictionaryColumn<string, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
             NestingLevel = AddColumn(nameof(NestingLevel), ColumnFactory.Build<int>(default));
             ExecutionOrder = AddColumn(nameof(ExecutionOrder), ColumnFactory.Build<int>(-1));
             ExecutionTimeUtc = AddColumn(nameof(ExecutionTimeUtc), ColumnFactory.Build<DateTime>(default));
             Importance = AddColumn(nameof(Importance), ColumnFactory.Build<int>((int)ThreadFlowLocationImportance.Important));
             WebRequest = AddColumn(nameof(WebRequest), new RefColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponse = AddColumn(nameof(WebResponse), new RefColumn(nameof(SarifLogDatabase.WebResponse)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ThreadFlowLocation Get(int index)

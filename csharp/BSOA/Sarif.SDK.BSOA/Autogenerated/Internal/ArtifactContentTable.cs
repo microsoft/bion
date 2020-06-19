@@ -28,7 +28,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Text = AddColumn(nameof(Text), ColumnFactory.Build<string>(default));
             Binary = AddColumn(nameof(Binary), ColumnFactory.Build<string>(default));
             Rendered = AddColumn(nameof(Rendered), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ArtifactContent Get(int index)

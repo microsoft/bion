@@ -63,7 +63,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ReleaseDateUtc = AddColumn(nameof(ReleaseDateUtc), ColumnFactory.Build<string>(default));
             DownloadUri = AddColumn(nameof(DownloadUri), ColumnFactory.Build<Uri>(default));
             InformationUri = AddColumn(nameof(InformationUri), ColumnFactory.Build<Uri>(default));
-            GlobalMessageStrings = AddColumn(nameof(GlobalMessageStrings), new DictionaryColumn<string, MultiformatMessageString>(new StringColumn(), new MultiformatMessageStringColumn(this.Database)));
+            GlobalMessageStrings = AddColumn(nameof(GlobalMessageStrings), new DictionaryColumn<string, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
             Notifications = AddColumn(nameof(Notifications), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptor)));
             Rules = AddColumn(nameof(Rules), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptor)));
             Taxa = AddColumn(nameof(Taxa), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptor)));
@@ -76,7 +76,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             AssociatedComponent = AddColumn(nameof(AssociatedComponent), new RefColumn(nameof(SarifLogDatabase.ToolComponentReference)));
             TranslationMetadata = AddColumn(nameof(TranslationMetadata), new RefColumn(nameof(SarifLogDatabase.TranslationMetadata)));
             SupportedTaxonomies = AddColumn(nameof(SupportedTaxonomies), new RefListColumn(nameof(SarifLogDatabase.ToolComponentReference)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ToolComponent Get(int index)

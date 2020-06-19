@@ -32,7 +32,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Bottom = AddColumn(nameof(Bottom), ColumnFactory.Build<double>(default));
             Right = AddColumn(nameof(Right), ColumnFactory.Build<double>(default));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Rectangle Get(int index)

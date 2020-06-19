@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default));
             Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default));
             CorrelationGuid = AddColumn(nameof(CorrelationGuid), ColumnFactory.Build<string>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override RunAutomationDetails Get(int index)

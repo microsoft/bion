@@ -28,7 +28,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default));
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ToolComponentReference Get(int index)

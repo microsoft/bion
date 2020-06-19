@@ -40,7 +40,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             OffsetFromParent = AddColumn(nameof(OffsetFromParent), ColumnFactory.Build<int>(default));
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             ParentIndex = AddColumn(nameof(ParentIndex), ColumnFactory.Build<int>(-1));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Address Get(int index)

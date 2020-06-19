@@ -38,7 +38,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Headers = AddColumn(nameof(Headers), ColumnFactory.Build<IDictionary<string, string>>(default));
             Parameters = AddColumn(nameof(Parameters), ColumnFactory.Build<IDictionary<string, string>>(default));
             Body = AddColumn(nameof(Body), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override WebRequest Get(int index)

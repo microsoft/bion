@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Label = AddColumn(nameof(Label), new RefColumn(nameof(SarifLogDatabase.Message)));
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.Location)));
             Children = AddColumn(nameof(Children), new RefListColumn(nameof(SarifLogDatabase.Node)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Node Get(int index)

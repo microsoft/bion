@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             DecoratedName = AddColumn(nameof(DecoratedName), ColumnFactory.Build<string>(default));
             ParentIndex = AddColumn(nameof(ParentIndex), ColumnFactory.Build<int>(-1));
             Kind = AddColumn(nameof(Kind), ColumnFactory.Build<string>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override LogicalLocation Get(int index)

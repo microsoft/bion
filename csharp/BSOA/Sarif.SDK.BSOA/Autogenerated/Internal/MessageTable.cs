@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Markdown = AddColumn(nameof(Markdown), ColumnFactory.Build<string>(default));
             Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default));
             Arguments = AddColumn(nameof(Arguments), ColumnFactory.Build<IList<string>>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Message Get(int index)

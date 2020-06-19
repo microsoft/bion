@@ -46,7 +46,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             SourceLanguage = AddColumn(nameof(SourceLanguage), ColumnFactory.Build<string>(default));
             Hashes = AddColumn(nameof(Hashes), ColumnFactory.Build<IDictionary<string, string>>(default));
             LastModifiedTimeUtc = AddColumn(nameof(LastModifiedTimeUtc), ColumnFactory.Build<DateTime>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Artifact Get(int index)

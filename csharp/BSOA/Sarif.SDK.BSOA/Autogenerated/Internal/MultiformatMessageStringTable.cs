@@ -26,7 +26,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             Text = AddColumn(nameof(Text), ColumnFactory.Build<string>(default));
             Markdown = AddColumn(nameof(Markdown), ColumnFactory.Build<string>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override MultiformatMessageString Get(int index)

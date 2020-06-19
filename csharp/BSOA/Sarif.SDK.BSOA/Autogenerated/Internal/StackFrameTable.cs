@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Module = AddColumn(nameof(Module), ColumnFactory.Build<string>(default));
             ThreadId = AddColumn(nameof(ThreadId), ColumnFactory.Build<int>(default));
             Parameters = AddColumn(nameof(Parameters), ColumnFactory.Build<IList<string>>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override StackFrame Get(int index)

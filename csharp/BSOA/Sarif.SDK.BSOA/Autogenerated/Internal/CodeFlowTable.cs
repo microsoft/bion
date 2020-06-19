@@ -26,7 +26,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
             ThreadFlows = AddColumn(nameof(ThreadFlows), new RefListColumn(nameof(SarifLogDatabase.ThreadFlow)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override CodeFlow Get(int index)

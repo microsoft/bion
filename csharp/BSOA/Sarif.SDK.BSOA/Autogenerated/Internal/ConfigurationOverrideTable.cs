@@ -26,7 +26,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             Configuration = AddColumn(nameof(Configuration), new RefColumn(nameof(SarifLogDatabase.ReportingConfiguration)));
             Descriptor = AddColumn(nameof(Descriptor), new RefColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ConfigurationOverride Get(int index)

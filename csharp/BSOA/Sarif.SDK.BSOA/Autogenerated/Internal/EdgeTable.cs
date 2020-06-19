@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Label = AddColumn(nameof(Label), new RefColumn(nameof(SarifLogDatabase.Message)));
             SourceNodeId = AddColumn(nameof(SourceNodeId), ColumnFactory.Build<string>(default));
             TargetNodeId = AddColumn(nameof(TargetNodeId), ColumnFactory.Build<string>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Edge Get(int index)

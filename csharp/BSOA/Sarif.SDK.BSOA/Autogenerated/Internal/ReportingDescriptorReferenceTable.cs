@@ -30,7 +30,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default));
             ToolComponent = AddColumn(nameof(ToolComponent), new RefColumn(nameof(SarifLogDatabase.ToolComponentReference)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new StringColumn(), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ReportingDescriptorReference Get(int index)
