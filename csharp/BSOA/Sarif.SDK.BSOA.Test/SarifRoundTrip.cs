@@ -32,33 +32,16 @@ namespace Sarif.SDK.BSOA.Test
             // Load via JSON
             SarifLog log = SarifLog.Load(sarifFilePath);
 
-            
-
-
             // Save as BSOA
             log.Save(bsoaFilePath);
 
+            // Reload as BSOA
+            log.DB.Clear();
             log = SarifLog.Load(bsoaFilePath);
-
-            var result = log.Runs[0].Results[0];
-            var ruleId = result.RuleId;
-            var guid = result.Guid;
-            string json = JsonConvert.SerializeObject(result);
-
 
             // Save back to JSON
             log.Save(jsonFilePath);
-
-
-
-            // Write BSOA diagnostics
-            using (StreamWriter writer = File.CreateText(Path.ChangeExtension(bsoaFilePath, ".bsoa.diag.txt")))
-            {
-                TreeDiagnostics diagnostics = Diagnostics(bsoaFilePath);
-                diagnostics.Write(writer, -1);
-            }
-
-
+            
             VerifyJsonIdentical(sarifFilePath, jsonFilePath);
         }
 
