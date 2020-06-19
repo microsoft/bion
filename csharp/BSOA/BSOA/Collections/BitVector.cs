@@ -71,7 +71,7 @@ namespace BSOA.Collections
         {
             // Ensure array created
             ArrayExtensions.ResizeTo(ref _array, ((Capacity + 31) >> 5), (DefaultValue ? ~0U : 0U), minSize: 4);
-            
+
             // Set everything
             uint toSet = (value ? ~0U : 0U);
             int blocksToSet = ((Capacity + 31) >> 5);
@@ -95,36 +95,17 @@ namespace BSOA.Collections
 
         public void RemoveFromEnd(int count)
         {
-            int newLastIndex = ((Capacity - 1) - count);
-            int firstRemovedBlock = (newLastIndex >> 5) + 1;
-            uint defaultInt = (DefaultValue ? ~0U : 0U);
+            int newCapacity = Capacity - count;
 
-            // Remove whole 32-bit chunks now out of range
-            if (_array != null)
-            {
-                for (int i = firstRemovedBlock; i < _array.Length; ++i)
-                {
-                    _array[i] = defaultInt;
-                }
-            }
-
-            // Reset values over new count in last block
-            int firstInvalidIndex = (firstRemovedBlock << 5);
-            for (int i = newLastIndex + 1; i < firstInvalidIndex; ++i)
+            // Reset values above new capacity
+            for (int i = newCapacity; i < Capacity; ++i)
             {
                 this[i] = DefaultValue;
             }
 
             // Track reduced size
-            Capacity -= count;
-
-            // Recalculate Count
-            int newCount = 0;
-            for (int i = 0; i < Capacity; ++i)
-            {
-                if (this[i]) { newCount++; }
-            }
-            Count = newCount;
+            Capacity = newCapacity;
+            if (DefaultValue) { Count = Count - count; }
         }
 
         public IEnumerator<int> GetEnumerator()
