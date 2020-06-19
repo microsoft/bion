@@ -42,17 +42,22 @@ namespace BSOA.Column
 
             set
             {
+                // Always set IsNull; IsNull tracks Count cheaply
                 IsNull[index] = (value == null);
 
-                if (value == null || value.Length > ArraySliceChapter<byte>.MaximumSmallValueLength)
+                int length = value?.Length ?? 0;
+                if (length == 0 || length > ArraySliceChapter<byte>.MaximumSmallValueLength)
                 {
+                    // Directly set null, empty, and long values
                     _savedValues?.Remove(index);
                     Values[index] = (string.IsNullOrEmpty(value) ? ArraySlice<byte>.Empty : new ArraySlice<byte>(Encoding.UTF8.GetBytes(value)));
                 }
                 else
                 {
+                    // Cache other values to convert together
                     if (_savedValues == null) { _savedValues = new Dictionary<int, string>(); }
                     _savedValues[index] = value;
+
                     if (_savedValues.Count >= SavedValueCountLimit) { PushSavedValues(); }
                 }
             }
@@ -62,21 +67,21 @@ namespace BSOA.Column
         {
             if (_savedValues?.Count > 0)
             {
+                // Find combined UTF-8 length of pending values
                 int totalLength = 0;
-
                 foreach (KeyValuePair<int, string> pair in _savedValues)
                 {
                     totalLength += Encoding.UTF8.GetByteCount(pair.Value);
                 }
 
-                int thisStart = 0;
+                // Allocate a shared array
                 byte[] sharedArray = new byte[totalLength];
 
+                // Convert and set on inner column
+                int thisStart = 0;
                 foreach (KeyValuePair<int, string> pair in _savedValues)
                 {
                     int thisLength = Encoding.UTF8.GetBytes(pair.Value, 0, pair.Value.Length, sharedArray, thisStart);
-
-                    IsNull[pair.Key] = false;
                     Values[pair.Key] = new ArraySlice<byte>(sharedArray, thisStart, thisLength);
 
                     thisStart += thisLength;
