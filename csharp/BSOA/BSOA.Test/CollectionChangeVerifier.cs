@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using Xunit;
 
@@ -88,8 +89,11 @@ namespace BSOA.Test
             CollectionReadVerifier.VerifySame(expected, row);
 
             // Test RemoveAt bounds checks
-            Assert.Throws<IndexOutOfRangeException>(() => row.RemoveAt(-1));
-            Assert.Throws<IndexOutOfRangeException>(() => row.RemoveAt(row.Count));
+            if (!Debugger.IsAttached)
+            {
+                Assert.Throws<IndexOutOfRangeException>(() => row.RemoveAt(-1));
+                Assert.Throws<IndexOutOfRangeException>(() => row.RemoveAt(row.Count));
+            }
 
             // Test Insert, RemoveAt
             row.Insert(0, notInExpected);
@@ -105,8 +109,11 @@ namespace BSOA.Test
             CollectionReadVerifier.VerifySame(expected, row);
 
             // Test Insert bounds checks
-            Assert.Throws<IndexOutOfRangeException>(() => row.Insert(-1, notInExpected));
-            Assert.Throws<IndexOutOfRangeException>(() => row.Insert(row.Count, notInExpected));
+            if (!Debugger.IsAttached)
+            {
+                Assert.Throws<IndexOutOfRangeException>(() => row.Insert(-1, notInExpected));
+                Assert.Throws<IndexOutOfRangeException>(() => row.Insert(row.Count, notInExpected));
+            }
 
             // Clear; verify empty, read-only static instance
             row.Clear();
@@ -172,9 +179,12 @@ namespace BSOA.Test
             }
 
             // CopyTo bounds
-            Assert.Throws<ArgumentNullException>(() => row.CopyTo(null, 0));
-            Assert.Throws<ArgumentException>(() => row.CopyTo(other, 2));
-            Assert.Throws<ArgumentOutOfRangeException>(() => row.CopyTo(other, -1));
+            if (!Debugger.IsAttached)
+            {
+                Assert.Throws<ArgumentNullException>(() => row.CopyTo(null, 0));
+                Assert.Throws<ArgumentException>(() => row.CopyTo(other, 2));
+                Assert.Throws<ArgumentOutOfRangeException>(() => row.CopyTo(other, -1));
+            }
 
             // Append an item; verify appended, count changed
             T ten = valueProvider(10);

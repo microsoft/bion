@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using BSOA.Column;
 using BSOA.Model;
@@ -75,10 +76,13 @@ namespace BSOA.Test
             Assert.Equal(column[0], other[1]);
 
             // CopyTo preconditions
-            Assert.Throws<ArgumentNullException>(() => column.CopyTo(null, 0));
-            Assert.Throws<ArgumentException>(() => column.CopyTo(other, 2));
-            Assert.Throws<ArgumentOutOfRangeException>(() => column.CopyTo(other, -1));
-            Assert.Throws<ArgumentException>(() => column.CopyTo((Array)(new decimal[column.Count]), 0));
+            if (!Debugger.IsAttached)
+            {
+                Assert.Throws<ArgumentNullException>(() => column.CopyTo(null, 0));
+                Assert.Throws<ArgumentException>(() => column.CopyTo(other, 2));
+                Assert.Throws<ArgumentOutOfRangeException>(() => column.CopyTo(other, -1));
+                Assert.Throws<ArgumentException>(() => column.CopyTo((Array)(new decimal[column.Count]), 0));
+            }
 
             // CopyTo (untyped)
             other = new T[column.Count];
@@ -105,7 +109,10 @@ namespace BSOA.Test
             column[1] = valueProvider(1);
 
             // CopyItem type checking
-            Assert.Throws<ArgumentException>(() => column.CopyItem(1, new NumberColumn<Decimal>(0.0m), 0));
+            if (!Debugger.IsAttached)
+            {
+                Assert.Throws<ArgumentException>(() => column.CopyItem(1, new NumberColumn<Decimal>(0.0m), 0));
+            }
 
             // Append so resize is required
             column[100] = valueProvider(100);
@@ -186,11 +193,14 @@ namespace BSOA.Test
             column.RemoveFromEnd(1);
             Assert.Equal(0, column.Count);
 
-            // Verify indexer range check (< 0 only; columns auto-size for bigger values)
-            Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
+            if (!Debugger.IsAttached)
+            {
+                // Verify indexer range check (< 0 only; columns auto-size for bigger values)
+                Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
 
-            // Verify Remove throws (not expected to be implemented)
-            Assert.Throws<NotSupportedException>(() => column.Remove(defaultValue));
+                // Verify Remove throws (not expected to be implemented)
+                Assert.Throws<NotSupportedException>(() => column.Remove(defaultValue));
+            }
         }
     }
 }

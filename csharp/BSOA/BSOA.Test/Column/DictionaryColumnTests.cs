@@ -36,7 +36,7 @@ namespace BSOA.Test
 
             Column.Basics<IDictionary<string, string>>(
                 () => new DictionaryColumn<string, string>(
-                    new DistinctColumn<string>(new StringColumn(), null),
+                    new DistinctColumn<string>(new StringColumn()),
                     new StringColumn()),
                 defaultValue,
                 otherValue,
