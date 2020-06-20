@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
+using System.IO;
+using System.Text;
 
 using Newtonsoft.Json;
 
@@ -29,13 +31,30 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (reader == null)
-            {
-                throw new ArgumentNullException(nameof(reader));
-            }
+            return Read(reader);
+        }
 
-            var serializedPropertyInfo = (SerializedPropertyInfo)reader.Value;
-            return serializedPropertyInfo.SerializedValue;
+        public SerializedPropertyInfo Read(JsonReader reader)
+        {
+            if (reader.TokenType == JsonToken.Null)
+            {
+                return null;
+            }
+            else if (reader.TokenType == JsonToken.String)
+            {
+                return new SerializedPropertyInfo((string)reader.Value, true);
+            }
+            else
+            {
+                StringBuilder builder = new StringBuilder();
+                using (StringWriter w = new StringWriter(builder))
+                using (JsonTextWriter writer = new JsonTextWriter(w))
+                {
+                    writer.WriteToken(reader);
+                }
+
+                return new SerializedPropertyInfo(builder.ToString(), false);
+            }
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -45,19 +64,19 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
                 throw new ArgumentNullException(nameof(writer));
             }
 
-            string serializedValue = ((SerializedPropertyInfo)value)?.SerializedValue;
+            SerializedPropertyInfo spi = (SerializedPropertyInfo)value;
 
-            if (serializedValue == null)
+            if (spi == null || spi.SerializedValue == null)
             {
                 writer.WriteNull();
             }
-            else if (serializedValue.StartsWith("\""))
+            else if (spi.IsString)
             {
-                writer.WriteRawValue(serializedValue);
+                writer.WriteValue(spi.SerializedValue);
             }
             else
             {
-                writer.WriteRawValue(@"""" + serializedValue + @"""");
+                writer.WriteRawValue(spi.SerializedValue);
             }
         }
     }
