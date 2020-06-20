@@ -40,6 +40,9 @@ namespace BSOA.Test.Model.V2
             root = item;
 
             reader.ReadObject(root, item, setters);
+            
+            item.DB.Trim();
+
             return item;
         }
 

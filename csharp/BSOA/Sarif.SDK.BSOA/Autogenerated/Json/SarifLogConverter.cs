@@ -44,6 +44,9 @@ namespace Microsoft.CodeAnalysis.Sarif
             root = item;
 
             reader.ReadObject(root, item, setters);
+            
+            item.DB.Trim();
+
             return item;
         }
 

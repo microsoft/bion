@@ -87,9 +87,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 using (JsonTextReader jtr = new JsonTextReader(sr))
                 {
                     // NOTE: Load with JsonSerializer.Deserialize, not JsonConvert.DeserializeObject, to avoid a string of the whole file in memory.
-                    SarifLog log = serializer.Deserialize<SarifLog>(jtr);
-                    log.DB.Trim();
-                    return log;
+                    return serializer.Deserialize<SarifLog>(jtr);
                 }
             }
         }
