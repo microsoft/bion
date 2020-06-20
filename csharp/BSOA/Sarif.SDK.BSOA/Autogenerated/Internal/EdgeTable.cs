@@ -26,11 +26,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<String>(default));
+            Id = AddColumn(nameof(Id), database.BuildColumn<String>(nameof(Edge), nameof(Id), default));
             Label = AddColumn(nameof(Label), new RefColumn(nameof(SarifLogDatabase.Message)));
-            SourceNodeId = AddColumn(nameof(SourceNodeId), ColumnFactory.Build<String>(default));
-            TargetNodeId = AddColumn(nameof(TargetNodeId), ColumnFactory.Build<String>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            SourceNodeId = AddColumn(nameof(SourceNodeId), database.BuildColumn<String>(nameof(Edge), nameof(SourceNodeId), default));
+            TargetNodeId = AddColumn(nameof(TargetNodeId), database.BuildColumn<String>(nameof(Edge), nameof(TargetNodeId), default));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(Edge), nameof(Properties), default));
         }
 
         public override Edge Get(int index)

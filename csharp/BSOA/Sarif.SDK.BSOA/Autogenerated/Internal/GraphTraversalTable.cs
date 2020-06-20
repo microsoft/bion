@@ -28,13 +28,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            RunGraphIndex = AddColumn(nameof(RunGraphIndex), ColumnFactory.Build<int>(-1));
-            ResultGraphIndex = AddColumn(nameof(ResultGraphIndex), ColumnFactory.Build<int>(-1));
+            RunGraphIndex = AddColumn(nameof(RunGraphIndex), database.BuildColumn<int>(nameof(GraphTraversal), nameof(RunGraphIndex), -1));
+            ResultGraphIndex = AddColumn(nameof(ResultGraphIndex), database.BuildColumn<int>(nameof(GraphTraversal), nameof(ResultGraphIndex), -1));
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            InitialState = AddColumn(nameof(InitialState), new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
-            ImmutableState = AddColumn(nameof(ImmutableState), new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
+            InitialState = AddColumn(nameof(InitialState), database.BuildColumn<IDictionary<String, MultiformatMessageString>>(nameof(GraphTraversal), nameof(InitialState), default));
+            ImmutableState = AddColumn(nameof(ImmutableState), database.BuildColumn<IDictionary<String, MultiformatMessageString>>(nameof(GraphTraversal), nameof(ImmutableState), default));
             EdgeTraversals = AddColumn(nameof(EdgeTraversals), new RefListColumn(nameof(SarifLogDatabase.EdgeTraversal)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(GraphTraversal), nameof(Properties), default));
         }
 
         public override GraphTraversal Get(int index)

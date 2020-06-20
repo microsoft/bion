@@ -26,11 +26,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<String>(default));
-            Message = AddColumn(nameof(Message), ColumnFactory.Build<String>(default));
+            Kind = AddColumn(nameof(Kind), database.BuildColumn<String>(nameof(ExceptionData), nameof(Kind), default));
+            Message = AddColumn(nameof(Message), database.BuildColumn<String>(nameof(ExceptionData), nameof(Message), default));
             Stack = AddColumn(nameof(Stack), new RefColumn(nameof(SarifLogDatabase.Stack)));
             InnerExceptions = AddColumn(nameof(InnerExceptions), new RefListColumn(nameof(SarifLogDatabase.ExceptionData)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(ExceptionData), nameof(Properties), default));
         }
 
         public override ExceptionData Get(int index)

@@ -27,10 +27,10 @@ namespace BSOA.Demo.Model
         {
             Database = database;
 
-            StartLine = AddColumn(nameof(StartLine), ColumnFactory.Build<int>(0));
-            StartColumn = AddColumn(nameof(StartColumn), ColumnFactory.Build<int>(0));
-            EndLine = AddColumn(nameof(EndLine), ColumnFactory.Build<int>(0));
-            EndColumn = AddColumn(nameof(EndColumn), ColumnFactory.Build<int>(0));
+            StartLine = AddColumn(nameof(StartLine), database.BuildColumn<int>(nameof(Region), nameof(StartLine), 0));
+            StartColumn = AddColumn(nameof(StartColumn), database.BuildColumn<int>(nameof(Region), nameof(StartColumn), 0));
+            EndLine = AddColumn(nameof(EndLine), database.BuildColumn<int>(nameof(Region), nameof(EndLine), 0));
+            EndColumn = AddColumn(nameof(EndColumn), database.BuildColumn<int>(nameof(Region), nameof(EndColumn), 0));
             Snippet = AddColumn(nameof(Snippet), new RefColumn(nameof(TinyDatabase.ArtifactContent)));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(TinyDatabase.Message)));
         }

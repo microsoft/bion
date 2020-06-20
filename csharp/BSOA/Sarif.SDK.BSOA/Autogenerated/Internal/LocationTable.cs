@@ -28,13 +28,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<int>(-1));
+            Id = AddColumn(nameof(Id), database.BuildColumn<int>(nameof(Location), nameof(Id), -1));
             PhysicalLocation = AddColumn(nameof(PhysicalLocation), new RefColumn(nameof(SarifLogDatabase.PhysicalLocation)));
             LogicalLocations = AddColumn(nameof(LogicalLocations), new RefListColumn(nameof(SarifLogDatabase.LogicalLocation)));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
             Annotations = AddColumn(nameof(Annotations), new RefListColumn(nameof(SarifLogDatabase.Region)));
             Relationships = AddColumn(nameof(Relationships), new RefListColumn(nameof(SarifLogDatabase.LocationRelationship)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(Location), nameof(Properties), default));
         }
 
         public override Location Get(int index)

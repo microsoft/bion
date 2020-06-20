@@ -28,13 +28,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            RepositoryUri = AddColumn(nameof(RepositoryUri), ColumnFactory.Build<Uri>(default));
-            RevisionId = AddColumn(nameof(RevisionId), ColumnFactory.Build<String>(default));
-            Branch = AddColumn(nameof(Branch), ColumnFactory.Build<String>(default));
-            RevisionTag = AddColumn(nameof(RevisionTag), ColumnFactory.Build<String>(default));
-            AsOfTimeUtc = AddColumn(nameof(AsOfTimeUtc), ColumnFactory.Build<DateTime>(default));
+            RepositoryUri = AddColumn(nameof(RepositoryUri), database.BuildColumn<Uri>(nameof(VersionControlDetails), nameof(RepositoryUri), default));
+            RevisionId = AddColumn(nameof(RevisionId), database.BuildColumn<String>(nameof(VersionControlDetails), nameof(RevisionId), default));
+            Branch = AddColumn(nameof(Branch), database.BuildColumn<String>(nameof(VersionControlDetails), nameof(Branch), default));
+            RevisionTag = AddColumn(nameof(RevisionTag), database.BuildColumn<String>(nameof(VersionControlDetails), nameof(RevisionTag), default));
+            AsOfTimeUtc = AddColumn(nameof(AsOfTimeUtc), database.BuildColumn<DateTime>(nameof(VersionControlDetails), nameof(AsOfTimeUtc), default));
             MappedTo = AddColumn(nameof(MappedTo), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(VersionControlDetails), nameof(Properties), default));
         }
 
         public override VersionControlDetails Get(int index)

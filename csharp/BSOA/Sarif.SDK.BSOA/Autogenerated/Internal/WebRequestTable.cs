@@ -30,15 +30,15 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
-            Protocol = AddColumn(nameof(Protocol), ColumnFactory.Build<String>(default));
-            Version = AddColumn(nameof(Version), ColumnFactory.Build<String>(default));
-            Target = AddColumn(nameof(Target), ColumnFactory.Build<String>(default));
-            Method = AddColumn(nameof(Method), ColumnFactory.Build<String>(default));
-            Headers = AddColumn(nameof(Headers), ColumnFactory.Build<IDictionary<String, String>>(default));
-            Parameters = AddColumn(nameof(Parameters), ColumnFactory.Build<IDictionary<String, String>>(default));
+            Index = AddColumn(nameof(Index), database.BuildColumn<int>(nameof(WebRequest), nameof(Index), -1));
+            Protocol = AddColumn(nameof(Protocol), database.BuildColumn<String>(nameof(WebRequest), nameof(Protocol), default));
+            Version = AddColumn(nameof(Version), database.BuildColumn<String>(nameof(WebRequest), nameof(Version), default));
+            Target = AddColumn(nameof(Target), database.BuildColumn<String>(nameof(WebRequest), nameof(Target), default));
+            Method = AddColumn(nameof(Method), database.BuildColumn<String>(nameof(WebRequest), nameof(Method), default));
+            Headers = AddColumn(nameof(Headers), database.BuildColumn<IDictionary<String, String>>(nameof(WebRequest), nameof(Headers), default));
+            Parameters = AddColumn(nameof(Parameters), database.BuildColumn<IDictionary<String, String>>(nameof(WebRequest), nameof(Parameters), default));
             Body = AddColumn(nameof(Body), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(WebRequest), nameof(Properties), default));
         }
 
         public override WebRequest Get(int index)

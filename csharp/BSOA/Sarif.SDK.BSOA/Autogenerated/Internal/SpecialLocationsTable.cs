@@ -24,7 +24,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Database = database;
 
             DisplayBase = AddColumn(nameof(DisplayBase), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(SpecialLocations), nameof(Properties), default));
         }
 
         public override SpecialLocations Get(int index)

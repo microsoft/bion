@@ -47,32 +47,32 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            CommandLine = AddColumn(nameof(CommandLine), ColumnFactory.Build<String>(default));
-            Arguments = AddColumn(nameof(Arguments), ColumnFactory.Build<IList<String>>(default));
+            CommandLine = AddColumn(nameof(CommandLine), database.BuildColumn<String>(nameof(Invocation), nameof(CommandLine), default));
+            Arguments = AddColumn(nameof(Arguments), database.BuildColumn<IList<String>>(nameof(Invocation), nameof(Arguments), default));
             ResponseFiles = AddColumn(nameof(ResponseFiles), new RefListColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            StartTimeUtc = AddColumn(nameof(StartTimeUtc), ColumnFactory.Build<DateTime>(default));
-            EndTimeUtc = AddColumn(nameof(EndTimeUtc), ColumnFactory.Build<DateTime>(default));
-            ExitCode = AddColumn(nameof(ExitCode), ColumnFactory.Build<int>(default));
+            StartTimeUtc = AddColumn(nameof(StartTimeUtc), database.BuildColumn<DateTime>(nameof(Invocation), nameof(StartTimeUtc), default));
+            EndTimeUtc = AddColumn(nameof(EndTimeUtc), database.BuildColumn<DateTime>(nameof(Invocation), nameof(EndTimeUtc), default));
+            ExitCode = AddColumn(nameof(ExitCode), database.BuildColumn<int>(nameof(Invocation), nameof(ExitCode), default));
             RuleConfigurationOverrides = AddColumn(nameof(RuleConfigurationOverrides), new RefListColumn(nameof(SarifLogDatabase.ConfigurationOverride)));
             NotificationConfigurationOverrides = AddColumn(nameof(NotificationConfigurationOverrides), new RefListColumn(nameof(SarifLogDatabase.ConfigurationOverride)));
             ToolExecutionNotifications = AddColumn(nameof(ToolExecutionNotifications), new RefListColumn(nameof(SarifLogDatabase.Notification)));
             ToolConfigurationNotifications = AddColumn(nameof(ToolConfigurationNotifications), new RefListColumn(nameof(SarifLogDatabase.Notification)));
-            ExitCodeDescription = AddColumn(nameof(ExitCodeDescription), ColumnFactory.Build<String>(default));
-            ExitSignalName = AddColumn(nameof(ExitSignalName), ColumnFactory.Build<String>(default));
-            ExitSignalNumber = AddColumn(nameof(ExitSignalNumber), ColumnFactory.Build<int>(default));
-            ProcessStartFailureMessage = AddColumn(nameof(ProcessStartFailureMessage), ColumnFactory.Build<String>(default));
-            ExecutionSuccessful = AddColumn(nameof(ExecutionSuccessful), ColumnFactory.Build<bool>(default));
-            Machine = AddColumn(nameof(Machine), ColumnFactory.Build<String>(default));
-            Account = AddColumn(nameof(Account), ColumnFactory.Build<String>(default));
-            ProcessId = AddColumn(nameof(ProcessId), ColumnFactory.Build<int>(default));
+            ExitCodeDescription = AddColumn(nameof(ExitCodeDescription), database.BuildColumn<String>(nameof(Invocation), nameof(ExitCodeDescription), default));
+            ExitSignalName = AddColumn(nameof(ExitSignalName), database.BuildColumn<String>(nameof(Invocation), nameof(ExitSignalName), default));
+            ExitSignalNumber = AddColumn(nameof(ExitSignalNumber), database.BuildColumn<int>(nameof(Invocation), nameof(ExitSignalNumber), default));
+            ProcessStartFailureMessage = AddColumn(nameof(ProcessStartFailureMessage), database.BuildColumn<String>(nameof(Invocation), nameof(ProcessStartFailureMessage), default));
+            ExecutionSuccessful = AddColumn(nameof(ExecutionSuccessful), database.BuildColumn<bool>(nameof(Invocation), nameof(ExecutionSuccessful), default));
+            Machine = AddColumn(nameof(Machine), database.BuildColumn<String>(nameof(Invocation), nameof(Machine), default));
+            Account = AddColumn(nameof(Account), database.BuildColumn<String>(nameof(Invocation), nameof(Account), default));
+            ProcessId = AddColumn(nameof(ProcessId), database.BuildColumn<int>(nameof(Invocation), nameof(ProcessId), default));
             ExecutableLocation = AddColumn(nameof(ExecutableLocation), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             WorkingDirectory = AddColumn(nameof(WorkingDirectory), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            EnvironmentVariables = AddColumn(nameof(EnvironmentVariables), ColumnFactory.Build<IDictionary<String, String>>(default));
+            EnvironmentVariables = AddColumn(nameof(EnvironmentVariables), database.BuildColumn<IDictionary<String, String>>(nameof(Invocation), nameof(EnvironmentVariables), default));
             Stdin = AddColumn(nameof(Stdin), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             Stdout = AddColumn(nameof(Stdout), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             Stderr = AddColumn(nameof(Stderr), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             StdoutStderr = AddColumn(nameof(StdoutStderr), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(Invocation), nameof(Properties), default));
         }
 
         public override Invocation Get(int index)

@@ -51,36 +51,36 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            RuleId = AddColumn(nameof(RuleId), ColumnFactory.Build<String>(default));
-            RuleIndex = AddColumn(nameof(RuleIndex), ColumnFactory.Build<int>(-1));
+            RuleId = AddColumn(nameof(RuleId), database.BuildColumn<String>(nameof(Result), nameof(RuleId), default));
+            RuleIndex = AddColumn(nameof(RuleIndex), database.BuildColumn<int>(nameof(Result), nameof(RuleIndex), -1));
             Rule = AddColumn(nameof(Rule), new RefColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
-            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<int>((int)ResultKind.Fail));
-            Level = AddColumn(nameof(Level), ColumnFactory.Build<int>((int)FailureLevel.Warning));
+            Kind = AddColumn(nameof(Kind), database.BuildColumn<int>(nameof(Result), nameof(Kind), (int)ResultKind.Fail));
+            Level = AddColumn(nameof(Level), database.BuildColumn<int>(nameof(Result), nameof(Level), (int)FailureLevel.Warning));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
             AnalysisTarget = AddColumn(nameof(AnalysisTarget), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             Locations = AddColumn(nameof(Locations), new RefListColumn(nameof(SarifLogDatabase.Location)));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<String>(default));
-            CorrelationGuid = AddColumn(nameof(CorrelationGuid), ColumnFactory.Build<String>(default));
-            OccurrenceCount = AddColumn(nameof(OccurrenceCount), ColumnFactory.Build<int>(default));
-            PartialFingerprints = AddColumn(nameof(PartialFingerprints), ColumnFactory.Build<IDictionary<String, String>>(default));
-            Fingerprints = AddColumn(nameof(Fingerprints), ColumnFactory.Build<IDictionary<String, String>>(default));
+            Guid = AddColumn(nameof(Guid), database.BuildColumn<String>(nameof(Result), nameof(Guid), default));
+            CorrelationGuid = AddColumn(nameof(CorrelationGuid), database.BuildColumn<String>(nameof(Result), nameof(CorrelationGuid), default));
+            OccurrenceCount = AddColumn(nameof(OccurrenceCount), database.BuildColumn<int>(nameof(Result), nameof(OccurrenceCount), default));
+            PartialFingerprints = AddColumn(nameof(PartialFingerprints), database.BuildColumn<IDictionary<String, String>>(nameof(Result), nameof(PartialFingerprints), default));
+            Fingerprints = AddColumn(nameof(Fingerprints), database.BuildColumn<IDictionary<String, String>>(nameof(Result), nameof(Fingerprints), default));
             Stacks = AddColumn(nameof(Stacks), new RefListColumn(nameof(SarifLogDatabase.Stack)));
             CodeFlows = AddColumn(nameof(CodeFlows), new RefListColumn(nameof(SarifLogDatabase.CodeFlow)));
             Graphs = AddColumn(nameof(Graphs), new RefListColumn(nameof(SarifLogDatabase.Graph)));
             GraphTraversals = AddColumn(nameof(GraphTraversals), new RefListColumn(nameof(SarifLogDatabase.GraphTraversal)));
             RelatedLocations = AddColumn(nameof(RelatedLocations), new RefListColumn(nameof(SarifLogDatabase.Location)));
             Suppressions = AddColumn(nameof(Suppressions), new RefListColumn(nameof(SarifLogDatabase.Suppression)));
-            BaselineState = AddColumn(nameof(BaselineState), ColumnFactory.Build<int>((int)default(BaselineState)));
-            Rank = AddColumn(nameof(Rank), ColumnFactory.Build<double>(-1));
+            BaselineState = AddColumn(nameof(BaselineState), database.BuildColumn<int>(nameof(Result), nameof(BaselineState), (int)default(BaselineState)));
+            Rank = AddColumn(nameof(Rank), database.BuildColumn<double>(nameof(Result), nameof(Rank), -1));
             Attachments = AddColumn(nameof(Attachments), new RefListColumn(nameof(SarifLogDatabase.Attachment)));
-            HostedViewerUri = AddColumn(nameof(HostedViewerUri), ColumnFactory.Build<Uri>(default));
-            WorkItemUris = AddColumn(nameof(WorkItemUris), ColumnFactory.Build<IList<Uri>>(default));
+            HostedViewerUri = AddColumn(nameof(HostedViewerUri), database.BuildColumn<Uri>(nameof(Result), nameof(HostedViewerUri), default));
+            WorkItemUris = AddColumn(nameof(WorkItemUris), database.BuildColumn<IList<Uri>>(nameof(Result), nameof(WorkItemUris), default));
             Provenance = AddColumn(nameof(Provenance), new RefColumn(nameof(SarifLogDatabase.ResultProvenance)));
             Fixes = AddColumn(nameof(Fixes), new RefListColumn(nameof(SarifLogDatabase.Fix)));
             Taxa = AddColumn(nameof(Taxa), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
             WebRequest = AddColumn(nameof(WebRequest), new RefColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponse = AddColumn(nameof(WebResponse), new RefColumn(nameof(SarifLogDatabase.WebResponse)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(Result), nameof(Properties), default));
         }
 
         public override Result Get(int index)

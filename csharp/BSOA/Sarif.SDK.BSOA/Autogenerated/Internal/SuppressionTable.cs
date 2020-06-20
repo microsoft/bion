@@ -27,12 +27,12 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<String>(default));
-            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<int>((int)default(SuppressionKind)));
-            Status = AddColumn(nameof(Status), ColumnFactory.Build<int>((int)default(SuppressionStatus)));
-            Justification = AddColumn(nameof(Justification), ColumnFactory.Build<String>(default));
+            Guid = AddColumn(nameof(Guid), database.BuildColumn<String>(nameof(Suppression), nameof(Guid), default));
+            Kind = AddColumn(nameof(Kind), database.BuildColumn<int>(nameof(Suppression), nameof(Kind), (int)default(SuppressionKind)));
+            Status = AddColumn(nameof(Status), database.BuildColumn<int>(nameof(Suppression), nameof(Status), (int)default(SuppressionStatus)));
+            Justification = AddColumn(nameof(Justification), database.BuildColumn<String>(nameof(Suppression), nameof(Justification), default));
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.Location)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(Suppression), nameof(Properties), default));
         }
 
         public override Suppression Get(int index)

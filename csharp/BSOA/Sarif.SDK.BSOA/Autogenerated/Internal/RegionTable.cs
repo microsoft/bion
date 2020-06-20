@@ -33,18 +33,18 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            StartLine = AddColumn(nameof(StartLine), ColumnFactory.Build<int>(default));
-            StartColumn = AddColumn(nameof(StartColumn), ColumnFactory.Build<int>(default));
-            EndLine = AddColumn(nameof(EndLine), ColumnFactory.Build<int>(default));
-            EndColumn = AddColumn(nameof(EndColumn), ColumnFactory.Build<int>(default));
-            CharOffset = AddColumn(nameof(CharOffset), ColumnFactory.Build<int>(-1));
-            CharLength = AddColumn(nameof(CharLength), ColumnFactory.Build<int>(default));
-            ByteOffset = AddColumn(nameof(ByteOffset), ColumnFactory.Build<int>(-1));
-            ByteLength = AddColumn(nameof(ByteLength), ColumnFactory.Build<int>(default));
+            StartLine = AddColumn(nameof(StartLine), database.BuildColumn<int>(nameof(Region), nameof(StartLine), default));
+            StartColumn = AddColumn(nameof(StartColumn), database.BuildColumn<int>(nameof(Region), nameof(StartColumn), default));
+            EndLine = AddColumn(nameof(EndLine), database.BuildColumn<int>(nameof(Region), nameof(EndLine), default));
+            EndColumn = AddColumn(nameof(EndColumn), database.BuildColumn<int>(nameof(Region), nameof(EndColumn), default));
+            CharOffset = AddColumn(nameof(CharOffset), database.BuildColumn<int>(nameof(Region), nameof(CharOffset), -1));
+            CharLength = AddColumn(nameof(CharLength), database.BuildColumn<int>(nameof(Region), nameof(CharLength), default));
+            ByteOffset = AddColumn(nameof(ByteOffset), database.BuildColumn<int>(nameof(Region), nameof(ByteOffset), -1));
+            ByteLength = AddColumn(nameof(ByteLength), database.BuildColumn<int>(nameof(Region), nameof(ByteLength), default));
             Snippet = AddColumn(nameof(Snippet), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
-            SourceLanguage = AddColumn(nameof(SourceLanguage), ColumnFactory.Build<String>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            SourceLanguage = AddColumn(nameof(SourceLanguage), database.BuildColumn<String>(nameof(Region), nameof(SourceLanguage), default));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(Region), nameof(Properties), default));
         }
 
         public override Region Get(int index)

@@ -26,11 +26,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<String>(default));
+            Id = AddColumn(nameof(Id), database.BuildColumn<String>(nameof(Node), nameof(Id), default));
             Label = AddColumn(nameof(Label), new RefColumn(nameof(SarifLogDatabase.Message)));
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.Location)));
             Children = AddColumn(nameof(Children), new RefListColumn(nameof(SarifLogDatabase.Node)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(Node), nameof(Properties), default));
         }
 
         public override Node Get(int index)

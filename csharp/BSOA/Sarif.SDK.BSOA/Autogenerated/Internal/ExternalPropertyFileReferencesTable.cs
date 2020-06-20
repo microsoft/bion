@@ -54,7 +54,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Translations = AddColumn(nameof(Translations), new RefListColumn(nameof(SarifLogDatabase.ExternalPropertyFileReference)));
             WebRequests = AddColumn(nameof(WebRequests), new RefListColumn(nameof(SarifLogDatabase.ExternalPropertyFileReference)));
             WebResponses = AddColumn(nameof(WebResponses), new RefListColumn(nameof(SarifLogDatabase.ExternalPropertyFileReference)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(ExternalPropertyFileReferences), nameof(Properties), default));
         }
 
         public override ExternalPropertyFileReferences Get(int index)

@@ -28,13 +28,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<String>(default));
-            FullName = AddColumn(nameof(FullName), ColumnFactory.Build<String>(default));
+            Name = AddColumn(nameof(Name), database.BuildColumn<String>(nameof(TranslationMetadata), nameof(Name), default));
+            FullName = AddColumn(nameof(FullName), database.BuildColumn<String>(nameof(TranslationMetadata), nameof(FullName), default));
             ShortDescription = AddColumn(nameof(ShortDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
             FullDescription = AddColumn(nameof(FullDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
-            DownloadUri = AddColumn(nameof(DownloadUri), ColumnFactory.Build<Uri>(default));
-            InformationUri = AddColumn(nameof(InformationUri), ColumnFactory.Build<Uri>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            DownloadUri = AddColumn(nameof(DownloadUri), database.BuildColumn<Uri>(nameof(TranslationMetadata), nameof(DownloadUri), default));
+            InformationUri = AddColumn(nameof(InformationUri), database.BuildColumn<Uri>(nameof(TranslationMetadata), nameof(InformationUri), default));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(TranslationMetadata), nameof(Properties), default));
         }
 
         public override TranslationMetadata Get(int index)

@@ -26,7 +26,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
             Frames = AddColumn(nameof(Frames), new RefListColumn(nameof(SarifLogDatabase.StackFrame)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(Stack), nameof(Properties), default));
         }
 
         public override Stack Get(int index)

@@ -26,11 +26,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Enabled = AddColumn(nameof(Enabled), ColumnFactory.Build<bool>(true));
-            Level = AddColumn(nameof(Level), ColumnFactory.Build<int>((int)FailureLevel.Warning));
-            Rank = AddColumn(nameof(Rank), ColumnFactory.Build<double>(-1));
+            Enabled = AddColumn(nameof(Enabled), database.BuildColumn<bool>(nameof(ReportingConfiguration), nameof(Enabled), true));
+            Level = AddColumn(nameof(Level), database.BuildColumn<int>(nameof(ReportingConfiguration), nameof(Level), (int)FailureLevel.Warning));
+            Rank = AddColumn(nameof(Rank), database.BuildColumn<double>(nameof(ReportingConfiguration), nameof(Rank), -1));
             Parameters = AddColumn(nameof(Parameters), new RefColumn(nameof(SarifLogDatabase.PropertyBag)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(ReportingConfiguration), nameof(Properties), default));
         }
 
         public override ReportingConfiguration Get(int index)

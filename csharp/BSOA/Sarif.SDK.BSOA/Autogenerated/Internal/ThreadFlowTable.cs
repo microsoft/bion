@@ -27,12 +27,12 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<String>(default));
+            Id = AddColumn(nameof(Id), database.BuildColumn<String>(nameof(ThreadFlow), nameof(Id), default));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
-            InitialState = AddColumn(nameof(InitialState), new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
-            ImmutableState = AddColumn(nameof(ImmutableState), new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
+            InitialState = AddColumn(nameof(InitialState), database.BuildColumn<IDictionary<String, MultiformatMessageString>>(nameof(ThreadFlow), nameof(InitialState), default));
+            ImmutableState = AddColumn(nameof(ImmutableState), database.BuildColumn<IDictionary<String, MultiformatMessageString>>(nameof(ThreadFlow), nameof(ImmutableState), default));
             Locations = AddColumn(nameof(Locations), new RefListColumn(nameof(SarifLogDatabase.ThreadFlowLocation)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(ThreadFlow), nameof(Properties), default));
         }
 
         public override ThreadFlow Get(int index)

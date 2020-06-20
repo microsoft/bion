@@ -35,20 +35,20 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<String>(default));
-            DeprecatedIds = AddColumn(nameof(DeprecatedIds), ColumnFactory.Build<IList<String>>(default));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<String>(default));
-            DeprecatedGuids = AddColumn(nameof(DeprecatedGuids), ColumnFactory.Build<IList<String>>(default));
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<String>(default));
-            DeprecatedNames = AddColumn(nameof(DeprecatedNames), ColumnFactory.Build<IList<String>>(default));
+            Id = AddColumn(nameof(Id), database.BuildColumn<String>(nameof(ReportingDescriptor), nameof(Id), default));
+            DeprecatedIds = AddColumn(nameof(DeprecatedIds), database.BuildColumn<IList<String>>(nameof(ReportingDescriptor), nameof(DeprecatedIds), default));
+            Guid = AddColumn(nameof(Guid), database.BuildColumn<String>(nameof(ReportingDescriptor), nameof(Guid), default));
+            DeprecatedGuids = AddColumn(nameof(DeprecatedGuids), database.BuildColumn<IList<String>>(nameof(ReportingDescriptor), nameof(DeprecatedGuids), default));
+            Name = AddColumn(nameof(Name), database.BuildColumn<String>(nameof(ReportingDescriptor), nameof(Name), default));
+            DeprecatedNames = AddColumn(nameof(DeprecatedNames), database.BuildColumn<IList<String>>(nameof(ReportingDescriptor), nameof(DeprecatedNames), default));
             ShortDescription = AddColumn(nameof(ShortDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
             FullDescription = AddColumn(nameof(FullDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
-            MessageStrings = AddColumn(nameof(MessageStrings), new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
+            MessageStrings = AddColumn(nameof(MessageStrings), database.BuildColumn<IDictionary<String, MultiformatMessageString>>(nameof(ReportingDescriptor), nameof(MessageStrings), default));
             DefaultConfiguration = AddColumn(nameof(DefaultConfiguration), new RefColumn(nameof(SarifLogDatabase.ReportingConfiguration)));
-            HelpUri = AddColumn(nameof(HelpUri), ColumnFactory.Build<Uri>(default));
+            HelpUri = AddColumn(nameof(HelpUri), database.BuildColumn<Uri>(nameof(ReportingDescriptor), nameof(HelpUri), default));
             Help = AddColumn(nameof(Help), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
             Relationships = AddColumn(nameof(Relationships), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptorRelationship)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(ReportingDescriptor), nameof(Properties), default));
         }
 
         public override ReportingDescriptor Get(int index)

@@ -23,8 +23,8 @@ namespace BSOA.Test.Model.V2
         {
             Database = database;
 
-            Birthdate = AddColumn(nameof(Birthdate), ColumnFactory.Build<DateTime>(default));
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default));
+            Birthdate = AddColumn(nameof(Birthdate), database.BuildColumn<DateTime>(nameof(Person), nameof(Birthdate), default));
+            Name = AddColumn(nameof(Name), database.BuildColumn<string>(nameof(Person), nameof(Name), default));
         }
 
         public override Person Get(int index)

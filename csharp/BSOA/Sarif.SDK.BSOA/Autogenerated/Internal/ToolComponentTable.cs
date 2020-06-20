@@ -49,34 +49,34 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<String>(default));
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<String>(default));
-            Organization = AddColumn(nameof(Organization), ColumnFactory.Build<String>(default));
-            Product = AddColumn(nameof(Product), ColumnFactory.Build<String>(default));
-            ProductSuite = AddColumn(nameof(ProductSuite), ColumnFactory.Build<String>(default));
+            Guid = AddColumn(nameof(Guid), database.BuildColumn<String>(nameof(ToolComponent), nameof(Guid), default));
+            Name = AddColumn(nameof(Name), database.BuildColumn<String>(nameof(ToolComponent), nameof(Name), default));
+            Organization = AddColumn(nameof(Organization), database.BuildColumn<String>(nameof(ToolComponent), nameof(Organization), default));
+            Product = AddColumn(nameof(Product), database.BuildColumn<String>(nameof(ToolComponent), nameof(Product), default));
+            ProductSuite = AddColumn(nameof(ProductSuite), database.BuildColumn<String>(nameof(ToolComponent), nameof(ProductSuite), default));
             ShortDescription = AddColumn(nameof(ShortDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
             FullDescription = AddColumn(nameof(FullDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
-            FullName = AddColumn(nameof(FullName), ColumnFactory.Build<String>(default));
-            Version = AddColumn(nameof(Version), ColumnFactory.Build<String>(default));
-            SemanticVersion = AddColumn(nameof(SemanticVersion), ColumnFactory.Build<String>(default));
-            DottedQuadFileVersion = AddColumn(nameof(DottedQuadFileVersion), ColumnFactory.Build<String>(default));
-            ReleaseDateUtc = AddColumn(nameof(ReleaseDateUtc), ColumnFactory.Build<String>(default));
-            DownloadUri = AddColumn(nameof(DownloadUri), ColumnFactory.Build<Uri>(default));
-            InformationUri = AddColumn(nameof(InformationUri), ColumnFactory.Build<Uri>(default));
-            GlobalMessageStrings = AddColumn(nameof(GlobalMessageStrings), new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
+            FullName = AddColumn(nameof(FullName), database.BuildColumn<String>(nameof(ToolComponent), nameof(FullName), default));
+            Version = AddColumn(nameof(Version), database.BuildColumn<String>(nameof(ToolComponent), nameof(Version), default));
+            SemanticVersion = AddColumn(nameof(SemanticVersion), database.BuildColumn<String>(nameof(ToolComponent), nameof(SemanticVersion), default));
+            DottedQuadFileVersion = AddColumn(nameof(DottedQuadFileVersion), database.BuildColumn<String>(nameof(ToolComponent), nameof(DottedQuadFileVersion), default));
+            ReleaseDateUtc = AddColumn(nameof(ReleaseDateUtc), database.BuildColumn<String>(nameof(ToolComponent), nameof(ReleaseDateUtc), default));
+            DownloadUri = AddColumn(nameof(DownloadUri), database.BuildColumn<Uri>(nameof(ToolComponent), nameof(DownloadUri), default));
+            InformationUri = AddColumn(nameof(InformationUri), database.BuildColumn<Uri>(nameof(ToolComponent), nameof(InformationUri), default));
+            GlobalMessageStrings = AddColumn(nameof(GlobalMessageStrings), database.BuildColumn<IDictionary<String, MultiformatMessageString>>(nameof(ToolComponent), nameof(GlobalMessageStrings), default));
             Notifications = AddColumn(nameof(Notifications), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptor)));
             Rules = AddColumn(nameof(Rules), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptor)));
             Taxa = AddColumn(nameof(Taxa), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptor)));
             Locations = AddColumn(nameof(Locations), new RefListColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            Language = AddColumn(nameof(Language), ColumnFactory.Build<String>("en-US"));
-            Contents = AddColumn(nameof(Contents), ColumnFactory.Build<int>((int)default(ToolComponentContents)));
-            IsComprehensive = AddColumn(nameof(IsComprehensive), ColumnFactory.Build<bool>(false));
-            LocalizedDataSemanticVersion = AddColumn(nameof(LocalizedDataSemanticVersion), ColumnFactory.Build<String>(default));
-            MinimumRequiredLocalizedDataSemanticVersion = AddColumn(nameof(MinimumRequiredLocalizedDataSemanticVersion), ColumnFactory.Build<String>(default));
+            Language = AddColumn(nameof(Language), database.BuildColumn<String>(nameof(ToolComponent), nameof(Language), "en-US"));
+            Contents = AddColumn(nameof(Contents), database.BuildColumn<int>(nameof(ToolComponent), nameof(Contents), (int)default(ToolComponentContents)));
+            IsComprehensive = AddColumn(nameof(IsComprehensive), database.BuildColumn<bool>(nameof(ToolComponent), nameof(IsComprehensive), false));
+            LocalizedDataSemanticVersion = AddColumn(nameof(LocalizedDataSemanticVersion), database.BuildColumn<String>(nameof(ToolComponent), nameof(LocalizedDataSemanticVersion), default));
+            MinimumRequiredLocalizedDataSemanticVersion = AddColumn(nameof(MinimumRequiredLocalizedDataSemanticVersion), database.BuildColumn<String>(nameof(ToolComponent), nameof(MinimumRequiredLocalizedDataSemanticVersion), default));
             AssociatedComponent = AddColumn(nameof(AssociatedComponent), new RefColumn(nameof(SarifLogDatabase.ToolComponentReference)));
             TranslationMetadata = AddColumn(nameof(TranslationMetadata), new RefColumn(nameof(SarifLogDatabase.TranslationMetadata)));
             SupportedTaxonomies = AddColumn(nameof(SupportedTaxonomies), new RefListColumn(nameof(SarifLogDatabase.ToolComponentReference)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(ToolComponent), nameof(Properties), default));
         }
 
         public override ToolComponent Get(int index)

@@ -42,10 +42,10 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Schema = AddColumn(nameof(Schema), ColumnFactory.Build<Uri>(default));
-            Version = AddColumn(nameof(Version), ColumnFactory.Build<int>((int)default(SarifVersion)));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<String>(default));
-            RunGuid = AddColumn(nameof(RunGuid), ColumnFactory.Build<String>(default));
+            Schema = AddColumn(nameof(Schema), database.BuildColumn<Uri>(nameof(ExternalProperties), nameof(Schema), default));
+            Version = AddColumn(nameof(Version), database.BuildColumn<int>(nameof(ExternalProperties), nameof(Version), (int)default(SarifVersion)));
+            Guid = AddColumn(nameof(Guid), database.BuildColumn<String>(nameof(ExternalProperties), nameof(Guid), default));
+            RunGuid = AddColumn(nameof(RunGuid), database.BuildColumn<String>(nameof(ExternalProperties), nameof(RunGuid), default));
             Conversion = AddColumn(nameof(Conversion), new RefColumn(nameof(SarifLogDatabase.Conversion)));
             Graphs = AddColumn(nameof(Graphs), new RefListColumn(nameof(SarifLogDatabase.Graph)));
             ExternalizedProperties = AddColumn(nameof(ExternalizedProperties), new RefColumn(nameof(SarifLogDatabase.PropertyBag)));
@@ -62,7 +62,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Addresses = AddColumn(nameof(Addresses), new RefListColumn(nameof(SarifLogDatabase.Address)));
             WebRequests = AddColumn(nameof(WebRequests), new RefListColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponses = AddColumn(nameof(WebResponses), new RefListColumn(nameof(SarifLogDatabase.WebResponse)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(ExternalProperties), nameof(Properties), default));
         }
 
         public override ExternalProperties Get(int index)

@@ -28,13 +28,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            FirstDetectionTimeUtc = AddColumn(nameof(FirstDetectionTimeUtc), ColumnFactory.Build<DateTime>(default));
-            LastDetectionTimeUtc = AddColumn(nameof(LastDetectionTimeUtc), ColumnFactory.Build<DateTime>(default));
-            FirstDetectionRunGuid = AddColumn(nameof(FirstDetectionRunGuid), ColumnFactory.Build<String>(default));
-            LastDetectionRunGuid = AddColumn(nameof(LastDetectionRunGuid), ColumnFactory.Build<String>(default));
-            InvocationIndex = AddColumn(nameof(InvocationIndex), ColumnFactory.Build<int>(-1));
+            FirstDetectionTimeUtc = AddColumn(nameof(FirstDetectionTimeUtc), database.BuildColumn<DateTime>(nameof(ResultProvenance), nameof(FirstDetectionTimeUtc), default));
+            LastDetectionTimeUtc = AddColumn(nameof(LastDetectionTimeUtc), database.BuildColumn<DateTime>(nameof(ResultProvenance), nameof(LastDetectionTimeUtc), default));
+            FirstDetectionRunGuid = AddColumn(nameof(FirstDetectionRunGuid), database.BuildColumn<String>(nameof(ResultProvenance), nameof(FirstDetectionRunGuid), default));
+            LastDetectionRunGuid = AddColumn(nameof(LastDetectionRunGuid), database.BuildColumn<String>(nameof(ResultProvenance), nameof(LastDetectionRunGuid), default));
+            InvocationIndex = AddColumn(nameof(InvocationIndex), database.BuildColumn<int>(nameof(ResultProvenance), nameof(InvocationIndex), -1));
             ConversionSources = AddColumn(nameof(ConversionSources), new RefListColumn(nameof(SarifLogDatabase.PhysicalLocation)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(ResultProvenance), nameof(Properties), default));
         }
 
         public override ResultProvenance Get(int index)

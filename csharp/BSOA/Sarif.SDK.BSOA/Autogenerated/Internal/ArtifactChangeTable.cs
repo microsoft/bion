@@ -26,7 +26,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             ArtifactLocation = AddColumn(nameof(ArtifactLocation), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             Replacements = AddColumn(nameof(Replacements), new RefListColumn(nameof(SarifLogDatabase.Replacement)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(ArtifactChange), nameof(Properties), default));
         }
 
         public override ArtifactChange Get(int index)

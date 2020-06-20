@@ -31,16 +31,16 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            AbsoluteAddress = AddColumn(nameof(AbsoluteAddress), ColumnFactory.Build<int>(-1));
-            RelativeAddress = AddColumn(nameof(RelativeAddress), ColumnFactory.Build<int>(default));
-            Length = AddColumn(nameof(Length), ColumnFactory.Build<int>(default));
-            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<String>(default));
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<String>(default));
-            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), ColumnFactory.Build<String>(default));
-            OffsetFromParent = AddColumn(nameof(OffsetFromParent), ColumnFactory.Build<int>(default));
-            Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
-            ParentIndex = AddColumn(nameof(ParentIndex), ColumnFactory.Build<int>(-1));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            AbsoluteAddress = AddColumn(nameof(AbsoluteAddress), database.BuildColumn<int>(nameof(Address), nameof(AbsoluteAddress), -1));
+            RelativeAddress = AddColumn(nameof(RelativeAddress), database.BuildColumn<int>(nameof(Address), nameof(RelativeAddress), default));
+            Length = AddColumn(nameof(Length), database.BuildColumn<int>(nameof(Address), nameof(Length), default));
+            Kind = AddColumn(nameof(Kind), database.BuildColumn<String>(nameof(Address), nameof(Kind), default));
+            Name = AddColumn(nameof(Name), database.BuildColumn<String>(nameof(Address), nameof(Name), default));
+            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), database.BuildColumn<String>(nameof(Address), nameof(FullyQualifiedName), default));
+            OffsetFromParent = AddColumn(nameof(OffsetFromParent), database.BuildColumn<int>(nameof(Address), nameof(OffsetFromParent), default));
+            Index = AddColumn(nameof(Index), database.BuildColumn<int>(nameof(Address), nameof(Index), -1));
+            ParentIndex = AddColumn(nameof(ParentIndex), database.BuildColumn<int>(nameof(Address), nameof(ParentIndex), -1));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(Address), nameof(Properties), default));
         }
 
         public override Address Get(int index)

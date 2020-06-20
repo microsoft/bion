@@ -26,11 +26,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Uri = AddColumn(nameof(Uri), ColumnFactory.Build<Uri>(default));
-            UriBaseId = AddColumn(nameof(UriBaseId), ColumnFactory.Build<String>(default));
-            Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
+            Uri = AddColumn(nameof(Uri), database.BuildColumn<Uri>(nameof(ArtifactLocation), nameof(Uri), default));
+            UriBaseId = AddColumn(nameof(UriBaseId), database.BuildColumn<String>(nameof(ArtifactLocation), nameof(UriBaseId), default));
+            Index = AddColumn(nameof(Index), database.BuildColumn<int>(nameof(ArtifactLocation), nameof(Index), -1));
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(ArtifactLocation), nameof(Properties), default));
         }
 
         public override ArtifactLocation Get(int index)

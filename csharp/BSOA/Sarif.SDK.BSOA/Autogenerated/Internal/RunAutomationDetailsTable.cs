@@ -27,10 +27,10 @@ namespace Microsoft.CodeAnalysis.Sarif
             Database = database;
 
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<String>(default));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<String>(default));
-            CorrelationGuid = AddColumn(nameof(CorrelationGuid), ColumnFactory.Build<String>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Id = AddColumn(nameof(Id), database.BuildColumn<String>(nameof(RunAutomationDetails), nameof(Id), default));
+            Guid = AddColumn(nameof(Guid), database.BuildColumn<String>(nameof(RunAutomationDetails), nameof(Guid), default));
+            CorrelationGuid = AddColumn(nameof(CorrelationGuid), database.BuildColumn<String>(nameof(RunAutomationDetails), nameof(CorrelationGuid), default));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(RunAutomationDetails), nameof(Properties), default));
         }
 
         public override RunAutomationDetails Get(int index)

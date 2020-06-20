@@ -28,13 +28,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<String>(default));
-            Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
-            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), ColumnFactory.Build<String>(default));
-            DecoratedName = AddColumn(nameof(DecoratedName), ColumnFactory.Build<String>(default));
-            ParentIndex = AddColumn(nameof(ParentIndex), ColumnFactory.Build<int>(-1));
-            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<String>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Name = AddColumn(nameof(Name), database.BuildColumn<String>(nameof(LogicalLocation), nameof(Name), default));
+            Index = AddColumn(nameof(Index), database.BuildColumn<int>(nameof(LogicalLocation), nameof(Index), -1));
+            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), database.BuildColumn<String>(nameof(LogicalLocation), nameof(FullyQualifiedName), default));
+            DecoratedName = AddColumn(nameof(DecoratedName), database.BuildColumn<String>(nameof(LogicalLocation), nameof(DecoratedName), default));
+            ParentIndex = AddColumn(nameof(ParentIndex), database.BuildColumn<int>(nameof(LogicalLocation), nameof(ParentIndex), -1));
+            Kind = AddColumn(nameof(Kind), database.BuildColumn<String>(nameof(LogicalLocation), nameof(Kind), default));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(LogicalLocation), nameof(Properties), default));
         }
 
         public override LogicalLocation Get(int index)

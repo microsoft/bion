@@ -28,7 +28,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Tool = AddColumn(nameof(Tool), new RefColumn(nameof(SarifLogDatabase.Tool)));
             Invocation = AddColumn(nameof(Invocation), new RefColumn(nameof(SarifLogDatabase.Invocation)));
             AnalysisToolLogFiles = AddColumn(nameof(AnalysisToolLogFiles), new RefListColumn(nameof(SarifLogDatabase.ArtifactLocation)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(Conversion), nameof(Properties), default));
         }
 
         public override Conversion Get(int index)

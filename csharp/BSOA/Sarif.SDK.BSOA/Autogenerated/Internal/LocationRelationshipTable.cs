@@ -25,10 +25,10 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Target = AddColumn(nameof(Target), ColumnFactory.Build<int>(default));
-            Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<String>>(default));
+            Target = AddColumn(nameof(Target), database.BuildColumn<int>(nameof(LocationRelationship), nameof(Target), default));
+            Kinds = AddColumn(nameof(Kinds), database.BuildColumn<IList<String>>(nameof(LocationRelationship), nameof(Kinds), default));
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(LocationRelationship), nameof(Properties), default));
         }
 
         public override LocationRelationship Get(int index)

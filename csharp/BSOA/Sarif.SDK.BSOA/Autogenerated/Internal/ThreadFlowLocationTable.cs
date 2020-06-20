@@ -35,20 +35,20 @@ namespace Microsoft.CodeAnalysis.Sarif
         {
             Database = database;
 
-            Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
+            Index = AddColumn(nameof(Index), database.BuildColumn<int>(nameof(ThreadFlowLocation), nameof(Index), -1));
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.Location)));
             Stack = AddColumn(nameof(Stack), new RefColumn(nameof(SarifLogDatabase.Stack)));
-            Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<String>>(default));
+            Kinds = AddColumn(nameof(Kinds), database.BuildColumn<IList<String>>(nameof(ThreadFlowLocation), nameof(Kinds), default));
             Taxa = AddColumn(nameof(Taxa), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
-            Module = AddColumn(nameof(Module), ColumnFactory.Build<String>(default));
-            State = AddColumn(nameof(State), new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
-            NestingLevel = AddColumn(nameof(NestingLevel), ColumnFactory.Build<int>(default));
-            ExecutionOrder = AddColumn(nameof(ExecutionOrder), ColumnFactory.Build<int>(-1));
-            ExecutionTimeUtc = AddColumn(nameof(ExecutionTimeUtc), ColumnFactory.Build<DateTime>(default));
-            Importance = AddColumn(nameof(Importance), ColumnFactory.Build<int>((int)ThreadFlowLocationImportance.Important));
+            Module = AddColumn(nameof(Module), database.BuildColumn<String>(nameof(ThreadFlowLocation), nameof(Module), default));
+            State = AddColumn(nameof(State), database.BuildColumn<IDictionary<String, MultiformatMessageString>>(nameof(ThreadFlowLocation), nameof(State), default));
+            NestingLevel = AddColumn(nameof(NestingLevel), database.BuildColumn<int>(nameof(ThreadFlowLocation), nameof(NestingLevel), default));
+            ExecutionOrder = AddColumn(nameof(ExecutionOrder), database.BuildColumn<int>(nameof(ThreadFlowLocation), nameof(ExecutionOrder), -1));
+            ExecutionTimeUtc = AddColumn(nameof(ExecutionTimeUtc), database.BuildColumn<DateTime>(nameof(ThreadFlowLocation), nameof(ExecutionTimeUtc), default));
+            Importance = AddColumn(nameof(Importance), database.BuildColumn<int>(nameof(ThreadFlowLocation), nameof(Importance), (int)ThreadFlowLocationImportance.Important));
             WebRequest = AddColumn(nameof(WebRequest), new RefColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponse = AddColumn(nameof(WebResponse), new RefColumn(nameof(SarifLogDatabase.WebResponse)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, SerializedPropertyInfo>>(nameof(ThreadFlowLocation), nameof(Properties), default));
         }
 
         public override ThreadFlowLocation Get(int index)
