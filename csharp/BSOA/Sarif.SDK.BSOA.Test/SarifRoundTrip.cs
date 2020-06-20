@@ -6,7 +6,6 @@ using System.IO;
 using BSOA.IO;
 
 using Microsoft.CodeAnalysis.Sarif;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using Newtonsoft.Json;
 
@@ -40,7 +39,7 @@ namespace Sarif.SDK.BSOA.Test
             log = SarifLog.Load(bsoaFilePath);
 
             // Save back to JSON
-            log.Save(jsonFilePath);
+            log.Save(File.Create(jsonFilePath), SarifFormat.IndentedJSON);
             
             VerifyJsonIdentical(sarifFilePath, jsonFilePath);
         }

@@ -4,16 +4,10 @@
 
   /* PropertyBag generated isn't right */
   "PropertyBag\\ :\\ PropertyBagHolder,\\ ": "PropertyBag : ",
-  "public IDictionary<string, SerializedPropertyInfo> Properties": "internal override IDictionary<string, SerializedPropertyInfo> Properties",
-  "\\[JsonConverter\\(typeof\\(PropertyBagConverter\\)\\)]": "// [JsonConverter(typeof(PropertyBagConverter))]",
-
-  
-  /* Use SerializedPropertyInfo custom serializer */
-  "me.([^ ]+) = reader.ReadIDictionary<string, SerializedPropertyInfo>\\(root\\)": "me.$1 = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)",
-  "writer\\.Write\\(\"properties\",\\ item\\.Properties,\\ default\\);": "writer.WriteDictionary(\"properties\", item.Properties, SerializedPropertyInfoJsonExtensions.Write);",
+  "public IDictionary<String, SerializedPropertyInfo> Properties": "internal override IDictionary<String, SerializedPropertyInfo> Properties",  
 
   /* Custom Column Creation */
-  "ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(default\\)\\);": "new DictionaryColumn<string, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));",
-  "ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(default\\)\\);": "new DictionaryColumn<string, ArtifactLocation>(new DistinctColumn<string>(new StringColumn()), new ArtifactLocationColumn(this.Database)));",
-  "ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>\\(default\\)\\);": "new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));",
+  "ColumnFactory.Build<IDictionary<String, MultiformatMessageString>>\\(default\\)\\);": "new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));",
+  "ColumnFactory.Build<IDictionary<String, ArtifactLocation>>\\(default\\)\\);": "new DictionaryColumn<String, ArtifactLocation>(new DistinctColumn<string>(new StringColumn()), new ArtifactLocationColumn(this.Database)));",
+  "ColumnFactory.Build<IDictionary<String, SerializedPropertyInfo>>\\(default\\)\\);": "new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));",
 }

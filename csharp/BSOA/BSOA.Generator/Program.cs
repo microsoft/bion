@@ -67,16 +67,13 @@ namespace BSOA.Generator
                 postReplacements = AsJson.Load<Dictionary<string, string>>(postReplacementsPath);
             }
 
+            // List and Dictionary read and write methods need a writeValue delegate passed
+            postReplacements["me.([^ ]+) = JsonToIList<([^>]+)>.Read\\(reader, root\\)"] = "JsonToIList<$2>.Read(reader, root, me.$1, JsonTo$2.Read)";
+            postReplacements["JsonToIList<([^>]+)>.Write\\(writer, ([^,]+), item.([^,]+), default\\);"] = "JsonToIList<$1>.Write(writer, $2, item.$3, JsonTo$1.Write);";
 
-            // Dictionaries don't generate correct read methods
-            postReplacements["me.([^ ]+) = reader.ReadIDictionary<string, string>\\(root\\)"] = "reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString)";
-            postReplacements["me.([^ ]+) = reader.ReadIDictionary<string, ([^>]+)>\\(root\\)"] = @"reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, $2JsonExtensions.Read$2)";
-
-            // Lists don't generate correct read methods; need to generate the item reading method correctly.
-            postReplacements["me.([^ ]+) = reader.ReadIList<string>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadString)";
-            postReplacements["me.([^ ]+) = reader.ReadIList<Uri>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadUri)";
-
-
+            postReplacements["me.([^ ]+) = JsonToIDictionary<String, ([^>]+)>.Read\\(reader, root\\)"] = @"me.$1 = JsonToIDictionary<String, $2>.Read(reader, root, null, JsonTo$2.Read)";
+            postReplacements["JsonToIDictionary<String, ([^>]+)>.Write\\(writer, ([^,]+), item.([^,]+), default\\);"] = "JsonToIDictionary<String, $1>.Write(writer, $2, item.$3, JsonTo$1.Write);";
+            
             // Generate Database class
             new CodeGenerator(TemplateType.Database, TemplatePath(templateFolderPath, @"Internal\CompanyDatabase.cs"), @"Internal\{0}.cs", postReplacements)
                 .Generate(outputFolder, db);
@@ -89,16 +86,16 @@ namespace BSOA.Generator
             new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Team.cs"), "{0}.cs", postReplacements)
                 .Generate(outputFolder, db);
 
-            // Generate Entity Json Converter
-            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Json\TeamConverter.cs"), @"Json\{0}Converter.cs", postReplacements)
-                .Generate(outputFolder, db);
-
-            // Generate Root Entity (overwrite normal style)
+            // Generate Root Entity (overwrite normal entity form)
             new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Company.cs"), @"{0}.cs", postReplacements)
                 .Generate(outputFolder, db.Tables.Where((table) => table.Name.Equals(db.RootTableName)).First(), db);
 
-            // Generate Root Entity Json Converters
-            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Json\CompanyConverter.cs"), @"Json\{0}Converter.cs", postReplacements)
+            // Generate Entity Json Converter
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Json\JsonToTeam.cs"), @"Json\JsonTo{0}.cs", postReplacements)
+                .Generate(outputFolder, db);
+
+            // Generate Root Entity Json Converter (overwrite normal entity form)
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Json\JsonToCompany.cs"), @"Json\JsonTo{0}.cs", postReplacements)
                 .Generate(outputFolder, db.Tables.Where((table) => table.Name.Equals(db.RootTableName)).First(), db);
 
             Console.WriteLine("Done.");

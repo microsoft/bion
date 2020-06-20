@@ -31,7 +31,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -53,15 +53,15 @@
         },
         {
           "name": "Kind",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Name",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "FullyQualifiedName",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "OffsetFromParent",
@@ -79,7 +79,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -121,7 +121,7 @@
         },
         {
           "name": "MimeType",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -131,15 +131,15 @@
         },
         {
           "name": "Encoding",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "SourceLanguage",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Hashes",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<String, String>"
         },
         {
           "name": "LastModifiedTimeUtc",
@@ -147,7 +147,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -168,7 +168,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -177,11 +177,11 @@
       "columns": [
         {
           "name": "Text",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Binary",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -191,7 +191,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -204,7 +204,7 @@
         },
         {
           "name": "UriBaseId",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Index",
@@ -219,7 +219,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -252,7 +252,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -273,7 +273,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -294,7 +294,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -321,7 +321,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -330,7 +330,7 @@
       "columns": [
         {
           "name": "Id",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -340,15 +340,15 @@
         },
         {
           "name": "SourceNodeId",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "TargetNodeId",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -357,7 +357,7 @@
       "columns": [
         {
           "name": "EdgeId",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -367,7 +367,7 @@
         },
         {
           "name": "FinalState",
-          "type": "IDictionary<string, MultiformatMessageString>"
+          "type": "IDictionary<String, MultiformatMessageString>"
         },
         {
           "name": "StepOverEdgeCount",
@@ -375,7 +375,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -384,11 +384,11 @@
       "columns": [
         {
           "name": "Kind",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Message",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -404,7 +404,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -424,11 +424,11 @@
         },
         {
           "name": "Guid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "RunGuid",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -528,7 +528,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -543,7 +543,7 @@
         },
         {
           "name": "Guid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "ItemCount",
@@ -552,7 +552,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -657,7 +657,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -678,7 +678,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -705,7 +705,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -730,11 +730,11 @@
         },
         {
           "name": "InitialState",
-          "type": "IDictionary<string, MultiformatMessageString>"
+          "type": "IDictionary<String, MultiformatMessageString>"
         },
         {
           "name": "ImmutableState",
-          "type": "IDictionary<string, MultiformatMessageString>"
+          "type": "IDictionary<String, MultiformatMessageString>"
         },
         {
           "category": "RefList",
@@ -744,7 +744,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -753,11 +753,11 @@
       "columns": [
         {
           "name": "CommandLine",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Arguments",
-          "type": "IList<string>"
+          "type": "IList<String>"
         },
         {
           "category": "RefList",
@@ -803,11 +803,11 @@
         },
         {
           "name": "ExitCodeDescription",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "ExitSignalName",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "ExitSignalNumber",
@@ -815,7 +815,7 @@
         },
         {
           "name": "ProcessStartFailureMessage",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "ExecutionSuccessful",
@@ -823,11 +823,11 @@
         },
         {
           "name": "Machine",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Account",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "ProcessId",
@@ -847,7 +847,7 @@
         },
         {
           "name": "EnvironmentVariables",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<String, String>"
         },
         {
           "category": "Ref",
@@ -875,7 +875,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -919,7 +919,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -932,7 +932,7 @@
         },
         {
           "name": "Kinds",
-          "type": "IList<string>"
+          "type": "IList<String>"
         },
         {
           "category": "Ref",
@@ -942,7 +942,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -951,7 +951,7 @@
       "columns": [
         {
           "name": "Name",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Index",
@@ -960,11 +960,11 @@
         },
         {
           "name": "FullyQualifiedName",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "DecoratedName",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "ParentIndex",
@@ -973,11 +973,11 @@
         },
         {
           "name": "Kind",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -986,23 +986,23 @@
       "columns": [
         {
           "name": "Text",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Markdown",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Id",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Arguments",
-          "type": "IList<string>"
+          "type": "IList<String>"
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1011,15 +1011,15 @@
       "columns": [
         {
           "name": "Text",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Markdown",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1028,7 +1028,7 @@
       "columns": [
         {
           "name": "Id",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -1050,7 +1050,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1104,7 +1104,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1137,7 +1137,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1146,7 +1146,7 @@
       "columns": [
         {
           "name": "Tags",
-          "type": "IList<string>"
+          "type": "IList<String>"
         }
       ]
     },
@@ -1177,7 +1177,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1232,11 +1232,11 @@
         },
         {
           "name": "SourceLanguage",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1257,7 +1257,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1266,27 +1266,27 @@
       "columns": [
         {
           "name": "Id",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "DeprecatedIds",
-          "type": "IList<string>"
+          "type": "IList<String>"
         },
         {
           "name": "Guid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "DeprecatedGuids",
-          "type": "IList<string>"
+          "type": "IList<String>"
         },
         {
           "name": "Name",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "DeprecatedNames",
-          "type": "IList<string>"
+          "type": "IList<String>"
         },
         {
           "category": "Ref",
@@ -1302,7 +1302,7 @@
         },
         {
           "name": "MessageStrings",
-          "type": "IDictionary<string, MultiformatMessageString>"
+          "type": "IDictionary<String, MultiformatMessageString>"
         },
         {
           "category": "Ref",
@@ -1328,7 +1328,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1360,7 +1360,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1369,7 +1369,7 @@
       "columns": [
         {
           "name": "Id",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Index",
@@ -1378,7 +1378,7 @@
         },
         {
           "name": "Guid",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -1388,7 +1388,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1403,7 +1403,7 @@
         },
         {
           "name": "Kinds",
-          "type": "IList<string>"
+          "type": "IList<String>"
         },
         {
           "category": "Ref",
@@ -1413,7 +1413,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1422,7 +1422,7 @@
       "columns": [
         {
           "name": "RuleId",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "RuleIndex",
@@ -1469,11 +1469,11 @@
         },
         {
           "name": "Guid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "CorrelationGuid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "OccurrenceCount",
@@ -1481,11 +1481,11 @@
         },
         {
           "name": "PartialFingerprints",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<String, String>"
         },
         {
           "name": "Fingerprints",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<String, String>"
         },
         {
           "category": "RefList",
@@ -1581,7 +1581,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1598,11 +1598,11 @@
         },
         {
           "name": "FirstDetectionRunGuid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "LastDetectionRunGuid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "InvocationIndex",
@@ -1617,7 +1617,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1644,7 +1644,7 @@
         },
         {
           "name": "Language",
-          "type": "string",
+          "type": "String",
           "default": "\"en-US\""
         },
         {
@@ -1655,7 +1655,7 @@
         },
         {
           "name": "OriginalUriBaseIds",
-          "type": "IDictionary<string, ArtifactLocation>"
+          "type": "IDictionary<String, ArtifactLocation>"
         },
         {
           "category": "RefList",
@@ -1695,23 +1695,23 @@
         },
         {
           "name": "BaselineGuid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "RedactionTokens",
-          "type": "IList<string>"
+          "type": "IList<String>"
         },
         {
           "name": "DefaultEncoding",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "DefaultSourceLanguage",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "NewlineSequences",
-          "type": "IList<string>"
+          "type": "IList<String>"
         },
         {
           "category": "Enum",
@@ -1776,7 +1776,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1791,19 +1791,19 @@
         },
         {
           "name": "Id",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Guid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "CorrelationGuid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1818,7 +1818,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1839,7 +1839,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1854,7 +1854,7 @@
         },
         {
           "name": "Module",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "ThreadId",
@@ -1862,11 +1862,11 @@
         },
         {
           "name": "Parameters",
-          "type": "IList<string>"
+          "type": "IList<String>"
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1875,7 +1875,7 @@
       "columns": [
         {
           "name": "Guid",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Enum",
@@ -1893,7 +1893,7 @@
         },
         {
           "name": "Justification",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -1903,7 +1903,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1912,7 +1912,7 @@
       "columns": [
         {
           "name": "Id",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -1922,11 +1922,11 @@
         },
         {
           "name": "InitialState",
-          "type": "IDictionary<string, MultiformatMessageString>"
+          "type": "IDictionary<String, MultiformatMessageString>"
         },
         {
           "name": "ImmutableState",
-          "type": "IDictionary<string, MultiformatMessageString>"
+          "type": "IDictionary<String, MultiformatMessageString>"
         },
         {
           "category": "RefList",
@@ -1936,7 +1936,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -1962,7 +1962,7 @@
         },
         {
           "name": "Kinds",
-          "type": "IList<string>"
+          "type": "IList<String>"
         },
         {
           "category": "RefList",
@@ -1972,11 +1972,11 @@
         },
         {
           "name": "Module",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "State",
-          "type": "IDictionary<string, MultiformatMessageString>"
+          "type": "IDictionary<String, MultiformatMessageString>"
         },
         {
           "name": "NestingLevel",
@@ -2012,7 +2012,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2033,7 +2033,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2042,23 +2042,23 @@
       "columns": [
         {
           "name": "Guid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Name",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Organization",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Product",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "ProductSuite",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -2074,23 +2074,23 @@
         },
         {
           "name": "FullName",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Version",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "SemanticVersion",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "DottedQuadFileVersion",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "ReleaseDateUtc",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "DownloadUri",
@@ -2102,7 +2102,7 @@
         },
         {
           "name": "GlobalMessageStrings",
-          "type": "IDictionary<string, MultiformatMessageString>"
+          "type": "IDictionary<String, MultiformatMessageString>"
         },
         {
           "category": "RefList",
@@ -2130,7 +2130,7 @@
         },
         {
           "name": "Language",
-          "type": "string",
+          "type": "String",
           "default": "\"en-US\""
         },
         {
@@ -2147,11 +2147,11 @@
         },
         {
           "name": "LocalizedDataSemanticVersion",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "MinimumRequiredLocalizedDataSemanticVersion",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -2173,7 +2173,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2182,7 +2182,7 @@
       "columns": [
         {
           "name": "Name",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Index",
@@ -2191,11 +2191,11 @@
         },
         {
           "name": "Guid",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2204,11 +2204,11 @@
       "columns": [
         {
           "name": "Name",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "FullName",
-          "type": "string"
+          "type": "String"
         },
         {
           "category": "Ref",
@@ -2232,7 +2232,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2245,15 +2245,15 @@
         },
         {
           "name": "RevisionId",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Branch",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "RevisionTag",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "AsOfTimeUtc",
@@ -2267,7 +2267,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2281,27 +2281,27 @@
         },
         {
           "name": "Protocol",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Version",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Target",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Method",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Headers",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<String, String>"
         },
         {
           "name": "Parameters",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<String, String>"
         },
         {
           "category": "Ref",
@@ -2311,7 +2311,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     },
@@ -2325,11 +2325,11 @@
         },
         {
           "name": "Protocol",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Version",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "StatusCode",
@@ -2337,11 +2337,11 @@
         },
         {
           "name": "ReasonPhrase",
-          "type": "string"
+          "type": "String"
         },
         {
           "name": "Headers",
-          "type": "IDictionary<string, string>"
+          "type": "IDictionary<String, String>"
         },
         {
           "category": "Ref",
@@ -2356,7 +2356,7 @@
         },
         {
           "name": "Properties",
-          "type": "IDictionary<string, SerializedPropertyInfo>"
+          "type": "IDictionary<String, SerializedPropertyInfo>"
         }
       ]
     }

@@ -9,32 +9,14 @@ using Newtonsoft.Json;
 
 namespace Microsoft.CodeAnalysis.Sarif
 {
-    public static class SerializedPropertyInfoJsonExtensions
+    public class JsonToSerializedPropertyInfo : JsonConverter
     {
-        public static void Write(this JsonWriter writer, SerializedPropertyInfo item)
-        {
-            Readers.SerializedPropertyInfoConverter.Instance.WriteJson(writer, item, null);
-        }
-    }
-}
-
-namespace Microsoft.CodeAnalysis.Sarif.Readers
-{
-    public class SerializedPropertyInfoConverter : JsonConverter
-    {
-        public static readonly SerializedPropertyInfoConverter Instance = new SerializedPropertyInfoConverter();
-
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(SerializedPropertyInfo);
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public static SerializedPropertyInfo Read<TRoot>(JsonReader reader, TRoot root)
         {
             return Read(reader);
         }
 
-        public SerializedPropertyInfo Read(JsonReader reader)
+        public static SerializedPropertyInfo Read(JsonReader reader)
         {
             if (reader.TokenType == JsonToken.Null)
             {
@@ -57,13 +39,8 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
             }
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public static void Write(JsonWriter writer, SerializedPropertyInfo value)
         {
-            if (writer == null)
-            {
-                throw new ArgumentNullException(nameof(writer));
-            }
-
             SerializedPropertyInfo spi = (SerializedPropertyInfo)value;
 
             if (spi == null || spi.SerializedValue == null)
@@ -78,6 +55,21 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
             {
                 writer.WriteRawValue(spi.SerializedValue);
             }
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(SerializedPropertyInfo);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            return Read(reader);
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            Write(writer, (SerializedPropertyInfo)value);
         }
     }
 }

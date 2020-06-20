@@ -6,13 +6,6 @@ using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
-namespace Microsoft.CodeAnalysis.Sarif
-{
-    [JsonConverter(typeof(Readers.PropertyBagConverter))]
-    public partial class PropertyBag
-    { }
-}
-
 namespace Microsoft.CodeAnalysis.Sarif.Readers
 {
     /// <summary>
@@ -41,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
                 string name = (string)reader.Value;
                 reader.Read();
 
-                SerializedPropertyInfo value = SerializedPropertyInfoConverter.Instance.Read(reader);
+                SerializedPropertyInfo value = JsonToSerializedPropertyInfo.Read(reader);
                 reader.Read();
 
                 dictionary[name] = value;
@@ -49,46 +42,6 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
 
             return dictionary;
         }
-
-        //public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        //{
-        //    serializer = serializer ?? _serializer;
-
-        //    var objectDictionary = new Dictionary<string, object>();
-        //    serializer.Populate(reader, objectDictionary);
-
-        //    var propertyDictionary = new Dictionary<string, SerializedPropertyInfo>();
-        //    foreach (string key in objectDictionary.Keys)
-        //    {
-        //        object value = objectDictionary[key];
-        //        Type propertyType = value?.GetType();
-
-        //        string serializedValue = value?.ToString();
-        //        bool isString = false;
-
-        //        if (propertyType == typeof(bool))
-        //        {
-        //            serializedValue = serializedValue.ToLowerInvariant();
-        //        }
-        //        else if (propertyType == typeof(string))
-        //        {
-        //            serializedValue = JsonConvert.ToString(serializedValue);
-        //            isString = true;
-        //        }
-        //        else if (propertyType == typeof(DateTime))
-        //        {
-        //            // There's no need to worry about value being null here, because we know that
-        //            // Newtonsoft.Json recognized the value as a string that looks like a DateTime.
-        //            serializedValue = JsonConvert.SerializeObject(value);
-        //        }
-
-        //        SerializedPropertyInfo propInfo = value == null ? null : new SerializedPropertyInfo(serializedValue, isString);
-
-        //        propertyDictionary.Add(key, propInfo);
-        //    }
-
-        //    return propertyDictionary;
-        //}
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
