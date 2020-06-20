@@ -38,11 +38,11 @@ namespace BSOA.Generator.Templates
             // <ColumnConstructorList>
 
             // <SimpleColumnConstructor>
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<long>(99));
+            Id = AddColumn(nameof(Id), database.BuildColumn<long>(nameof(Team), nameof(Id), 99));
             // </SimpleColumnConstructor>
 
             // <EnumColumnConstructor>
-            JoinPolicy = AddColumn(nameof(JoinPolicy), ColumnFactory.Build<byte>((byte)SecurityPolicy.Open));
+            JoinPolicy = AddColumn(nameof(JoinPolicy), database.BuildColumn<byte>(nameof(Team), nameof(JoinPolicy), (byte)SecurityPolicy.Open));
             // </EnumColumnConstructor>
 
             // <RefColumnConstructor>

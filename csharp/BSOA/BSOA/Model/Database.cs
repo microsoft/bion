@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 
+using BSOA.Column;
 using BSOA.IO;
 
 namespace BSOA.Model
@@ -27,14 +28,14 @@ namespace BSOA.Model
             return table;
         }
 
-        public IColumn<T> Build<T>(T defaultValue = default(T))
+        public IColumn<T> BuildColumn<T>(string tableName, string columnName, T defaultValue = default)
         {
-            return (IColumn<T>)Build(typeof(T), defaultValue);
+            return (IColumn<T>)BuildColumn(tableName, columnName, typeof(T), defaultValue);
         }
 
-        public virtual IColumn Build(Type type, object defaultValue = null)
+        public virtual IColumn BuildColumn(string tableName, string columnName, Type type, object defaultValue = null)
         {
-            return null;
+            return ColumnFactory.Build(type, defaultValue);
         }
 
         /// <summary>

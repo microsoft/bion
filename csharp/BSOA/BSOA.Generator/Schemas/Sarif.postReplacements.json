@@ -2,12 +2,9 @@
   /* SchemaUri writes as "$schema" in file */
   "\"schemaUri\"": "\"$schema\"",
 
-  /* PropertyBag generated isn't right */
+  /* PropertyBag shouldn't inherit from itself */ 
   "PropertyBag\\ :\\ PropertyBagHolder,\\ ": "PropertyBag : ",
-  "public IDictionary<String, SerializedPropertyInfo> Properties": "internal override IDictionary<String, SerializedPropertyInfo> Properties",  
 
-  /* Custom Column Creation */
-  "ColumnFactory.Build<IDictionary<String, MultiformatMessageString>>\\(default\\)\\);": "new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));",
-  "ColumnFactory.Build<IDictionary<String, ArtifactLocation>>\\(default\\)\\);": "new DictionaryColumn<String, ArtifactLocation>(new DistinctColumn<string>(new StringColumn()), new ArtifactLocationColumn(this.Database)));",
-  "ColumnFactory.Build<IDictionary<String, SerializedPropertyInfo>>\\(default\\)\\);": "new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));",
+  /* Base class defines Properties, so entities must declare as 'internal override' */
+  "public IDictionary<String, SerializedPropertyInfo> Properties": "internal override IDictionary<String, SerializedPropertyInfo> Properties"
 }

@@ -44,7 +44,7 @@ namespace BSOA.Test
 
         private void AssertBuild<T>(object defaultValue)
         {
-            IColumn column = ColumnFactory.Build(typeof(T), defaultValue);
+            IColumn column = ColumnFactory.BuildTyped<T>((T)defaultValue);
             Assert.NotNull(column);
             Assert.True(column is IColumn<T>);
 
