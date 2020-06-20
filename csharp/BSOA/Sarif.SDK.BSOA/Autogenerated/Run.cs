@@ -43,20 +43,20 @@ namespace Microsoft.CodeAnalysis.Sarif
             Tool tool,
             IList<Invocation> invocations,
             Conversion conversion,
-            string language,
+            String language,
             IList<VersionControlDetails> versionControlProvenance,
-            IDictionary<string, ArtifactLocation> originalUriBaseIds,
+            IDictionary<String, ArtifactLocation> originalUriBaseIds,
             IList<Artifact> artifacts,
             IList<LogicalLocation> logicalLocations,
             IList<Graph> graphs,
             IList<Result> results,
             RunAutomationDetails automationDetails,
             IList<RunAutomationDetails> runAggregates,
-            string baselineGuid,
-            IList<string> redactionTokens,
-            string defaultEncoding,
-            string defaultSourceLanguage,
-            IList<string> newlineSequences,
+            String baselineGuid,
+            IList<String> redactionTokens,
+            String defaultEncoding,
+            String defaultSourceLanguage,
+            IList<String> newlineSequences,
             ColumnKind columnKind,
             ExternalPropertyFileReferences externalPropertyFileReferences,
             IList<ThreadFlowLocation> threadFlowLocations,
@@ -67,7 +67,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             IList<WebRequest> webRequests,
             IList<WebResponse> webResponses,
             SpecialLocations specialLocations,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Run)
         {
@@ -154,7 +154,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Conversion[_index] = _table.Database.Conversion.LocalIndex(value);
         }
 
-        public string Language
+        public String Language
         {
             get => _table.Language[_index];
             set => _table.Language[_index] = value;
@@ -166,7 +166,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.VersionControlDetails.List(_table.VersionControlProvenance[_index]).SetTo(value);
         }
 
-        public IDictionary<string, ArtifactLocation> OriginalUriBaseIds
+        public IDictionary<String, ArtifactLocation> OriginalUriBaseIds
         {
             get => _table.OriginalUriBaseIds[_index];
             set => _table.OriginalUriBaseIds[_index] = value;
@@ -208,31 +208,31 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.RunAutomationDetails.List(_table.RunAggregates[_index]).SetTo(value);
         }
 
-        public string BaselineGuid
+        public String BaselineGuid
         {
             get => _table.BaselineGuid[_index];
             set => _table.BaselineGuid[_index] = value;
         }
 
-        public IList<string> RedactionTokens
+        public IList<String> RedactionTokens
         {
             get => _table.RedactionTokens[_index];
             set => _table.RedactionTokens[_index] = value;
         }
 
-        public string DefaultEncoding
+        public String DefaultEncoding
         {
             get => _table.DefaultEncoding[_index];
             set => _table.DefaultEncoding[_index] = value;
         }
 
-        public string DefaultSourceLanguage
+        public String DefaultSourceLanguage
         {
             get => _table.DefaultSourceLanguage[_index];
             set => _table.DefaultSourceLanguage[_index] = value;
         }
 
-        public IList<string> NewlineSequences
+        public IList<String> NewlineSequences
         {
             get => _table.NewlineSequences[_index];
             set => _table.NewlineSequences[_index] = value;
@@ -298,7 +298,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.SpecialLocations[_index] = _table.Database.SpecialLocations.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -364,7 +364,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Conversion.GetHashCode();
                 }
 
-                if (Language != default(string))
+                if (Language != default(String))
                 {
                     result = (result * 31) + Language.GetHashCode();
                 }
@@ -374,7 +374,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + VersionControlProvenance.GetHashCode();
                 }
 
-                if (OriginalUriBaseIds != default(IDictionary<string, ArtifactLocation>))
+                if (OriginalUriBaseIds != default(IDictionary<String, ArtifactLocation>))
                 {
                     result = (result * 31) + OriginalUriBaseIds.GetHashCode();
                 }
@@ -409,27 +409,27 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + RunAggregates.GetHashCode();
                 }
 
-                if (BaselineGuid != default(string))
+                if (BaselineGuid != default(String))
                 {
                     result = (result * 31) + BaselineGuid.GetHashCode();
                 }
 
-                if (RedactionTokens != default(IList<string>))
+                if (RedactionTokens != default(IList<String>))
                 {
                     result = (result * 31) + RedactionTokens.GetHashCode();
                 }
 
-                if (DefaultEncoding != default(string))
+                if (DefaultEncoding != default(String))
                 {
                     result = (result * 31) + DefaultEncoding.GetHashCode();
                 }
 
-                if (DefaultSourceLanguage != default(string))
+                if (DefaultSourceLanguage != default(String))
                 {
                     result = (result * 31) + DefaultSourceLanguage.GetHashCode();
                 }
 
-                if (NewlineSequences != default(IList<string>))
+                if (NewlineSequences != default(IList<String>))
                 {
                     result = (result * 31) + NewlineSequences.GetHashCode();
                 }
@@ -484,7 +484,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + SpecialLocations.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

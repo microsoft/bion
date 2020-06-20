@@ -46,7 +46,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Message message,
             IList<Region> annotations,
             IList<LocationRelationship> relationships,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Location)
         {
@@ -109,7 +109,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.LocationRelationship.List(_table.Relationships[_index]).SetTo(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -169,7 +169,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Relationships.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

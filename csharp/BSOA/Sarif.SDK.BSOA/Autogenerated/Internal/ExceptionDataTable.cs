@@ -16,21 +16,21 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         internal SarifLogDatabase Database;
 
-        internal IColumn<string> Kind;
-        internal IColumn<string> Message;
+        internal IColumn<String> Kind;
+        internal IColumn<String> Message;
         internal RefColumn Stack;
         internal RefListColumn InnerExceptions;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal ExceptionDataTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
-            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<string>(default));
-            Message = AddColumn(nameof(Message), ColumnFactory.Build<string>(default));
+            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<String>(default));
+            Message = AddColumn(nameof(Message), ColumnFactory.Build<String>(default));
             Stack = AddColumn(nameof(Stack), new RefColumn(nameof(SarifLogDatabase.Stack)));
             InnerExceptions = AddColumn(nameof(InnerExceptions), new RefListColumn(nameof(SarifLogDatabase.ExceptionData)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ExceptionData Get(int index)

@@ -88,7 +88,7 @@ namespace JschemaToBsoaSchema
 
             if (columnName == "Properties")
             {
-                return Column.Simple("Properties", "IDictionary<string, SerializedPropertyInfo>");
+                return Column.Simple("Properties", "IDictionary<String, SerializedPropertyInfo>");
             }
 
             switch (type)
@@ -111,7 +111,7 @@ namespace JschemaToBsoaSchema
                     else
                     {
                         if (defaultValue != null) { defaultValue = "\"" + defaultValue + "\""; }
-                        return Column.Simple(columnName, "string", defaultValue);
+                        return Column.Simple(columnName, "String", defaultValue);
                     }
                 case SchemaType.Object:
                     if (schema.Reference != null)
@@ -123,7 +123,7 @@ namespace JschemaToBsoaSchema
                     else
                     {
                         string valueType = ToColumn(tableName, columnName, schema.AdditionalProperties.Schema).Type;
-                        return Column.Simple(columnName, $"IDictionary<string, {valueType}>");
+                        return Column.Simple(columnName, $"IDictionary<String, {valueType}>");
                     }
                 case SchemaType.Array:
                     Column itemType = ToColumn(tableName, columnName, schema.Items.Schema);

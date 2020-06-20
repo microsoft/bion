@@ -41,10 +41,10 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public RunAutomationDetails(
             Message description,
-            string id,
-            string guid,
-            string correlationGuid,
-            IDictionary<string, SerializedPropertyInfo> properties
+            String id,
+            String guid,
+            String correlationGuid,
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.RunAutomationDetails)
         {
@@ -73,25 +73,25 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        public string Id
+        public String Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
-        public string Guid
+        public String Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
         }
 
-        public string CorrelationGuid
+        public String CorrelationGuid
         {
             get => _table.CorrelationGuid[_index];
             set => _table.CorrelationGuid[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -124,22 +124,22 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Description.GetHashCode();
                 }
 
-                if (Id != default(string))
+                if (Id != default(String))
                 {
                     result = (result * 31) + Id.GetHashCode();
                 }
 
-                if (Guid != default(string))
+                if (Guid != default(String))
                 {
                     result = (result * 31) + Guid.GetHashCode();
                 }
 
-                if (CorrelationGuid != default(string))
+                if (CorrelationGuid != default(String))
                 {
                     result = (result * 31) + CorrelationGuid.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

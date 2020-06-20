@@ -18,11 +18,11 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         internal IColumn<DateTime> FirstDetectionTimeUtc;
         internal IColumn<DateTime> LastDetectionTimeUtc;
-        internal IColumn<string> FirstDetectionRunGuid;
-        internal IColumn<string> LastDetectionRunGuid;
+        internal IColumn<String> FirstDetectionRunGuid;
+        internal IColumn<String> LastDetectionRunGuid;
         internal IColumn<int> InvocationIndex;
         internal RefListColumn ConversionSources;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal ResultProvenanceTable(SarifLogDatabase database) : base()
         {
@@ -30,11 +30,11 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             FirstDetectionTimeUtc = AddColumn(nameof(FirstDetectionTimeUtc), ColumnFactory.Build<DateTime>(default));
             LastDetectionTimeUtc = AddColumn(nameof(LastDetectionTimeUtc), ColumnFactory.Build<DateTime>(default));
-            FirstDetectionRunGuid = AddColumn(nameof(FirstDetectionRunGuid), ColumnFactory.Build<string>(default));
-            LastDetectionRunGuid = AddColumn(nameof(LastDetectionRunGuid), ColumnFactory.Build<string>(default));
+            FirstDetectionRunGuid = AddColumn(nameof(FirstDetectionRunGuid), ColumnFactory.Build<String>(default));
+            LastDetectionRunGuid = AddColumn(nameof(LastDetectionRunGuid), ColumnFactory.Build<String>(default));
             InvocationIndex = AddColumn(nameof(InvocationIndex), ColumnFactory.Build<int>(-1));
             ConversionSources = AddColumn(nameof(ConversionSources), new RefListColumn(nameof(SarifLogDatabase.PhysicalLocation)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ResultProvenance Get(int index)

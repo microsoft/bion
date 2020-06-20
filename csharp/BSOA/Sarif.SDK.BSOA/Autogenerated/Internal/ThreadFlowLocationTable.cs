@@ -19,17 +19,17 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<int> Index;
         internal RefColumn Location;
         internal RefColumn Stack;
-        internal IColumn<IList<string>> Kinds;
+        internal IColumn<IList<String>> Kinds;
         internal RefListColumn Taxa;
-        internal IColumn<string> Module;
-        internal IColumn<IDictionary<string, MultiformatMessageString>> State;
+        internal IColumn<String> Module;
+        internal IColumn<IDictionary<String, MultiformatMessageString>> State;
         internal IColumn<int> NestingLevel;
         internal IColumn<int> ExecutionOrder;
         internal IColumn<DateTime> ExecutionTimeUtc;
         internal IColumn<int> Importance;
         internal RefColumn WebRequest;
         internal RefColumn WebResponse;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal ThreadFlowLocationTable(SarifLogDatabase database) : base()
         {
@@ -38,17 +38,17 @@ namespace Microsoft.CodeAnalysis.Sarif
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.Location)));
             Stack = AddColumn(nameof(Stack), new RefColumn(nameof(SarifLogDatabase.Stack)));
-            Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<string>>(default));
+            Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<String>>(default));
             Taxa = AddColumn(nameof(Taxa), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
-            Module = AddColumn(nameof(Module), ColumnFactory.Build<string>(default));
-            State = AddColumn(nameof(State), new DictionaryColumn<string, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
+            Module = AddColumn(nameof(Module), ColumnFactory.Build<String>(default));
+            State = AddColumn(nameof(State), new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
             NestingLevel = AddColumn(nameof(NestingLevel), ColumnFactory.Build<int>(default));
             ExecutionOrder = AddColumn(nameof(ExecutionOrder), ColumnFactory.Build<int>(-1));
             ExecutionTimeUtc = AddColumn(nameof(ExecutionTimeUtc), ColumnFactory.Build<DateTime>(default));
             Importance = AddColumn(nameof(Importance), ColumnFactory.Build<int>((int)ThreadFlowLocationImportance.Important));
             WebRequest = AddColumn(nameof(WebRequest), new RefColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponse = AddColumn(nameof(WebResponse), new RefColumn(nameof(SarifLogDatabase.WebResponse)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ThreadFlowLocation Get(int index)

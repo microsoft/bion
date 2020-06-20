@@ -41,9 +41,9 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public LocationRelationship(
             int target,
-            IList<string> kinds,
+            IList<String> kinds,
             Message description,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.LocationRelationship)
         {
@@ -70,7 +70,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Target[_index] = value;
         }
 
-        public IList<string> Kinds
+        public IList<String> Kinds
         {
             get => _table.Kinds[_index];
             set => _table.Kinds[_index] = value;
@@ -82,7 +82,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -114,7 +114,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Target.GetHashCode();
                 }
 
-                if (Kinds != default(IList<string>))
+                if (Kinds != default(IList<String>))
                 {
                     result = (result * 31) + Kinds.GetHashCode();
                 }
@@ -124,7 +124,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Description.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

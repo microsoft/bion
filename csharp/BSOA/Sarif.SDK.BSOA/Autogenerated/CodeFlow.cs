@@ -42,7 +42,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         public CodeFlow(
             Message message,
             IList<ThreadFlow> threadFlows,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.CodeFlow)
         {
@@ -73,7 +73,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.ThreadFlow.List(_table.ThreadFlows[_index]).SetTo(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -109,7 +109,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + ThreadFlows.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

@@ -42,7 +42,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         public ArtifactChange(
             ArtifactLocation artifactLocation,
             IList<Replacement> replacements,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ArtifactChange)
         {
@@ -73,7 +73,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.Replacement.List(_table.Replacements[_index]).SetTo(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -109,7 +109,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Replacements.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

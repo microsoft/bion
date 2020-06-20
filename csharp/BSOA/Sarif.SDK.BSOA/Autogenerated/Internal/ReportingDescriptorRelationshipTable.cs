@@ -17,18 +17,18 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal SarifLogDatabase Database;
 
         internal RefColumn Target;
-        internal IColumn<IList<string>> Kinds;
+        internal IColumn<IList<String>> Kinds;
         internal RefColumn Description;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal ReportingDescriptorRelationshipTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
             Target = AddColumn(nameof(Target), new RefColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
-            Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<string>>(default));
+            Kinds = AddColumn(nameof(Kinds), ColumnFactory.Build<IList<String>>(default));
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ReportingDescriptorRelationship Get(int index)

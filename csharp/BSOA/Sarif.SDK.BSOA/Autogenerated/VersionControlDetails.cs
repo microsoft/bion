@@ -41,12 +41,12 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public VersionControlDetails(
             Uri repositoryUri,
-            string revisionId,
-            string branch,
-            string revisionTag,
+            String revisionId,
+            String branch,
+            String revisionTag,
             DateTime asOfTimeUtc,
             ArtifactLocation mappedTo,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.VersionControlDetails)
         {
@@ -79,19 +79,19 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.RepositoryUri[_index] = value;
         }
 
-        public string RevisionId
+        public String RevisionId
         {
             get => _table.RevisionId[_index];
             set => _table.RevisionId[_index] = value;
         }
 
-        public string Branch
+        public String Branch
         {
             get => _table.Branch[_index];
             set => _table.Branch[_index] = value;
         }
 
-        public string RevisionTag
+        public String RevisionTag
         {
             get => _table.RevisionTag[_index];
             set => _table.RevisionTag[_index] = value;
@@ -109,7 +109,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.MappedTo[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -144,17 +144,17 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + RepositoryUri.GetHashCode();
                 }
 
-                if (RevisionId != default(string))
+                if (RevisionId != default(String))
                 {
                     result = (result * 31) + RevisionId.GetHashCode();
                 }
 
-                if (Branch != default(string))
+                if (Branch != default(String))
                 {
                     result = (result * 31) + Branch.GetHashCode();
                 }
 
-                if (RevisionTag != default(string))
+                if (RevisionTag != default(String))
                 {
                     result = (result * 31) + RevisionTag.GetHashCode();
                 }
@@ -169,7 +169,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + MappedTo.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

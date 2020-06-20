@@ -40,10 +40,10 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public ToolComponentReference(
-            string name,
+            String name,
             int index,
-            string guid,
-            IDictionary<string, SerializedPropertyInfo> properties
+            String guid,
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ToolComponentReference)
         {
@@ -64,7 +64,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string Name
+        public String Name
         {
             get => _table.Name[_index];
             set => _table.Name[_index] = value;
@@ -76,13 +76,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Index[_index] = value;
         }
 
-        public string Guid
+        public String Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -109,7 +109,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (Name != default(string))
+                if (Name != default(String))
                 {
                     result = (result * 31) + Name.GetHashCode();
                 }
@@ -119,12 +119,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Index.GetHashCode();
                 }
 
-                if (Guid != default(string))
+                if (Guid != default(String))
                 {
                     result = (result * 31) + Guid.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

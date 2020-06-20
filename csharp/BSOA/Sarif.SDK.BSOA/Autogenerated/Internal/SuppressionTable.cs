@@ -16,23 +16,23 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         internal SarifLogDatabase Database;
 
-        internal IColumn<string> Guid;
+        internal IColumn<String> Guid;
         internal IColumn<int> Kind;
         internal IColumn<int> Status;
-        internal IColumn<string> Justification;
+        internal IColumn<String> Justification;
         internal RefColumn Location;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal SuppressionTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default));
+            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<String>(default));
             Kind = AddColumn(nameof(Kind), ColumnFactory.Build<int>((int)default(SuppressionKind)));
             Status = AddColumn(nameof(Status), ColumnFactory.Build<int>((int)default(SuppressionStatus)));
-            Justification = AddColumn(nameof(Justification), ColumnFactory.Build<string>(default));
+            Justification = AddColumn(nameof(Justification), ColumnFactory.Build<String>(default));
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.Location)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Suppression Get(int index)

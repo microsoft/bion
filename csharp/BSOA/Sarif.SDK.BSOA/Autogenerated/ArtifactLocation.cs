@@ -41,10 +41,10 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public ArtifactLocation(
             Uri uri,
-            string uriBaseId,
+            String uriBaseId,
             int index,
             Message description,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ArtifactLocation)
         {
@@ -73,7 +73,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Uri[_index] = value;
         }
 
-        public string UriBaseId
+        public String UriBaseId
         {
             get => _table.UriBaseId[_index];
             set => _table.UriBaseId[_index] = value;
@@ -91,7 +91,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -124,7 +124,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Uri.GetHashCode();
                 }
 
-                if (UriBaseId != default(string))
+                if (UriBaseId != default(String))
                 {
                     result = (result * 31) + UriBaseId.GetHashCode();
                 }
@@ -139,7 +139,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Description.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

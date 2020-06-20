@@ -43,10 +43,10 @@ namespace Microsoft.CodeAnalysis.Sarif
             int runGraphIndex,
             int resultGraphIndex,
             Message description,
-            IDictionary<string, MultiformatMessageString> initialState,
-            IDictionary<string, MultiformatMessageString> immutableState,
+            IDictionary<String, MultiformatMessageString> initialState,
+            IDictionary<String, MultiformatMessageString> immutableState,
             IList<EdgeTraversal> edgeTraversals,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.GraphTraversal)
         {
@@ -91,13 +91,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Description[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        public IDictionary<string, MultiformatMessageString> InitialState
+        public IDictionary<String, MultiformatMessageString> InitialState
         {
             get => _table.InitialState[_index];
             set => _table.InitialState[_index] = value;
         }
 
-        public IDictionary<string, MultiformatMessageString> ImmutableState
+        public IDictionary<String, MultiformatMessageString> ImmutableState
         {
             get => _table.ImmutableState[_index];
             set => _table.ImmutableState[_index] = value;
@@ -109,7 +109,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.EdgeTraversal.List(_table.EdgeTraversals[_index]).SetTo(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -154,12 +154,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Description.GetHashCode();
                 }
 
-                if (InitialState != default(IDictionary<string, MultiformatMessageString>))
+                if (InitialState != default(IDictionary<String, MultiformatMessageString>))
                 {
                     result = (result * 31) + InitialState.GetHashCode();
                 }
 
-                if (ImmutableState != default(IDictionary<string, MultiformatMessageString>))
+                if (ImmutableState != default(IDictionary<String, MultiformatMessageString>))
                 {
                     result = (result * 31) + ImmutableState.GetHashCode();
                 }
@@ -169,7 +169,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + EdgeTraversals.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

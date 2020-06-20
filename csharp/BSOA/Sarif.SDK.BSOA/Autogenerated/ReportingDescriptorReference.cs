@@ -40,11 +40,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public ReportingDescriptorReference(
-            string id,
+            String id,
             int index,
-            string guid,
+            String guid,
             ToolComponentReference toolComponent,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ReportingDescriptorReference)
         {
@@ -67,7 +67,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string Id
+        public String Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
@@ -79,7 +79,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Index[_index] = value;
         }
 
-        public string Guid
+        public String Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
@@ -91,7 +91,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.ToolComponent[_index] = _table.Database.ToolComponentReference.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -119,7 +119,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (Id != default(string))
+                if (Id != default(String))
                 {
                     result = (result * 31) + Id.GetHashCode();
                 }
@@ -129,7 +129,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Index.GetHashCode();
                 }
 
-                if (Guid != default(string))
+                if (Guid != default(String))
                 {
                     result = (result * 31) + Guid.GetHashCode();
                 }
@@ -139,7 +139,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + ToolComponent.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

@@ -43,17 +43,17 @@ namespace Microsoft.CodeAnalysis.Sarif
             int index,
             Location location,
             Stack stack,
-            IList<string> kinds,
+            IList<String> kinds,
             IList<ReportingDescriptorReference> taxa,
-            string module,
-            IDictionary<string, MultiformatMessageString> state,
+            String module,
+            IDictionary<String, MultiformatMessageString> state,
             int nestingLevel,
             int executionOrder,
             DateTime executionTimeUtc,
             ThreadFlowLocationImportance importance,
             WebRequest webRequest,
             WebResponse webResponse,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ThreadFlowLocation)
         {
@@ -112,7 +112,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Stack[_index] = _table.Database.Stack.LocalIndex(value);
         }
 
-        public IList<string> Kinds
+        public IList<String> Kinds
         {
             get => _table.Kinds[_index];
             set => _table.Kinds[_index] = value;
@@ -124,13 +124,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.ReportingDescriptorReference.List(_table.Taxa[_index]).SetTo(value);
         }
 
-        public string Module
+        public String Module
         {
             get => _table.Module[_index];
             set => _table.Module[_index] = value;
         }
 
-        public IDictionary<string, MultiformatMessageString> State
+        public IDictionary<String, MultiformatMessageString> State
         {
             get => _table.State[_index];
             set => _table.State[_index] = value;
@@ -172,7 +172,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.WebResponse[_index] = _table.Database.WebResponse.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -224,7 +224,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Stack.GetHashCode();
                 }
 
-                if (Kinds != default(IList<string>))
+                if (Kinds != default(IList<String>))
                 {
                     result = (result * 31) + Kinds.GetHashCode();
                 }
@@ -234,12 +234,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Taxa.GetHashCode();
                 }
 
-                if (Module != default(string))
+                if (Module != default(String))
                 {
                     result = (result * 31) + Module.GetHashCode();
                 }
 
-                if (State != default(IDictionary<string, MultiformatMessageString>))
+                if (State != default(IDictionary<String, MultiformatMessageString>))
                 {
                     result = (result * 31) + State.GetHashCode();
                 }
@@ -274,7 +274,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + WebResponse.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

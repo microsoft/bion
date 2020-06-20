@@ -19,20 +19,20 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn Tool;
         internal RefListColumn Invocations;
         internal RefColumn Conversion;
-        internal IColumn<string> Language;
+        internal IColumn<String> Language;
         internal RefListColumn VersionControlProvenance;
-        internal IColumn<IDictionary<string, ArtifactLocation>> OriginalUriBaseIds;
+        internal IColumn<IDictionary<String, ArtifactLocation>> OriginalUriBaseIds;
         internal RefListColumn Artifacts;
         internal RefListColumn LogicalLocations;
         internal RefListColumn Graphs;
         internal RefListColumn Results;
         internal RefColumn AutomationDetails;
         internal RefListColumn RunAggregates;
-        internal IColumn<string> BaselineGuid;
-        internal IColumn<IList<string>> RedactionTokens;
-        internal IColumn<string> DefaultEncoding;
-        internal IColumn<string> DefaultSourceLanguage;
-        internal IColumn<IList<string>> NewlineSequences;
+        internal IColumn<String> BaselineGuid;
+        internal IColumn<IList<String>> RedactionTokens;
+        internal IColumn<String> DefaultEncoding;
+        internal IColumn<String> DefaultSourceLanguage;
+        internal IColumn<IList<String>> NewlineSequences;
         internal IColumn<int> ColumnKind;
         internal RefColumn ExternalPropertyFileReferences;
         internal RefListColumn ThreadFlowLocations;
@@ -43,7 +43,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefListColumn WebRequests;
         internal RefListColumn WebResponses;
         internal RefColumn SpecialLocations;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal RunTable(SarifLogDatabase database) : base()
         {
@@ -52,20 +52,20 @@ namespace Microsoft.CodeAnalysis.Sarif
             Tool = AddColumn(nameof(Tool), new RefColumn(nameof(SarifLogDatabase.Tool)));
             Invocations = AddColumn(nameof(Invocations), new RefListColumn(nameof(SarifLogDatabase.Invocation)));
             Conversion = AddColumn(nameof(Conversion), new RefColumn(nameof(SarifLogDatabase.Conversion)));
-            Language = AddColumn(nameof(Language), ColumnFactory.Build<string>("en-US"));
+            Language = AddColumn(nameof(Language), ColumnFactory.Build<String>("en-US"));
             VersionControlProvenance = AddColumn(nameof(VersionControlProvenance), new RefListColumn(nameof(SarifLogDatabase.VersionControlDetails)));
-            OriginalUriBaseIds = AddColumn(nameof(OriginalUriBaseIds), new DictionaryColumn<string, ArtifactLocation>(new DistinctColumn<string>(new StringColumn()), new ArtifactLocationColumn(this.Database)));
+            OriginalUriBaseIds = AddColumn(nameof(OriginalUriBaseIds), new DictionaryColumn<String, ArtifactLocation>(new DistinctColumn<string>(new StringColumn()), new ArtifactLocationColumn(this.Database)));
             Artifacts = AddColumn(nameof(Artifacts), new RefListColumn(nameof(SarifLogDatabase.Artifact)));
             LogicalLocations = AddColumn(nameof(LogicalLocations), new RefListColumn(nameof(SarifLogDatabase.LogicalLocation)));
             Graphs = AddColumn(nameof(Graphs), new RefListColumn(nameof(SarifLogDatabase.Graph)));
             Results = AddColumn(nameof(Results), new RefListColumn(nameof(SarifLogDatabase.Result)));
             AutomationDetails = AddColumn(nameof(AutomationDetails), new RefColumn(nameof(SarifLogDatabase.RunAutomationDetails)));
             RunAggregates = AddColumn(nameof(RunAggregates), new RefListColumn(nameof(SarifLogDatabase.RunAutomationDetails)));
-            BaselineGuid = AddColumn(nameof(BaselineGuid), ColumnFactory.Build<string>(default));
-            RedactionTokens = AddColumn(nameof(RedactionTokens), ColumnFactory.Build<IList<string>>(default));
-            DefaultEncoding = AddColumn(nameof(DefaultEncoding), ColumnFactory.Build<string>(default));
-            DefaultSourceLanguage = AddColumn(nameof(DefaultSourceLanguage), ColumnFactory.Build<string>(default));
-            NewlineSequences = AddColumn(nameof(NewlineSequences), ColumnFactory.Build<IList<string>>(default));
+            BaselineGuid = AddColumn(nameof(BaselineGuid), ColumnFactory.Build<String>(default));
+            RedactionTokens = AddColumn(nameof(RedactionTokens), ColumnFactory.Build<IList<String>>(default));
+            DefaultEncoding = AddColumn(nameof(DefaultEncoding), ColumnFactory.Build<String>(default));
+            DefaultSourceLanguage = AddColumn(nameof(DefaultSourceLanguage), ColumnFactory.Build<String>(default));
+            NewlineSequences = AddColumn(nameof(NewlineSequences), ColumnFactory.Build<IList<String>>(default));
             ColumnKind = AddColumn(nameof(ColumnKind), ColumnFactory.Build<int>((int)default(ColumnKind)));
             ExternalPropertyFileReferences = AddColumn(nameof(ExternalPropertyFileReferences), new RefColumn(nameof(SarifLogDatabase.ExternalPropertyFileReferences)));
             ThreadFlowLocations = AddColumn(nameof(ThreadFlowLocations), new RefListColumn(nameof(SarifLogDatabase.ThreadFlowLocation)));
@@ -76,7 +76,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             WebRequests = AddColumn(nameof(WebRequests), new RefListColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponses = AddColumn(nameof(WebResponses), new RefListColumn(nameof(SarifLogDatabase.WebResponse)));
             SpecialLocations = AddColumn(nameof(SpecialLocations), new RefColumn(nameof(SarifLogDatabase.SpecialLocations)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Run Get(int index)

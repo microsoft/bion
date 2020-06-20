@@ -40,34 +40,34 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public ToolComponent(
-            string guid,
-            string name,
-            string organization,
-            string product,
-            string productSuite,
+            String guid,
+            String name,
+            String organization,
+            String product,
+            String productSuite,
             MultiformatMessageString shortDescription,
             MultiformatMessageString fullDescription,
-            string fullName,
-            string version,
-            string semanticVersion,
-            string dottedQuadFileVersion,
-            string releaseDateUtc,
+            String fullName,
+            String version,
+            String semanticVersion,
+            String dottedQuadFileVersion,
+            String releaseDateUtc,
             Uri downloadUri,
             Uri informationUri,
-            IDictionary<string, MultiformatMessageString> globalMessageStrings,
+            IDictionary<String, MultiformatMessageString> globalMessageStrings,
             IList<ReportingDescriptor> notifications,
             IList<ReportingDescriptor> rules,
             IList<ReportingDescriptor> taxa,
             IList<ArtifactLocation> locations,
-            string language,
+            String language,
             ToolComponentContents contents,
             bool isComprehensive,
-            string localizedDataSemanticVersion,
-            string minimumRequiredLocalizedDataSemanticVersion,
+            String localizedDataSemanticVersion,
+            String minimumRequiredLocalizedDataSemanticVersion,
             ToolComponentReference associatedComponent,
             TranslationMetadata translationMetadata,
             IList<ToolComponentReference> supportedTaxonomies,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ToolComponent)
         {
@@ -136,31 +136,31 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string Guid
+        public String Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
         }
 
-        public string Name
+        public String Name
         {
             get => _table.Name[_index];
             set => _table.Name[_index] = value;
         }
 
-        public string Organization
+        public String Organization
         {
             get => _table.Organization[_index];
             set => _table.Organization[_index] = value;
         }
 
-        public string Product
+        public String Product
         {
             get => _table.Product[_index];
             set => _table.Product[_index] = value;
         }
 
-        public string ProductSuite
+        public String ProductSuite
         {
             get => _table.ProductSuite[_index];
             set => _table.ProductSuite[_index] = value;
@@ -178,31 +178,31 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.FullDescription[_index] = _table.Database.MultiformatMessageString.LocalIndex(value);
         }
 
-        public string FullName
+        public String FullName
         {
             get => _table.FullName[_index];
             set => _table.FullName[_index] = value;
         }
 
-        public string Version
+        public String Version
         {
             get => _table.Version[_index];
             set => _table.Version[_index] = value;
         }
 
-        public string SemanticVersion
+        public String SemanticVersion
         {
             get => _table.SemanticVersion[_index];
             set => _table.SemanticVersion[_index] = value;
         }
 
-        public string DottedQuadFileVersion
+        public String DottedQuadFileVersion
         {
             get => _table.DottedQuadFileVersion[_index];
             set => _table.DottedQuadFileVersion[_index] = value;
         }
 
-        public string ReleaseDateUtc
+        public String ReleaseDateUtc
         {
             get => _table.ReleaseDateUtc[_index];
             set => _table.ReleaseDateUtc[_index] = value;
@@ -220,7 +220,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.InformationUri[_index] = value;
         }
 
-        public IDictionary<string, MultiformatMessageString> GlobalMessageStrings
+        public IDictionary<String, MultiformatMessageString> GlobalMessageStrings
         {
             get => _table.GlobalMessageStrings[_index];
             set => _table.GlobalMessageStrings[_index] = value;
@@ -250,7 +250,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.ArtifactLocation.List(_table.Locations[_index]).SetTo(value);
         }
 
-        public string Language
+        public String Language
         {
             get => _table.Language[_index];
             set => _table.Language[_index] = value;
@@ -268,13 +268,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.IsComprehensive[_index] = value;
         }
 
-        public string LocalizedDataSemanticVersion
+        public String LocalizedDataSemanticVersion
         {
             get => _table.LocalizedDataSemanticVersion[_index];
             set => _table.LocalizedDataSemanticVersion[_index] = value;
         }
 
-        public string MinimumRequiredLocalizedDataSemanticVersion
+        public String MinimumRequiredLocalizedDataSemanticVersion
         {
             get => _table.MinimumRequiredLocalizedDataSemanticVersion[_index];
             set => _table.MinimumRequiredLocalizedDataSemanticVersion[_index] = value;
@@ -298,7 +298,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.ToolComponentReference.List(_table.SupportedTaxonomies[_index]).SetTo(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -349,27 +349,27 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (Guid != default(string))
+                if (Guid != default(String))
                 {
                     result = (result * 31) + Guid.GetHashCode();
                 }
 
-                if (Name != default(string))
+                if (Name != default(String))
                 {
                     result = (result * 31) + Name.GetHashCode();
                 }
 
-                if (Organization != default(string))
+                if (Organization != default(String))
                 {
                     result = (result * 31) + Organization.GetHashCode();
                 }
 
-                if (Product != default(string))
+                if (Product != default(String))
                 {
                     result = (result * 31) + Product.GetHashCode();
                 }
 
-                if (ProductSuite != default(string))
+                if (ProductSuite != default(String))
                 {
                     result = (result * 31) + ProductSuite.GetHashCode();
                 }
@@ -384,27 +384,27 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + FullDescription.GetHashCode();
                 }
 
-                if (FullName != default(string))
+                if (FullName != default(String))
                 {
                     result = (result * 31) + FullName.GetHashCode();
                 }
 
-                if (Version != default(string))
+                if (Version != default(String))
                 {
                     result = (result * 31) + Version.GetHashCode();
                 }
 
-                if (SemanticVersion != default(string))
+                if (SemanticVersion != default(String))
                 {
                     result = (result * 31) + SemanticVersion.GetHashCode();
                 }
 
-                if (DottedQuadFileVersion != default(string))
+                if (DottedQuadFileVersion != default(String))
                 {
                     result = (result * 31) + DottedQuadFileVersion.GetHashCode();
                 }
 
-                if (ReleaseDateUtc != default(string))
+                if (ReleaseDateUtc != default(String))
                 {
                     result = (result * 31) + ReleaseDateUtc.GetHashCode();
                 }
@@ -419,7 +419,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + InformationUri.GetHashCode();
                 }
 
-                if (GlobalMessageStrings != default(IDictionary<string, MultiformatMessageString>))
+                if (GlobalMessageStrings != default(IDictionary<String, MultiformatMessageString>))
                 {
                     result = (result * 31) + GlobalMessageStrings.GetHashCode();
                 }
@@ -444,7 +444,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Locations.GetHashCode();
                 }
 
-                if (Language != default(string))
+                if (Language != default(String))
                 {
                     result = (result * 31) + Language.GetHashCode();
                 }
@@ -459,12 +459,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + IsComprehensive.GetHashCode();
                 }
 
-                if (LocalizedDataSemanticVersion != default(string))
+                if (LocalizedDataSemanticVersion != default(String))
                 {
                     result = (result * 31) + LocalizedDataSemanticVersion.GetHashCode();
                 }
 
-                if (MinimumRequiredLocalizedDataSemanticVersion != default(string))
+                if (MinimumRequiredLocalizedDataSemanticVersion != default(String))
                 {
                     result = (result * 31) + MinimumRequiredLocalizedDataSemanticVersion.GetHashCode();
                 }
@@ -484,7 +484,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + SupportedTaxonomies.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

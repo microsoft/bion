@@ -43,13 +43,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             int absoluteAddress,
             int relativeAddress,
             int length,
-            string kind,
-            string name,
-            string fullyQualifiedName,
+            String kind,
+            String name,
+            String fullyQualifiedName,
             int offsetFromParent,
             int index,
             int parentIndex,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Address)
         {
@@ -100,19 +100,19 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Length[_index] = value;
         }
 
-        public string Kind
+        public String Kind
         {
             get => _table.Kind[_index];
             set => _table.Kind[_index] = value;
         }
 
-        public string Name
+        public String Name
         {
             get => _table.Name[_index];
             set => _table.Name[_index] = value;
         }
 
-        public string FullyQualifiedName
+        public String FullyQualifiedName
         {
             get => _table.FullyQualifiedName[_index];
             set => _table.FullyQualifiedName[_index] = value;
@@ -136,7 +136,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.ParentIndex[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -184,17 +184,17 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Length.GetHashCode();
                 }
 
-                if (Kind != default(string))
+                if (Kind != default(String))
                 {
                     result = (result * 31) + Kind.GetHashCode();
                 }
 
-                if (Name != default(string))
+                if (Name != default(String))
                 {
                     result = (result * 31) + Name.GetHashCode();
                 }
 
-                if (FullyQualifiedName != default(string))
+                if (FullyQualifiedName != default(String))
                 {
                     result = (result * 31) + FullyQualifiedName.GetHashCode();
                 }
@@ -214,7 +214,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + ParentIndex.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

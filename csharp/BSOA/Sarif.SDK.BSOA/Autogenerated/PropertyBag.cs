@@ -40,7 +40,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public PropertyBag(
-            IList<string> tags
+            IList<String> tags
         ) 
             : this(SarifLogDatabase.Current.PropertyBag)
         {
@@ -55,7 +55,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public IList<string> Tags
+        public IList<String> Tags
         {
             get => _table.Tags[_index];
             set => _table.Tags[_index] = value;
@@ -79,7 +79,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (Tags != default(IList<string>))
+                if (Tags != default(IList<String>))
                 {
                     result = (result * 31) + Tags.GetHashCode();
                 }

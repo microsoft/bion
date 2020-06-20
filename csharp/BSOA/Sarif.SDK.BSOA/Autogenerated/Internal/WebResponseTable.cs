@@ -17,28 +17,28 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal SarifLogDatabase Database;
 
         internal IColumn<int> Index;
-        internal IColumn<string> Protocol;
-        internal IColumn<string> Version;
+        internal IColumn<String> Protocol;
+        internal IColumn<String> Version;
         internal IColumn<int> StatusCode;
-        internal IColumn<string> ReasonPhrase;
-        internal IColumn<IDictionary<string, string>> Headers;
+        internal IColumn<String> ReasonPhrase;
+        internal IColumn<IDictionary<String, String>> Headers;
         internal RefColumn Body;
         internal IColumn<bool> NoResponseReceived;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal WebResponseTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
-            Protocol = AddColumn(nameof(Protocol), ColumnFactory.Build<string>(default));
-            Version = AddColumn(nameof(Version), ColumnFactory.Build<string>(default));
+            Protocol = AddColumn(nameof(Protocol), ColumnFactory.Build<String>(default));
+            Version = AddColumn(nameof(Version), ColumnFactory.Build<String>(default));
             StatusCode = AddColumn(nameof(StatusCode), ColumnFactory.Build<int>(default));
-            ReasonPhrase = AddColumn(nameof(ReasonPhrase), ColumnFactory.Build<string>(default));
-            Headers = AddColumn(nameof(Headers), ColumnFactory.Build<IDictionary<string, string>>(default));
+            ReasonPhrase = AddColumn(nameof(ReasonPhrase), ColumnFactory.Build<String>(default));
+            Headers = AddColumn(nameof(Headers), ColumnFactory.Build<IDictionary<String, String>>(default));
             Body = AddColumn(nameof(Body), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
             NoResponseReceived = AddColumn(nameof(NoResponseReceived), ColumnFactory.Build<bool>(false));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override WebResponse Get(int index)

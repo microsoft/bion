@@ -16,21 +16,21 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         internal SarifLogDatabase Database;
 
-        internal IColumn<string> Id;
+        internal IColumn<String> Id;
         internal RefColumn Label;
         internal RefColumn Location;
         internal RefListColumn Children;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal NodeTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default));
+            Id = AddColumn(nameof(Id), ColumnFactory.Build<String>(default));
             Label = AddColumn(nameof(Label), new RefColumn(nameof(SarifLogDatabase.Message)));
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.Location)));
             Children = AddColumn(nameof(Children), new RefListColumn(nameof(SarifLogDatabase.Node)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Node Get(int index)

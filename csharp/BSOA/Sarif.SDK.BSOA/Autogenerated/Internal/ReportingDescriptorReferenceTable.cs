@@ -16,21 +16,21 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         internal SarifLogDatabase Database;
 
-        internal IColumn<string> Id;
+        internal IColumn<String> Id;
         internal IColumn<int> Index;
-        internal IColumn<string> Guid;
+        internal IColumn<String> Guid;
         internal RefColumn ToolComponent;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal ReportingDescriptorReferenceTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default));
+            Id = AddColumn(nameof(Id), ColumnFactory.Build<String>(default));
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default));
+            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<String>(default));
             ToolComponent = AddColumn(nameof(ToolComponent), new RefColumn(nameof(SarifLogDatabase.ToolComponentReference)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ReportingDescriptorReference Get(int index)

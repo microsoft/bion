@@ -17,28 +17,28 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal SarifLogDatabase Database;
 
         internal IColumn<int> Index;
-        internal IColumn<string> Protocol;
-        internal IColumn<string> Version;
-        internal IColumn<string> Target;
-        internal IColumn<string> Method;
-        internal IColumn<IDictionary<string, string>> Headers;
-        internal IColumn<IDictionary<string, string>> Parameters;
+        internal IColumn<String> Protocol;
+        internal IColumn<String> Version;
+        internal IColumn<String> Target;
+        internal IColumn<String> Method;
+        internal IColumn<IDictionary<String, String>> Headers;
+        internal IColumn<IDictionary<String, String>> Parameters;
         internal RefColumn Body;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal WebRequestTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
-            Protocol = AddColumn(nameof(Protocol), ColumnFactory.Build<string>(default));
-            Version = AddColumn(nameof(Version), ColumnFactory.Build<string>(default));
-            Target = AddColumn(nameof(Target), ColumnFactory.Build<string>(default));
-            Method = AddColumn(nameof(Method), ColumnFactory.Build<string>(default));
-            Headers = AddColumn(nameof(Headers), ColumnFactory.Build<IDictionary<string, string>>(default));
-            Parameters = AddColumn(nameof(Parameters), ColumnFactory.Build<IDictionary<string, string>>(default));
+            Protocol = AddColumn(nameof(Protocol), ColumnFactory.Build<String>(default));
+            Version = AddColumn(nameof(Version), ColumnFactory.Build<String>(default));
+            Target = AddColumn(nameof(Target), ColumnFactory.Build<String>(default));
+            Method = AddColumn(nameof(Method), ColumnFactory.Build<String>(default));
+            Headers = AddColumn(nameof(Headers), ColumnFactory.Build<IDictionary<String, String>>(default));
+            Parameters = AddColumn(nameof(Parameters), ColumnFactory.Build<IDictionary<String, String>>(default));
             Body = AddColumn(nameof(Body), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override WebRequest Get(int index)

@@ -16,21 +16,21 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         internal SarifLogDatabase Database;
 
-        internal IColumn<string> Id;
+        internal IColumn<String> Id;
         internal RefColumn Label;
-        internal IColumn<string> SourceNodeId;
-        internal IColumn<string> TargetNodeId;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<String> SourceNodeId;
+        internal IColumn<String> TargetNodeId;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal EdgeTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default));
+            Id = AddColumn(nameof(Id), ColumnFactory.Build<String>(default));
             Label = AddColumn(nameof(Label), new RefColumn(nameof(SarifLogDatabase.Message)));
-            SourceNodeId = AddColumn(nameof(SourceNodeId), ColumnFactory.Build<string>(default));
-            TargetNodeId = AddColumn(nameof(TargetNodeId), ColumnFactory.Build<string>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            SourceNodeId = AddColumn(nameof(SourceNodeId), ColumnFactory.Build<String>(default));
+            TargetNodeId = AddColumn(nameof(TargetNodeId), ColumnFactory.Build<String>(default));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Edge Get(int index)

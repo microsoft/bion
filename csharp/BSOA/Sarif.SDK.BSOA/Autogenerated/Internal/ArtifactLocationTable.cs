@@ -17,20 +17,20 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal SarifLogDatabase Database;
 
         internal IColumn<Uri> Uri;
-        internal IColumn<string> UriBaseId;
+        internal IColumn<String> UriBaseId;
         internal IColumn<int> Index;
         internal RefColumn Description;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal ArtifactLocationTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
             Uri = AddColumn(nameof(Uri), ColumnFactory.Build<Uri>(default));
-            UriBaseId = AddColumn(nameof(UriBaseId), ColumnFactory.Build<string>(default));
+            UriBaseId = AddColumn(nameof(UriBaseId), ColumnFactory.Build<String>(default));
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ArtifactLocation Get(int index)

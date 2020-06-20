@@ -56,7 +56,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             IList<ExternalPropertyFileReference> translations,
             IList<ExternalPropertyFileReference> webRequests,
             IList<ExternalPropertyFileReference> webResponses,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ExternalPropertyFileReferences)
         {
@@ -199,7 +199,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.ExternalPropertyFileReference.List(_table.WebResponses[_index]).SetTo(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -319,7 +319,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + WebResponses.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

@@ -41,14 +41,14 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public WebResponse(
             int index,
-            string protocol,
-            string version,
+            String protocol,
+            String version,
             int statusCode,
-            string reasonPhrase,
-            IDictionary<string, string> headers,
+            String reasonPhrase,
+            IDictionary<String, String> headers,
             ArtifactContent body,
             bool noResponseReceived,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.WebResponse)
         {
@@ -85,13 +85,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Index[_index] = value;
         }
 
-        public string Protocol
+        public String Protocol
         {
             get => _table.Protocol[_index];
             set => _table.Protocol[_index] = value;
         }
 
-        public string Version
+        public String Version
         {
             get => _table.Version[_index];
             set => _table.Version[_index] = value;
@@ -103,13 +103,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.StatusCode[_index] = value;
         }
 
-        public string ReasonPhrase
+        public String ReasonPhrase
         {
             get => _table.ReasonPhrase[_index];
             set => _table.ReasonPhrase[_index] = value;
         }
 
-        public IDictionary<string, string> Headers
+        public IDictionary<String, String> Headers
         {
             get => _table.Headers[_index];
             set => _table.Headers[_index] = value;
@@ -127,7 +127,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.NoResponseReceived[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -164,12 +164,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Index.GetHashCode();
                 }
 
-                if (Protocol != default(string))
+                if (Protocol != default(String))
                 {
                     result = (result * 31) + Protocol.GetHashCode();
                 }
 
-                if (Version != default(string))
+                if (Version != default(String))
                 {
                     result = (result * 31) + Version.GetHashCode();
                 }
@@ -179,12 +179,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + StatusCode.GetHashCode();
                 }
 
-                if (ReasonPhrase != default(string))
+                if (ReasonPhrase != default(String))
                 {
                     result = (result * 31) + ReasonPhrase.GetHashCode();
                 }
 
-                if (Headers != default(IDictionary<string, string>))
+                if (Headers != default(IDictionary<String, String>))
                 {
                     result = (result * 31) + Headers.GetHashCode();
                 }
@@ -199,7 +199,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + NoResponseReceived.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

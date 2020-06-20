@@ -22,13 +22,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<int> Offset;
         internal IColumn<int> Length;
         internal IColumn<int> Roles;
-        internal IColumn<string> MimeType;
+        internal IColumn<String> MimeType;
         internal RefColumn Contents;
-        internal IColumn<string> Encoding;
-        internal IColumn<string> SourceLanguage;
-        internal IColumn<IDictionary<string, string>> Hashes;
+        internal IColumn<String> Encoding;
+        internal IColumn<String> SourceLanguage;
+        internal IColumn<IDictionary<String, String>> Hashes;
         internal IColumn<DateTime> LastModifiedTimeUtc;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal ArtifactTable(SarifLogDatabase database) : base()
         {
@@ -40,13 +40,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             Offset = AddColumn(nameof(Offset), ColumnFactory.Build<int>(default));
             Length = AddColumn(nameof(Length), ColumnFactory.Build<int>(-1));
             Roles = AddColumn(nameof(Roles), ColumnFactory.Build<int>((int)default(ArtifactRoles)));
-            MimeType = AddColumn(nameof(MimeType), ColumnFactory.Build<string>(default));
+            MimeType = AddColumn(nameof(MimeType), ColumnFactory.Build<String>(default));
             Contents = AddColumn(nameof(Contents), new RefColumn(nameof(SarifLogDatabase.ArtifactContent)));
-            Encoding = AddColumn(nameof(Encoding), ColumnFactory.Build<string>(default));
-            SourceLanguage = AddColumn(nameof(SourceLanguage), ColumnFactory.Build<string>(default));
-            Hashes = AddColumn(nameof(Hashes), ColumnFactory.Build<IDictionary<string, string>>(default));
+            Encoding = AddColumn(nameof(Encoding), ColumnFactory.Build<String>(default));
+            SourceLanguage = AddColumn(nameof(SourceLanguage), ColumnFactory.Build<String>(default));
+            Hashes = AddColumn(nameof(Hashes), ColumnFactory.Build<IDictionary<String, String>>(default));
             LastModifiedTimeUtc = AddColumn(nameof(LastModifiedTimeUtc), ColumnFactory.Build<DateTime>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Artifact Get(int index)

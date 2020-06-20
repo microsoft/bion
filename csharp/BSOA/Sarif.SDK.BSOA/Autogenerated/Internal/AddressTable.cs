@@ -19,13 +19,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<int> AbsoluteAddress;
         internal IColumn<int> RelativeAddress;
         internal IColumn<int> Length;
-        internal IColumn<string> Kind;
-        internal IColumn<string> Name;
-        internal IColumn<string> FullyQualifiedName;
+        internal IColumn<String> Kind;
+        internal IColumn<String> Name;
+        internal IColumn<String> FullyQualifiedName;
         internal IColumn<int> OffsetFromParent;
         internal IColumn<int> Index;
         internal IColumn<int> ParentIndex;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal AddressTable(SarifLogDatabase database) : base()
         {
@@ -34,13 +34,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             AbsoluteAddress = AddColumn(nameof(AbsoluteAddress), ColumnFactory.Build<int>(-1));
             RelativeAddress = AddColumn(nameof(RelativeAddress), ColumnFactory.Build<int>(default));
             Length = AddColumn(nameof(Length), ColumnFactory.Build<int>(default));
-            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<string>(default));
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default));
-            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), ColumnFactory.Build<string>(default));
+            Kind = AddColumn(nameof(Kind), ColumnFactory.Build<String>(default));
+            Name = AddColumn(nameof(Name), ColumnFactory.Build<String>(default));
+            FullyQualifiedName = AddColumn(nameof(FullyQualifiedName), ColumnFactory.Build<String>(default));
             OffsetFromParent = AddColumn(nameof(OffsetFromParent), ColumnFactory.Build<int>(default));
             Index = AddColumn(nameof(Index), ColumnFactory.Build<int>(-1));
             ParentIndex = AddColumn(nameof(ParentIndex), ColumnFactory.Build<int>(-1));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Address Get(int index)

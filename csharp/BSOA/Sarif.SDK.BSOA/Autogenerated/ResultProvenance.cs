@@ -42,11 +42,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         public ResultProvenance(
             DateTime firstDetectionTimeUtc,
             DateTime lastDetectionTimeUtc,
-            string firstDetectionRunGuid,
-            string lastDetectionRunGuid,
+            String firstDetectionRunGuid,
+            String lastDetectionRunGuid,
             int invocationIndex,
             IList<PhysicalLocation> conversionSources,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ResultProvenance)
         {
@@ -85,13 +85,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.LastDetectionTimeUtc[_index] = value;
         }
 
-        public string FirstDetectionRunGuid
+        public String FirstDetectionRunGuid
         {
             get => _table.FirstDetectionRunGuid[_index];
             set => _table.FirstDetectionRunGuid[_index] = value;
         }
 
-        public string LastDetectionRunGuid
+        public String LastDetectionRunGuid
         {
             get => _table.LastDetectionRunGuid[_index];
             set => _table.LastDetectionRunGuid[_index] = value;
@@ -109,7 +109,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.PhysicalLocation.List(_table.ConversionSources[_index]).SetTo(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -149,12 +149,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + LastDetectionTimeUtc.GetHashCode();
                 }
 
-                if (FirstDetectionRunGuid != default(string))
+                if (FirstDetectionRunGuid != default(String))
                 {
                     result = (result * 31) + FirstDetectionRunGuid.GetHashCode();
                 }
 
-                if (LastDetectionRunGuid != default(string))
+                if (LastDetectionRunGuid != default(String))
                 {
                     result = (result * 31) + LastDetectionRunGuid.GetHashCode();
                 }
@@ -169,7 +169,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + ConversionSources.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

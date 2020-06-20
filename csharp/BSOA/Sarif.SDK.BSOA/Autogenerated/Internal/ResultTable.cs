@@ -16,7 +16,7 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         internal SarifLogDatabase Database;
 
-        internal IColumn<string> RuleId;
+        internal IColumn<String> RuleId;
         internal IColumn<int> RuleIndex;
         internal RefColumn Rule;
         internal IColumn<int> Kind;
@@ -24,11 +24,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn Message;
         internal RefColumn AnalysisTarget;
         internal RefListColumn Locations;
-        internal IColumn<string> Guid;
-        internal IColumn<string> CorrelationGuid;
+        internal IColumn<String> Guid;
+        internal IColumn<String> CorrelationGuid;
         internal IColumn<int> OccurrenceCount;
-        internal IColumn<IDictionary<string, string>> PartialFingerprints;
-        internal IColumn<IDictionary<string, string>> Fingerprints;
+        internal IColumn<IDictionary<String, String>> PartialFingerprints;
+        internal IColumn<IDictionary<String, String>> Fingerprints;
         internal RefListColumn Stacks;
         internal RefListColumn CodeFlows;
         internal RefListColumn Graphs;
@@ -45,13 +45,13 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefListColumn Taxa;
         internal RefColumn WebRequest;
         internal RefColumn WebResponse;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal ResultTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
-            RuleId = AddColumn(nameof(RuleId), ColumnFactory.Build<string>(default));
+            RuleId = AddColumn(nameof(RuleId), ColumnFactory.Build<String>(default));
             RuleIndex = AddColumn(nameof(RuleIndex), ColumnFactory.Build<int>(-1));
             Rule = AddColumn(nameof(Rule), new RefColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
             Kind = AddColumn(nameof(Kind), ColumnFactory.Build<int>((int)ResultKind.Fail));
@@ -59,11 +59,11 @@ namespace Microsoft.CodeAnalysis.Sarif
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
             AnalysisTarget = AddColumn(nameof(AnalysisTarget), new RefColumn(nameof(SarifLogDatabase.ArtifactLocation)));
             Locations = AddColumn(nameof(Locations), new RefListColumn(nameof(SarifLogDatabase.Location)));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default));
-            CorrelationGuid = AddColumn(nameof(CorrelationGuid), ColumnFactory.Build<string>(default));
+            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<String>(default));
+            CorrelationGuid = AddColumn(nameof(CorrelationGuid), ColumnFactory.Build<String>(default));
             OccurrenceCount = AddColumn(nameof(OccurrenceCount), ColumnFactory.Build<int>(default));
-            PartialFingerprints = AddColumn(nameof(PartialFingerprints), ColumnFactory.Build<IDictionary<string, string>>(default));
-            Fingerprints = AddColumn(nameof(Fingerprints), ColumnFactory.Build<IDictionary<string, string>>(default));
+            PartialFingerprints = AddColumn(nameof(PartialFingerprints), ColumnFactory.Build<IDictionary<String, String>>(default));
+            Fingerprints = AddColumn(nameof(Fingerprints), ColumnFactory.Build<IDictionary<String, String>>(default));
             Stacks = AddColumn(nameof(Stacks), new RefListColumn(nameof(SarifLogDatabase.Stack)));
             CodeFlows = AddColumn(nameof(CodeFlows), new RefListColumn(nameof(SarifLogDatabase.CodeFlow)));
             Graphs = AddColumn(nameof(Graphs), new RefListColumn(nameof(SarifLogDatabase.Graph)));
@@ -80,7 +80,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Taxa = AddColumn(nameof(Taxa), new RefListColumn(nameof(SarifLogDatabase.ReportingDescriptorReference)));
             WebRequest = AddColumn(nameof(WebRequest), new RefColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponse = AddColumn(nameof(WebResponse), new RefColumn(nameof(SarifLogDatabase.WebResponse)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Result Get(int index)

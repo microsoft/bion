@@ -40,9 +40,9 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public MultiformatMessageString(
-            string text,
-            string markdown,
-            IDictionary<string, SerializedPropertyInfo> properties
+            String text,
+            String markdown,
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.MultiformatMessageString)
         {
@@ -61,19 +61,19 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string Text
+        public String Text
         {
             get => _table.Text[_index];
             set => _table.Text[_index] = value;
         }
 
-        public string Markdown
+        public String Markdown
         {
             get => _table.Markdown[_index];
             set => _table.Markdown[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -99,17 +99,17 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (Text != default(string))
+                if (Text != default(String))
                 {
                     result = (result * 31) + Text.GetHashCode();
                 }
 
-                if (Markdown != default(string))
+                if (Markdown != default(String))
                 {
                     result = (result * 31) + Markdown.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

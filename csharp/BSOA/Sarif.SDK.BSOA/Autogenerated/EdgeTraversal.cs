@@ -40,11 +40,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public EdgeTraversal(
-            string edgeId,
+            String edgeId,
             Message message,
-            IDictionary<string, MultiformatMessageString> finalState,
+            IDictionary<String, MultiformatMessageString> finalState,
             int stepOverEdgeCount,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.EdgeTraversal)
         {
@@ -67,7 +67,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string EdgeId
+        public String EdgeId
         {
             get => _table.EdgeId[_index];
             set => _table.EdgeId[_index] = value;
@@ -79,7 +79,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        public IDictionary<string, MultiformatMessageString> FinalState
+        public IDictionary<String, MultiformatMessageString> FinalState
         {
             get => _table.FinalState[_index];
             set => _table.FinalState[_index] = value;
@@ -91,7 +91,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.StepOverEdgeCount[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -119,7 +119,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (EdgeId != default(string))
+                if (EdgeId != default(String))
                 {
                     result = (result * 31) + EdgeId.GetHashCode();
                 }
@@ -129,7 +129,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Message.GetHashCode();
                 }
 
-                if (FinalState != default(IDictionary<string, MultiformatMessageString>))
+                if (FinalState != default(IDictionary<String, MultiformatMessageString>))
                 {
                     result = (result * 31) + FinalState.GetHashCode();
                 }
@@ -139,7 +139,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + StepOverEdgeCount.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

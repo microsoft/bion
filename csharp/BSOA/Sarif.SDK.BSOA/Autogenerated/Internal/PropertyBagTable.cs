@@ -16,13 +16,13 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         internal SarifLogDatabase Database;
 
-        internal IColumn<IList<string>> Tags;
+        internal IColumn<IList<String>> Tags;
 
         internal PropertyBagTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
-            Tags = AddColumn(nameof(Tags), ColumnFactory.Build<IList<string>>(default));
+            Tags = AddColumn(nameof(Tags), ColumnFactory.Build<IList<String>>(default));
         }
 
         public override PropertyBag Get(int index)

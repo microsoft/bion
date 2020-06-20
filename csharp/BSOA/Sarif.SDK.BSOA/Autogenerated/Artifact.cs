@@ -46,13 +46,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             int offset,
             int length,
             ArtifactRoles roles,
-            string mimeType,
+            String mimeType,
             ArtifactContent contents,
-            string encoding,
-            string sourceLanguage,
-            IDictionary<string, string> hashes,
+            String encoding,
+            String sourceLanguage,
+            IDictionary<String, String> hashes,
             DateTime lastModifiedTimeUtc,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Artifact)
         {
@@ -127,7 +127,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Roles[_index] = (int)value;
         }
 
-        public string MimeType
+        public String MimeType
         {
             get => _table.MimeType[_index];
             set => _table.MimeType[_index] = value;
@@ -139,19 +139,19 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Contents[_index] = _table.Database.ArtifactContent.LocalIndex(value);
         }
 
-        public string Encoding
+        public String Encoding
         {
             get => _table.Encoding[_index];
             set => _table.Encoding[_index] = value;
         }
 
-        public string SourceLanguage
+        public String SourceLanguage
         {
             get => _table.SourceLanguage[_index];
             set => _table.SourceLanguage[_index] = value;
         }
 
-        public IDictionary<string, string> Hashes
+        public IDictionary<String, String> Hashes
         {
             get => _table.Hashes[_index];
             set => _table.Hashes[_index] = value;
@@ -163,7 +163,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.LastModifiedTimeUtc[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -229,7 +229,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Roles.GetHashCode();
                 }
 
-                if (MimeType != default(string))
+                if (MimeType != default(String))
                 {
                     result = (result * 31) + MimeType.GetHashCode();
                 }
@@ -239,17 +239,17 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Contents.GetHashCode();
                 }
 
-                if (Encoding != default(string))
+                if (Encoding != default(String))
                 {
                     result = (result * 31) + Encoding.GetHashCode();
                 }
 
-                if (SourceLanguage != default(string))
+                if (SourceLanguage != default(String))
                 {
                     result = (result * 31) + SourceLanguage.GetHashCode();
                 }
 
-                if (Hashes != default(IDictionary<string, string>))
+                if (Hashes != default(IDictionary<String, String>))
                 {
                     result = (result * 31) + Hashes.GetHashCode();
                 }
@@ -259,7 +259,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + LastModifiedTimeUtc.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

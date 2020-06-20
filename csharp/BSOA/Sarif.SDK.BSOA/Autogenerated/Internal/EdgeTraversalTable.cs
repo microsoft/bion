@@ -16,21 +16,21 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         internal SarifLogDatabase Database;
 
-        internal IColumn<string> EdgeId;
+        internal IColumn<String> EdgeId;
         internal RefColumn Message;
-        internal IColumn<IDictionary<string, MultiformatMessageString>> FinalState;
+        internal IColumn<IDictionary<String, MultiformatMessageString>> FinalState;
         internal IColumn<int> StepOverEdgeCount;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal EdgeTraversalTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
-            EdgeId = AddColumn(nameof(EdgeId), ColumnFactory.Build<string>(default));
+            EdgeId = AddColumn(nameof(EdgeId), ColumnFactory.Build<String>(default));
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
-            FinalState = AddColumn(nameof(FinalState), new DictionaryColumn<string, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
+            FinalState = AddColumn(nameof(FinalState), new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
             StepOverEdgeCount = AddColumn(nameof(StepOverEdgeCount), ColumnFactory.Build<int>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override EdgeTraversal Get(int index)

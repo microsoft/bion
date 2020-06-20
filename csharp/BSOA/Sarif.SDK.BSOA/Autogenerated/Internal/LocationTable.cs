@@ -22,7 +22,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefColumn Message;
         internal RefListColumn Annotations;
         internal RefListColumn Relationships;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal LocationTable(SarifLogDatabase database) : base()
         {
@@ -34,7 +34,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Message = AddColumn(nameof(Message), new RefColumn(nameof(SarifLogDatabase.Message)));
             Annotations = AddColumn(nameof(Annotations), new RefListColumn(nameof(SarifLogDatabase.Region)));
             Relationships = AddColumn(nameof(Relationships), new RefListColumn(nameof(SarifLogDatabase.LocationRelationship)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override Location Get(int index)

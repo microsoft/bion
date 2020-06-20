@@ -40,11 +40,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public Node(
-            string id,
+            String id,
             Message label,
             Location location,
             IList<Node> children,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Node)
         {
@@ -67,7 +67,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string Id
+        public String Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
@@ -91,7 +91,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.Node.List(_table.Children[_index]).SetTo(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -119,7 +119,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (Id != default(string))
+                if (Id != default(String))
                 {
                     result = (result * 31) + Id.GetHashCode();
                 }
@@ -139,7 +139,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Children.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

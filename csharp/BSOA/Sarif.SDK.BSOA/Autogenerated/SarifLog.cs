@@ -46,7 +46,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             SarifVersion version,
             IList<Run> runs,
             IList<ExternalProperties> inlineExternalProperties,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) : this()
         {
             SchemaUri = schemaUri;
@@ -92,7 +92,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.ExternalProperties.List(_table.InlineExternalProperties[_index]).SetTo(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -140,7 +140,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + InlineExternalProperties.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

@@ -40,12 +40,12 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public Suppression(
-            string guid,
+            String guid,
             SuppressionKind kind,
             SuppressionStatus status,
-            string justification,
+            String justification,
             Location location,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Suppression)
         {
@@ -70,7 +70,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string Guid
+        public String Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
@@ -88,7 +88,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Status[_index] = (int)value;
         }
 
-        public string Justification
+        public String Justification
         {
             get => _table.Justification[_index];
             set => _table.Justification[_index] = value;
@@ -100,7 +100,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Location[_index] = _table.Database.Location.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -129,7 +129,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (Guid != default(string))
+                if (Guid != default(String))
                 {
                     result = (result * 31) + Guid.GetHashCode();
                 }
@@ -144,7 +144,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Status.GetHashCode();
                 }
 
-                if (Justification != default(string))
+                if (Justification != default(String))
                 {
                     result = (result * 31) + Justification.GetHashCode();
                 }
@@ -154,7 +154,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Location.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

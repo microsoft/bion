@@ -17,20 +17,20 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal SarifLogDatabase Database;
 
         internal RefColumn Location;
-        internal IColumn<string> Module;
+        internal IColumn<String> Module;
         internal IColumn<int> ThreadId;
-        internal IColumn<IList<string>> Parameters;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IList<String>> Parameters;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal StackFrameTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
             Location = AddColumn(nameof(Location), new RefColumn(nameof(SarifLogDatabase.Location)));
-            Module = AddColumn(nameof(Module), ColumnFactory.Build<string>(default));
+            Module = AddColumn(nameof(Module), ColumnFactory.Build<String>(default));
             ThreadId = AddColumn(nameof(ThreadId), ColumnFactory.Build<int>(default));
-            Parameters = AddColumn(nameof(Parameters), ColumnFactory.Build<IList<string>>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Parameters = AddColumn(nameof(Parameters), ColumnFactory.Build<IList<String>>(default));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override StackFrame Get(int index)

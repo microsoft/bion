@@ -40,8 +40,8 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public Invocation(
-            string commandLine,
-            IList<string> arguments,
+            String commandLine,
+            IList<String> arguments,
             IList<ArtifactLocation> responseFiles,
             DateTime startTimeUtc,
             DateTime endTimeUtc,
@@ -50,22 +50,22 @@ namespace Microsoft.CodeAnalysis.Sarif
             IList<ConfigurationOverride> notificationConfigurationOverrides,
             IList<Notification> toolExecutionNotifications,
             IList<Notification> toolConfigurationNotifications,
-            string exitCodeDescription,
-            string exitSignalName,
+            String exitCodeDescription,
+            String exitSignalName,
             int exitSignalNumber,
-            string processStartFailureMessage,
+            String processStartFailureMessage,
             bool executionSuccessful,
-            string machine,
-            string account,
+            String machine,
+            String account,
             int processId,
             ArtifactLocation executableLocation,
             ArtifactLocation workingDirectory,
-            IDictionary<string, string> environmentVariables,
+            IDictionary<String, String> environmentVariables,
             ArtifactLocation stdin,
             ArtifactLocation stdout,
             ArtifactLocation stderr,
             ArtifactLocation stdoutStderr,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Invocation)
         {
@@ -130,13 +130,13 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string CommandLine
+        public String CommandLine
         {
             get => _table.CommandLine[_index];
             set => _table.CommandLine[_index] = value;
         }
 
-        public IList<string> Arguments
+        public IList<String> Arguments
         {
             get => _table.Arguments[_index];
             set => _table.Arguments[_index] = value;
@@ -190,13 +190,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.Notification.List(_table.ToolConfigurationNotifications[_index]).SetTo(value);
         }
 
-        public string ExitCodeDescription
+        public String ExitCodeDescription
         {
             get => _table.ExitCodeDescription[_index];
             set => _table.ExitCodeDescription[_index] = value;
         }
 
-        public string ExitSignalName
+        public String ExitSignalName
         {
             get => _table.ExitSignalName[_index];
             set => _table.ExitSignalName[_index] = value;
@@ -208,7 +208,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.ExitSignalNumber[_index] = value;
         }
 
-        public string ProcessStartFailureMessage
+        public String ProcessStartFailureMessage
         {
             get => _table.ProcessStartFailureMessage[_index];
             set => _table.ProcessStartFailureMessage[_index] = value;
@@ -220,13 +220,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.ExecutionSuccessful[_index] = value;
         }
 
-        public string Machine
+        public String Machine
         {
             get => _table.Machine[_index];
             set => _table.Machine[_index] = value;
         }
 
-        public string Account
+        public String Account
         {
             get => _table.Account[_index];
             set => _table.Account[_index] = value;
@@ -250,7 +250,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.WorkingDirectory[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
-        public IDictionary<string, string> EnvironmentVariables
+        public IDictionary<String, String> EnvironmentVariables
         {
             get => _table.EnvironmentVariables[_index];
             set => _table.EnvironmentVariables[_index] = value;
@@ -280,7 +280,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.StdoutStderr[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -329,12 +329,12 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (CommandLine != default(string))
+                if (CommandLine != default(String))
                 {
                     result = (result * 31) + CommandLine.GetHashCode();
                 }
 
-                if (Arguments != default(IList<string>))
+                if (Arguments != default(IList<String>))
                 {
                     result = (result * 31) + Arguments.GetHashCode();
                 }
@@ -379,12 +379,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + ToolConfigurationNotifications.GetHashCode();
                 }
 
-                if (ExitCodeDescription != default(string))
+                if (ExitCodeDescription != default(String))
                 {
                     result = (result * 31) + ExitCodeDescription.GetHashCode();
                 }
 
-                if (ExitSignalName != default(string))
+                if (ExitSignalName != default(String))
                 {
                     result = (result * 31) + ExitSignalName.GetHashCode();
                 }
@@ -394,7 +394,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + ExitSignalNumber.GetHashCode();
                 }
 
-                if (ProcessStartFailureMessage != default(string))
+                if (ProcessStartFailureMessage != default(String))
                 {
                     result = (result * 31) + ProcessStartFailureMessage.GetHashCode();
                 }
@@ -404,12 +404,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + ExecutionSuccessful.GetHashCode();
                 }
 
-                if (Machine != default(string))
+                if (Machine != default(String))
                 {
                     result = (result * 31) + Machine.GetHashCode();
                 }
 
-                if (Account != default(string))
+                if (Account != default(String))
                 {
                     result = (result * 31) + Account.GetHashCode();
                 }
@@ -429,7 +429,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + WorkingDirectory.GetHashCode();
                 }
 
-                if (EnvironmentVariables != default(IDictionary<string, string>))
+                if (EnvironmentVariables != default(IDictionary<String, String>))
                 {
                     result = (result * 31) + EnvironmentVariables.GetHashCode();
                 }
@@ -454,7 +454,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + StdoutStderr.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

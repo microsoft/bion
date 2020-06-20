@@ -40,7 +40,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public Result(
-            string ruleId,
+            String ruleId,
             int ruleIndex,
             ReportingDescriptorReference rule,
             ResultKind kind,
@@ -48,11 +48,11 @@ namespace Microsoft.CodeAnalysis.Sarif
             Message message,
             ArtifactLocation analysisTarget,
             IList<Location> locations,
-            string guid,
-            string correlationGuid,
+            String guid,
+            String correlationGuid,
             int occurrenceCount,
-            IDictionary<string, string> partialFingerprints,
-            IDictionary<string, string> fingerprints,
+            IDictionary<String, String> partialFingerprints,
+            IDictionary<String, String> fingerprints,
             IList<Stack> stacks,
             IList<CodeFlow> codeFlows,
             IList<Graph> graphs,
@@ -69,7 +69,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             IList<ReportingDescriptorReference> taxa,
             WebRequest webRequest,
             WebResponse webResponse,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Result)
         {
@@ -142,7 +142,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string RuleId
+        public String RuleId
         {
             get => _table.RuleId[_index];
             set => _table.RuleId[_index] = value;
@@ -190,13 +190,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.Location.List(_table.Locations[_index]).SetTo(value);
         }
 
-        public string Guid
+        public String Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
         }
 
-        public string CorrelationGuid
+        public String CorrelationGuid
         {
             get => _table.CorrelationGuid[_index];
             set => _table.CorrelationGuid[_index] = value;
@@ -208,13 +208,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.OccurrenceCount[_index] = value;
         }
 
-        public IDictionary<string, string> PartialFingerprints
+        public IDictionary<String, String> PartialFingerprints
         {
             get => _table.PartialFingerprints[_index];
             set => _table.PartialFingerprints[_index] = value;
         }
 
-        public IDictionary<string, string> Fingerprints
+        public IDictionary<String, String> Fingerprints
         {
             get => _table.Fingerprints[_index];
             set => _table.Fingerprints[_index] = value;
@@ -316,7 +316,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.WebResponse[_index] = _table.Database.WebResponse.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -369,7 +369,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (RuleId != default(string))
+                if (RuleId != default(String))
                 {
                     result = (result * 31) + RuleId.GetHashCode();
                 }
@@ -409,12 +409,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Locations.GetHashCode();
                 }
 
-                if (Guid != default(string))
+                if (Guid != default(String))
                 {
                     result = (result * 31) + Guid.GetHashCode();
                 }
 
-                if (CorrelationGuid != default(string))
+                if (CorrelationGuid != default(String))
                 {
                     result = (result * 31) + CorrelationGuid.GetHashCode();
                 }
@@ -424,12 +424,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + OccurrenceCount.GetHashCode();
                 }
 
-                if (PartialFingerprints != default(IDictionary<string, string>))
+                if (PartialFingerprints != default(IDictionary<String, String>))
                 {
                     result = (result * 31) + PartialFingerprints.GetHashCode();
                 }
 
-                if (Fingerprints != default(IDictionary<string, string>))
+                if (Fingerprints != default(IDictionary<String, String>))
                 {
                     result = (result * 31) + Fingerprints.GetHashCode();
                 }
@@ -514,7 +514,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + WebResponse.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

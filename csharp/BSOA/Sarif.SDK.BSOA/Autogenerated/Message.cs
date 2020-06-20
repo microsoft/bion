@@ -40,11 +40,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public Message(
-            string text,
-            string markdown,
-            string id,
-            IList<string> arguments,
-            IDictionary<string, SerializedPropertyInfo> properties
+            String text,
+            String markdown,
+            String id,
+            IList<String> arguments,
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Message)
         {
@@ -67,31 +67,31 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string Text
+        public String Text
         {
             get => _table.Text[_index];
             set => _table.Text[_index] = value;
         }
 
-        public string Markdown
+        public String Markdown
         {
             get => _table.Markdown[_index];
             set => _table.Markdown[_index] = value;
         }
 
-        public string Id
+        public String Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
-        public IList<string> Arguments
+        public IList<String> Arguments
         {
             get => _table.Arguments[_index];
             set => _table.Arguments[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -119,27 +119,27 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (Text != default(string))
+                if (Text != default(String))
                 {
                     result = (result * 31) + Text.GetHashCode();
                 }
 
-                if (Markdown != default(string))
+                if (Markdown != default(String))
                 {
                     result = (result * 31) + Markdown.GetHashCode();
                 }
 
-                if (Id != default(string))
+                if (Id != default(String))
                 {
                     result = (result * 31) + Id.GetHashCode();
                 }
 
-                if (Arguments != default(IList<string>))
+                if (Arguments != default(IList<String>))
                 {
                     result = (result * 31) + Arguments.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

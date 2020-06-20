@@ -48,7 +48,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             ExceptionData exception,
             ReportingDescriptorReference descriptor,
             ReportingDescriptorReference associatedRule,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Notification)
         {
@@ -127,7 +127,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.AssociatedRule[_index] = _table.Database.ReportingDescriptorReference.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -199,7 +199,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + AssociatedRule.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

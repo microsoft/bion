@@ -41,14 +41,14 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public WebRequest(
             int index,
-            string protocol,
-            string version,
-            string target,
-            string method,
-            IDictionary<string, string> headers,
-            IDictionary<string, string> parameters,
+            String protocol,
+            String version,
+            String target,
+            String method,
+            IDictionary<String, String> headers,
+            IDictionary<String, String> parameters,
             ArtifactContent body,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.WebRequest)
         {
@@ -85,37 +85,37 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Index[_index] = value;
         }
 
-        public string Protocol
+        public String Protocol
         {
             get => _table.Protocol[_index];
             set => _table.Protocol[_index] = value;
         }
 
-        public string Version
+        public String Version
         {
             get => _table.Version[_index];
             set => _table.Version[_index] = value;
         }
 
-        public string Target
+        public String Target
         {
             get => _table.Target[_index];
             set => _table.Target[_index] = value;
         }
 
-        public string Method
+        public String Method
         {
             get => _table.Method[_index];
             set => _table.Method[_index] = value;
         }
 
-        public IDictionary<string, string> Headers
+        public IDictionary<String, String> Headers
         {
             get => _table.Headers[_index];
             set => _table.Headers[_index] = value;
         }
 
-        public IDictionary<string, string> Parameters
+        public IDictionary<String, String> Parameters
         {
             get => _table.Parameters[_index];
             set => _table.Parameters[_index] = value;
@@ -127,7 +127,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Body[_index] = _table.Database.ArtifactContent.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -164,32 +164,32 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Index.GetHashCode();
                 }
 
-                if (Protocol != default(string))
+                if (Protocol != default(String))
                 {
                     result = (result * 31) + Protocol.GetHashCode();
                 }
 
-                if (Version != default(string))
+                if (Version != default(String))
                 {
                     result = (result * 31) + Version.GetHashCode();
                 }
 
-                if (Target != default(string))
+                if (Target != default(String))
                 {
                     result = (result * 31) + Target.GetHashCode();
                 }
 
-                if (Method != default(string))
+                if (Method != default(String))
                 {
                     result = (result * 31) + Method.GetHashCode();
                 }
 
-                if (Headers != default(IDictionary<string, string>))
+                if (Headers != default(IDictionary<String, String>))
                 {
                     result = (result * 31) + Headers.GetHashCode();
                 }
 
-                if (Parameters != default(IDictionary<string, string>))
+                if (Parameters != default(IDictionary<String, String>))
                 {
                     result = (result * 31) + Parameters.GetHashCode();
                 }
@@ -199,7 +199,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Body.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

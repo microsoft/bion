@@ -41,10 +41,10 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public StackFrame(
             Location location,
-            string module,
+            String module,
             int threadId,
-            IList<string> parameters,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IList<String> parameters,
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.StackFrame)
         {
@@ -73,7 +73,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Location[_index] = _table.Database.Location.LocalIndex(value);
         }
 
-        public string Module
+        public String Module
         {
             get => _table.Module[_index];
             set => _table.Module[_index] = value;
@@ -85,13 +85,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.ThreadId[_index] = value;
         }
 
-        public IList<string> Parameters
+        public IList<String> Parameters
         {
             get => _table.Parameters[_index];
             set => _table.Parameters[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -124,7 +124,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Location.GetHashCode();
                 }
 
-                if (Module != default(string))
+                if (Module != default(String))
                 {
                     result = (result * 31) + Module.GetHashCode();
                 }
@@ -134,12 +134,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + ThreadId.GetHashCode();
                 }
 
-                if (Parameters != default(IList<string>))
+                if (Parameters != default(IList<String>))
                 {
                     result = (result * 31) + Parameters.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

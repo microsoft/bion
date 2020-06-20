@@ -18,8 +18,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         internal IColumn<Uri> Schema;
         internal IColumn<int> Version;
-        internal IColumn<string> Guid;
-        internal IColumn<string> RunGuid;
+        internal IColumn<String> Guid;
+        internal IColumn<String> RunGuid;
         internal RefColumn Conversion;
         internal RefListColumn Graphs;
         internal RefColumn ExternalizedProperties;
@@ -36,7 +36,7 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal RefListColumn Addresses;
         internal RefListColumn WebRequests;
         internal RefListColumn WebResponses;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal ExternalPropertiesTable(SarifLogDatabase database) : base()
         {
@@ -44,8 +44,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             Schema = AddColumn(nameof(Schema), ColumnFactory.Build<Uri>(default));
             Version = AddColumn(nameof(Version), ColumnFactory.Build<int>((int)default(SarifVersion)));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default));
-            RunGuid = AddColumn(nameof(RunGuid), ColumnFactory.Build<string>(default));
+            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<String>(default));
+            RunGuid = AddColumn(nameof(RunGuid), ColumnFactory.Build<String>(default));
             Conversion = AddColumn(nameof(Conversion), new RefColumn(nameof(SarifLogDatabase.Conversion)));
             Graphs = AddColumn(nameof(Graphs), new RefListColumn(nameof(SarifLogDatabase.Graph)));
             ExternalizedProperties = AddColumn(nameof(ExternalizedProperties), new RefColumn(nameof(SarifLogDatabase.PropertyBag)));
@@ -62,7 +62,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             Addresses = AddColumn(nameof(Addresses), new RefListColumn(nameof(SarifLogDatabase.Address)));
             WebRequests = AddColumn(nameof(WebRequests), new RefListColumn(nameof(SarifLogDatabase.WebRequest)));
             WebResponses = AddColumn(nameof(WebResponses), new RefListColumn(nameof(SarifLogDatabase.WebResponse)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override ExternalProperties Get(int index)

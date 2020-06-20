@@ -40,11 +40,11 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public Edge(
-            string id,
+            String id,
             Message label,
-            string sourceNodeId,
-            string targetNodeId,
-            IDictionary<string, SerializedPropertyInfo> properties
+            String sourceNodeId,
+            String targetNodeId,
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Edge)
         {
@@ -67,7 +67,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string Id
+        public String Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
@@ -79,19 +79,19 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Label[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        public string SourceNodeId
+        public String SourceNodeId
         {
             get => _table.SourceNodeId[_index];
             set => _table.SourceNodeId[_index] = value;
         }
 
-        public string TargetNodeId
+        public String TargetNodeId
         {
             get => _table.TargetNodeId[_index];
             set => _table.TargetNodeId[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -119,7 +119,7 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (Id != default(string))
+                if (Id != default(String))
                 {
                     result = (result * 31) + Id.GetHashCode();
                 }
@@ -129,17 +129,17 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Label.GetHashCode();
                 }
 
-                if (SourceNodeId != default(string))
+                if (SourceNodeId != default(String))
                 {
                     result = (result * 31) + SourceNodeId.GetHashCode();
                 }
 
-                if (TargetNodeId != default(string))
+                if (TargetNodeId != default(String))
                 {
                     result = (result * 31) + TargetNodeId.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

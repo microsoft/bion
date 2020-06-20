@@ -19,10 +19,10 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal IColumn<int> RunGraphIndex;
         internal IColumn<int> ResultGraphIndex;
         internal RefColumn Description;
-        internal IColumn<IDictionary<string, MultiformatMessageString>> InitialState;
-        internal IColumn<IDictionary<string, MultiformatMessageString>> ImmutableState;
+        internal IColumn<IDictionary<String, MultiformatMessageString>> InitialState;
+        internal IColumn<IDictionary<String, MultiformatMessageString>> ImmutableState;
         internal RefListColumn EdgeTraversals;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal GraphTraversalTable(SarifLogDatabase database) : base()
         {
@@ -31,10 +31,10 @@ namespace Microsoft.CodeAnalysis.Sarif
             RunGraphIndex = AddColumn(nameof(RunGraphIndex), ColumnFactory.Build<int>(-1));
             ResultGraphIndex = AddColumn(nameof(ResultGraphIndex), ColumnFactory.Build<int>(-1));
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            InitialState = AddColumn(nameof(InitialState), new DictionaryColumn<string, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
-            ImmutableState = AddColumn(nameof(ImmutableState), new DictionaryColumn<string, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
+            InitialState = AddColumn(nameof(InitialState), new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
+            ImmutableState = AddColumn(nameof(ImmutableState), new DictionaryColumn<String, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));
             EdgeTraversals = AddColumn(nameof(EdgeTraversals), new RefListColumn(nameof(SarifLogDatabase.EdgeTraversal)));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override GraphTraversal Get(int index)

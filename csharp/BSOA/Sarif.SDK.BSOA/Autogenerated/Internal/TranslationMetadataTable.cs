@@ -16,25 +16,25 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         internal SarifLogDatabase Database;
 
-        internal IColumn<string> Name;
-        internal IColumn<string> FullName;
+        internal IColumn<String> Name;
+        internal IColumn<String> FullName;
         internal RefColumn ShortDescription;
         internal RefColumn FullDescription;
         internal IColumn<Uri> DownloadUri;
         internal IColumn<Uri> InformationUri;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal TranslationMetadataTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
-            Name = AddColumn(nameof(Name), ColumnFactory.Build<string>(default));
-            FullName = AddColumn(nameof(FullName), ColumnFactory.Build<string>(default));
+            Name = AddColumn(nameof(Name), ColumnFactory.Build<String>(default));
+            FullName = AddColumn(nameof(FullName), ColumnFactory.Build<String>(default));
             ShortDescription = AddColumn(nameof(ShortDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
             FullDescription = AddColumn(nameof(FullDescription), new RefColumn(nameof(SarifLogDatabase.MultiformatMessageString)));
             DownloadUri = AddColumn(nameof(DownloadUri), ColumnFactory.Build<Uri>(default));
             InformationUri = AddColumn(nameof(InformationUri), ColumnFactory.Build<Uri>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override TranslationMetadata Get(int index)

@@ -17,20 +17,20 @@ namespace Microsoft.CodeAnalysis.Sarif
         internal SarifLogDatabase Database;
 
         internal RefColumn Description;
-        internal IColumn<string> Id;
-        internal IColumn<string> Guid;
-        internal IColumn<string> CorrelationGuid;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<String> Id;
+        internal IColumn<String> Guid;
+        internal IColumn<String> CorrelationGuid;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal RunAutomationDetailsTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
             Description = AddColumn(nameof(Description), new RefColumn(nameof(SarifLogDatabase.Message)));
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<string>(default));
-            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<string>(default));
-            CorrelationGuid = AddColumn(nameof(CorrelationGuid), ColumnFactory.Build<string>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Id = AddColumn(nameof(Id), ColumnFactory.Build<String>(default));
+            Guid = AddColumn(nameof(Guid), ColumnFactory.Build<String>(default));
+            CorrelationGuid = AddColumn(nameof(CorrelationGuid), ColumnFactory.Build<String>(default));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override RunAutomationDetails Get(int index)

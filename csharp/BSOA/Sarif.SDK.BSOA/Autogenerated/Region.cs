@@ -50,8 +50,8 @@ namespace Microsoft.CodeAnalysis.Sarif
             int byteLength,
             ArtifactContent snippet,
             Message message,
-            string sourceLanguage,
-            IDictionary<string, SerializedPropertyInfo> properties
+            String sourceLanguage,
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Region)
         {
@@ -148,13 +148,13 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        public string SourceLanguage
+        public String SourceLanguage
         {
             get => _table.SourceLanguage[_index];
             set => _table.SourceLanguage[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -239,12 +239,12 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Message.GetHashCode();
                 }
 
-                if (SourceLanguage != default(string))
+                if (SourceLanguage != default(String))
                 {
                     result = (result * 31) + SourceLanguage.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

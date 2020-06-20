@@ -16,17 +16,17 @@ namespace Microsoft.CodeAnalysis.Sarif
     {
         internal SarifLogDatabase Database;
 
-        internal IColumn<string> Text;
-        internal IColumn<string> Markdown;
-        internal IColumn<IDictionary<string, SerializedPropertyInfo>> Properties;
+        internal IColumn<String> Text;
+        internal IColumn<String> Markdown;
+        internal IColumn<IDictionary<String, SerializedPropertyInfo>> Properties;
 
         internal MultiformatMessageStringTable(SarifLogDatabase database) : base()
         {
             Database = database;
 
-            Text = AddColumn(nameof(Text), ColumnFactory.Build<string>(default));
-            Markdown = AddColumn(nameof(Markdown), ColumnFactory.Build<string>(default));
-            Properties = AddColumn(nameof(Properties), new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
+            Text = AddColumn(nameof(Text), ColumnFactory.Build<String>(default));
+            Markdown = AddColumn(nameof(Markdown), ColumnFactory.Build<String>(default));
+            Properties = AddColumn(nameof(Properties), new DictionaryColumn<String, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));
         }
 
         public override MultiformatMessageString Get(int index)

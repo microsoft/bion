@@ -45,7 +45,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             double bottom,
             double right,
             Message message,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.Rectangle)
         {
@@ -100,7 +100,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Message[_index] = _table.Database.Message.LocalIndex(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -154,7 +154,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Message.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

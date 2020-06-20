@@ -41,9 +41,9 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public ExternalPropertyFileReference(
             ArtifactLocation location,
-            string guid,
+            String guid,
             int itemCount,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ExternalPropertyFileReference)
         {
@@ -70,7 +70,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Location[_index] = _table.Database.ArtifactLocation.LocalIndex(value);
         }
 
-        public string Guid
+        public String Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
@@ -82,7 +82,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.ItemCount[_index] = value;
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -114,7 +114,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Location.GetHashCode();
                 }
 
-                if (Guid != default(string))
+                if (Guid != default(String))
                 {
                     result = (result * 31) + Guid.GetHashCode();
                 }
@@ -124,7 +124,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + ItemCount.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }

@@ -40,20 +40,20 @@ namespace Microsoft.CodeAnalysis.Sarif
         }
 
         public ReportingDescriptor(
-            string id,
-            IList<string> deprecatedIds,
-            string guid,
-            IList<string> deprecatedGuids,
-            string name,
-            IList<string> deprecatedNames,
+            String id,
+            IList<String> deprecatedIds,
+            String guid,
+            IList<String> deprecatedGuids,
+            String name,
+            IList<String> deprecatedNames,
             MultiformatMessageString shortDescription,
             MultiformatMessageString fullDescription,
-            IDictionary<string, MultiformatMessageString> messageStrings,
+            IDictionary<String, MultiformatMessageString> messageStrings,
             ReportingConfiguration defaultConfiguration,
             Uri helpUri,
             MultiformatMessageString help,
             IList<ReportingDescriptorRelationship> relationships,
-            IDictionary<string, SerializedPropertyInfo> properties
+            IDictionary<String, SerializedPropertyInfo> properties
         ) 
             : this(SarifLogDatabase.Current.ReportingDescriptor)
         {
@@ -94,37 +94,37 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         partial void Init();
 
-        public string Id
+        public String Id
         {
             get => _table.Id[_index];
             set => _table.Id[_index] = value;
         }
 
-        public IList<string> DeprecatedIds
+        public IList<String> DeprecatedIds
         {
             get => _table.DeprecatedIds[_index];
             set => _table.DeprecatedIds[_index] = value;
         }
 
-        public string Guid
+        public String Guid
         {
             get => _table.Guid[_index];
             set => _table.Guid[_index] = value;
         }
 
-        public IList<string> DeprecatedGuids
+        public IList<String> DeprecatedGuids
         {
             get => _table.DeprecatedGuids[_index];
             set => _table.DeprecatedGuids[_index] = value;
         }
 
-        public string Name
+        public String Name
         {
             get => _table.Name[_index];
             set => _table.Name[_index] = value;
         }
 
-        public IList<string> DeprecatedNames
+        public IList<String> DeprecatedNames
         {
             get => _table.DeprecatedNames[_index];
             set => _table.DeprecatedNames[_index] = value;
@@ -142,7 +142,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.FullDescription[_index] = _table.Database.MultiformatMessageString.LocalIndex(value);
         }
 
-        public IDictionary<string, MultiformatMessageString> MessageStrings
+        public IDictionary<String, MultiformatMessageString> MessageStrings
         {
             get => _table.MessageStrings[_index];
             set => _table.MessageStrings[_index] = value;
@@ -172,7 +172,7 @@ namespace Microsoft.CodeAnalysis.Sarif
             set => _table.Database.ReportingDescriptorRelationship.List(_table.Relationships[_index]).SetTo(value);
         }
 
-        internal override IDictionary<string, SerializedPropertyInfo> Properties
+        internal override IDictionary<String, SerializedPropertyInfo> Properties
         {
             get => _table.Properties[_index];
             set => _table.Properties[_index] = value;
@@ -209,32 +209,32 @@ namespace Microsoft.CodeAnalysis.Sarif
 
             unchecked
             {
-                if (Id != default(string))
+                if (Id != default(String))
                 {
                     result = (result * 31) + Id.GetHashCode();
                 }
 
-                if (DeprecatedIds != default(IList<string>))
+                if (DeprecatedIds != default(IList<String>))
                 {
                     result = (result * 31) + DeprecatedIds.GetHashCode();
                 }
 
-                if (Guid != default(string))
+                if (Guid != default(String))
                 {
                     result = (result * 31) + Guid.GetHashCode();
                 }
 
-                if (DeprecatedGuids != default(IList<string>))
+                if (DeprecatedGuids != default(IList<String>))
                 {
                     result = (result * 31) + DeprecatedGuids.GetHashCode();
                 }
 
-                if (Name != default(string))
+                if (Name != default(String))
                 {
                     result = (result * 31) + Name.GetHashCode();
                 }
 
-                if (DeprecatedNames != default(IList<string>))
+                if (DeprecatedNames != default(IList<String>))
                 {
                     result = (result * 31) + DeprecatedNames.GetHashCode();
                 }
@@ -249,7 +249,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + FullDescription.GetHashCode();
                 }
 
-                if (MessageStrings != default(IDictionary<string, MultiformatMessageString>))
+                if (MessageStrings != default(IDictionary<String, MultiformatMessageString>))
                 {
                     result = (result * 31) + MessageStrings.GetHashCode();
                 }
@@ -274,7 +274,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                     result = (result * 31) + Relationships.GetHashCode();
                 }
 
-                if (Properties != default(IDictionary<string, SerializedPropertyInfo>))
+                if (Properties != default(IDictionary<String, SerializedPropertyInfo>))
                 {
                     result = (result * 31) + Properties.GetHashCode();
                 }
