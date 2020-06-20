@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace BSOA.Demo.Comparison
 {
@@ -13,26 +14,34 @@ namespace BSOA.Demo.Comparison
     {
         static void Main(string[] args)
         {
-            SarifLog log;
             string mode = (args.Length > 0 ? args[0].ToLowerInvariant() : "load");
             string filePath = (args.Length > 1 ? args[1] : @"C:\Download\Demo\V2\Inputs\CodeAsData.sarif");
+            string outputPath;
+            SarifLog log;
 
-            switch(mode)
+            Assembly sdk = typeof(SarifLog).Assembly;
+            string loadDescription = $"Loading {Path.GetFileName(filePath)} into {sdk.GetName().Name} v{sdk.GetName().Version}...";
+
+            switch (mode)
             {
                 case "load":
-                    log = Measure.LoadPerformance<SarifLog>(SarifLog.Load, filePath, "SARIF JSON to Normal object model", iterations: 8);
+                    log = Measure.LoadPerformance(SarifLog.Load, filePath, loadDescription, iterations: 5);
                     Console.WriteLine($"Line Sum: {LineTotal(log):n0}");
                     break;
 
-                case "build":
-                    RegionDemoBuilder.Build(SarifLog.Load(filePath), @"C:\Download\Demo\V2\Inputs\Regions.json");
+                
+                case "loadandsave":
+                    outputPath = (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "..", Path.ChangeExtension(Path.GetFileName(filePath), ".Out.sarif")));
+                    
+                    log = Measure.LoadPerformance(SarifLog.Load, filePath, loadDescription, iterations: 1);
+                    Measure.Time($"Saving to {outputPath}", () => log.Save(outputPath));
+
                     break;
 
-                case "loadandsave":
-                    string outputPath = (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "..", Path.GetFileName(filePath)));
-                    log = SarifLog.Load(filePath);
+                case "indent":
+                    outputPath = (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "..", Path.ChangeExtension(Path.GetFileName(filePath), ".indented.sarif")));
 
-                    //log.Save(outputPath);
+                    log = Measure.LoadPerformance(SarifLog.Load, filePath, loadDescription, iterations: 1);
 
                     using (JsonTextWriter writer = new JsonTextWriter(File.CreateText(outputPath)))
                     {
@@ -40,6 +49,14 @@ namespace BSOA.Demo.Comparison
                         JsonSerializer.Create().Serialize(writer, log);
                     }
 
+                    break;
+
+                case "regionbuild":
+                    outputPath = (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "Regions.json"));
+
+                    Console.WriteLine($"Building Region demo from {filePath} to {outputPath}");
+                    RegionDemoBuilder.Build(filePath, outputPath);
+                    
                     break;
 
                 default:

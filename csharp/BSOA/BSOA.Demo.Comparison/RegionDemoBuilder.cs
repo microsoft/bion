@@ -9,8 +9,10 @@ namespace BSOA.Demo.Comparison
 {
     public static class RegionDemoBuilder
     {
-        public static void Build(SarifLog log, string outputPath)
+        public static void Build(string inputPath, string outputPath)
         {
+            SarifLog log = SarifLog.Load(inputPath);
+            
             // Extract Regions from log
             RegionVisitor visitor = new RegionVisitor();
             visitor.VisitSarifLog(log);
