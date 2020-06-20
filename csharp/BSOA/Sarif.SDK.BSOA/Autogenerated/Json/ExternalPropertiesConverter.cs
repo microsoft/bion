@@ -79,7 +79,6 @@ namespace Microsoft.CodeAnalysis.Sarif
             else
             {
                 writer.WriteStartObject();
-                writer.WriteList("results", item.Results, ResultJsonExtensions.Write);
                 writer.Write("schema", item.Schema, default);
                 writer.WriteEnum("version", item.Version, default(SarifVersion));
                 writer.Write("guid", item.Guid, default);
@@ -91,7 +90,7 @@ namespace Microsoft.CodeAnalysis.Sarif
                 writer.WriteList("invocations", item.Invocations, InvocationJsonExtensions.Write);
                 writer.WriteList("logicalLocations", item.LogicalLocations, LogicalLocationJsonExtensions.Write);
                 writer.WriteList("threadFlowLocations", item.ThreadFlowLocations, ThreadFlowLocationJsonExtensions.Write);
-                
+                writer.WriteList("results", item.Results, ResultJsonExtensions.Write);
                 writer.WriteList("taxonomies", item.Taxonomies, ToolComponentJsonExtensions.Write);
                 writer.Write("driver", item.Driver);
                 writer.WriteList("extensions", item.Extensions, ToolComponentJsonExtensions.Write);

@@ -12,7 +12,7 @@ namespace BSOA.Demo
             bool forceReconvert = (args.Length > 1 ? bool.Parse(args[1]) : false);
 
             //inputFilePath = @"C:\Download\Demo\V2\Inputs\CodeAsData.20000.sarif";
-            //inputFilePath = @"C:\Download\Demo\V2\Inputs\elfie-arriba.sarif";
+            inputFilePath = @"C:\Download\Demo\V2\Inputs\elfie-arriba.sarif";
             forceReconvert = true;
 
             Benchmarker benchmarker = new Benchmarker(inputFilePath, workingFolderPath);
