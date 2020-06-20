@@ -133,10 +133,9 @@ namespace Microsoft.CodeAnalysis.Sarif
         ITable IRow.Table => _table;
         int IRow.Index => _index;
 
-        void IRow.Reset(ITable table, int index)
+        void IRow.Next()
         {
-            _table = (SpecialLocationsTable)table;
-            _index = index;
+            _index++;
         }
         #endregion
 
