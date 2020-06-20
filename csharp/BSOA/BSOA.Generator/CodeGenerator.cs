@@ -20,11 +20,12 @@ namespace BSOA.Generator
 
         public string OutputPathFormatString { get; set; }
 
-        public CodeGenerator(TemplateType type, string templateFilePath, string outputPathFormatString)
+        public CodeGenerator(TemplateType type, string templateFilePath, string outputPathFormatString, Dictionary<string, string> postReplacements = null)
         {
             Type = type;
             Code = File.ReadAllText(templateFilePath);
             Templates = CodeSection.AllTemplates(Code);
+            PostReplacements = postReplacements;
 
             OutputPathFormatString = outputPathFormatString;
         }

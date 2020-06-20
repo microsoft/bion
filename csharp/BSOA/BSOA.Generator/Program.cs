@@ -41,13 +41,14 @@ namespace BSOA.Generator
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("Usage: BSOA.Generator <SchemaJsonFile> <OutputFolder> [<TemplateFolderPath>]?");
+                Console.WriteLine("Usage: BSOA.Generator <SchemaJsonFile> <OutputFolder> [<TemplateFolderPath>]? [<PostReplacementsJsonPath>]?");
                 return;
             }
 
             string schemaPath = args[0];
             string outputFolder = (args.Length > 1 ? args[1] : @"Model");
             string templateFolderPath = (args.Length > 2 ? args[2] : DefaultTemplateFolderPath).TrimEnd('\\');
+            string postReplacementsPath = (args.Length > 3 ? args[3] : null);
 
             Console.WriteLine($"Generating BSOA object model from schema\r\n  '{schemaPath}' at \r\n  '{outputFolder}'...");
 
@@ -56,64 +57,48 @@ namespace BSOA.Generator
             if (Directory.Exists(outputFolder)) { Directory.Delete(outputFolder, true); }
             Directory.CreateDirectory(outputFolder);
 
-            Dictionary<string, string> postReplacements = new Dictionary<string, string>()
+            Dictionary<string, string> postReplacements;
+            if (postReplacementsPath == null)
             {
-                // Generate PropertyBag, but it shouldn't inherit from PropertyBagHolder
-                [Regex.Escape("PropertyBag : PropertyBagHolder, ")] = "PropertyBag : ",
+                postReplacements = new Dictionary<string, string>();
+            }
+            else
+            {
+                postReplacements = AsJson.Load<Dictionary<string, string>>(postReplacementsPath);
+            }
 
-                // Properties has to be internal and override the PropertyBagHolder copy to work properly
-                ["public IDictionary<string, SerializedPropertyInfo> Properties"] = @"internal override IDictionary<string, SerializedPropertyInfo> Properties",
 
-                // The Generated PropertyBagConverter is wrong; disable it
-                [Regex.Escape("[JsonConverter(typeof(PropertyBagConverter))]")] = "// [JsonConverter(typeof(PropertyBagConverter))]",
+            // Dictionaries don't generate correct read methods
+            postReplacements["me.([^ ]+) = reader.ReadIDictionary<string, string>\\(root\\)"] = "reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString)";
+            postReplacements["me.([^ ]+) = reader.ReadIDictionary<string, ([^>]+)>\\(root\\)"] = @"reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, $2JsonExtensions.Read$2)";
 
-                // "schemaUri" is written to the JSON as "$schema"
-                ["\"schemaUri\""] = "\"$schema\"",
+            // Lists don't generate correct read methods; need to generate the item reading method correctly.
+            postReplacements["me.([^ ]+) = reader.ReadIList<string>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadString)";
+            postReplacements["me.([^ ]+) = reader.ReadIList<Uri>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadUri)";
 
-                // Use PropertyBagConverter to read and write Properties. SerializedPropertyInfoConverter.ReadJson doesn't actually work.
-                ["me.([^ ]+) = reader.ReadIDictionary<string, SerializedPropertyInfo>\\(root\\)"] = "me.$1 = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)",
-                [Regex.Escape("writer.Write(\"properties\", item.Properties, default);")] = "writer.WriteDictionary(\"properties\", item.Properties, SerializedPropertyInfoJsonExtensions.Write);",
-
-                // Dictionaries don't generate correct read methods
-                ["me.([^ ]+) = reader.ReadIDictionary<string, string>\\(root\\)"] = "reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString)",
-                ["me.([^ ]+) = reader.ReadIDictionary<string, ([^>]+)>\\(root\\)"] = @"reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, $2JsonExtensions.Read$2)",
-
-                // Lists don't generate correct read methods; need to generate the item reading method correctly.
-                ["me.([^ ]+) = reader.ReadIList<string>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadString)",
-                ["me.([^ ]+) = reader.ReadIList<Uri>\\(root\\)"] = "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadUri)",
-
-                // Override column construction for Dictionaries of other table types
-                ["ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(default\\)\\);"] = "new DictionaryColumn<string, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));",
-                ["ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(default\\)\\);"] = "new DictionaryColumn<string, ArtifactLocation>(new DistinctColumn<string>(new StringColumn()), new ArtifactLocationColumn(this.Database)));",
-                ["ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>\\(default\\)\\);"] = "new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));",
-
-                // Get Run to write Results array first
-                ["writer.WriteStartObject\\(\\);(.*)writer.WriteList\\(\"results\", item.Results, ResultJsonExtensions.Write\\);"] = @"writer.WriteStartObject();
-                writer.WriteList(""results"", item.Results, ResultJsonExtensions.Write);$1",
-            };
 
             // Generate Database class
-            new CodeGenerator(TemplateType.Database, TemplatePath(templateFolderPath, @"Internal\CompanyDatabase.cs"), @"Internal\{0}.cs") { PostReplacements = postReplacements }
+            new CodeGenerator(TemplateType.Database, TemplatePath(templateFolderPath, @"Internal\CompanyDatabase.cs"), @"Internal\{0}.cs", postReplacements)
                 .Generate(outputFolder, db);
 
             // Generate Tables
-            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Internal\TeamTable.cs"), @"Internal\{0}Table.cs") { PostReplacements = postReplacements }
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Internal\TeamTable.cs"), @"Internal\{0}Table.cs", postReplacements)
                 .Generate(outputFolder, db);
 
             // Generate Entities
-            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Team.cs"), "{0}.cs") { PostReplacements = postReplacements }
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Team.cs"), "{0}.cs", postReplacements)
                 .Generate(outputFolder, db);
 
-            // Generate Entity Json Converters
-            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Json\TeamConverter.cs"), @"Json\{0}Converter.cs") { PostReplacements = postReplacements }
+            // Generate Entity Json Converter
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Json\TeamConverter.cs"), @"Json\{0}Converter.cs", postReplacements)
                 .Generate(outputFolder, db);
 
             // Generate Root Entity (overwrite normal style)
-            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Company.cs"), @"{0}.cs") { PostReplacements = postReplacements }
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Company.cs"), @"{0}.cs", postReplacements)
                 .Generate(outputFolder, db.Tables.Where((table) => table.Name.Equals(db.RootTableName)).First(), db);
 
             // Generate Root Entity Json Converters
-            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Json\CompanyConverter.cs"), @"Json\{0}Converter.cs") { PostReplacements = postReplacements }
+            new CodeGenerator(TemplateType.Table, TemplatePath(templateFolderPath, @"Json\CompanyConverter.cs"), @"Json\{0}Converter.cs", postReplacements)
                 .Generate(outputFolder, db.Tables.Where((table) => table.Name.Equals(db.RootTableName)).First(), db);
 
             Console.WriteLine("Done.");

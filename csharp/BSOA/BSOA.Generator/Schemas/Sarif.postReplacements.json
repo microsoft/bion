@@ -1,0 +1,21 @@
+{
+  "PropertyBag\\ :\\ PropertyBagHolder,\\ ": "PropertyBag : ",
+  "public IDictionary<string, SerializedPropertyInfo> Properties": "internal override IDictionary<string, SerializedPropertyInfo> Properties",
+  "\\[JsonConverter\\(typeof\\(PropertyBagConverter\\)\\)]": "// [JsonConverter(typeof(PropertyBagConverter))]",
+  "\"schemaUri\"": "\"$schema\"",
+  
+  "me.([^ ]+) = reader.ReadIDictionary<string, SerializedPropertyInfo>\\(root\\)": "me.$1 = (IDictionary<string, SerializedPropertyInfo>)Readers.PropertyBagConverter.Instance.ReadJson(reader, null, null, null)",
+  "writer\\.Write\\(\"properties\",\\ item\\.Properties,\\ default\\);": "writer.WriteDictionary(\"properties\", item.Properties, SerializedPropertyInfoJsonExtensions.Write);",
+  
+  "me.([^ ]+) = reader.ReadIDictionary<string, string>\\(root\\)": "reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, JsonReaderExtensions.ReadString)",
+  "me.([^ ]+) = reader.ReadIDictionary<string, ([^>]+)>\\(root\\)": "reader.ReadDictionary(root, me.$1, JsonReaderExtensions.ReadString, $2JsonExtensions.Read$2)",
+  
+  "me.([^ ]+) = reader.ReadIList<string>\\(root\\)": "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadString)",
+  "me.([^ ]+) = reader.ReadIList<Uri>\\(root\\)": "reader.ReadList(root, me.$1, JsonReaderExtensions.ReadUri)",
+
+  "ColumnFactory.Build<IDictionary<string, MultiformatMessageString>>\\(default\\)\\);": "new DictionaryColumn<string, MultiformatMessageString>(new DistinctColumn<string>(new StringColumn()), new MultiformatMessageStringColumn(this.Database)));",
+  "ColumnFactory.Build<IDictionary<string, ArtifactLocation>>\\(default\\)\\);": "new DictionaryColumn<string, ArtifactLocation>(new DistinctColumn<string>(new StringColumn()), new ArtifactLocationColumn(this.Database)));",
+  "ColumnFactory.Build<IDictionary<string, SerializedPropertyInfo>>\\(default\\)\\);": "new DictionaryColumn<string, SerializedPropertyInfo>(new DistinctColumn<string>(new StringColumn()), new SerializedPropertyInfoColumn()));",
+  
+  "writer.WriteStartObject\\(\\);(.*)writer.WriteList\\(\"results\", item.Results, ResultJsonExtensions.Write\\);": "writer.WriteStartObject();\r\n                writer.WriteList(\"results\", item.Results, ResultJsonExtensions.Write);$1"
+}
