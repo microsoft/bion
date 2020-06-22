@@ -31,7 +31,8 @@ namespace BSOA.Demo.Comparison
 
                 
                 case "loadandsave":
-                    outputPath = (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "..", Path.ChangeExtension(Path.GetFileName(filePath), ".Out.sarif")));
+                    outputPath = (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "..\\Out", Path.GetFileName(filePath)));
+                    Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
                     
                     log = Measure.LoadPerformance(SarifLog.Load, filePath, loadDescription, iterations: 1);
                     Measure.Time($"Saving to {outputPath}", () => log.Save(outputPath));
@@ -39,7 +40,8 @@ namespace BSOA.Demo.Comparison
                     break;
 
                 case "indent":
-                    outputPath = (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "..", Path.ChangeExtension(Path.GetFileName(filePath), ".indented.sarif")));
+                    outputPath = (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "..\\Indented", Path.GetFileName(filePath)));
+                    Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
 
                     log = Measure.LoadPerformance(SarifLog.Load, filePath, loadDescription, iterations: 1);
 
