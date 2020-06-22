@@ -29,41 +29,65 @@ namespace BSOA.Demo.Comparison
                     Console.WriteLine($"Line Sum: {LineTotal(log):n0}");
                     break;
 
-                
+
                 case "loadandsave":
                     outputPath = (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "..\\Out", Path.GetFileName(filePath)));
                     Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
-                    
+
                     log = Measure.LoadPerformance(SarifLog.Load, filePath, loadDescription, iterations: 1);
                     Measure.Time($"Saving to {outputPath}", () => log.Save(outputPath));
 
                     break;
 
-                case "indent":
-                    outputPath = (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "..\\Indented", Path.GetFileName(filePath)));
-                    Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
-
-                    log = Measure.LoadPerformance(SarifLog.Load, filePath, loadDescription, iterations: 1);
-
-                    using (JsonTextWriter writer = new JsonTextWriter(File.CreateText(outputPath)))
-                    {
-                        writer.Formatting = Formatting.Indented;
-                        JsonSerializer.Create().Serialize(writer, log);
-                    }
-
+                case "indentfolder":
+                    IndentFolder(filePath);
                     break;
 
                 case "regionbuild":
-                    outputPath = (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "Regions.json"));
+                    RegionDemoBuilder.Build(
+                        filePath,
+                        (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "Regions.json")));
+                    break;
 
-                    Console.WriteLine($"Building Region demo from {filePath} to {outputPath}");
-                    RegionDemoBuilder.Build(filePath, outputPath);
-                    
+                case "roundtripfolder":
+                    RoundTripFolder(filePath);
                     break;
 
                 default:
                     Console.WriteLine($"Unknown mode '{mode}'. Usage: BSOA.Demo.Comparison <load/build> <filePath>");
                     break;
+            }
+        }
+
+        private static void IndentFolder(string folderPath)
+        {
+            foreach (string filePath in Directory.GetFiles(folderPath, "*.sarif"))
+            {
+                Console.WriteLine($" - {filePath}");
+
+                SarifLog log = SarifLog.LoadDeferred(filePath);
+                string outputPath = Path.Combine(Path.GetDirectoryName(filePath), @"..\Indented", Path.GetFileName(filePath));
+                Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+
+                using (JsonTextWriter writer = new JsonTextWriter(File.CreateText(outputPath)))
+                {
+                    writer.Formatting = Formatting.Indented;
+                    JsonSerializer.Create().Serialize(writer, log);
+                }
+            }
+        }
+
+        private static void RoundTripFolder(string folderPath)
+        {
+            foreach (string filePath in Directory.GetFiles(folderPath, "*.sarif"))
+            {
+                Console.WriteLine($" - {filePath}");
+
+                SarifLog log = SarifLog.LoadDeferred(filePath);
+                string outputPath = Path.Combine(Path.GetDirectoryName(filePath), @"..\RoundTripped", Path.GetFileName(filePath));
+                Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+                
+                log.Save(outputPath);
             }
         }
 

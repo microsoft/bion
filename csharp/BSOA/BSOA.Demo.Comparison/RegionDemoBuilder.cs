@@ -11,6 +11,8 @@ namespace BSOA.Demo.Comparison
     {
         public static void Build(string inputPath, string outputPath)
         {
+            Console.WriteLine($"Building Region demo from {inputPath} to {outputPath}");
+
             SarifLog log = SarifLog.Load(inputPath);
             
             // Extract Regions from log
