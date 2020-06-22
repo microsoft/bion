@@ -22,10 +22,6 @@ namespace Microsoft.CodeAnalysis.Sarif
             {
                 return null;
             }
-            else if (reader.TokenType == JsonToken.String)
-            {
-                return new SerializedPropertyInfo((string)reader.Value, true);
-            }
             else
             {
                 StringBuilder builder = new StringBuilder();
@@ -46,10 +42,6 @@ namespace Microsoft.CodeAnalysis.Sarif
             if (spi == null || spi.SerializedValue == null)
             {
                 writer.WriteNull();
-            }
-            else if (spi.IsString)
-            {
-                writer.WriteValue(spi.SerializedValue);
             }
             else
             {

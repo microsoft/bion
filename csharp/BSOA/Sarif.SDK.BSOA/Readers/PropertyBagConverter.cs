@@ -45,26 +45,13 @@ namespace Microsoft.CodeAnalysis.Sarif.Readers
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (writer == null)
-            {
-                throw new ArgumentNullException(nameof(writer));
-            }
-
             writer.WriteStartObject();
-            var propertyDictionary = (IDictionary<string, SerializedPropertyInfo>)value;
-            foreach (string key in propertyDictionary.Keys)
-            {
-                writer.WritePropertyName(key);
-                string valueToSerialize = propertyDictionary[key]?.SerializedValue;
 
-                if (valueToSerialize == null)
-                {
-                    writer.WriteNull();
-                }
-                else
-                {
-                    writer.WriteRawValue(propertyDictionary[key].SerializedValue);
-                }
+            var propertyDictionary = (IDictionary<string, SerializedPropertyInfo>)value;
+            foreach (KeyValuePair<string, SerializedPropertyInfo> pair in propertyDictionary)
+            {
+                writer.WritePropertyName(pair.Key);
+                JsonToSerializedPropertyInfo.Write(writer, pair.Value);
             }
 
             writer.WriteEndObject();
