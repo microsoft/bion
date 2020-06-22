@@ -25,10 +25,11 @@ namespace BSOA.Demo
         {
             InputFilePath = inputFilePath;
             WorkingFolderPath = workingFolderPath;
+            Directory.CreateDirectory(WorkingFolderPath);
 
             string fileName = Path.GetFileName(inputFilePath);
             BsoaBinPath = Path.Combine(WorkingFolderPath, Path.ChangeExtension(fileName, ".bsoa"));
-            JsonOutPath = Path.Combine(WorkingFolderPath, Path.ChangeExtension(fileName, "Out.json"));
+            JsonOutPath = Path.Combine(WorkingFolderPath, fileName);
 
             Assembly sdk = typeof(SarifLog).Assembly;
             SdkDescription = $"{sdk.GetName().Name} v{sdk.GetName().Version}";
