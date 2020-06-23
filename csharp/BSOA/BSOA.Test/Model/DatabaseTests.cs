@@ -32,9 +32,7 @@ namespace BSOA.Test.Model
             TreeDiagnostics diagnostics = TreeSerializer.Diagnostics(community.DB, () => new V1.Community().DB, TreeFormat.Binary);
 
             // Verify table and column names in diagnostics
-            StringBuilder textBuilder = new StringBuilder();
-            diagnostics.Write(new StringWriter(textBuilder), -1);
-            string text = textBuilder.ToString();
+            string text = diagnostics.ToString();
             Assert.Contains("Person", text);
             Assert.Contains("Age", text);
             Assert.Contains("Name", text);

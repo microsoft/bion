@@ -222,8 +222,6 @@ namespace BSOA.Collections
 
         public bool MoveNext()
         {
-            if (_vector == null) { return false; }
-
             Current++;
 
             // Look for the next set bit

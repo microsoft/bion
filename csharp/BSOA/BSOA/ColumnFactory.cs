@@ -55,7 +55,7 @@ namespace BSOA.Column
 
             if (type.IsEnum)
             {
-                throw new NotImplementedException($"Can't create EnumColumn via builder because can't generically define converting Funcs.");
+                throw new NotSupportedException($"Enums should use a NumberColumn of the underlying type and be casted to and from the enum type in the property getter/setter.");
             }
 
             if (type.IsGenericType)

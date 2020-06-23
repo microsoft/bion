@@ -36,6 +36,18 @@ namespace BSOA.Test
             int actual = 0;
             column.ForEach((slice) => actual += slice.Sum());
             Assert.Equal(sum, actual);
+
+            // Force allocating multiple chapters
+            column[200000] = ArraySlice<int>.Empty;
+            Assert.Equal(200001, column.Count);
+            Assert.Equal(ArraySlice<int>.Empty, column[200000]);
+            column[200000] = new ArraySlice<int>(new int[] { 1, 2, 3 });
+            Assert.Equal(new ArraySlice<int>(new int[] { 1, 2, 3 }), column[200000]);
+
+            // Remove enough to remove a chapter
+            column.RemoveFromEnd(100000);
+            Assert.Equal(100001, column.Count);
+            Assert.Equal(ArraySlice<int>.Empty, column[200000]);
         }
     }
 }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using BSOA.Column;
 using BSOA.Model;
@@ -33,13 +34,17 @@ namespace BSOA.Test
             AssertBuild<double>((double)1);
             AssertBuild<char>((char)1);
 
-            Assert.Throws<NotImplementedException>(() => ColumnFactory.Build(typeof(DayOfWeek), DayOfWeek.Sunday));
-
             IColumn<IList<string>> listColumn = (IColumn<IList<string>>)ColumnFactory.Build(typeof(IList<string>), null);
             Assert.NotNull(listColumn);
 
             IColumn<IDictionary<string, string>> dictionaryColumn = (IColumn<IDictionary<string, string>>)(ColumnFactory.Build(typeof(IDictionary<string, string>), null));
             Assert.NotNull(dictionaryColumn);
+
+            if (!Debugger.IsAttached)
+            {
+                Assert.Throws<NotImplementedException>(() => ColumnFactory.Build(typeof(Decimal)));
+                Assert.Throws<NotSupportedException>(() => ColumnFactory.Build(typeof(DayOfWeek), DayOfWeek.Sunday));
+            }
         }
 
         private void AssertBuild<T>(object defaultValue)
@@ -51,6 +56,10 @@ namespace BSOA.Test
             if (defaultValue != null)
             {
                 column = ColumnFactory.Build(typeof(T), null);
+                Assert.NotNull(column);
+                Assert.True(column is IColumn<T>);
+
+                column = ColumnFactory.Build(typeof(T));
                 Assert.NotNull(column);
                 Assert.True(column is IColumn<T>);
             }

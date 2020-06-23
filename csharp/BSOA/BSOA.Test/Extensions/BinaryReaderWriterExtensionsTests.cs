@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using BSOA.Extensions;
+using BSOA.IO;
+
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
-
-using BSOA.Extensions;
 
 using Xunit;
 
@@ -14,121 +16,131 @@ namespace BSOA.Test.Extensions
     public class BinaryReaderWriterExtensionsTests
     {
         [Fact]
-        public static void ReadAndWriteArray_Null()
+        public static void BinaryReaderWriterExtensions_Strings()
         {
             byte[] buffer = null;
-            int[] roundTripped = null;
-                
-            using (MemoryStream stream = new MemoryStream())
+            string sample = "Hello";
+
+            RoundTrip((writer) =>
             {
-                using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: true))
-                {
-                    writer.WriteBlockArray<int>(null, ref buffer);
-                }
+                writer.WriteString(TreeToken.String, null, ref buffer);
+                writer.WriteString(TreeToken.String, "", ref buffer);
+                writer.WriteString(TreeToken.String, sample, ref buffer);
+                writer.WriteString(TreeToken.PropertyName, sample, ref buffer);
+            }, (reader) =>
+            {
+                byte hint;
+                string roundTripped;
 
-                long position = stream.Position;
-                stream.Seek(0, SeekOrigin.Begin);
-                using (BinaryReader reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true))
-                {
-                    roundTripped = reader.ReadBlockArray<int>(ref buffer);
-                }
+                // Null strings roundtrip as empty
+                hint = (byte)(reader.ReadByte() >> 4);
+                roundTripped = reader.ReadString(hint, ref buffer);
+                Assert.Equal("", roundTripped);
 
-                // Ensure all bytes (length only) read back
-                Assert.Equal(position, stream.Position);
+                hint = (byte)(reader.ReadByte() >> 4);
+                roundTripped = reader.ReadString(hint, ref buffer);
+                Assert.Equal("", roundTripped);
 
-                // Ensure array is empty (not null)
-                Assert.NotNull(roundTripped);
-                Assert.Empty(roundTripped);
-            }
+                hint = (byte)(reader.ReadByte() >> 4);
+                roundTripped = reader.ReadString(hint, ref buffer);
+                Assert.Equal(sample, roundTripped);
+
+                hint = (byte)(reader.ReadByte() >> 4);
+                roundTripped = reader.ReadString(hint, ref buffer);
+                Assert.Equal(sample, roundTripped);
+            });
         }
 
         [Fact]
-        public static void SkipArray()
-        {
-            byte[] buffer = null;
-            int[] array = new int[] { 1, 2, 3 };
-
-            using (MemoryStream stream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: true))
-                {
-                    writer.WriteBlockArray<int>(array, ref buffer);
-                    writer.Write(true);
-                }
-
-                long arrayLength = stream.Position - 1;
-                stream.Seek(0, SeekOrigin.Begin);
-                using (BinaryReader reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true))
-                {
-                    byte hint = (byte)(reader.ReadByte() >> 4);
-                    reader.SkipBlockArray(hint);
-
-                    // Ensure all bytes *except* guard boolean read
-                    Assert.Equal(arrayLength, stream.Position);
-
-                    bool guardBoolean = reader.ReadBoolean();
-                    Assert.True(guardBoolean);
-                }
-            }
-        }
-
-        [Fact]
-        public static void ReadAndWriteArray_BufferUse()
+        public static void BinaryReaderWriterExtensions_BlockArrays()
         {
             int[] sample = new int[] { 1, 2, 3 };
             byte[] buffer = null;
 
-            using (MemoryStream stream = new MemoryStream())
+            // Verify arrays skip properly
+            RoundTrip((writer) =>
             {
-                // Write, ensure buffer used (started as null)
-                using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: true))
-                {
-                    writer.WriteBlockArray<int>(sample, ref buffer);
-                }
+                writer.WriteBlockArray<int>(sample, ref buffer);
+                writer.Write(true);
+            }, (reader) =>
+            {
+                byte hint = (byte)(reader.ReadByte() >> 4);
+                reader.SkipBlockArray(hint);
 
-                Assert.True(buffer?.Length >= 12);
+                bool guardBoolean = reader.ReadBoolean();
+                Assert.True(guardBoolean);
+            });
 
+            // Verify null arrays roundtrip properly (to empty array)
+            RoundTrip((writer) =>
+            {
+                writer.WriteBlockArray<int>(null, ref buffer);
+            }, (reader) =>
+            {
+                int[] roundTripped = reader.ReadBlockArray<int>(ref buffer);
 
-                // Write, ensure buffer used (too small)
-                buffer = new byte[11];
-                stream.Seek(0, SeekOrigin.Begin);
-                using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: true))
-                {
-                    writer.WriteBlockArray<int>(sample, ref buffer);
-                }
+                // Ensure array is empty (not null)
+                Assert.NotNull(roundTripped);
+                Assert.Empty(roundTripped);
+            });
 
-                Assert.True(buffer?.Length >= 12);
-
-
-                // Read, ensure buffer used (null)
+            // Verify buffers are allocated when null or too small
+            RoundTrip((writer) =>
+            {
                 buffer = null;
-                stream.Seek(0, SeekOrigin.Begin);
-                using (BinaryReader reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true))
-                {
-                    int[] roundTripped = reader.ReadBlockArray<int>(ref buffer);
-                }
-
+                writer.WriteBlockArray<int>(sample, ref buffer);
                 Assert.True(buffer?.Length >= 12);
 
-
-                // Read, ensure buffer used (too small)
                 buffer = new byte[11];
-                stream.Seek(0, SeekOrigin.Begin);
-                using (BinaryReader reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true))
-                {
-                    int[] roundTripped = reader.ReadBlockArray<int>(ref buffer);
-                }
-
+                writer.WriteBlockArray<int>(sample, ref buffer);
                 Assert.True(buffer?.Length >= 12);
+
+            }, (reader) =>
+            {
+                buffer = null;
+                int[] roundTripped = reader.ReadBlockArray<int>(ref buffer);
+                Assert.True(buffer?.Length >= 12);
+
+                buffer = new byte[11];
+                roundTripped = reader.ReadBlockArray<int>(ref buffer);
+                Assert.True(buffer?.Length >= 12);
+
+                Assert.Equal(sample, roundTripped);
+            });
+
+            // Verify char size reported properly (Marshal.SizeOf reports one because it defaults to marshalling to ASCII)
+            Assert.Equal(2, BinaryReaderWriterExtensions.SizeOf(typeof(char)));
+
+            if (!Debugger.IsAttached)
+            {
+                Assert.Throws<NotSupportedException>(() => BinaryReaderWriterExtensions.SizeOf(typeof(Guid)));
+
+                // WriteMarker bounds verification
+                Assert.Throws<ArgumentException>(() => RoundTrip((writer) => writer.WriteMarker(TreeToken.String, 16), null));
+                Assert.Throws<ArgumentException>(() => RoundTrip((writer) => writer.WriteMarker(TreeToken.String, -1), null));
             }
         }
 
-        [Fact]
-        public void SizeOf()
+        internal static void RoundTrip(Action<BinaryWriter> write, Action<BinaryReader> read)
         {
-            // Verify char size reported properly (Marshal.SizeOf reports one because it defaults to marshalling to ASCII)
-            Assert.Equal(2, BinaryReaderWriterExtensions.SizeOf(typeof(char)));
-            Assert.Throws<NotSupportedException>(() => BinaryReaderWriterExtensions.SizeOf(typeof(Guid)));
+            using (MemoryStream stream = new MemoryStream())
+            {
+                using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: true))
+                {
+                    write(writer);
+                }
+
+                long bytesWritten = stream.Position;
+                stream.Seek(0, SeekOrigin.Begin);
+
+                using (BinaryReader reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true))
+                {
+                    read(reader);
+                }
+
+                // Ensure everything written is read back
+                Assert.Equal(bytesWritten, stream.Position);
+            }
         }
     }
 }

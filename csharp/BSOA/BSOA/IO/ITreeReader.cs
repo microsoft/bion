@@ -185,8 +185,6 @@ namespace BSOA.IO
         /// <param name="throwOnUnknown">True to throw for property name not in Dictionary, false to quietly skip over it</param>
         public static void ReadDictionaryItems<T>(this ITreeReader reader, Dictionary<string, T> dictionary, bool throwOnUnknown = true) where T : ITreeSerializable
         {
-            if (reader.TokenType == TreeToken.Null) { return; }
-
             reader.Expect(TreeToken.StartObject);
             reader.Read();
 
@@ -235,9 +233,6 @@ namespace BSOA.IO
         {
             // Ensure object state reset before Read
             instance.Clear();
-
-            // Null means default state
-            if (reader.TokenType == TreeToken.Null) { return; }
 
             reader.Expect(TreeToken.StartObject);
             reader.Read();

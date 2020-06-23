@@ -22,6 +22,17 @@ namespace BSOA.Test
                 "AnotherValue",
                 (i) => i.ToString()
             );
+
+            // Add enough to force conversion of values
+            List<string> expected = new List<string>();
+            StringColumn column = new StringColumn();
+            for (int i = 0; i < 300; ++i)
+            {
+                column[i] = "A";
+                expected.Add("A");
+            }
+
+            CollectionReadVerifier.VerifySame(expected, column, true);
         }
 
         [Fact]
@@ -47,10 +58,10 @@ namespace BSOA.Test
             CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, TreeFormat.Binary, testDoubleDispose: false));
             diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
             Assert.True(1 == diagnostics.Children.Count);
-            Assert.True(diagnostics.Length <= 13); 
+            Assert.True(diagnostics.Length <= 13);
 
             // All empty: Only nulls false written
-            for(int i = 0; i < 100; ++i)
+            for (int i = 0; i < 100; ++i)
             {
                 column[i] = "";
             }
@@ -73,7 +84,7 @@ namespace BSOA.Test
 
             // Nulls and Non-Nulls; both parts must be written
             column[50] = null;
-            
+
             CollectionReadVerifier.VerifySame(column, TreeSerializer.RoundTrip(column, TreeFormat.Binary, testDoubleDispose: false));
             diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
             Assert.True(2 == diagnostics.Children.Count);
