@@ -1,4 +1,6 @@
 @ECHO OFF
+SET NuGetLocal=%SystemDrive%\NuGetLocal
+IF NOT "%1"=="" ( SET NuGetLocal=%1 )
 
 PUSHD "%~dp0"
 
@@ -23,6 +25,13 @@ ECHO Clearing BSOA from Local NuGet Cache
 ECHO ====================================
 RMDIR "%USERPROFILE%\.nuget\packages\bsoa" /S /Q
 RMDIR "%USERPROFILE%\.nuget\packages\bsoa.json" /S /Q
+
+IF EXIST "%NuGetLocal%" (
+  ECHO.
+  ECHO Copying to NuGet Local [%NuGetLocal%]
+  ECHO =====================================
+  XCOPY /Y "bin\NuGet\*.*" "%NuGetLocal%\"
+)
 
 POPD
 
