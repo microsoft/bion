@@ -13,7 +13,14 @@ namespace BSOA.Json.Converters
 
         public static Uri Read(JsonReader reader)
         {
-            return new Uri((string)reader.Value, UriKind.RelativeOrAbsolute);
+            if (reader.TokenType == JsonToken.Null)
+            {
+                return null;
+            }
+            else
+            {
+                return new Uri((string)reader.Value, UriKind.RelativeOrAbsolute);
+            }
         }
 
         public static void Write(JsonWriter writer, string propertyName, Uri item, Uri defaultValue = default)
@@ -21,13 +28,13 @@ namespace BSOA.Json.Converters
             if (item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
-                writer.WriteValue(item.OriginalString);
+                writer.WriteValue(item?.OriginalString);
             }
         }
 
         public static void Write(JsonWriter writer, Uri item)
         {
-            writer.WriteValue(item.OriginalString);
+            writer.WriteValue(item?.OriginalString);
         }
     }
 }

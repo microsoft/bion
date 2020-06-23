@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 
+using System.Numerics;
+
 namespace BSOA.Json.Converters
 {
     public static class JsonToByte
@@ -29,7 +31,61 @@ namespace BSOA.Json.Converters
         }
     }
 
-    public static class JsonToUShort
+    public static class JsonToSbyte
+    {
+        public static sbyte Read<TRoot>(JsonReader reader, TRoot root)
+        {
+            return Read(reader);
+        }
+
+        public static sbyte Read(JsonReader reader)
+        {
+            return (sbyte)(long)reader.Value;
+        }
+
+        public static void Write(JsonWriter writer, string propertyName, sbyte item, sbyte defaultValue = default)
+        {
+            if (item != defaultValue)
+            {
+                writer.WritePropertyName(propertyName);
+                writer.WriteValue(item);
+            }
+        }
+
+        public static void Write(JsonWriter writer, sbyte item)
+        {
+            writer.WriteValue(item);
+        }
+    }
+
+    public static class JsonToShort
+    {
+        public static short Read<TRoot>(JsonReader reader, TRoot root)
+        {
+            return Read(reader);
+        }
+
+        public static short Read(JsonReader reader)
+        {
+            return (short)(long)reader.Value;
+        }
+
+        public static void Write(JsonWriter writer, string propertyName, short item, short defaultValue = default)
+        {
+            if (item != defaultValue)
+            {
+                writer.WritePropertyName(propertyName);
+                writer.WriteValue(item);
+            }
+        }
+
+        public static void Write(JsonWriter writer, short item)
+        {
+            writer.WriteValue(item);
+        }
+    }
+
+    public static class JsonToUshort
     {
         public static ushort Read<TRoot>(JsonReader reader, TRoot root)
         {
@@ -83,6 +139,33 @@ namespace BSOA.Json.Converters
         }
     }
 
+    public static class JsonToUint
+    {
+        public static uint Read<TRoot>(JsonReader reader, TRoot root)
+        {
+            return Read(reader);
+        }
+
+        public static uint Read(JsonReader reader)
+        {
+            return (uint)(long)reader.Value;
+        }
+
+        public static void Write(JsonWriter writer, string propertyName, uint item, uint defaultValue = default)
+        {
+            if (item != defaultValue)
+            {
+                writer.WritePropertyName(propertyName);
+                writer.WriteValue(item);
+            }
+        }
+
+        public static void Write(JsonWriter writer, uint item)
+        {
+            writer.WriteValue(item);
+        }
+    }
+
     public static class JsonToLong
     {
         public static long Read<TRoot>(JsonReader reader, TRoot root)
@@ -105,6 +188,40 @@ namespace BSOA.Json.Converters
         }
 
         public static void Write(JsonWriter writer, long item)
+        {
+            writer.WriteValue(item);
+        }
+    }
+
+    public static class JsonToUlong
+    {
+        public static ulong Read<TRoot>(JsonReader reader, TRoot root)
+        {
+            return Read(reader);
+        }
+
+        public static ulong Read(JsonReader reader)
+        {
+            if (reader.Value is BigInteger)
+            {
+                return (ulong)((BigInteger)reader.Value);
+            }
+            else
+            {
+                return (ulong)(long)reader.Value;
+            }
+        }
+
+        public static void Write(JsonWriter writer, string propertyName, ulong item, ulong defaultValue = default)
+        {
+            if (item != defaultValue)
+            {
+                writer.WritePropertyName(propertyName);
+                writer.WriteValue(item);
+            }
+        }
+
+        public static void Write(JsonWriter writer, ulong item)
         {
             writer.WriteValue(item);
         }

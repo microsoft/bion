@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-using System;
-
 namespace BSOA.Json.Converters
 {
     public static class JsonToEnum<TEnum>
@@ -23,7 +21,7 @@ namespace BSOA.Json.Converters
             }
         }
 
-        public static void Write(JsonWriter writer, Uri item)
+        public static void Write(JsonWriter writer, TEnum item)
         {
             _enumConverter.WriteJson(writer, item, null);
         }
