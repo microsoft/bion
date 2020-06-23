@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA", "BSOA\BSOA.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Test", "BSOA.Test\BSOA.Test.csproj", "{9214D0E9-A742-49B4-9FB8-7D0627BE0F57}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Console", "BSOA.Console\BSOA.Console.csproj", "{41E0B98F-5A40-4B69-8017-C757EEE35E91}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Json", "BSOA.Json\BSOA.Json.csproj", "{DC9C4219-4691-4F10-B874-21B686A1EFC4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Generator", "BSOA.Generator\BSOA.Generator.csproj", "{AD27E34A-5B7A-4CA5-8FA0-898F0ADDDE55}"
@@ -21,9 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sarif.SDK.BSOA", "Sarif.SDK
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sarif.SDK.BSOA.Test", "Sarif.SDK.BSOA.Test\Sarif.SDK.BSOA.Test.csproj", "{225B0863-F1F1-4F39-A0B0-C40F0982AA8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSOA.Demo.Comparison", "BSOA.Demo.Comparison\BSOA.Demo.Comparison.csproj", "{5923C23E-584F-4545-8C4A-12D30C01FAA9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegionDemo", "RegionDemo\RegionDemo.csproj", "{89D74E8E-CA81-4CFA-9906-F480D9F848F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Demo.Comparison", "BSOA.Demo.Comparison\BSOA.Demo.Comparison.csproj", "{5923C23E-584F-4545-8C4A-12D30C01FAA9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,10 +35,6 @@ Global
 		{9214D0E9-A742-49B4-9FB8-7D0627BE0F57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9214D0E9-A742-49B4-9FB8-7D0627BE0F57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9214D0E9-A742-49B4-9FB8-7D0627BE0F57}.Release|Any CPU.Build.0 = Release|Any CPU
-		{41E0B98F-5A40-4B69-8017-C757EEE35E91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{41E0B98F-5A40-4B69-8017-C757EEE35E91}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{41E0B98F-5A40-4B69-8017-C757EEE35E91}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{41E0B98F-5A40-4B69-8017-C757EEE35E91}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DC9C4219-4691-4F10-B874-21B686A1EFC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DC9C4219-4691-4F10-B874-21B686A1EFC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC9C4219-4691-4F10-B874-21B686A1EFC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -71,10 +63,6 @@ Global
 		{5923C23E-584F-4545-8C4A-12D30C01FAA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5923C23E-584F-4545-8C4A-12D30C01FAA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5923C23E-584F-4545-8C4A-12D30C01FAA9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{89D74E8E-CA81-4CFA-9906-F480D9F848F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{89D74E8E-CA81-4CFA-9906-F480D9F848F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{89D74E8E-CA81-4CFA-9906-F480D9F848F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{89D74E8E-CA81-4CFA-9906-F480D9F848F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

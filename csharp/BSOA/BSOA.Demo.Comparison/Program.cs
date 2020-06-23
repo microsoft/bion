@@ -43,12 +43,6 @@ namespace BSOA.Demo.Comparison
                     IndentFolder(filePath);
                     break;
 
-                case "regionbuild":
-                    RegionDemoBuilder.Build(
-                        filePath,
-                        (args.Length > 2 ? args[2] : Path.Combine(Path.GetDirectoryName(filePath), "Regions.json")));
-                    break;
-
                 case "roundtripfolder":
                     RoundTripFolder(filePath);
                     break;

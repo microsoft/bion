@@ -18,12 +18,12 @@ namespace BSOA.Test.Diagnostics
             // Single iteration
             average = Measure.Time("Thread.Sleep", () => Thread.Sleep(10));
             Assert.True(average.TotalMilliseconds > 8);
-            Assert.True(average.TotalMilliseconds < 12);
+            Assert.True(average.TotalMilliseconds < 15);
 
             // Multiple iterations
             average = Measure.Time("Thread.Sleep", () => Thread.Sleep(10), 3);
             Assert.True(average.TotalMilliseconds > 8);
-            Assert.True(average.TotalMilliseconds < 12);
+            Assert.True(average.TotalMilliseconds < 15);
 
             // LoadPerformance
             string filePath = "Measure.bsoa";
