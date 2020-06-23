@@ -25,6 +25,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static EdgeTraversal Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             EdgeTraversal item = (root == null ? new EdgeTraversal() : new EdgeTraversal(root));
             reader.ReadObject(root, item, setters);
             return item;

@@ -33,6 +33,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Artifact Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Artifact item = (root == null ? new Artifact() : new Artifact(root));
             reader.ReadObject(root, item, setters);
             return item;

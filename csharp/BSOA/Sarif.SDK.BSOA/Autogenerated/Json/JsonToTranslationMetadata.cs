@@ -27,6 +27,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static TranslationMetadata Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             TranslationMetadata item = (root == null ? new TranslationMetadata() : new TranslationMetadata(root));
             reader.ReadObject(root, item, setters);
             return item;

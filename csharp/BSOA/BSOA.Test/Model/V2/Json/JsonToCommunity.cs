@@ -21,6 +21,8 @@ namespace BSOA.Test.Model.V2
 
         public static Community Read(JsonReader reader, Community root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+
             Community item = new Community();
 
             // Community is root object

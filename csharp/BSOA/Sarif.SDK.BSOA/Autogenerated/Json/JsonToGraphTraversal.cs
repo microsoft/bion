@@ -27,6 +27,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static GraphTraversal Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             GraphTraversal item = (root == null ? new GraphTraversal() : new GraphTraversal(root));
             reader.ReadObject(root, item, setters);
             return item;

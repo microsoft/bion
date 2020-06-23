@@ -18,7 +18,7 @@ namespace BSOA.Test.Json
             
             // Verify 'null' allowed (no setters set)
             result = JsonRoundTrip.Parse<Community, Person>("null", JsonToPerson.Read);
-            Assert.Equal(new Person(), result);
+            Assert.Null(result);
 
             // Verify empty allowed (no setters set)
             result = JsonRoundTrip.Parse<Community, Person>("{ }", JsonToPerson.Read);

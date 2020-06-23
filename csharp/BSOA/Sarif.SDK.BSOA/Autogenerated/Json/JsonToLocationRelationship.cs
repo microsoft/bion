@@ -24,6 +24,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static LocationRelationship Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             LocationRelationship item = (root == null ? new LocationRelationship() : new LocationRelationship(root));
             reader.ReadObject(root, item, setters);
             return item;

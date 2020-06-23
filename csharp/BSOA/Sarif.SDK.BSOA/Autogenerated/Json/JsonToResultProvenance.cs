@@ -27,6 +27,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static ResultProvenance Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             ResultProvenance item = (root == null ? new ResultProvenance() : new ResultProvenance(root));
             reader.ReadObject(root, item, setters);
             return item;

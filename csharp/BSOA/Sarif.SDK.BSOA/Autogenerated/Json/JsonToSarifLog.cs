@@ -25,6 +25,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static SarifLog Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+
             SarifLog item = new SarifLog();
 
             // SarifLog is root object

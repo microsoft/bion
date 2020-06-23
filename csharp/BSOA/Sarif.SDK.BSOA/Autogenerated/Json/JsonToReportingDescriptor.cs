@@ -34,6 +34,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static ReportingDescriptor Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             ReportingDescriptor item = (root == null ? new ReportingDescriptor() : new ReportingDescriptor(root));
             reader.ReadObject(root, item, setters);
             return item;

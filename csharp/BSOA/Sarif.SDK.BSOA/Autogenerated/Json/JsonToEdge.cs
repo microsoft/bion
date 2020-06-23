@@ -25,6 +25,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Edge Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Edge item = (root == null ? new Edge() : new Edge(root));
             reader.ReadObject(root, item, setters);
             return item;

@@ -37,6 +37,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static ExternalPropertyFileReferences Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             ExternalPropertyFileReferences item = (root == null ? new ExternalPropertyFileReferences() : new ExternalPropertyFileReferences(root));
             reader.ReadObject(root, item, setters);
             return item;

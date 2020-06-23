@@ -26,6 +26,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Rectangle Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Rectangle item = (root == null ? new Rectangle() : new Rectangle(root));
             reader.ReadObject(root, item, setters);
             return item;

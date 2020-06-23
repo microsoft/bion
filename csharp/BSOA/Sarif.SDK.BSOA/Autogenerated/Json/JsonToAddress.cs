@@ -30,6 +30,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Address Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Address item = (root == null ? new Address() : new Address(root));
             reader.ReadObject(root, item, setters);
             return item;

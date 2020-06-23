@@ -34,6 +34,8 @@ namespace BSOA.Generator.Templates
 
         public static Team Read(JsonReader reader, Company root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Team item = (root == null ? new Team() : new Team(root));
             reader.ReadObject(root, item, setters);
             return item;

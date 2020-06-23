@@ -24,6 +24,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Graph Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Graph item = (root == null ? new Graph() : new Graph(root));
             reader.ReadObject(root, item, setters);
             return item;

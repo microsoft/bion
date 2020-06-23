@@ -21,6 +21,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static PropertyBag Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             PropertyBag item = (root == null ? new PropertyBag() : new PropertyBag(root));
             reader.ReadObject(root, item, setters);
             return item;

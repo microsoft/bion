@@ -34,6 +34,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static ThreadFlowLocation Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             ThreadFlowLocation item = (root == null ? new ThreadFlowLocation() : new ThreadFlowLocation(root));
             reader.ReadObject(root, item, setters);
             return item;

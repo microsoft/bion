@@ -29,6 +29,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static WebResponse Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             WebResponse item = (root == null ? new WebResponse() : new WebResponse(root));
             reader.ReadObject(root, item, setters);
             return item;

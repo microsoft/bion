@@ -25,6 +25,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Attachment Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Attachment item = (root == null ? new Attachment() : new Attachment(root));
             reader.ReadObject(root, item, setters);
             return item;

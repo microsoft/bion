@@ -25,6 +25,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static ArtifactLocation Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             ArtifactLocation item = (root == null ? new ArtifactLocation() : new ArtifactLocation(root));
             reader.ReadObject(root, item, setters);
             return item;

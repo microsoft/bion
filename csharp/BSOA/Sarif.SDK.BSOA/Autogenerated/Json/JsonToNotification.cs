@@ -29,6 +29,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Notification Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Notification item = (root == null ? new Notification() : new Notification(root));
             reader.ReadObject(root, item, setters);
             return item;

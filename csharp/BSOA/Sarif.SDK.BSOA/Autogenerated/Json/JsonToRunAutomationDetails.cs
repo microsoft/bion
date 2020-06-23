@@ -25,6 +25,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static RunAutomationDetails Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             RunAutomationDetails item = (root == null ? new RunAutomationDetails() : new RunAutomationDetails(root));
             reader.ReadObject(root, item, setters);
             return item;

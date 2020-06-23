@@ -107,13 +107,7 @@ namespace BSOA.Test.Model
         public void Database_NewtonsoftCompatibility()
         {
             // Test that basic Database, Table, and Row types can successfully roundtrip via Newtonsoft.Json serialization by default.
-
-            // This requires:
-            //  - Root element exposes collections reaching everything
-            //  - Items have empty constructors
-            //  - Collections support Add(T item)
-            //  - Item empty constructor chooses the right Database/Table or cross-table copy works correctly.
-            //  - Item properties are settable and types are understandable to Newtonsoft.Json.
+            // These use generated JsonConverter classes to serialize using safe constructors and good default behaviors.
 
             V1.Community v1 = new V1.Community();
             v1.People.Add(new V1.Person() { Age = 39, Name = "Scott" });

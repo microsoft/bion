@@ -24,6 +24,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static ToolComponentReference Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             ToolComponentReference item = (root == null ? new ToolComponentReference() : new ToolComponentReference(root));
             reader.ReadObject(root, item, setters);
             return item;

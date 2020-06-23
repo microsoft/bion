@@ -46,6 +46,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Invocation Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Invocation item = (root == null ? new Invocation() : new Invocation(root));
             reader.ReadObject(root, item, setters);
             return item;

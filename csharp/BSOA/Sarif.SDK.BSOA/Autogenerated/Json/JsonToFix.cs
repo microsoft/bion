@@ -23,6 +23,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Fix Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Fix item = (root == null ? new Fix() : new Fix(root));
             reader.ReadObject(root, item, setters);
             return item;

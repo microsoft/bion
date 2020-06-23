@@ -23,6 +23,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Replacement Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Replacement item = (root == null ? new Replacement() : new Replacement(root));
             reader.ReadObject(root, item, setters);
             return item;

@@ -26,6 +26,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Suppression Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Suppression item = (root == null ? new Suppression() : new Suppression(root));
             reader.ReadObject(root, item, setters);
             return item;

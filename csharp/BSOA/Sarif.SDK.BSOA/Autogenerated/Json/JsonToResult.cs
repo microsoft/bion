@@ -50,6 +50,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Result Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Result item = (root == null ? new Result() : new Result(root));
             reader.ReadObject(root, item, setters);
             return item;

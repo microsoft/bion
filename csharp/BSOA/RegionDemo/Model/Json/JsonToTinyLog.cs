@@ -21,6 +21,8 @@ namespace BSOA.Demo.Model
 
         public static TinyLog Read(JsonReader reader, TinyLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+
             TinyLog item = new TinyLog();
 
             // TinyLog is root object

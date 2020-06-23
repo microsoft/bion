@@ -23,6 +23,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static ConfigurationOverride Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             ConfigurationOverride item = (root == null ? new ConfigurationOverride() : new ConfigurationOverride(root));
             reader.ReadObject(root, item, setters);
             return item;

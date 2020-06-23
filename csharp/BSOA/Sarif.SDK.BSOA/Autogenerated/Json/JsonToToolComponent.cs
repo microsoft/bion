@@ -48,6 +48,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static ToolComponent Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             ToolComponent item = (root == null ? new ToolComponent() : new ToolComponent(root));
             reader.ReadObject(root, item, setters);
             return item;

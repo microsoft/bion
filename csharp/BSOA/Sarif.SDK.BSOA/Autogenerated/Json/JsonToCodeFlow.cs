@@ -23,6 +23,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static CodeFlow Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             CodeFlow item = (root == null ? new CodeFlow() : new CodeFlow(root));
             reader.ReadObject(root, item, setters);
             return item;

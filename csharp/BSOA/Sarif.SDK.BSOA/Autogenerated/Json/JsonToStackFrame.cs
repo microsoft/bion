@@ -25,6 +25,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static StackFrame Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             StackFrame item = (root == null ? new StackFrame() : new StackFrame(root));
             reader.ReadObject(root, item, setters);
             return item;

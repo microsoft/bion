@@ -34,6 +34,8 @@ namespace BSOA.Generator.Templates
 
         public static Company Read(JsonReader reader, Company root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+
             Company item = new Company();
 
             // Company is root object

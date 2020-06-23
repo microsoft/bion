@@ -9,10 +9,14 @@ namespace Newtonsoft.Json
         {
             if (reader.TokenType != token)
             {
-                JsonTextReader jtr = reader as JsonTextReader;
-                string position = (jtr == null ? "" : $"({jtr.LineNumber:n0}, {jtr.LinePosition:n0})");
-                throw new JsonReaderException($"Expected {token}, found {reader.TokenType} at {reader.Path}. {position}");
+                throw new JsonReaderException($"Expected {token}, found {reader.TokenType} at {reader.Position()}");
             }
+        }
+
+        public static string Position(this JsonReader reader)
+        {
+            JsonTextReader jtr = reader as JsonTextReader;
+            return (jtr == null ? $"{reader.Path}" : $"{reader.Path} ({jtr.LineNumber:n0}, {jtr.LinePosition:n0})");
         }
 
         public static void ReadObject<TItem, TRoot>(this JsonReader reader, TRoot root, TItem item, Dictionary<string, Action<JsonReader, TRoot, TItem>> setters)

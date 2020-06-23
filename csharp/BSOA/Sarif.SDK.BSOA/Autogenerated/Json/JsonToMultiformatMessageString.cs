@@ -23,6 +23,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static MultiformatMessageString Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             MultiformatMessageString item = (root == null ? new MultiformatMessageString() : new MultiformatMessageString(root));
             reader.ReadObject(root, item, setters);
             return item;

@@ -27,6 +27,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Location Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Location item = (root == null ? new Location() : new Location(root));
             reader.ReadObject(root, item, setters);
             return item;

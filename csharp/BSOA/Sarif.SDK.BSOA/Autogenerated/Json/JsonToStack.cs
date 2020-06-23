@@ -23,6 +23,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Stack Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Stack item = (root == null ? new Stack() : new Stack(root));
             reader.ReadObject(root, item, setters);
             return item;

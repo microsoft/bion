@@ -22,6 +22,8 @@ namespace BSOA.Demo.Model
 
         public static ArtifactContent Read(JsonReader reader, TinyLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             ArtifactContent item = (root == null ? new ArtifactContent() : new ArtifactContent(root));
             reader.ReadObject(root, item, setters);
             return item;

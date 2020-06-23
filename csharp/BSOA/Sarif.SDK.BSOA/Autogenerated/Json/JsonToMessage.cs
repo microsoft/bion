@@ -25,6 +25,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Message Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Message item = (root == null ? new Message() : new Message(root));
             reader.ReadObject(root, item, setters);
             return item;

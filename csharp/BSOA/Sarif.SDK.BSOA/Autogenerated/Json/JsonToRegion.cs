@@ -32,6 +32,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Region Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Region item = (root == null ? new Region() : new Region(root));
             reader.ReadObject(root, item, setters);
             return item;

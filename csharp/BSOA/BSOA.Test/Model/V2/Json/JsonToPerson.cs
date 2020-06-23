@@ -22,6 +22,8 @@ namespace BSOA.Test.Model.V2
 
         public static Person Read(JsonReader reader, Community root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Person item = (root == null ? new Person() : new Person(root));
             reader.ReadObject(root, item, setters);
             return item;

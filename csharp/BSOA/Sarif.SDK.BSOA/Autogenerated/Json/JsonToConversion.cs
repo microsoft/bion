@@ -24,6 +24,8 @@ namespace Microsoft.CodeAnalysis.Sarif
 
         public static Conversion Read(JsonReader reader, SarifLog root = null)
         {
+            if (reader.TokenType == JsonToken.Null) { return null; }
+            
             Conversion item = (root == null ? new Conversion() : new Conversion(root));
             reader.ReadObject(root, item, setters);
             return item;
