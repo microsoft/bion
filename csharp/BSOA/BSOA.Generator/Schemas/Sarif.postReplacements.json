@@ -6,5 +6,5 @@
   "PropertyBag\\ :\\ PropertyBagHolder,\\ ": "PropertyBag : ",
 
   /* Base class defines Properties, so entities must declare as 'internal override' */
-  "public IDictionary<String, SerializedPropertyInfo> Properties": "internal override IDictionary<String, SerializedPropertyInfo> Properties"
+  "public virtual IDictionary<String, SerializedPropertyInfo> Properties": "internal override IDictionary<String, SerializedPropertyInfo> Properties"
 }
