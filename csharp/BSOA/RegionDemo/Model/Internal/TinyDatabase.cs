@@ -12,11 +12,6 @@ namespace BSOA.Demo.Model
     /// </summary>
     internal partial class TinyDatabase : Database
     {
-        [ThreadStatic]
-        private static WeakReference<TinyDatabase> _lastCreated;
-
-        internal static TinyDatabase Current => (_lastCreated.TryGetTarget(out TinyDatabase value) ? value : new TinyDatabase());
-        
         internal ArtifactContentTable ArtifactContent { get; }
         internal MessageTable Message { get; }
         internal RegionTable Region { get; }
@@ -30,6 +25,19 @@ namespace BSOA.Demo.Model
             Message = AddTable(nameof(Message), new MessageTable(this));
             Region = AddTable(nameof(Region), new RegionTable(this));
             TinyLog = AddTable(nameof(TinyLog), new TinyLogTable(this));
+        }
+
+        [ThreadStatic]
+        private static WeakReference<TinyDatabase> _lastCreated;
+
+        internal static TinyDatabase Current
+        {
+            get
+            {
+                TinyDatabase db;
+                if (_lastCreated == null || !_lastCreated.TryGetTarget(out db)) { db = new TinyDatabase(); }
+                return db;
+            }
         }
     }
 }

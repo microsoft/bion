@@ -12,11 +12,6 @@ namespace BSOA.Test.Model.V1
     /// </summary>
     internal partial class PersonDatabase : Database
     {
-        [ThreadStatic]
-        private static WeakReference<PersonDatabase> _lastCreated;
-
-        internal static PersonDatabase Current => (_lastCreated.TryGetTarget(out PersonDatabase value) ? value : new PersonDatabase());
-        
         internal PersonTable Person { get; }
         internal CommunityTable Community { get; }
 
@@ -26,6 +21,19 @@ namespace BSOA.Test.Model.V1
 
             Person = AddTable(nameof(Person), new PersonTable(this));
             Community = AddTable(nameof(Community), new CommunityTable(this));
+        }
+
+        [ThreadStatic]
+        private static WeakReference<PersonDatabase> _lastCreated;
+
+        internal static PersonDatabase Current
+        {
+            get
+            {
+                PersonDatabase db;
+                if (_lastCreated == null || !_lastCreated.TryGetTarget(out db)) { db = new PersonDatabase(); }
+                return db;
+            }
         }
     }
 }

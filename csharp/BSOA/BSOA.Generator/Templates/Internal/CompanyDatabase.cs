@@ -12,11 +12,6 @@ namespace BSOA.Generator.Templates
     /// </summary>
     internal partial class CompanyDatabase : Database
     {
-        [ThreadStatic]
-        private static WeakReference<CompanyDatabase> _lastCreated;
-
-        internal static CompanyDatabase Current => (_lastCreated.TryGetTarget(out CompanyDatabase value) ? value : new CompanyDatabase());
-        
         // <TableMemberList>
         internal CompanyTable Company { get; }
         internal EmployeeTable Employee { get; }
@@ -36,6 +31,19 @@ namespace BSOA.Generator.Templates
             Team = AddTable(nameof(Team), new TeamTable(this));
             //   </TableConstructor>
             // </TableConstructorList>
+        }
+
+        [ThreadStatic]
+        private static WeakReference<CompanyDatabase> _lastCreated;
+
+        internal static CompanyDatabase Current
+        {
+            get
+            {
+                CompanyDatabase db;
+                if (_lastCreated == null || !_lastCreated.TryGetTarget(out db)) { db = new CompanyDatabase(); }
+                return db;
+            }
         }
     }
 }

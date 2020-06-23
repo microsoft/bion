@@ -52,32 +52,5 @@ namespace BSOA.Json.Converters
 
             writer.WriteEndArray();
         }
-
-        //public static void Write(JsonWriter writer, string propertyName, IList<TItem> list, IList<TItem> defaultList = null)
-        //{
-        //    if (list?.Count > 0)
-        //    {
-        //        writer.WritePropertyName(propertyName);
-        //        Write(writer, list);
-        //    }
-        //}
-
-        //public static void Write(JsonWriter writer, IList<TItem> list, IList<TItem> defaultList = null)
-        //{
-        //    if (list == null)
-        //    {
-        //        writer.WriteNull();
-        //        return;
-        //    }
-
-        //    writer.WriteStartArray();
-
-        //    for (int i = 0; i < list.Count; ++i)
-        //    {
-        //        writer.WriteValue(list[i]);
-        //    }
-
-        //    writer.WriteEndArray();
-        //}
     }
 }

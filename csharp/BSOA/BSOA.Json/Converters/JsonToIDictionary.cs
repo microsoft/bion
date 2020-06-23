@@ -58,33 +58,5 @@ namespace BSOA.Json.Converters
 
             writer.WriteEndObject();
         }
-
-        //public static void Write(JsonWriter writer, string propertyName, IDictionary<string, TValue> dictionary, IDictionary<string, TValue> defaultValue = null)
-        //{
-        //    if (dictionary?.Count > 0)
-        //    {
-        //        writer.WritePropertyName(propertyName);
-        //        Write(writer, dictionary);
-        //    }
-        //}
-
-        //public static void Write(JsonWriter writer, IDictionary<string, TValue> dictionary, IDictionary<string, TValue> defaultValue = null)
-        //{
-        //    if (dictionary == null)
-        //    {
-        //        writer.WriteNull();
-        //        return;
-        //    }
-
-        //    writer.WriteStartObject();
-
-        //    foreach (KeyValuePair<string, TValue> pair in dictionary)
-        //    {
-        //        writer.WritePropertyName(pair.Key);
-        //        writer.WriteValue(pair.Value);
-        //    }
-
-        //    writer.WriteEndObject();
-        //}
     }
 }

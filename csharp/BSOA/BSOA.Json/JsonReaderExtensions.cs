@@ -29,7 +29,7 @@ namespace Newtonsoft.Json
 
                 if (!setters.TryGetValue(propertyName, out var setter))
                 {
-                    throw new NotImplementedException($"Unknown property ArtifactContent.{propertyName}. Stopping.");
+                    throw new JsonReaderException($"Unknown property {typeof(TItem).Name}.{propertyName}.");
                 }
 
                 setter(reader, root, item);

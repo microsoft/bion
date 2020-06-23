@@ -12,11 +12,6 @@ namespace Microsoft.CodeAnalysis.Sarif
     /// </summary>
     internal partial class SarifLogDatabase : Database
     {
-        [ThreadStatic]
-        private static WeakReference<SarifLogDatabase> _lastCreated;
-
-        internal static SarifLogDatabase Current => (_lastCreated.TryGetTarget(out SarifLogDatabase value) ? value : new SarifLogDatabase());
-        
         internal SarifLogTable SarifLog { get; }
         internal AddressTable Address { get; }
         internal ArtifactTable Artifact { get; }
@@ -128,6 +123,19 @@ namespace Microsoft.CodeAnalysis.Sarif
             VersionControlDetails = AddTable(nameof(VersionControlDetails), new VersionControlDetailsTable(this));
             WebRequest = AddTable(nameof(WebRequest), new WebRequestTable(this));
             WebResponse = AddTable(nameof(WebResponse), new WebResponseTable(this));
+        }
+
+        [ThreadStatic]
+        private static WeakReference<SarifLogDatabase> _lastCreated;
+
+        internal static SarifLogDatabase Current
+        {
+            get
+            {
+                SarifLogDatabase db;
+                if (_lastCreated == null || !_lastCreated.TryGetTarget(out db)) { db = new SarifLogDatabase(); }
+                return db;
+            }
         }
     }
 }
