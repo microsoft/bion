@@ -10,7 +10,7 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
+  solution: 'csharp/BSOA/BSOA.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
@@ -31,3 +31,55 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: EsrpCodeSigning@1
+  inputs:
+    ConnectedServiceName: 'DevSecOps'
+    FolderPath: 'csharp/BSOA/bin'
+    Pattern: 'BSOA.dll,BSOA.Json.dll'
+    signConfigType: 'inlineSignParams'
+    inlineOperation: |
+      [
+        {
+          "keyCode": "CP-230012",
+          "operationSetCode": "SigntoolSign",
+          "parameters": [
+            {
+              "parameterName": "OpusName",
+              "parameterValue": "Microsoft"
+            },
+            {
+              "parameterName": "OpusInfo",
+              "parameterValue": "http://www.microsoft.com"
+            },
+            {
+              "parameterName": "PageHash",
+              "parameterValue": "/NPH"
+            },
+            {
+              "parameterName": "FileDigest",
+              "parameterValue": "/fd sha256"
+            },
+            {
+              "parameterName": "TimeStamp",
+              "parameterValue": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+            }
+          ],
+          "toolName": "signtool.exe",
+          "toolVersion": "6.2.9304.0"
+        }
+      ]
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    packagesToPack: 'csharp/BSOA/**/*.csproj'
+    nobuild: true
+    includesymbols: true
+    includesource: true
+    versioningScheme: 'off'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'csharp/BSOA/bin'
+    publishLocation: 'Container'
