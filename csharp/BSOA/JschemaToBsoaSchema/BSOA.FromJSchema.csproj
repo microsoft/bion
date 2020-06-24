@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>JSchemaToBsoaSchema</ToolCommandName>
+    <ToolCommandName>BSOA.FromJSchema</ToolCommandName>
   </PropertyGroup>
 
   <ItemGroup>
