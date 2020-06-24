@@ -1,7 +1,10 @@
-﻿using BSOA.Json;
-using BSOA.Test.Model.V2;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
+
+using BSOA.Json;
+using BSOA.Test.Model.V2;
 
 using Xunit;
 

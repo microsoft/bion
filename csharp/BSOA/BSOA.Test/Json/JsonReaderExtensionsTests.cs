@@ -1,9 +1,12 @@
-﻿using BSOA.Test.Model.V2;
-
-using Newtonsoft.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Diagnostics;
+
+using BSOA.Test.Model.V2;
+
+using Newtonsoft.Json;
 
 using Xunit;
 
