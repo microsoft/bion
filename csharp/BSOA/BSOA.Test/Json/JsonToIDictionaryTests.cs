@@ -1,11 +1,14 @@
-﻿using BSOA.Json.Converters;
-using BSOA.Model;
-
-using Newtonsoft.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using System.Text;
+
+using BSOA.Json.Converters;
+using BSOA.Model;
+
+using Newtonsoft.Json;
 
 using Xunit;
 

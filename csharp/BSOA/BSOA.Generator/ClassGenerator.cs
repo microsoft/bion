@@ -11,7 +11,7 @@ using BSOA.Generator.Schema;
 
 namespace BSOA.Generator
 {
-    public class CodeGenerator
+    public class ClassGenerator
     {
         public TemplateType Type { get; set; }
         public string Code { get; set; }
@@ -20,7 +20,7 @@ namespace BSOA.Generator
 
         public string OutputPathFormatString { get; set; }
 
-        public CodeGenerator(TemplateType type, string templateFilePath, string outputPathFormatString, Dictionary<string, string> postReplacements = null)
+        public ClassGenerator(TemplateType type, string templateFilePath, string outputPathFormatString, Dictionary<string, string> postReplacements = null)
         {
             Type = type;
             Code = File.ReadAllText(templateFilePath);
