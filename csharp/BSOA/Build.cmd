@@ -9,26 +9,23 @@ ECHO Build BSOA
 ECHO ==========
 dotnet build BSOA.sln -c Release
 
-::ECHO.
-::ECHO Test BSOA
-::ECHO =========
-::dotnet test BSOA.sln
+ECHO.
+ECHO Test BSOA
+ECHO =========
+dotnet test BSOA.sln
 
 ECHO.
 ECHO Build NuGet Packages
 ECHO ====================
-dotnet pack BSOA\BSOA.csproj -c Release -o "bin\NuGet" --include-symbols --no-build
-dotnet pack BSOA.Json\BSOA.Json.csproj -c Release -o "bin\NuGet" --include-symbols --no-build
-dotnet pack BSOA.Generator\BSOA.Generator.csproj -c Release -o "bin\NuGet" --include-symbols --no-build
-dotnet pack JschemaToBsoaSchema\JschemaToBsoaSchema.csproj -c Release -o "bin\NuGet" --include-symbols --no-build
+dotnet pack BSOA.sln -c Release -o "bin\NuGet" --include-symbols --include-source --no-build
 
 ECHO.
 ECHO Clearing BSOA from Local NuGet Cache
 ECHO ====================================
-RMDIR "%USERPROFILE%\.nuget\packages\bsoa" /S /Q
-RMDIR "%USERPROFILE%\.nuget\packages\bsoa.json" /S /Q
-RMDIR "%USERPROFILE%\.nuget\packages\bsoa.generator" /S /Q
-RMDIR "%USERPROFILE%\.nuget\packages\jschematobsoaschema" /S /Q
+FOR /F "delims=" %%C IN ('dir /b "%USERPROFILE%\.nuget\packages\bsoa*"') DO (
+    ECHO - "%USERPROFILE%\.nuget\packages\%%C
+    RMDIR "%USERPROFILE%\.nuget\packages\%%C" /S /Q
+)
 
 IF EXIST "%NuGetLocal%" (
   ECHO.

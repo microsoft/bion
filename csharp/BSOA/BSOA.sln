@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Json", "BSOA.Json\BSOA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Generator", "BSOA.Generator\BSOA.Generator.csproj", "{AD27E34A-5B7A-4CA5-8FA0-898F0ADDDE55}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JschemaToBsoaSchema", "JschemaToBsoaSchema\JschemaToBsoaSchema.csproj", "{047F6B6A-A3C6-45A9-90A3-51986B7F5F1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.FromJSchema", "JschemaToBsoaSchema\BSOA.FromJSchema.csproj", "{047F6B6A-A3C6-45A9-90A3-51986B7F5F1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

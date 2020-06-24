@@ -8,10 +8,11 @@ using System.IO;
 using BSOA.Generator.Extensions;
 using BSOA.Generator.Schema;
 using BSOA.Json;
+using SColumn = BSOA.Generator.Schema.Column;
 
 using Microsoft.Json.Schema;
 
-namespace JschemaToBsoaSchema
+namespace BSOA.FromJSchema
 {
     class Program
     {
@@ -34,40 +35,58 @@ namespace JschemaToBsoaSchema
             ["ReportingConfigurationLevel"] = "FailureLevel"
         };
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            string jschemaPath = (args.Length > 0 ? args[0] : @"C:\Code\sarif-sdk\src\Sarif\Schemata\sarif-2.1.0-rtm.5.json");
-            string outputPath = (args.Length > 1 ? args[1] : @"..\..\..\..\BSOA.Generator\Schemas\Sarif-2.1.0-rtm.5.schema.json");
-
-            Console.WriteLine($"Converting jschema\r\n  '{jschemaPath}' to \r\n  '{outputPath}'...");
-            JsonSchema schema = null;
-
-            using (StreamReader sr = File.OpenText(jschemaPath))
+            if(args.Length < 4)
             {
-                schema = SchemaReader.ReadSchema(sr, jschemaPath);
+                Console.WriteLine("Usage: BSOA.FromJSchema <JSchemaPath> <OutputBsoaSchemaPath> <RootTypeName> <OutputNamespace>");
+                return -2;
             }
 
-            schema = JsonSchema.Collapse(schema);
-
-            Database db = new Database("SarifLogDatabase", "Microsoft.CodeAnalysis.Sarif", "SarifLog");
-
-            Table root = new Table("SarifLog");
-            db.Tables.Add(root);
-            AddColumns(root, schema);
-
-            foreach (KeyValuePair<string, JsonSchema> type in schema.Definitions)
+            try
             {
-                string tableName = type.Key.ToPascalCase();
-                if (TypeRenames.TryGetValue(tableName, out string renamed)) { tableName = renamed; }
+                string jschemaPath = args[0];
+                string outputPath = args[1];
+                string rootTypeName = args[2];
+                string outputNamespace = args[3];
 
-                Table table = new Table(tableName);
-                AddColumns(table, type.Value);
-                db.Tables.Add(table);
+                Console.WriteLine($"Converting jschema\r\n  '{jschemaPath}' to \r\n  '{outputPath}'...");
+                JsonSchema schema = null;
+
+                using (StreamReader sr = File.OpenText(jschemaPath))
+                {
+                    schema = SchemaReader.ReadSchema(sr, jschemaPath);
+                }
+
+                schema = JsonSchema.Collapse(schema);
+
+                Database db = new Database($"{rootTypeName}Database", outputNamespace, rootTypeName);
+
+                Table root = new Table(rootTypeName);
+                db.Tables.Add(root);
+                AddColumns(root, schema);
+
+                foreach (KeyValuePair<string, JsonSchema> type in schema.Definitions)
+                {
+                    string tableName = type.Key.ToPascalCase();
+                    if (TypeRenames.TryGetValue(tableName, out string renamed)) { tableName = renamed; }
+
+                    Table table = new Table(tableName);
+                    AddColumns(table, type.Value);
+                    db.Tables.Add(table);
+                }
+
+                AsJson.Save(outputPath, db, verbose: true);
+                Console.WriteLine("Done.");
+                Console.WriteLine();
+
+                return 0;
             }
-
-            AsJson.Save(outputPath, db, verbose: true);
-            Console.WriteLine("Done.");
-            Console.WriteLine();
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR: {ex}");
+                return -1;
+            }
         }
 
         static void AddColumns(Table table, JsonSchema schema)
@@ -80,7 +99,7 @@ namespace JschemaToBsoaSchema
             }
         }
 
-        static Column ToColumn(string tableName, string columnName, JsonSchema schema)
+        static SColumn ToColumn(string tableName, string columnName, JsonSchema schema)
         {
             SchemaType type = schema.SafeGetType();
             string defaultValue = schema.Default?.ToString();
@@ -88,59 +107,59 @@ namespace JschemaToBsoaSchema
 
             if (columnName == "Properties")
             {
-                return Column.Simple("Properties", "IDictionary<String, SerializedPropertyInfo>");
+                return SColumn.Simple("Properties", "IDictionary<String, SerializedPropertyInfo>");
             }
 
             switch (type)
             {
                 case SchemaType.Boolean:
-                    return Column.Simple(columnName, "bool", defaultValue?.ToLowerInvariant());
+                    return SColumn.Simple(columnName, "bool", defaultValue?.ToLowerInvariant());
                 case SchemaType.Integer:
-                    return Column.Simple(columnName, "int", defaultValue);
+                    return SColumn.Simple(columnName, "int", defaultValue);
                 case SchemaType.Number:
-                    return Column.Simple(columnName, "double", defaultValue);
+                    return SColumn.Simple(columnName, "double", defaultValue);
                 case SchemaType.String:
                     if (schema.Format == "uri" || schema.Format == "uri-reference")
                     {
-                        return Column.Simple(columnName, "Uri");
+                        return SColumn.Simple(columnName, "Uri");
                     }
                     else if (schema.Format == "date-time")
                     {
-                        return Column.Simple(columnName, "DateTime");
+                        return SColumn.Simple(columnName, "DateTime");
                     }
                     else
                     {
                         if (defaultValue != null) { defaultValue = "\"" + defaultValue + "\""; }
-                        return Column.Simple(columnName, "String", defaultValue);
+                        return SColumn.Simple(columnName, "String", defaultValue);
                     }
                 case SchemaType.Object:
                     if (schema.Reference != null)
                     {
                         string refType = schema.Reference.GetDefinitionName().ToPascalCase();
                         if (TypeRenames.TryGetValue(refType, out string renamed)) { refType = renamed; }
-                        return Column.Ref(columnName, refType);
+                        return SColumn.Ref(columnName, refType);
                     }
                     else
                     {
                         string valueType = ToColumn(tableName, columnName, schema.AdditionalProperties.Schema).Type;
-                        return Column.Simple(columnName, $"IDictionary<String, {valueType}>");
+                        return SColumn.Simple(columnName, $"IDictionary<String, {valueType}>");
                     }
                 case SchemaType.Array:
-                    Column itemType = ToColumn(tableName, columnName, schema.Items.Schema);
+                    SColumn itemType = ToColumn(tableName, columnName, schema.Items.Schema);
 
                     if (itemType.Category == ColumnTypeCategory.Enum)
                     {
                         // NOTE: DefaultValue not translated for FlagsEnum
                         string enumType = itemType.Type;
-                        return Column.Enum(columnName, enumType, "int", $"default({enumType})");
+                        return SColumn.Enum(columnName, enumType, "int", $"default({enumType})");
                     }
                     else if (itemType.ReferencedTableName != null)
                     {
-                        return Column.RefList(columnName, itemType.ReferencedTableName);
+                        return SColumn.RefList(columnName, itemType.ReferencedTableName);
                     }
                     else
                     {
-                        return Column.Simple(columnName, $"IList<{itemType.Type}>");
+                        return SColumn.Simple(columnName, $"IList<{itemType.Type}>");
                     }
                 case SchemaType.None:
                     if (schema.Enum != null)
@@ -157,7 +176,7 @@ namespace JschemaToBsoaSchema
                             defaultValue = $"{enumType}.{defaultValue.ToPascalCase()}";
                         }
 
-                        return Column.Enum(columnName, enumType, "int", defaultValue);
+                        return SColumn.Enum(columnName, enumType, "int", defaultValue);
                     }
 
                     break;
