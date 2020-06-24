@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using BSOA.Extensions;
-using BSOA.IO;
-
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+
+using BSOA.Extensions;
+using BSOA.IO;
 
 using Xunit;
 
