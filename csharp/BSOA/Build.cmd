@@ -19,12 +19,16 @@ ECHO Build NuGet Packages
 ECHO ====================
 dotnet pack BSOA\BSOA.csproj -c Release -o "bin\NuGet" --include-symbols --no-build
 dotnet pack BSOA.Json\BSOA.Json.csproj -c Release -o "bin\NuGet" --include-symbols --no-build
+dotnet pack BSOA.Generator\BSOA.Generator.csproj -c Release -o "bin\NuGet" --include-symbols --no-build
+dotnet pack JschemaToBsoaSchema\JschemaToBsoaSchema.csproj -c Release -o "bin\NuGet" --include-symbols --no-build
 
 ECHO.
 ECHO Clearing BSOA from Local NuGet Cache
 ECHO ====================================
 RMDIR "%USERPROFILE%\.nuget\packages\bsoa" /S /Q
 RMDIR "%USERPROFILE%\.nuget\packages\bsoa.json" /S /Q
+RMDIR "%USERPROFILE%\.nuget\packages\bsoa.generator" /S /Q
+RMDIR "%USERPROFILE%\.nuget\packages\jschematobsoaschema" /S /Q
 
 IF EXIST "%NuGetLocal%" (
   ECHO.
