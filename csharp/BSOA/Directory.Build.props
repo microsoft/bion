@@ -8,6 +8,18 @@
 
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Microsoft.ManagedKey.snk</AssemblyOriginatorKeyFile>
+
+    <Company Condition=" '$(Company)' == '' ">Microsoft</Company>
+    <Product Condition=" '$(Product)' == '' ">Microsoft BSOA</Product>
+    <Copyright Condition=" '$(Copyright)' == '' ">© Microsoft Corporation. All rights reserved.</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package">
+    <Title>$(AssemblyTitle)</Title>
+    <Authors>$(Company)</Authors>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Microsoft/bion</PackageProjectUrl>
   </PropertyGroup>
 
 </Project>
