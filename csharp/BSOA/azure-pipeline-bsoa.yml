@@ -36,7 +36,7 @@ steps:
   inputs:
     ConnectedServiceName: 'DevSecOps'
     FolderPath: 'csharp/BSOA/bin'
-    Pattern: 'BSOA.dll,BSOA.Json.dll'
+    Pattern: 'BSOA.dll,BSOA.Json.dll,BSOA.Generator.*,BSOA.FromJSchema.*'
     signConfigType: 'inlineSignParams'
     inlineOperation: |
       [
@@ -69,6 +69,7 @@ steps:
           "toolVersion": "6.2.9304.0"
         }
       ]
+      
 - task: DotNetCoreCLI@2
   inputs:
     command: 'pack'
