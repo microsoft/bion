@@ -36,7 +36,7 @@ steps:
   inputs:
     ConnectedServiceName: 'DevSecOps'
     FolderPath: 'csharp/BSOA/bin'
-    Pattern: 'BSOA.dll,BSOA.Json.dll,BSOA.Generator.*,BSOA.FromJSchema.*'
+    Pattern: 'BSOA.dll,BSOA.Json.dll,BSOA.Generator.exe,BSOA.Generator.dll,BSOA.FromJSchema.exe,BSOA.FromJSchema.dll'
     signConfigType: 'inlineSignParams'
     inlineOperation: |
       [
