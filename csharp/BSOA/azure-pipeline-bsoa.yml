@@ -32,6 +32,16 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
+# Pack to ensure Tool variant binaries pre-built
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    packagesToPack: 'csharp/BSOA/**/*.csproj'
+    nobuild: true
+    includesymbols: true
+    includesource: true
+    versioningScheme: 'off'
+
 - task: EsrpCodeSigning@1
   inputs:
     ConnectedServiceName: 'DevSecOps'
