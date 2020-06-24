@@ -1,0 +1,90 @@
+{
+  "name": "TinyDatabase",
+  "namespace": "BSOA.Demo.Model",
+  "rootTableName": "TinyLog",
+  "tables": [
+    {
+      "name": "ArtifactContent",
+      "columns": [
+        {
+          "name": "Text",
+          "type": "string",
+          "default": "null"
+        },
+        {
+          "name": "Binary",
+          "type": "string",
+          "default": "null"
+        }
+      ]
+    },
+    {
+      "name": "Message",
+      "columns": [
+        {
+          "name": "Text",
+          "type": "string",
+          "default": "null"
+        },
+        {
+          "name": "Markdown",
+          "type": "string",
+          "default": "null"
+        },
+        {
+          "name": "Id",
+          "type": "string",
+          "default": "null"
+        }
+      ]
+    },
+    {
+      "name": "Region",
+      "columns": [
+        {
+          "name": "StartLine",
+          "type": "int",
+          "default": "0"
+        },
+        {
+          "name": "StartColumn",
+          "type": "int",
+          "default": "0"
+        },
+        {
+          "name": "EndLine",
+          "type": "int",
+          "default": "0"
+        },
+        {
+          "name": "EndColumn",
+          "type": "int",
+          "default": "0"
+        },
+        {
+          "category": "Ref",
+          "name": "Snippet",
+          "type": "ArtifactContent",
+          "referencedTableName": "ArtifactContent"
+        },
+        {
+          "category": "Ref",
+          "name": "Message",
+          "type": "Message",
+          "referencedTableName": "Message"
+        }
+      ]
+    },
+    {
+      "name": "TinyLog",
+      "columns": [
+        {
+          "category": "RefList",
+          "name": "Regions",
+          "type": "IList<Region>",
+          "referencedTableName": "Region"
+        }
+      ]
+    }
+  ]
+}

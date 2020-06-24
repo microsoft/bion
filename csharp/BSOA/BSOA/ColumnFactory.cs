@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using BSOA.Model;
 
@@ -30,18 +29,25 @@ namespace BSOA.Column
             [typeof(char)] = (defaultValue) => new NumberColumn<char>((char)(defaultValue ?? default(char))),
         };
 
-        public static IColumn<T> Build<T>()
+        public static IColumn<T> BuildTyped<T>(T defaultValue = default, Func<Type, object, IColumn> recurseTo = null)
         {
-            return (IColumn<T>)Build(typeof(T), default(T));
+            return (IColumn<T>)Build(typeof(T), defaultValue, recurseTo);
         }
 
-        public static IColumn<T> Build<T>(T defaultValue)
+        public static IColumn Build(Type type)
         {
-            return (IColumn<T>)Build(typeof(T), defaultValue);
+            return Build(type, defaultValue: null, recurseTo: null);
         }
 
         public static IColumn Build(Type type, object defaultValue)
         {
+            return Build(type, defaultValue: defaultValue, recurseTo: null);
+        }
+
+        public static IColumn Build(Type type, object defaultValue, Func<Type, object, IColumn> recurseTo)
+        {
+            if (recurseTo == null) { recurseTo = Build; }
+
             if (Builders.TryGetValue(type, out Func<object, IColumn> creator))
             {
                 return creator(defaultValue);
@@ -49,7 +55,7 @@ namespace BSOA.Column
 
             if (type.IsEnum)
             {
-                throw new NotImplementedException($"Can't create EnumColumn via builder because can't generically define converting Funcs.");
+                throw new NotSupportedException($"Enums should use a NumberColumn of the underlying type and be casted to and from the enum type in the property getter/setter.");
             }
 
             if (type.IsGenericType)
@@ -59,27 +65,27 @@ namespace BSOA.Column
 
                 if (genericType == typeof(IList<>))
                 {
-                    return BuildList(typeArguments[0]);
+                    return BuildList(typeArguments[0], recurseTo);
                 }
                 else if (genericType == typeof(IDictionary<,>))
                 {
-                    return BuildDictionary(typeArguments[0], typeArguments[1]);
+                    return BuildDictionary(typeArguments[0], typeArguments[1], recurseTo);
                 }
             }
 
             throw new NotImplementedException($"ColumnFactory doesn't know how to build an IColumn<{type.Name}>.");
         }
 
-        private static IColumn BuildList(Type itemType)
+        private static IColumn BuildList(Type itemType, Func<Type, object, IColumn> recurseTo)
         {
-            IColumn innerColumn = Build(itemType, null);
+            IColumn innerColumn = recurseTo(itemType, null);
             return (IColumn)(typeof(ListColumn<>).MakeGenericType(itemType).GetConstructor(new[] { typeof(IColumn) }).Invoke(new[] { innerColumn }));
         }
 
-        private static IColumn BuildDictionary(Type keyType, Type valueType)
+        private static IColumn BuildDictionary(Type keyType, Type valueType, Func<Type, object, IColumn> recurseTo)
         {
-            IColumn keyColumn = WrapInDistinct(Build(keyType, null), null);
-            IColumn valueColumn = Build(valueType, null);
+            IColumn keyColumn = WrapInDistinct(recurseTo(keyType, null), null);
+            IColumn valueColumn = recurseTo(valueType, null);
             return (IColumn)(typeof(DictionaryColumn<,>).MakeGenericType(keyType, valueType).GetConstructor(new[] { typeof(IColumn), typeof(IColumn) }).Invoke(new[] { keyColumn, valueColumn }));
         }
 

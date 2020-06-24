@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 using BSOA.IO;
 using BSOA.Model;
@@ -17,9 +18,12 @@ namespace BSOA.Test.Model.V2
         private CommunityTable _table;
         private int _index;
 
+        internal PersonDatabase Database => _table.Database;
+        public ITreeSerializable DB => _table.Database;
+
         public Community() : this(new PersonDatabase().Community)
         { }
-        
+
         internal Community(CommunityTable table) : this(table, table.Count)
         {
             table.Add();
@@ -95,14 +99,56 @@ namespace BSOA.Test.Model.V2
         ITable IRow.Table => _table;
         int IRow.Index => _index;
 
-        void IRow.Reset(ITable table, int index)
+        void IRow.Next()
         {
-            _table = (CommunityTable)table;
-            _index = index;
+            _index++;
         }
         #endregion
 
-        internal PersonDatabase Database => _table.Database;
-        public ITreeSerializable DB => _table.Database;
+        #region Easy Serialization
+        public void WriteBsoa(Stream stream)
+        {
+            using (BinaryTreeWriter writer = new BinaryTreeWriter(stream))
+            {
+                DB.Write(writer);
+            }
+        }
+
+        public void WriteBsoa(string filePath)
+        {
+            WriteBsoa(File.Create(filePath));
+        }
+
+        public static Community ReadBsoa(Stream stream)
+        {
+            using (BinaryTreeReader reader = new BinaryTreeReader(stream))
+            {
+                Community result = new Community();
+                result.DB.Read(reader);
+                return result;
+            }
+        }
+
+        public static Community ReadBsoa(string filePath)
+        {
+            return ReadBsoa(File.OpenRead(filePath));
+        }
+
+        public static TreeDiagnostics Diagnostics(string filePath)
+        {
+            return Diagnostics(File.OpenRead(filePath));
+        }
+
+        public static TreeDiagnostics Diagnostics(Stream stream)
+        {
+            using (BinaryTreeReader btr = new BinaryTreeReader(stream))
+            using (TreeDiagnosticsReader reader = new TreeDiagnosticsReader(btr))
+            {
+                Community result = new Community();
+                result.DB.Read(reader);
+                return reader.Tree;
+            }
+        }
+        #endregion
     }
 }

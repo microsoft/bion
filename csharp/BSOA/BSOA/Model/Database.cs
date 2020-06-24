@@ -1,8 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 
+using BSOA.Column;
 using BSOA.IO;
 
 namespace BSOA.Model
@@ -24,6 +26,16 @@ namespace BSOA.Model
         {
             Tables[name] = table;
             return table;
+        }
+
+        public IColumn<T> BuildColumn<T>(string tableName, string columnName, T defaultValue = default)
+        {
+            return (IColumn<T>)BuildColumn(tableName, columnName, typeof(T), defaultValue);
+        }
+
+        public virtual IColumn BuildColumn(string tableName, string columnName, Type type, object defaultValue = null)
+        {
+            return ColumnFactory.Build(type, defaultValue);
         }
 
         /// <summary>

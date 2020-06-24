@@ -18,7 +18,7 @@ namespace BSOA.Collections
     ///  NumberList therefore "points" to a row index in the column and retrieves the current slice on use.
     ///  NumberList persists each Count change back to the column immediately.
     /// </remarks>
-    public class NumberList<T> : IList<T>, IReadOnlyList<T> where T : unmanaged
+    public class NumberList<T> : IList<T>, IReadOnlyList<T> where T : unmanaged, IEquatable<T>
     {
         private const int MinimumSize = 16;
 

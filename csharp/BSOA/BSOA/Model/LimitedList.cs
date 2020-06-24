@@ -45,9 +45,12 @@ namespace BSOA.Model
 
         public virtual void Swap(int index1, int index2)
         {
-            T value1 = this[index1];
-            this[index1] = this[index2];
-            this[index2] = value1;
+            if (index1 != index2)
+            {
+                T value1 = this[index1];
+                this[index1] = this[index2];
+                this[index2] = value1;
+            }
         }
 
         public virtual void CopyItem(int toIndex, ILimitedList fromList, int fromIndex)

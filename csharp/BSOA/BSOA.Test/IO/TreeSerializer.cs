@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 
 using BSOA.IO;
@@ -273,7 +274,10 @@ namespace BSOA.Test.Components
                 if (!settings.LeaveStreamOpen)
                 {
                     // Verify stream disposed
-                    Assert.Throws<ObjectDisposedException>(() => stream.Position);
+                    if (!Debugger.IsAttached)
+                    {
+                        Assert.Throws<ObjectDisposedException>(() => stream.Position);
+                    }
                 }
                 else
                 {
@@ -304,7 +308,10 @@ namespace BSOA.Test.Components
                 if (!settings.LeaveStreamOpen)
                 {
                     // Verify stream disposed
-                    Assert.Throws<ObjectDisposedException>(() => stream.Position);
+                    if (!Debugger.IsAttached)
+                    {
+                        Assert.Throws<ObjectDisposedException>(() => stream.Position);
+                    }
                 }
                 else
                 {

@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 using BSOA.Generator.Extensions;
+using BSOA.Generator.Schema;
 
 namespace BSOA.Generator
 {
@@ -103,36 +105,41 @@ namespace BSOA.Generator
         public static string Populate(string template, Schema.Column columnInTemplate, Schema.Column column)
         {
             // Populate by replacing default values.
-
-            // Replace type, default, table name first to avoid string.Replace errors 
-            // if the column name or type is contained within those values.
-            string populated = template;
+            List<Tuple<string, string>> replacements = new List<Tuple<string, string>>();
 
             if (columnInTemplate.UnderlyingType != null)
             {
-                populated = ReplaceTerm(populated, columnInTemplate.UnderlyingType, column.UnderlyingType);
+                replacements.Add(new Tuple<string, string>(columnInTemplate.UnderlyingType, column.UnderlyingType));
             }
 
             if (columnInTemplate.Default != null)
             {
-                populated = ReplaceTerm(populated, columnInTemplate.Default, column.Default ?? "");
+                replacements.Add(new Tuple<string, string>(columnInTemplate.Default, column.Default ?? "default"));
             }
 
             if (columnInTemplate.ReferencedTableName != null)
             {
-                populated = ReplaceTerm(populated, columnInTemplate.ReferencedTableName, column.ReferencedTableName);
+                replacements.Add(new Tuple<string, string>(columnInTemplate.ReferencedTableName, column.ReferencedTableName));
             }
 
-            populated = ReplaceTerm(populated, columnInTemplate.Type, column.Type);
-            populated = ReplaceTerm(populated, columnInTemplate.Name, column.Name);
-            populated = ReplaceTerm(populated, columnInTemplate.Name.ToCamelCase(), column.Name.ToCamelCase());
+            replacements.Add(new Tuple<string, string>(columnInTemplate.Type, column.Type));
+            replacements.Add(new Tuple<string, string>(columnInTemplate.Type.ToPascalCase(), column.Type.ToPascalCase()));
+            replacements.Add(new Tuple<string, string>(columnInTemplate.Name, column.Name));
+            replacements.Add(new Tuple<string, string>(columnInTemplate.Name.ToCamelCase(), column.Name.ToCamelCase()));
+
+            // Sort by length descending
+            replacements.Sort((left, right) => -left.Item1.Length.CompareTo(right.Item1.Length));
+
+            // Turn template into a format string
+            string escaped = template.Replace("{", "{{").Replace("}", "}}");
+            for (int i = 0; i < replacements.Count; ++i)
+            {
+                escaped = escaped.Replace(replacements[i].Item1, $"{{{i}}}");
+            }
+
+            string populated = string.Format(escaped, replacements.Select(tuple => tuple.Item2).ToArray());
 
             return populated;
-        }
-
-        private static string ReplaceTerm(string content, string token, string replacement)
-        {
-            return Regex.Replace(content, $"\\b{Regex.Escape(token)}\\b", replacement);
         }
 
         public static string MakeReplacements(string code, Dictionary<string, string> replacements)

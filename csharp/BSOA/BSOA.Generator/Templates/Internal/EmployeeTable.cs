@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 using BSOA.Column;
 using BSOA.Model;
@@ -21,7 +21,7 @@ namespace BSOA.Generator.Templates
         {
             Database = database;
 
-            Name = AddColumn(nameof(Name), new StringColumn());
+            Name = AddColumn(nameof(Name), database.BuildColumn<string>(nameof(Employee), nameof(Name)));
         }
 
         public override Employee Get(int index)

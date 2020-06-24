@@ -25,7 +25,7 @@ namespace BSOA.Column
     ///  The overall column uses longs for large values and chapter positions, allowing the column to be over 4 GB.
     /// </remarks>
     /// <typeparam name="T">Type of each part of Values (if each value is a string, this type is char)</typeparam>
-    internal class ArraySliceChapter<T> : ITreeSerializable where T : unmanaged
+    internal class ArraySliceChapter<T> : ITreeSerializable where T : unmanaged, IEquatable<T>
     {
         private static int[] PageStartDefault = new int[1] { 0 };
 
@@ -218,18 +218,18 @@ namespace BSOA.Column
                 // If there are any non-empty values, write the text and end positions
                 writer.WriteBlockArray(Names.ValueEnd, _valueEndInPage);
                 writer.WriteBlockArray(Names.SmallValues, _smallValueArray);
+
+                // If there is more than one page, write page starts
+                int pages = (Count / PageRowCount) + 1;
+                if (pages > 1)
+                {
+                    writer.WriteBlockArray(Names.PageStart, _pageStartInChapter);
+                }
             }
             else if (Count > 0)
             {
                 // If there is no text but a non-zero count, we must preserve the count
                 writer.Write(Names.Count, Count);
-            }
-
-            // If there is more than one page, write page starts
-            int pages = ((_lastNonEmptyIndex + 1) / PageRowCount) + 1;
-            if (pages > 1)
-            {
-                writer.WriteBlockArray(Names.PageStart, _pageStartInChapter, 0, pages);
             }
 
             // If there are any large values, write them

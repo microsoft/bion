@@ -16,7 +16,7 @@ namespace BSOA.Column
     ///  ushort, short, uint, int, ulong, long, float, double.
     /// </summary>
     /// <typeparam name="T">Numeric Type of column values</typeparam>
-    public class NumberColumn<T> : LimitedList<T>, IColumn<T>, INumberColumn<T> where T : unmanaged
+    public class NumberColumn<T> : LimitedList<T>, IColumn<T>, INumberColumn<T> where T : unmanaged, IEquatable<T>
     {
         private T _defaultValue;
         private T[] _array;

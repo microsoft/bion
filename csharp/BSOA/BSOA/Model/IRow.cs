@@ -13,8 +13,8 @@ namespace BSOA.Model
         ITable Table { get; }
         int Index { get; }
 
-        // Reset this instance to refer to another row.
+        // Reset this instance to refer to the next item in the table.
         // This provides a way to set up many instances without allocation for each.
-        void Reset(ITable table, int index);
+        void Next();
     }
 }

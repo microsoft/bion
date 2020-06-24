@@ -10,7 +10,7 @@ using BSOA.IO;
 
 namespace BSOA.Collections
 {
-    public struct ArraySlice<T> : IReadOnlyList<T>, ITreeSerializable where T : unmanaged
+    public struct ArraySlice<T> : IReadOnlyList<T>, ITreeSerializable, IEquatable<ArraySlice<T>> where T : unmanaged, IEquatable<T>
     {
         public T[] Array { get; private set; }
         public int Index { get; private set; }
@@ -27,13 +27,13 @@ namespace BSOA.Collections
             if (length < 0) { length = array.Length - index; }
             if (index < 0 || index > array.Length) { throw new ArgumentOutOfRangeException("index"); }
             if (index + length > array.Length) { throw new ArgumentOutOfRangeException("length"); }
-            
+
             Array = array;
             Index = index;
             Count = length;
             IsExpandable = isExpandable;
         }
-        
+
         public void CopyTo(T[] other, int toIndex)
         {
             if (Count > 0)
@@ -78,12 +78,38 @@ namespace BSOA.Collections
 
         public override int GetHashCode()
         {
-            return ReadOnlyListExtensions.GetHashCode(this);
+            int hashCode = 17;
+
+            for (int i = 0; i < Count; ++i)
+            {
+                hashCode = unchecked(hashCode * 31) + Array[Index + i].GetHashCode();
+            }
+
+            return hashCode;
         }
 
         public override bool Equals(object obj)
         {
-            return ReadOnlyListExtensions.AreEqual(this, obj as IReadOnlyList<T>);
+            if (obj is ArraySlice<T>)
+            {
+                return Equals((ArraySlice<T>)obj);
+            }
+            else
+            {
+                return ReadOnlyListExtensions.AreEqual(this, obj as IReadOnlyList<T>);
+            }
+        }
+
+        public bool Equals(ArraySlice<T> other)
+        {
+            if (this.Count != other.Count) { return false; }
+
+            for (int i = 0; i < Count; ++i)
+            {
+                if (!Array[Index + i].Equals(other.Array[other.Index + i])) { return false; }
+            }
+
+            return true;
         }
 
         public static bool operator ==(ArraySlice<T> left, ArraySlice<T> right)

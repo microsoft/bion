@@ -12,7 +12,7 @@ namespace BSOA
     ///  to enable garbage collection.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IRemapper<T> where T : unmanaged
+    public interface IRemapper<T> where T : unmanaged, IEquatable<T>
     {
         // Remove all values found in slice from vector (to find remaining unused values)
         void RemoveValues(ArraySlice<T> slice, BitVector vector);
@@ -23,7 +23,7 @@ namespace BSOA
 
     public static class RemapperFactory
     {
-        public static IRemapper<T> Build<T>() where T : unmanaged
+        public static IRemapper<T> Build<T>() where T : unmanaged, IEquatable<T>
         {
             if (typeof(T) == typeof(int)) { return (IRemapper<T>)IntRemapper.Instance; }
             if (typeof(T) == typeof(byte)) { return (IRemapper<T>)ByteRemapper.Instance; }

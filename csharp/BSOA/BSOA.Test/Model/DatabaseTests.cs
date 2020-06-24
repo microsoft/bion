@@ -32,9 +32,7 @@ namespace BSOA.Test.Model
             TreeDiagnostics diagnostics = TreeSerializer.Diagnostics(community.DB, () => new V1.Community().DB, TreeFormat.Binary);
 
             // Verify table and column names in diagnostics
-            StringBuilder textBuilder = new StringBuilder();
-            diagnostics.Write(new StringWriter(textBuilder), -1);
-            string text = textBuilder.ToString();
+            string text = diagnostics.ToString();
             Assert.Contains("Person", text);
             Assert.Contains("Age", text);
             Assert.Contains("Name", text);
@@ -107,13 +105,7 @@ namespace BSOA.Test.Model
         public void Database_NewtonsoftCompatibility()
         {
             // Test that basic Database, Table, and Row types can successfully roundtrip via Newtonsoft.Json serialization by default.
-
-            // This requires:
-            //  - Root element exposes collections reaching everything
-            //  - Items have empty constructors
-            //  - Collections support Add(T item)
-            //  - Item empty constructor chooses the right Database/Table or cross-table copy works correctly.
-            //  - Item properties are settable and types are understandable to Newtonsoft.Json.
+            // These use generated JsonConverter classes to serialize using safe constructors and good default behaviors.
 
             V1.Community v1 = new V1.Community();
             v1.People.Add(new V1.Person() { Age = 39, Name = "Scott" });

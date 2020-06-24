@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Linq;
 
 using BSOA.Collections;
@@ -11,12 +12,12 @@ namespace BSOA
 {
     public class GarbageCollector
     {
-        public static bool Collect<T, U>(INumberColumn<T> indices, IColumn<U> values) where T : unmanaged
+        public static bool Collect<T, U>(INumberColumn<T> indices, IColumn<U> values) where T : unmanaged, IEquatable<T>
         {
             return Collect(indices, values, new BitVector(true, values.Count));
         }
 
-        public static bool Collect<T, U>(INumberColumn<T> indices, IColumn<U> values, BitVector unusedValues) where T : unmanaged
+        public static bool Collect<T, U>(INumberColumn<T> indices, IColumn<U> values, BitVector unusedValues) where T : unmanaged, IEquatable<T>
         {
             IRemapper<T> remapper = RemapperFactory.Build<T>();
 

@@ -47,7 +47,7 @@ namespace BSOA.Extensions
         {
             // Negative count means write the rest of the array
             if (array == null) { count = 0; }
-            if (count < 0) { count = array?.Length - index ?? 0; }
+            if (count < 0) { count = array.Length - index; }
 
             int elementSize = SizeOf(typeof(T));
             int byteOffset = index * elementSize;

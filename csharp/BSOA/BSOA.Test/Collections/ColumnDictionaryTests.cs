@@ -101,6 +101,8 @@ namespace BSOA.Test.Collections
             Assert.False(row == ColumnDictionary<string, string>.Empty);
             Assert.True(ColumnDictionary<string, string>.Empty != row);
             Assert.False(row2 != row);
+            Assert.True((ColumnDictionary<string, string>)null == null);
+            Assert.False((ColumnDictionary<string, string>)null != null);
 
             // GetHashCode (order-independent)
             Assert.Equal(row.GetHashCode(), row2.GetHashCode());

@@ -27,7 +27,7 @@ namespace BSOA.Column
     ///  Each row records the page-relative start position of the value only.
     /// </remarks>
     /// <typeparam name="T">Type of each element of Values (for StringColumn, T is char)</typeparam>
-    public class ArraySliceColumn<T> : LimitedList<ArraySlice<T>>, IColumn<ArraySlice<T>>, INumberColumn<T> where T : unmanaged
+    public class ArraySliceColumn<T> : LimitedList<ArraySlice<T>>, IColumn<ArraySlice<T>>, INumberColumn<T> where T : unmanaged, IEquatable<T>
     {
         private int _count;
         private List<ArraySliceChapter<T>> _chapters;

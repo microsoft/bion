@@ -24,7 +24,7 @@ namespace BSOA.Column
         private NumberColumn<byte> _indices;
         private bool _requiresTrim;
 
-        public DistinctColumn(IColumn<T> values, T defaultValue)
+        public DistinctColumn(IColumn<T> values, T defaultValue = default)
         {
             _defaultValue = defaultValue;
             _values = values;

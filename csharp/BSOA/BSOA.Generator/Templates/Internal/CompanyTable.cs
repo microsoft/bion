@@ -26,8 +26,8 @@ namespace BSOA.Generator.Templates
         {
             Database = database;
 
-            Id = AddColumn(nameof(Id), ColumnFactory.Build<long>(99));
-            JoinPolicy = AddColumn(nameof(JoinPolicy), ColumnFactory.Build<byte>((byte)SecurityPolicy.Open));
+            Id = AddColumn(nameof(Id), database.BuildColumn<long>(nameof(Company), nameof(Id), 99));
+            JoinPolicy = AddColumn(nameof(JoinPolicy), database.BuildColumn<byte>(nameof(Company), nameof(JoinPolicy), (byte)SecurityPolicy.Open));
             Owner = AddColumn(nameof(Owner), new RefColumn(nameof(CompanyDatabase.Employee)));
             Members = AddColumn(nameof(Members), new RefListColumn(nameof(CompanyDatabase.Employee)));
             Teams = AddColumn(nameof(Teams), new RefListColumn(nameof(CompanyDatabase.Team)));
