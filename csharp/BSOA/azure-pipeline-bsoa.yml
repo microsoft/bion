@@ -18,15 +18,15 @@ variables:
 steps:
 
 - task: DotNetCoreCLI@2
+  displayName: 'dotnet build'
   inputs:
-    displayName: 'dotnet build'
     command: 'build'
     projects: '$(solution)'
     arguments: '-c $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  displayName: 'dotnet test'
   inputs:
-    displayName: 'dotnet test'
     command: 'test'
     projects: '$(solution)'
     arguments: '-c $(buildConfiguration)'
@@ -70,10 +70,10 @@ steps:
       ]
       
 - task: DotNetCoreCLI@2
+  displayName: 'dotnet pack'
   inputs:
-    displayName: 'dotnet pack'
     command: 'pack'
-    packagesToPack: '(solution)'
+    packagesToPack: 'csharp/BSOA/**/*.csproj'
     arguments: '-c $(buildConfiguration) -o $(outFolder)\NuGet'
     nobuild: true
     includesymbols: true
