@@ -21,7 +21,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(solution)'
-    configuration: '$(buildConfiguration)'
+    arguments: '-c $(buildConfiguration)'
 
 - task: PublishBuildArtifacts@1
   inputs:
