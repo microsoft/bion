@@ -19,12 +19,14 @@ steps:
 
 - task: DotNetCoreCLI@2
   inputs:
+    displayName: 'dotnet build'
     command: 'build'
     projects: '$(solution)'
     arguments: '-c $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   inputs:
+    displayName: 'dotnet test'
     command: 'test'
     projects: '$(solution)'
     arguments: '-c $(buildConfiguration)'
@@ -69,6 +71,7 @@ steps:
       
 - task: DotNetCoreCLI@2
   inputs:
+    displayName: 'dotnet pack'
     command: 'pack'
     packagesToPack: '(solution)'
     arguments: '-c $(buildConfiguration) -o $(outFolder)\NuGet'
