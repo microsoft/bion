@@ -31,6 +31,17 @@ steps:
     projects: '$(solution)'
     arguments: '-c $(buildConfiguration)'
 
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack'
+  inputs:
+    command: 'pack'
+    packagesToPack: 'csharp/BSOA/**/*.csproj'
+    arguments: '-c $(buildConfiguration)'
+    nobuild: true
+    includesymbols: true
+    includesource: true
+    versioningScheme: 'off'
+
 - task: EsrpCodeSigning@1
   inputs:
     ConnectedServiceName: 'DevSecOps'
@@ -81,11 +92,14 @@ steps:
     versioningScheme: 'off'
 
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish Binaries'
   inputs:
     PathtoPublish: '$(outFolder)'
     ArtifactName: 'build'
     publishLocation: 'Container'
+
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish NuGet Packages'
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'packages'
