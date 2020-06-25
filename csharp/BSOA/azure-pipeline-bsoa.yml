@@ -22,6 +22,7 @@ steps:
     command: 'build'
     projects: '$(solution)'
     configuration: '$(buildConfiguration)'
+    arguments: '-c Release'
 
 - task: DotNetCoreCLI@2
   inputs:
