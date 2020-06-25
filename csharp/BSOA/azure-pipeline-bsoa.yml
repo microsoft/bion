@@ -22,10 +22,9 @@ steps:
     command: 'build'
     projects: '$(solution)'
     configuration: '$(buildConfiguration)'
-    arguments: '-c Release'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: '$(outFolder)'
+    PathtoPublish: '$(outFolder)'
+    ArtifactName: 'drop'
     publishLocation: 'Container'
