@@ -17,79 +17,14 @@ variables:
 
 steps:
 
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet build'
-  inputs:
-    command: 'build'
-    projects: '$(solution)'
-    arguments: '-c $(buildConfiguration)'
-
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet test'
-  inputs:
-    command: 'test'
-    projects: '$(solution)'
-    arguments: '-c $(buildConfiguration)'
-
+steps:
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack'
   inputs:
-    command: 'pack'
-    packagesToPack: 'csharp/BSOA/**/*.csproj'
-    arguments: '-c $(buildConfiguration)'
-    nobuild: true
-    includesymbols: true
-    includesource: true
-    versioningScheme: 'off'
-
-- task: EsrpCodeSigning@1
-  inputs:
-    ConnectedServiceName: 'DevSecOps'
-    FolderPath: '$(outFolder)'
-    Pattern: 'BSOA*.dll,BSOA*.exe'
-    signConfigType: 'inlineSignParams'
-    inlineOperation: |
-      [
-        {
-          "keyCode": "CP-230012",
-          "operationSetCode": "SigntoolSign",
-          "parameters": [
-            {
-              "parameterName": "OpusName",
-              "parameterValue": "Microsoft"
-            },
-            {
-              "parameterName": "OpusInfo",
-              "parameterValue": "http://www.microsoft.com"
-            },
-            {
-              "parameterName": "PageHash",
-              "parameterValue": "/NPH"
-            },
-            {
-              "parameterName": "FileDigest",
-              "parameterValue": "/fd sha256"
-            },
-            {
-              "parameterName": "TimeStamp",
-              "parameterValue": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
-            }
-          ],
-          "toolName": "signtool.exe",
-          "toolVersion": "6.2.9304.0"
-        }
-      ]
-      
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet pack'
-  inputs:
-    command: 'pack'
-    packagesToPack: 'csharp/BSOA/**/*.csproj'
-    arguments: '-c $(buildConfiguration)'
-    nobuild: true
-    includesymbols: true
-    includesource: true
-    versioningScheme: 'off'
+    command: custom
+    projects: 'csharp/BSOA/**/*.csproj'
+    custom: pack
+    arguments: '-c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory) --include-source --include-symbols'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Binaries'
