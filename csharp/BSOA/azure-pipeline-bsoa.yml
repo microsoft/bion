@@ -25,6 +25,52 @@ steps:
     custom: pack
     arguments: '-c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory) --include-source --include-symbols'
 
+- task: EsrpCodeSigning@1
+  inputs:
+    ConnectedServiceName: 'DevSecOps'
+    FolderPath: '$(outFolder)'
+    Pattern: 'BSOA*.dll,BSOA*.exe'
+    signConfigType: 'inlineSignParams'
+    inlineOperation: |
+      [
+        {
+          "keyCode": "CP-230012",
+          "operationSetCode": "SigntoolSign",
+          "parameters": [
+            {
+              "parameterName": "OpusName",
+              "parameterValue": "Microsoft"
+            },
+            {
+              "parameterName": "OpusInfo",
+              "parameterValue": "http://www.microsoft.com"
+            },
+            {
+              "parameterName": "PageHash",
+              "parameterValue": "/NPH"
+            },
+            {
+              "parameterName": "FileDigest",
+              "parameterValue": "/fd sha256"
+            },
+            {
+              "parameterName": "TimeStamp",
+              "parameterValue": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+            }
+          ],
+          "toolName": "signtool.exe",
+          "toolVersion": "6.2.9304.0"
+        }
+      ]
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack [signed]'
+  inputs:
+    command: custom
+    projects: 'csharp/BSOA/**/*.csproj'
+    custom: pack
+    arguments: '--no-build -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory) --include-source --include-symbols'
+
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Binaries'
   inputs:
