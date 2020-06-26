@@ -111,8 +111,8 @@ namespace BSOA.Test.Model
             v1.People.Add(new V1.Person() { Age = 39, Name = "Scott" });
             v1.People.Add(new V1.Person() { Age = 36, Name = "Adam" });
 
-            string serializeToPath = "Community.V1.json";
-            AsJson.Save(serializeToPath, v1);
+            string serializeToPath = Path.GetFullPath("Community.V1.json");
+            AsJson.Save(serializeToPath, v1, verbose: true);
 
             V1.Community roundTrip = AsJson.Load<V1.Community>(serializeToPath);
             CollectionReadVerifier.VerifySame(v1.People, roundTrip.People);

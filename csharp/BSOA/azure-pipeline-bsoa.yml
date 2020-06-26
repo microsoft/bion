@@ -11,32 +11,25 @@ pool:
 
 variables:
   solution: 'csharp/BSOA/BSOA.sln'
+  outFolder: 'csharp/BSOA/bld'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@1
 
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack (build and pack)'
   inputs:
-    restoreSolution: '$(solution)'
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    command: custom
+    projects: 'csharp/BSOA/**/*.csproj'
+    custom: pack
+    arguments: '-c $(buildConfiguration) -o $(outFolder)/NuGet --include-source'
 
 - task: EsrpCodeSigning@1
   inputs:
     ConnectedServiceName: 'DevSecOps'
-    FolderPath: 'csharp/BSOA/bin'
-    Pattern: 'BSOA.dll,BSOA.Json.dll'
+    FolderPath: '$(outFolder)'
+    Pattern: 'BSOA*.dll,BSOA*.exe'
     signConfigType: 'inlineSignParams'
     inlineOperation: |
       [
@@ -70,17 +63,31 @@ steps:
         }
       ]
 
-- task: DotNetCoreCLI@2
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Binaries'
   inputs:
-    command: 'pack'
-    packagesToPack: 'csharp/BSOA/**/*.csproj'
-    nobuild: true
-    includesymbols: true
-    includesource: true
-    versioningScheme: 'off'
+    PathtoPublish: '$(outFolder)'
+    ArtifactName: 'build'
+    publishLocation: 'Container'
+    
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack [signed]'
+  inputs:
+    command: custom
+    projects: 'csharp/BSOA/**/*.csproj'
+    custom: pack
+    arguments: '--no-build -c $(buildConfiguration) -o $(outFolder)/NuGet --include-source'
 
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish Packages'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'csharp/BSOA/bin'
+    PathtoPublish: '$(outFolder)/NuGet'
+    ArtifactName: 'packages'
     publishLocation: 'Container'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test'
+  inputs:
+    command: 'test'
+    projects: '$(solution)'
+    arguments: '-c $(buildConfiguration)'
