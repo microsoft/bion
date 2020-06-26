@@ -84,3 +84,10 @@ steps:
     PathtoPublish: '$(outFolder)/NuGet'
     ArtifactName: 'packages'
     publishLocation: 'Container'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test'
+  inputs:
+    command: 'test'
+    projects: '$(solution)'
+    arguments: '-c $(buildConfiguration)'
