@@ -5,19 +5,14 @@ IF NOT "%1"=="" ( SET NuGetLocal=%1 )
 PUSHD "%~dp0"
 
 ECHO.
-ECHO Build BSOA
-ECHO ==========
-dotnet build BSOA.sln -c Release
+ECHO Build and Pack BSOA
+ECHO ===================
+dotnet pack BSOA.sln -c Release -o "bld\NuGet" --include-source
 
 ECHO.
 ECHO Test BSOA
 ECHO =========
-dotnet test BSOA.sln
-
-ECHO.
-ECHO Build NuGet Packages
-ECHO ====================
-dotnet pack BSOA.sln -c Release -o "bin\NuGet" --include-symbols --include-source --no-build
+dotnet test BSOA.sln -c Release
 
 ECHO.
 ECHO Clearing BSOA from Local NuGet Cache
@@ -31,7 +26,7 @@ IF EXIST "%NuGetLocal%" (
   ECHO.
   ECHO Copying to NuGet Local [%NuGetLocal%]
   ECHO =====================================
-  XCOPY /Y "bin\NuGet\*.*" "%NuGetLocal%\"
+  XCOPY /Y "bld\NuGet\*.*" "%NuGetLocal%\"
 )
 
 POPD

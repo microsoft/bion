@@ -11,19 +11,19 @@ pool:
 
 variables:
   solution: 'csharp/BSOA/BSOA.sln'
-  outFolder: 'csharp/BSOA/bin'
+  outFolder: 'csharp/BSOA/bld'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
 steps:
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet pack'
+  displayName: 'dotnet pack (build and pack)'
   inputs:
     command: custom
     projects: 'csharp/BSOA/**/*.csproj'
     custom: pack
-    arguments: '-c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory) --include-source --include-symbols'
+    arguments: '-c $(buildConfiguration) -o $(outFolder)/NuGet --include-source'
 
 - task: EsrpCodeSigning@1
   inputs:
@@ -63,24 +63,24 @@ steps:
         }
       ]
 
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet pack [signed]'
-  inputs:
-    command: custom
-    projects: 'csharp/BSOA/**/*.csproj'
-    custom: pack
-    arguments: '--no-build -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory) --include-source --include-symbols'
-
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Binaries'
   inputs:
     PathtoPublish: '$(outFolder)'
     ArtifactName: 'build'
     publishLocation: 'Container'
+    
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack [signed]'
+  inputs:
+    command: custom
+    projects: 'csharp/BSOA/**/*.csproj'
+    custom: pack
+    arguments: '--no-build -c $(buildConfiguration) -o $(outFolder)/NuGet --include-source'
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish NuGet Packages'
+  displayName: 'Publish Packages'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    PathtoPublish: '$(outFolder)/NuGet'
     ArtifactName: 'packages'
     publishLocation: 'Container'

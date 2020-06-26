@@ -4,7 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Version>0.5.0</Version>
 
-    <OutputPath>..\bin\$(Configuration)</OutputPath>
+    <IntermediateOutputPath>..\bld\obj\$(Configuration)\$(MSBuildProjectName)</IntermediateOutputPath>  
+    <OutputPath>..\bld\bin\$(Configuration)\$(MSBuildProjectName)</OutputPath>
 
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Microsoft.ManagedKey.snk</AssemblyOriginatorKeyFile>
