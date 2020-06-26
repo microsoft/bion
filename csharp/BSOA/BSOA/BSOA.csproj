@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>BSOA provides core types for struct-of-arrays (SoA) object models in C# with binary to the BSOA format. See BSOA.Generator for a code generator for the object models and BSOA.Json for Newtonsoft.JSON interop.</Description>
   </PropertyGroup>
 
 </Project>

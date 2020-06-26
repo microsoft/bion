@@ -6,6 +6,7 @@
 
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>BSOA.Generator</ToolCommandName>
+    <Description>BSOA.Generator is a tool to generate BSOA-based object models from a schema in a simple JSON format.</Description>
   </PropertyGroup>
 
   <ItemGroup>
