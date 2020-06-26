@@ -17,7 +17,6 @@ variables:
 
 steps:
 
-steps:
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack'
   inputs:
