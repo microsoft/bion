@@ -26,6 +26,7 @@ steps:
     arguments: '-c $(buildConfiguration) -o $(outFolder)/NuGet --include-source'
 
 - task: EsrpCodeSigning@1
+  displayName: 'Sign Binaries'
   inputs:
     ConnectedServiceName: 'DevSecOps'
     FolderPath: '$(outFolder)'
@@ -77,6 +78,31 @@ steps:
     projects: 'csharp/BSOA/**/*.csproj'
     custom: pack
     arguments: '--no-build -c $(buildConfiguration) -o $(outFolder)/NuGet --include-source'
+
+- task: EsrpCodeSigning@1
+  displayName: 'Sign NuGet Packages'
+  inputs:
+    ConnectedServiceName: 'DevSecOps'
+    FolderPath: '$(outFolder)/NuGet'
+    Pattern: '*.nupkg'
+    signConfigType: 'inlineSignParams'
+    inlineOperation: |
+      [
+          {
+              "keyCode": "CP-401405",
+              "operationSetCode": "NuGetSign",
+              "parameters": [],
+              "toolName": "sign",
+              "toolVersion": "1.0"
+          },
+          {
+              "keyCode": "CP-401405",
+              "operationSetCode": "NuGetVerify",
+              "parameters": [],
+              "toolName": "sign",
+              "toolVersion": "1.0"
+          }
+      ]
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Packages'
