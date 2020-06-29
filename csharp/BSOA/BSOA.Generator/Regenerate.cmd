@@ -1,6 +1,6 @@
 @ECHO OFF
 
-SET BSOAGenerator="%~dp0bin\Release\netcoreapp3.1\BSOA.Generator.exe"
+SET BSOAGenerator="%~dp0..\bld\bin\Release\BSOA.Generator\netcoreapp3.1\BSOA.Generator.exe"
 PUSHD %~dp0
 
 ECHO Generating Unit Test models...
