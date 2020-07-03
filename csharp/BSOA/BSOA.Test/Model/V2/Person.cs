@@ -67,8 +67,8 @@ namespace BSOA.Test.Model.V2
         {
             if (other == null) { return false; }
 
-            if (this.Birthdate != other.Birthdate) { return false; }
-            if (this.Name != other.Name) { return false; }
+            if (!object.Equals(this.Birthdate, other.Birthdate)) { return false; }
+            if (!object.Equals(this.Name, other.Name)) { return false; }
 
             return true;
         }

@@ -6,54 +6,54 @@ using System.Collections.Generic;
 
 using BSOA.Model;
 
-namespace BSOA.Test.Model.V1
+namespace BSOA.Demo.Model.BSOA
 {
     /// <summary>
-    ///  BSOA GENERATED Entity for 'Person'
+    ///  BSOA GENERATED Entity for 'Folder'
     /// </summary>
-    public partial class Person : IRow, IEquatable<Person>
+    public partial class Folder : IRow, IEquatable<Folder>
     {
-        private PersonTable _table;
+        private FolderTable _table;
         private int _index;
 
-        public Person() : this(PersonDatabase.Current.Person)
+        public Folder() : this(FileSystemDatabase.Current.Folder)
         { }
 
-        public Person(Community root) : this(root.Database.Person)
+        public Folder(FileSystem root) : this(root.Database.Folder)
         { }
 
-        internal Person(PersonTable table) : this(table, table.Count)
+        internal Folder(FolderTable table) : this(table, table.Count)
         {
             table.Add();
         }
         
-        internal Person(PersonTable table, int index)
+        internal Folder(FolderTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
 
-        public Person(
-            byte age,
+        public Folder(
+            int parentIndex,
             string name
         ) 
-            : this(PersonDatabase.Current.Person)
+            : this(FileSystemDatabase.Current.Folder)
         {
-            Age = age;
+            ParentIndex = parentIndex;
             Name = name;
         }
 
-        public Person(Person other) 
-            : this(PersonDatabase.Current.Person)
+        public Folder(Folder other) 
+            : this(FileSystemDatabase.Current.Folder)
         {
-            Age = other.Age;
+            ParentIndex = other.ParentIndex;
             Name = other.Name;
         }
 
-        public byte Age
+        public int ParentIndex
         {
-            get => _table.Age[_index];
-            set => _table.Age[_index] = value;
+            get => _table.ParentIndex[_index];
+            set => _table.ParentIndex[_index] = value;
         }
 
         public string Name
@@ -62,12 +62,12 @@ namespace BSOA.Test.Model.V1
             set => _table.Name[_index] = value;
         }
 
-        #region IEquatable<Person>
-        public bool Equals(Person other)
+        #region IEquatable<Folder>
+        public bool Equals(Folder other)
         {
             if (other == null) { return false; }
 
-            if (!object.Equals(this.Age, other.Age)) { return false; }
+            if (!object.Equals(this.ParentIndex, other.ParentIndex)) { return false; }
             if (!object.Equals(this.Name, other.Name)) { return false; }
 
             return true;
@@ -81,9 +81,9 @@ namespace BSOA.Test.Model.V1
 
             unchecked
             {
-                if (Age != default(byte))
+                if (ParentIndex != default(int))
                 {
-                    result = (result * 31) + Age.GetHashCode();
+                    result = (result * 31) + ParentIndex.GetHashCode();
                 }
 
                 if (Name != default(string))
@@ -97,10 +97,10 @@ namespace BSOA.Test.Model.V1
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as Person);
+            return Equals(obj as Folder);
         }
 
-        public static bool operator ==(Person left, Person right)
+        public static bool operator ==(Folder left, Folder right)
         {
             if (object.ReferenceEquals(left, null))
             {
@@ -110,7 +110,7 @@ namespace BSOA.Test.Model.V1
             return left.Equals(right);
         }
 
-        public static bool operator !=(Person left, Person right)
+        public static bool operator !=(Folder left, Folder right)
         {
             if (object.ReferenceEquals(left, null))
             {

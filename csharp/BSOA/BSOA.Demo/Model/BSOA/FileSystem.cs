@@ -8,46 +8,53 @@ using System.IO;
 using BSOA.IO;
 using BSOA.Model;
 
-namespace BSOA.Test.Model.V1
+namespace BSOA.Demo.Model.BSOA
 {
     /// <summary>
-    ///  BSOA GENERATED Root Entity for 'Community'
+    ///  BSOA GENERATED Root Entity for 'FileSystem'
     /// </summary>
-    public partial class Community : IRow
+    public partial class FileSystem : IRow
     {
-        private CommunityTable _table;
+        private FileSystemTable _table;
         private int _index;
 
-        internal PersonDatabase Database => _table.Database;
+        internal FileSystemDatabase Database => _table.Database;
         public ITreeSerializable DB => _table.Database;
 
-        public Community() : this(new PersonDatabase().Community)
+        public FileSystem() : this(new FileSystemDatabase().FileSystem)
         { }
 
-        internal Community(CommunityTable table) : this(table, table.Count)
+        internal FileSystem(FileSystemTable table) : this(table, table.Count)
         {
             table.Add();
         }
 
-        internal Community(CommunityTable table, int index)
+        internal FileSystem(FileSystemTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
 
-        public IList<Person> People
+        public IList<Folder> Folders
         {
-            get => _table.Database.Person.List(_table.People[_index]);
-            set => _table.Database.Person.List(_table.People[_index]).SetTo(value);
+            get => _table.Database.Folder.List(_table.Folders[_index]);
+            set => _table.Database.Folder.List(_table.Folders[_index]).SetTo(value);
+        }
+
+        public IList<File> Files
+        {
+            get => _table.Database.File.List(_table.Files[_index]);
+            set => _table.Database.File.List(_table.Files[_index]).SetTo(value);
         }
 
 
-        #region IEquatable<Community>
-        public bool Equals(Community other)
+        #region IEquatable<FileSystem>
+        public bool Equals(FileSystem other)
         {
             if (other == null) { return false; }
 
-            if (!object.Equals(this.People, other.People)) { return false; }
+            if (!object.Equals(this.Folders, other.Folders)) { return false; }
+            if (!object.Equals(this.Files, other.Files)) { return false; }
 
             return true;
         }
@@ -60,9 +67,14 @@ namespace BSOA.Test.Model.V1
 
             unchecked
             {
-                if (People != default(IList<Person>))
+                if (Folders != default(IList<Folder>))
                 {
-                    result = (result * 31) + People.GetHashCode();
+                    result = (result * 31) + Folders.GetHashCode();
+                }
+
+                if (Files != default(IList<File>))
+                {
+                    result = (result * 31) + Files.GetHashCode();
                 }
             }
 
@@ -71,10 +83,10 @@ namespace BSOA.Test.Model.V1
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as Community);
+            return Equals(obj as FileSystem);
         }
 
-        public static bool operator ==(Community left, Community right)
+        public static bool operator ==(FileSystem left, FileSystem right)
         {
             if (object.ReferenceEquals(left, null))
             {
@@ -84,7 +96,7 @@ namespace BSOA.Test.Model.V1
             return left.Equals(right);
         }
 
-        public static bool operator !=(Community left, Community right)
+        public static bool operator !=(FileSystem left, FileSystem right)
         {
             if (object.ReferenceEquals(left, null))
             {
@@ -116,27 +128,27 @@ namespace BSOA.Test.Model.V1
 
         public void WriteBsoa(string filePath)
         {
-            WriteBsoa(File.Create(filePath));
+            WriteBsoa(System.IO.File.Create(filePath));
         }
 
-        public static Community ReadBsoa(Stream stream)
+        public static FileSystem ReadBsoa(Stream stream)
         {
             using (BinaryTreeReader reader = new BinaryTreeReader(stream))
             {
-                Community result = new Community();
+                FileSystem result = new FileSystem();
                 result.DB.Read(reader);
                 return result;
             }
         }
 
-        public static Community ReadBsoa(string filePath)
+        public static FileSystem ReadBsoa(string filePath)
         {
-            return ReadBsoa(File.OpenRead(filePath));
+            return ReadBsoa(System.IO.File.OpenRead(filePath));
         }
 
         public static TreeDiagnostics Diagnostics(string filePath)
         {
-            return Diagnostics(File.OpenRead(filePath));
+            return Diagnostics(System.IO.File.OpenRead(filePath));
         }
 
         public static TreeDiagnostics Diagnostics(Stream stream)
@@ -144,7 +156,7 @@ namespace BSOA.Test.Model.V1
             using (BinaryTreeReader btr = new BinaryTreeReader(stream))
             using (TreeDiagnosticsReader reader = new TreeDiagnosticsReader(btr))
             {
-                Community result = new Community();
+                FileSystem result = new FileSystem();
                 result.DB.Read(reader);
                 return reader.Tree;
             }

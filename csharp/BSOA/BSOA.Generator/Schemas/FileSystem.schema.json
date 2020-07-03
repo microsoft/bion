@@ -1,0 +1,68 @@
+{
+  "name": "FileSystemDatabase",
+  "namespace": "BSOA.Demo.Model.BSOA",
+  "rootTableName": "FileSystem",
+  "tables": [
+    {
+      "name": "File",
+      "columns": [
+        {
+          "name": "ParentFolderIndex",
+          "type": "int"
+        },
+        {
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "name": "LastModifiedUtc",
+          "type": "DateTime"
+        },
+        {
+          "name": "CreatedUtc",
+          "type": "DateTime"
+        },
+        {
+          "name": "Attributes",
+          "type": "System.IO.FileAttributes",
+          "category": "Enum",
+          "underlyingType": "int"
+        },
+        {
+          "name": "Length",
+          "type": "long"
+        }
+      ]
+    },
+    {
+      "name": "Folder",
+      "columns": [
+        {
+          "name": "ParentIndex",
+          "type": "int"
+        },
+        {
+          "name": "Name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "FileSystem",
+      "columns": [
+        {
+          "name": "Folders",
+          "type": "IList<Folder>",
+          "category": "RefList",
+          "referencedTableName": "Folder"
+        },
+        {
+          "name": "Files",
+          "type": "IList<File>",
+          "category": "RefList",
+          "referencedTableName": "File"
+        }
+      ]
+    }
+  ]
+}

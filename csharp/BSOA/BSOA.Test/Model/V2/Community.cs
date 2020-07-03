@@ -47,7 +47,7 @@ namespace BSOA.Test.Model.V2
         {
             if (other == null) { return false; }
 
-            if (this.People != other.People) { return false; }
+            if (!object.Equals(this.People, other.People)) { return false; }
 
             return true;
         }
