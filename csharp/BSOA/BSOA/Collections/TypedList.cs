@@ -39,6 +39,12 @@ namespace BSOA.Collections
 
         public void SetTo(IList<TItem> list)
         {
+            if (list is TypedList<TItem>)
+            {
+                // Avoid Clear() on SetTo(self)
+                if (_inner.Equals(((TypedList<TItem>)list)._inner)) { return; }
+            }
+
             _inner.Clear();
 
             if (list != null)
