@@ -61,6 +61,16 @@ namespace BSOA.Collections
 
         public void SetTo(IDictionary<TKey, TValue> other)
         {
+            if (other is ColumnDictionary<TKey, TValue>)
+            {
+                // Avoid Clear() on SetTo(self)
+                ColumnDictionary<TKey, TValue> otherDictionary = (ColumnDictionary<TKey, TValue>)other;
+                if (object.ReferenceEquals(this._column, otherDictionary._column) && this._rowIndex == otherDictionary._rowIndex)
+                {
+                    return;
+                }
+            }
+
             Clear();
 
             if (other != null)
@@ -257,6 +267,6 @@ namespace BSOA.Collections
             return !left.Equals(right);
         }
 
-        
+
     }
 }
