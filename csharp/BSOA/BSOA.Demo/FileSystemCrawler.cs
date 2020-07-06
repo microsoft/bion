@@ -1,7 +1,5 @@
 ﻿using BSOA.Demo.Model.BSOA;
 
-using System.IO;
-
 namespace BSOA.Demo
 {
     public class FileSystemCrawler
@@ -9,16 +7,16 @@ namespace BSOA.Demo
         public static FileSystem Crawl(string rootPath, bool simple = false)
         {
             FileSystem result = new FileSystem();
-            result.Folders.Add(new Folder() { Name = Path.GetFullPath(rootPath), ParentIndex = -1 });
+            result.Folders.Add(new Folder() { Name = System.IO.Path.GetFullPath(rootPath), ParentIndex = -1 });
 
-            Crawl(new DirectoryInfo(rootPath), result, 0, simple);
+            Crawl(new System.IO.DirectoryInfo(rootPath), result, 0, simple);
 
             return result;
         }
 
-        private static void Crawl(DirectoryInfo directory, FileSystem result, int folderIndex, bool simple = false)
+        private static void Crawl(System.IO.DirectoryInfo directory, FileSystem result, int folderIndex, bool simple = false)
         {
-            foreach (DirectoryInfo subdirectory in directory.GetDirectories())
+            foreach (System.IO.DirectoryInfo subdirectory in directory.GetDirectories())
             {
                 int subfolderIndex = result.Folders.Count;
                 result.Folders.Add(new Folder() { Name = subdirectory.Name, ParentIndex = folderIndex });
@@ -26,9 +24,9 @@ namespace BSOA.Demo
                 Crawl(subdirectory, result, subfolderIndex, simple);
             }
 
-            foreach (FileInfo fi in directory.GetFiles())
+            foreach (System.IO.FileInfo fi in directory.GetFiles())
             {
-                Model.BSOA.File file = new Model.BSOA.File()
+                File file = new File()
                 {
                     ParentFolderIndex = folderIndex,
                     Name = fi.Name,

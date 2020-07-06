@@ -4,6 +4,7 @@ using BSOA.Json;
 using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace BSOA.Demo
 {
@@ -28,18 +29,17 @@ namespace BSOA.Demo
                 {
                     case "crawl":
                         if (args.Length < 3) { throw new UsageException("'crawl' requires DBPath and PathToCrawl."); }
+                        string pathToCrawl = args[2];
 
-                        Measure.Time("Crawl", 1, () =>
+                        Measure.Time($"Crawling {pathToCrawl}...", 1, () =>
                         {
-                            db = FileSystemCrawler.Crawl(rootPath: args[2], simple: (args.Length > 3 ? bool.Parse(args[3]) : false));
+                            db = FileSystemCrawler.Crawl(rootPath: pathToCrawl, simple: (args.Length > 3 ? bool.Parse(args[3]) : false));
                         });
 
-                        Measure.Time("Save (JSON)", 1, () =>
+                        Measure.Time($"Saving as {databasePath}...", 1, () =>
                         {
-                            AsJson.Save(databasePath, db);
+                            db.Save(databasePath);
                         });
-
-                        db.WriteBsoa(System.IO.Path.ChangeExtension(databasePath, ".bsoa"));
 
                         break;
 
@@ -51,24 +51,34 @@ namespace BSOA.Demo
                         if (args.Length < 3) { throw new UsageException("'search' requires DBPath and FileNamePart."); }
                         string searchString = args[2];
 
-                        //db = Measure.LoadPerformance(databasePath, 1, AsJson.Load<FileSystem>);
-                        db = Measure.LoadPerformance(databasePath, 1, (path) => FileSystem.ReadBsoa(System.IO.Path.ChangeExtension(path, ".bsoa")));
+                        db = Measure.LoadPerformance(databasePath, 1, FileSystem.Load);
 
-                        Measure.Time("Search", 1, () =>
+                        int matchCount = 0;
+
+                        Measure.Time($"Searching for '{searchString}'...", 5, () =>
                         {
-                            int matchCount = 0;
-
-                            foreach (var file in db.Files.Where((f) => f.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)))
+                            matchCount = 0;
+                            foreach (var file in db.Files.Where((f) => f.Name.IndexOf(searchString, StringComparison.Ordinal) >= 0))
                             {
                                 matchCount++;
-                                if (matchCount < 15)
-                                {
-                                    Console.WriteLine($" -> {file.Description(db)}");
-                                }
+                            }
+                        });
+
+                        Console.WriteLine($"{matchCount:n0} matches found.");
+
+                        int innerIterations = 100;
+                        Measure.Time($"Vector search for '{searchString}' ({innerIterations}x)...", 5, () =>
+                        {
+                            byte[] searchString8 = Encoding.UTF8.GetBytes(searchString);
+
+                            for (int i = 0; i < innerIterations; ++i)
+                            {
+                                matchCount = db.FileNamesContaining(searchString8);
                             }
 
-                            Console.WriteLine($"{matchCount:n0} matches found.");
                         });
+
+                        Console.WriteLine($"{matchCount:n0} matches found.");
 
                         break;
 

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using BSOA.Model;
+
+using System;
 
 namespace BSOA.Demo.Model.BSOA
 {
