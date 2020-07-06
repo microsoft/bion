@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 using BSOA.IO;
 using BSOA.Model;
@@ -106,7 +105,7 @@ namespace BSOA.Test.Model.V2
         #endregion
 
         #region Easy Serialization
-        public void WriteBsoa(Stream stream)
+        public void WriteBsoa(System.IO.Stream stream)
         {
             using (BinaryTreeWriter writer = new BinaryTreeWriter(stream))
             {
@@ -116,10 +115,10 @@ namespace BSOA.Test.Model.V2
 
         public void WriteBsoa(string filePath)
         {
-            WriteBsoa(File.Create(filePath));
+            WriteBsoa(System.IO.File.Create(filePath));
         }
 
-        public static Community ReadBsoa(Stream stream)
+        public static Community ReadBsoa(System.IO.Stream stream)
         {
             using (BinaryTreeReader reader = new BinaryTreeReader(stream))
             {
@@ -131,15 +130,15 @@ namespace BSOA.Test.Model.V2
 
         public static Community ReadBsoa(string filePath)
         {
-            return ReadBsoa(File.OpenRead(filePath));
+            return ReadBsoa(System.IO.File.OpenRead(filePath));
         }
 
         public static TreeDiagnostics Diagnostics(string filePath)
         {
-            return Diagnostics(File.OpenRead(filePath));
+            return Diagnostics(System.IO.File.OpenRead(filePath));
         }
 
-        public static TreeDiagnostics Diagnostics(Stream stream)
+        public static TreeDiagnostics Diagnostics(System.IO.Stream stream)
         {
             using (BinaryTreeReader btr = new BinaryTreeReader(stream))
             using (TreeDiagnosticsReader reader = new TreeDiagnosticsReader(btr))

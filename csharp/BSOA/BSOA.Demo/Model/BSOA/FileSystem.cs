@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 using BSOA.IO;
 using BSOA.Model;
@@ -118,7 +117,7 @@ namespace BSOA.Demo.Model.BSOA
         #endregion
 
         #region Easy Serialization
-        public void WriteBsoa(Stream stream)
+        public void WriteBsoa(System.IO.Stream stream)
         {
             using (BinaryTreeWriter writer = new BinaryTreeWriter(stream))
             {
@@ -131,7 +130,7 @@ namespace BSOA.Demo.Model.BSOA
             WriteBsoa(System.IO.File.Create(filePath));
         }
 
-        public static FileSystem ReadBsoa(Stream stream)
+        public static FileSystem ReadBsoa(System.IO.Stream stream)
         {
             using (BinaryTreeReader reader = new BinaryTreeReader(stream))
             {
@@ -151,7 +150,7 @@ namespace BSOA.Demo.Model.BSOA
             return Diagnostics(System.IO.File.OpenRead(filePath));
         }
 
-        public static TreeDiagnostics Diagnostics(Stream stream)
+        public static TreeDiagnostics Diagnostics(System.IO.Stream stream)
         {
             using (BinaryTreeReader btr = new BinaryTreeReader(stream))
             using (TreeDiagnosticsReader reader = new TreeDiagnosticsReader(btr))
