@@ -22,7 +22,7 @@ namespace BSOA.Generator.Templates
         public Team(Company root) : this(root.Database.Team)
         { }
 
-        public Team(Company root, Team other) : this(root)
+        public Team(Company root, Team other) : this(root.Database.Team)
         {
             CopyFrom(other);
         }

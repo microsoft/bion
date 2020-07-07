@@ -22,7 +22,7 @@ namespace BSOA.Demo.Model.BSOA
         public Folder(FileSystem root) : this(root.Database.Folder)
         { }
 
-        public Folder(FileSystem root, Folder other) : this(root)
+        public Folder(FileSystem root, Folder other) : this(root.Database.Folder)
         {
             CopyFrom(other);
         }

@@ -22,7 +22,7 @@ namespace BSOA.Test.Model.V1
         public Person(Community root) : this(root.Database.Person)
         { }
 
-        public Person(Community root, Person other) : this(root)
+        public Person(Community root, Person other) : this(root.Database.Person)
         {
             CopyFrom(other);
         }

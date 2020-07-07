@@ -61,7 +61,7 @@ namespace BSOA.Generator.Templates
         //  <RefColumn>
         public Employee Owner
         {
-            get => _table.Database.Employee[_table.Owner[_index]];
+            get => _table.Database.Employee.Get(_table.Owner[_index]);
             set => _table.Owner[_index] = _table.LocalIndex(value);
         }
 
@@ -74,11 +74,6 @@ namespace BSOA.Generator.Templates
         }
 
         //  </RefListColumn>
-        public IList<Team> Teams
-        {
-            get => _table.Database.Team.List(_table.Teams[_index]);
-            set => _table.Database.Team.List(_table.Teams[_index]).SetTo(value);
-        }
         // </ColumnList>
 
         #region IEquatable<Company>

@@ -22,7 +22,7 @@ namespace BSOA.Demo.Model.BSOA
         public File(FileSystem root) : this(root.Database.File)
         { }
 
-        public File(FileSystem root, File other) : this(root)
+        public File(FileSystem root, File other) : this(root.Database.File)
         {
             CopyFrom(other);
         }
