@@ -15,9 +15,9 @@ namespace BSOA.Collections
     /// </summary>
     public class TypedList<TItem> : IList<TItem>, IReadOnlyList<TItem>
     {
-        private NumberList<int> _inner;
-        private Func<int, TItem> _toInstance;
-        private Func<TItem, int> _toIndex;
+        private readonly NumberList<int> _inner;
+        private readonly Func<int, TItem> _toInstance;
+        private readonly Func<TItem, int> _toIndex;
 
         public TypedList(NumberList<int> indices, Func<int, TItem> toInstance, Func<TItem, int> toIndex)
         {
@@ -37,7 +37,7 @@ namespace BSOA.Collections
         public int Count => _inner.Count;
         public bool IsReadOnly => false;
 
-        public void SetTo(IList<TItem> list)
+        public void SetTo(IEnumerable<TItem> list)
         {
             if (list is TypedList<TItem>)
             {
@@ -49,9 +49,9 @@ namespace BSOA.Collections
 
             if (list != null)
             {
-                for (int i = 0; i < list.Count; ++i)
+                foreach (TItem item in list)
                 {
-                    _inner.Add(_toIndex(list[i]));
+                    _inner.Add(_toIndex(item));
                 }
             }
         }
