@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using System.Reflection;
 
 using BSOA.Model;
 
@@ -13,8 +14,8 @@ namespace BSOA.Generator.Templates
     /// </summary>
     public partial class Employee : IRow
     {
-        private EmployeeTable _table;
-        private int _index;
+        private readonly EmployeeTable _table;
+        private readonly int _index;
 
         public Employee() : this(CompanyDatabase.Current.Employee)
         { }
@@ -22,9 +23,15 @@ namespace BSOA.Generator.Templates
         public Employee(Company root) : this(root.Database.Employee)
         { }
 
-        internal Employee(EmployeeTable table) : this(table, table.Count)
+        public Employee(Company root, Employee other) : this(root.Database.Employee, other)
+        { }
+
+        internal Employee(EmployeeTable table) : this(table, table.Add()._index)
+        { }
+
+        internal Employee(EmployeeTable table, Employee other) : this(table ?? CompanyDatabase.Current.Employee)
         {
-            table.Add();
+            CopyFrom(other);
         }
 
         internal Employee(EmployeeTable table, int index)
@@ -40,15 +47,13 @@ namespace BSOA.Generator.Templates
         }
 
         #region IRow
-        ITable IRow.Table => _table;
-        int IRow.Index => _index;
+        ITable IRow<Employee>.Table => _table;
+        int IRow<Employee>.Index => _index;
 
-        void IRow.Next()
+        public void CopyFrom(Employee other)
         {
-            _index++;
+            Name = other.Name;
         }
-
-        internal CompanyDatabase Database => _table.Database;
         #endregion
     }
 }

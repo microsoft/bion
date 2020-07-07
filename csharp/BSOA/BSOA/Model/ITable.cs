@@ -3,7 +3,7 @@
 
 namespace BSOA.Model
 {
-    public interface ITable<T> : IColumn<T>, ITable where T : IRow
+    public interface ITable<T> : IColumn<T>, ITable where T : IRow<T>
     { }
 
     public interface ITable : IColumn

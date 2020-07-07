@@ -12,10 +12,10 @@ namespace BSOA.Test.Model.V2
     /// <summary>
     ///  BSOA GENERATED Root Entity for 'Community'
     /// </summary>
-    public partial class Community : IRow
+    public partial class Community : IRow<Community>, IEquatable<Community>
     {
-        private CommunityTable _table;
-        private int _index;
+        private readonly CommunityTable _table;
+        private readonly int _index;
 
         internal PersonDatabase Database => _table.Database;
         public ITreeSerializable DB => _table.Database;
@@ -23,9 +23,15 @@ namespace BSOA.Test.Model.V2
         public Community() : this(new PersonDatabase().Community)
         { }
 
-        internal Community(CommunityTable table) : this(table, table.Count)
+        public Community(Community other) : this(new PersonDatabase().Community, other)
+        { }
+
+        internal Community(CommunityTable table) : this(table, table.Add()._index)
+        { }
+
+        internal Community(CommunityTable table, Community other) : this(table)
         {
-            table.Add();
+            CopyFrom(other);
         }
 
         internal Community(CommunityTable table, int index)
@@ -39,7 +45,6 @@ namespace BSOA.Test.Model.V2
             get => _table.Database.Person.List(_table.People[_index]);
             set => _table.Database.Person.List(_table.People[_index]).SetTo(value);
         }
-
 
         #region IEquatable<Community>
         public bool Equals(Community other)
@@ -95,12 +100,12 @@ namespace BSOA.Test.Model.V2
         #endregion
 
         #region IRow
-        ITable IRow.Table => _table;
-        int IRow.Index => _index;
+        ITable IRow<Community>.Table => _table;
+        int IRow<Community>.Index => _index;
 
-        void IRow.Next()
+        public void CopyFrom(Community other)
         {
-            _index++;
+            People = other.People;
         }
         #endregion
 

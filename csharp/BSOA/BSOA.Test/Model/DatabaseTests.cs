@@ -2,8 +2,9 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Diagnostics;
 using System.IO;
-using System.Text;
+using System.Runtime.CompilerServices;
 
 using BSOA.IO;
 using BSOA.Json;
@@ -46,6 +47,12 @@ namespace BSOA.Test.Model
             // Verify Trim doesn't throw (results not visible)
             community.DB.Trim();
             CollectionReadVerifier.VerifySame(community.People, roundTripped.People);
+
+            // Verify Copy constructor recursively copies (List.SetTo -> LocalIndex -> CopyFrom construction)
+            V1.Community copy = new V1.Community(community);
+            CollectionReadVerifier.VerifySame(community.People, copy.People);
+            community.People[0].Age += 10;
+            Assert.NotEqual(community.People[0].Age, copy.People[0].Age);
 
             // Verify Database.Clear works
             community.DB.Clear();
@@ -98,7 +105,10 @@ namespace BSOA.Test.Model
             Assert.Equal(0, v1RoundTrip.People[0].Age);
 
             // Read with TreeSerializationSettings.Strict and verify error
-            Assert.Throws<IOException>(() => v1RoundTrip.DB.Load(filePath, TreeFormat.Binary, new BSOA.IO.TreeSerializationSettings() { Strict = true }));
+            if (Debugger.IsAttached)
+            {
+                Assert.Throws<IOException>(() => v1RoundTrip.DB.Load(filePath, TreeFormat.Binary, new BSOA.IO.TreeSerializationSettings() { Strict = true }));
+            }
         }
 
         [Fact]

@@ -11,10 +11,10 @@ namespace BSOA.Demo.Model.BSOA
     /// <summary>
     ///  BSOA GENERATED Entity for 'File'
     /// </summary>
-    public partial class File : IRow, IEquatable<File>
+    public partial class File : IRow<File>, IEquatable<File>
     {
-        private FileTable _table;
-        private int _index;
+        private readonly FileTable _table;
+        private readonly int _index;
 
         public File() : this(FileSystemDatabase.Current.File)
         { }
@@ -22,44 +22,21 @@ namespace BSOA.Demo.Model.BSOA
         public File(FileSystem root) : this(root.Database.File)
         { }
 
-        internal File(FileTable table) : this(table, table.Count)
+        public File(FileSystem root, File other) : this(root.Database.File, other)
+        { }
+
+        internal File(FileTable table) : this(table, table.Add()._index)
+        { }
+
+        internal File(FileTable table, File other) : this(table ?? FileSystemDatabase.Current.File)
         {
-            table.Add();
+            CopyFrom(other);
         }
-        
+
         internal File(FileTable table, int index)
         {
             this._table = table;
             this._index = index;
-        }
-
-        public File(
-            int parentFolderIndex,
-            string name,
-            DateTime lastModifiedUtc,
-            DateTime createdUtc,
-            System.IO.FileAttributes attributes,
-            long length
-        ) 
-            : this(FileSystemDatabase.Current.File)
-        {
-            ParentFolderIndex = parentFolderIndex;
-            Name = name;
-            LastModifiedUtc = lastModifiedUtc;
-            CreatedUtc = createdUtc;
-            Attributes = attributes;
-            Length = length;
-        }
-
-        public File(File other) 
-            : this(FileSystemDatabase.Current.File)
-        {
-            ParentFolderIndex = other.ParentFolderIndex;
-            Name = other.Name;
-            LastModifiedUtc = other.LastModifiedUtc;
-            CreatedUtc = other.CreatedUtc;
-            Attributes = other.Attributes;
-            Length = other.Length;
         }
 
         public int ParentFolderIndex
@@ -182,12 +159,17 @@ namespace BSOA.Demo.Model.BSOA
         #endregion
 
         #region IRow
-        ITable IRow.Table => _table;
-        int IRow.Index => _index;
+        ITable IRow<File>.Table => _table;
+        int IRow<File>.Index => _index;
 
-        void IRow.Next()
+        public void CopyFrom(File other)
         {
-            _index++;
+            ParentFolderIndex = other.ParentFolderIndex;
+            Name = other.Name;
+            LastModifiedUtc = other.LastModifiedUtc;
+            CreatedUtc = other.CreatedUtc;
+            Attributes = other.Attributes;
+            Length = other.Length;
         }
         #endregion
     }

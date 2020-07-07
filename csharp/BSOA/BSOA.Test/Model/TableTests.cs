@@ -32,9 +32,9 @@ namespace BSOA.Test.Model
             other[1] = other[1];
             Assert.Equal(name, other[1].Name);
 
-            // Verify Add detects already in this table item
+            // Verify Add detects already is last Table item
             int count = other.Count;
-            other.Add(other[1]);
+            other.Add(other[count - 1]);
             Assert.Equal(count, other.Count);
         }
 

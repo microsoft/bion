@@ -11,10 +11,10 @@ namespace BSOA.Generator.Templates
     /// <summary>
     ///  BSOA GENERATED Entity for 'Team'
     /// </summary>
-    public partial class Team : IRow, IEquatable<Team>
+    public partial class Team : IRow<Team>, IEquatable<Team>
     {
-        private TeamTable _table;
-        private int _index;
+        private readonly TeamTable _table;
+        private readonly int _index;
 
         public Team() : this(CompanyDatabase.Current.Team)
         { }
@@ -22,50 +22,21 @@ namespace BSOA.Generator.Templates
         public Team(Company root) : this(root.Database.Team)
         { }
 
-        internal Team(TeamTable table) : this(table, table.Count)
+        public Team(Company root, Team other) : this(root.Database.Team, other)
+        { }
+
+        internal Team(TeamTable table) : this(table, table.Add()._index)
+        { }
+
+        internal Team(TeamTable table, Team other) : this(table ?? CompanyDatabase.Current.Team)
         {
-            table.Add();
+            CopyFrom(other);
         }
-        
+
         internal Team(TeamTable table, int index)
         {
             this._table = table;
             this._index = index;
-        }
-
-        public Team(
-            // <ArgumentList>
-            //  <Argument>
-            long id,
-            //  </Argument>
-            SecurityPolicy joinPolicy,
-            Employee owner,
-            IList<Employee> members
-            // </ArgumentList>
-        ) 
-            : this(CompanyDatabase.Current.Team)
-        {
-            // <AssignmentList>
-            //  <Assignment>
-            Id = id;
-            //  </Assignment>
-            JoinPolicy = joinPolicy;
-            Owner = owner;
-            Members = members;
-            // </AssignmentList>
-        }
-
-        public Team(Team other) 
-            : this(CompanyDatabase.Current.Team)
-        {
-            // <OtherAssignmentList>
-            //  <OtherAssignment>
-            Id = other.Id;
-            //  </OtherAssignment>
-            JoinPolicy = other.JoinPolicy;
-            Owner = other.Owner;
-            Members = other.Members;
-            // </OtherAssignmentList>
         }
 
         // <ColumnList>
@@ -89,7 +60,7 @@ namespace BSOA.Generator.Templates
         public Employee Owner
         {
             get => _table.Database.Employee.Get(_table.Owner[_index]);
-            set => _table.Owner[_index] = _table.Database.Employee.LocalIndex(value);
+            set => _table.Owner[_index] = value?.LocalIndex(_table) ?? -1;
         }
 
         //   </RefColumn>
@@ -183,12 +154,19 @@ namespace BSOA.Generator.Templates
         #endregion
 
         #region IRow
-        ITable IRow.Table => _table;
-        int IRow.Index => _index;
+        ITable IRow<Team>.Table => _table;
+        int IRow<Team>.Index => _index;
 
-        void IRow.Next()
+        public void CopyFrom(Team other)
         {
-            _index++;
+            // <OtherAssignmentList>
+            //  <OtherAssignment>
+            Id = other.Id;
+            //  </OtherAssignment>
+            JoinPolicy = other.JoinPolicy;
+            Owner = other.Owner;
+            Members = other.Members;
+            // </OtherAssignmentList>
         }
         #endregion
     }

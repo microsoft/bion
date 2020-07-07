@@ -12,10 +12,10 @@ namespace BSOA.Demo.Model.BSOA
     /// <summary>
     ///  BSOA GENERATED Root Entity for 'FileSystem'
     /// </summary>
-    public partial class FileSystem : IRow
+    public partial class FileSystem : IRow<FileSystem>, IEquatable<FileSystem>
     {
-        private FileSystemTable _table;
-        private int _index;
+        private readonly FileSystemTable _table;
+        private readonly int _index;
 
         internal FileSystemDatabase Database => _table.Database;
         public ITreeSerializable DB => _table.Database;
@@ -23,9 +23,15 @@ namespace BSOA.Demo.Model.BSOA
         public FileSystem() : this(new FileSystemDatabase().FileSystem)
         { }
 
-        internal FileSystem(FileSystemTable table) : this(table, table.Count)
+        public FileSystem(FileSystem other) : this(new FileSystemDatabase().FileSystem, other)
+        { }
+
+        internal FileSystem(FileSystemTable table) : this(table, table.Add()._index)
+        { }
+
+        internal FileSystem(FileSystemTable table, FileSystem other) : this(table)
         {
-            table.Add();
+            CopyFrom(other);
         }
 
         internal FileSystem(FileSystemTable table, int index)
@@ -45,7 +51,6 @@ namespace BSOA.Demo.Model.BSOA
             get => _table.Database.File.List(_table.Files[_index]);
             set => _table.Database.File.List(_table.Files[_index]).SetTo(value);
         }
-
 
         #region IEquatable<FileSystem>
         public bool Equals(FileSystem other)
@@ -107,12 +112,13 @@ namespace BSOA.Demo.Model.BSOA
         #endregion
 
         #region IRow
-        ITable IRow.Table => _table;
-        int IRow.Index => _index;
+        ITable IRow<FileSystem>.Table => _table;
+        int IRow<FileSystem>.Index => _index;
 
-        void IRow.Next()
+        public void CopyFrom(FileSystem other)
         {
-            _index++;
+            Folders = other.Folders;
+            Files = other.Files;
         }
         #endregion
 

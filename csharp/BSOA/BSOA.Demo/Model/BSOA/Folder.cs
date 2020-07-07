@@ -11,10 +11,10 @@ namespace BSOA.Demo.Model.BSOA
     /// <summary>
     ///  BSOA GENERATED Entity for 'Folder'
     /// </summary>
-    public partial class Folder : IRow, IEquatable<Folder>
+    public partial class Folder : IRow<Folder>, IEquatable<Folder>
     {
-        private FolderTable _table;
-        private int _index;
+        private readonly FolderTable _table;
+        private readonly int _index;
 
         public Folder() : this(FileSystemDatabase.Current.Folder)
         { }
@@ -22,32 +22,21 @@ namespace BSOA.Demo.Model.BSOA
         public Folder(FileSystem root) : this(root.Database.Folder)
         { }
 
-        internal Folder(FolderTable table) : this(table, table.Count)
+        public Folder(FileSystem root, Folder other) : this(root.Database.Folder, other)
+        { }
+
+        internal Folder(FolderTable table) : this(table, table.Add()._index)
+        { }
+
+        internal Folder(FolderTable table, Folder other) : this(table ?? FileSystemDatabase.Current.Folder)
         {
-            table.Add();
+            CopyFrom(other);
         }
-        
+
         internal Folder(FolderTable table, int index)
         {
             this._table = table;
             this._index = index;
-        }
-
-        public Folder(
-            int parentIndex,
-            string name
-        ) 
-            : this(FileSystemDatabase.Current.Folder)
-        {
-            ParentIndex = parentIndex;
-            Name = name;
-        }
-
-        public Folder(Folder other) 
-            : this(FileSystemDatabase.Current.Folder)
-        {
-            ParentIndex = other.ParentIndex;
-            Name = other.Name;
         }
 
         public int ParentIndex
@@ -122,12 +111,13 @@ namespace BSOA.Demo.Model.BSOA
         #endregion
 
         #region IRow
-        ITable IRow.Table => _table;
-        int IRow.Index => _index;
+        ITable IRow<Folder>.Table => _table;
+        int IRow<Folder>.Index => _index;
 
-        void IRow.Next()
+        public void CopyFrom(Folder other)
         {
-            _index++;
+            ParentIndex = other.ParentIndex;
+            Name = other.Name;
         }
         #endregion
     }

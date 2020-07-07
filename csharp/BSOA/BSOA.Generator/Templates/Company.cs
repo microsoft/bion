@@ -12,10 +12,10 @@ namespace BSOA.Generator.Templates
     /// <summary>
     ///  BSOA GENERATED Root Entity for 'Company'
     /// </summary>
-    public partial class Company : IRow
+    public partial class Company : IRow<Company>, IEquatable<Company>
     {
-        private CompanyTable _table;
-        private int _index;
+        private readonly CompanyTable _table;
+        private readonly int _index;
 
         internal CompanyDatabase Database => _table.Database;
         public ITreeSerializable DB => _table.Database;
@@ -23,9 +23,15 @@ namespace BSOA.Generator.Templates
         public Company() : this(new CompanyDatabase().Company)
         { }
 
-        internal Company(CompanyTable table) : this(table, table.Count)
+        public Company(Company other) : this(new CompanyDatabase().Company, other)
+        { }
+
+        internal Company(CompanyTable table) : this(table, table.Add()._index)
+        { }
+
+        internal Company(CompanyTable table, Company other) : this(table)
         {
-            table.Add();
+            CopyFrom(other);
         }
 
         internal Company(CompanyTable table, int index)
@@ -71,7 +77,6 @@ namespace BSOA.Generator.Templates
             set => _table.Database.Team.List(_table.Teams[_index]).SetTo(value);
         }
         // </ColumnList>
-
 
         #region IEquatable<Company>
         public bool Equals(Company other)
@@ -153,12 +158,19 @@ namespace BSOA.Generator.Templates
         #endregion
 
         #region IRow
-        ITable IRow.Table => _table;
-        int IRow.Index => _index;
+        ITable IRow<Company>.Table => _table;
+        int IRow<Company>.Index => _index;
 
-        void IRow.Next()
+        public void CopyFrom(Company other)
         {
-            _index++;
+            // <OtherAssignmentList>
+            //  <OtherAssignment>
+            Id = other.Id;
+            //  </OtherAssignment>
+            JoinPolicy = other.JoinPolicy;
+            Owner = other.Owner;
+            Members = other.Members;
+            // </OtherAssignmentList>
         }
         #endregion
 

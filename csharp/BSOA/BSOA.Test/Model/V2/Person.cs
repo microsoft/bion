@@ -11,10 +11,10 @@ namespace BSOA.Test.Model.V2
     /// <summary>
     ///  BSOA GENERATED Entity for 'Person'
     /// </summary>
-    public partial class Person : IRow, IEquatable<Person>
+    public partial class Person : IRow<Person>, IEquatable<Person>
     {
-        private PersonTable _table;
-        private int _index;
+        private readonly PersonTable _table;
+        private readonly int _index;
 
         public Person() : this(PersonDatabase.Current.Person)
         { }
@@ -22,32 +22,21 @@ namespace BSOA.Test.Model.V2
         public Person(Community root) : this(root.Database.Person)
         { }
 
-        internal Person(PersonTable table) : this(table, table.Count)
+        public Person(Community root, Person other) : this(root.Database.Person, other)
+        { }
+
+        internal Person(PersonTable table) : this(table, table.Add()._index)
+        { }
+
+        internal Person(PersonTable table, Person other) : this(table ?? PersonDatabase.Current.Person)
         {
-            table.Add();
+            CopyFrom(other);
         }
-        
+
         internal Person(PersonTable table, int index)
         {
             this._table = table;
             this._index = index;
-        }
-
-        public Person(
-            DateTime birthdate,
-            string name
-        ) 
-            : this(PersonDatabase.Current.Person)
-        {
-            Birthdate = birthdate;
-            Name = name;
-        }
-
-        public Person(Person other) 
-            : this(PersonDatabase.Current.Person)
-        {
-            Birthdate = other.Birthdate;
-            Name = other.Name;
         }
 
         public DateTime Birthdate
@@ -122,12 +111,13 @@ namespace BSOA.Test.Model.V2
         #endregion
 
         #region IRow
-        ITable IRow.Table => _table;
-        int IRow.Index => _index;
+        ITable IRow<Person>.Table => _table;
+        int IRow<Person>.Index => _index;
 
-        void IRow.Next()
+        public void CopyFrom(Person other)
         {
-            _index++;
+            Birthdate = other.Birthdate;
+            Name = other.Name;
         }
         #endregion
     }
