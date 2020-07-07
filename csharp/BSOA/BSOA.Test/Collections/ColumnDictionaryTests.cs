@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using BSOA.Collections;
 
@@ -116,7 +117,10 @@ namespace BSOA.Test.Collections
             // NOTE: Must use unique keys, because Add(KeyValuePair) will throw for a duplicate key
             CollectionChangeVerifier.VerifyCollection(row, (i) => new KeyValuePair<string, string>(i.ToString(), i.ToString()));
 
-            Assert.Throws<IndexOutOfRangeException>(() => new ColumnDictionary<string, string>(null, -1));
+            if (!Debugger.IsAttached)
+            {
+                Assert.Throws<IndexOutOfRangeException>(() => new ColumnDictionary<string, string>(null, -1));
+            }
         }
     }
 }

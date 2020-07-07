@@ -18,7 +18,11 @@ namespace BSOA.Test
                 new DistinctColumn<string>(new StringColumn(), null),
                 new StringColumn());
 
-            return (ColumnDictionary<string, string>)column[0];
+            ColumnDictionary<string, string> first = (ColumnDictionary<string, string>)column[0];
+            first["One"] = "One";
+            first["Two"] = "Two";
+
+            return (ColumnDictionary<string, string>)column[1];
         }
 
         [Fact]

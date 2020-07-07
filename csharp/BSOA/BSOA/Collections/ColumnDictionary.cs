@@ -44,14 +44,14 @@ namespace BSOA.Collections
 
             set
             {
-                int index = InternalIndexOfKey(key);
-                if (index == -1)
+                int pairIndex = InternalIndexOfKey(key);
+                if (pairIndex == -1)
                 {
                     AddInternal(key, value);
                 }
                 else
                 {
-                    _column._values[index] = value;
+                    _column._values[Pairs[pairIndex]] = value;
                 }
             }
         }
