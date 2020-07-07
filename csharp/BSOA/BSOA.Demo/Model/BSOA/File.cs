@@ -22,15 +22,14 @@ namespace BSOA.Demo.Model.BSOA
         public File(FileSystem root) : this(root.Database.File)
         { }
 
-        public File(FileSystem root, File other) : this(root.Database.File, other)
-        { }
-
-        internal File(FileTable table) : this(table, table.Add()._index)
-        { }
-
-        internal File(FileTable table, File other) : this(table ?? FileSystemDatabase.Current.File)
+        public File(FileSystem root, File other) : this(root)
         {
             CopyFrom(other);
+        }
+
+        internal File(FileTable table) : this(table, table.Add()._index)
+        {
+            Init();
         }
 
         internal File(FileTable table, int index)
@@ -38,6 +37,8 @@ namespace BSOA.Demo.Model.BSOA
             this._table = table;
             this._index = index;
         }
+
+        partial void Init();
 
         public int ParentFolderIndex
         {

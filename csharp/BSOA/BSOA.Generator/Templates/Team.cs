@@ -22,15 +22,14 @@ namespace BSOA.Generator.Templates
         public Team(Company root) : this(root.Database.Team)
         { }
 
-        public Team(Company root, Team other) : this(root.Database.Team, other)
-        { }
-
-        internal Team(TeamTable table) : this(table, table.Add()._index)
-        { }
-
-        internal Team(TeamTable table, Team other) : this(table ?? CompanyDatabase.Current.Team)
+        public Team(Company root, Team other) : this(root)
         {
             CopyFrom(other);
+        }
+
+        internal Team(TeamTable table) : this(table, table.Add()._index)
+        {
+            Init();
         }
 
         internal Team(TeamTable table, int index)
@@ -38,6 +37,8 @@ namespace BSOA.Generator.Templates
             this._table = table;
             this._index = index;
         }
+
+        partial void Init();
 
         // <ColumnList>
         //   <SimpleColumn>

@@ -23,15 +23,14 @@ namespace BSOA.Test.Model.V2
         public Community() : this(new PersonDatabase().Community)
         { }
 
-        public Community(Community other) : this(new PersonDatabase().Community, other)
-        { }
-
-        internal Community(CommunityTable table) : this(table, table.Add()._index)
-        { }
-
-        internal Community(CommunityTable table, Community other) : this(table)
+        public Community(Community other) : this(new PersonDatabase().Community)
         {
             CopyFrom(other);
+        }
+
+        internal Community(CommunityTable table) : this(table, table.Add()._index)
+        {
+            Init();
         }
 
         internal Community(CommunityTable table, int index)
@@ -39,6 +38,8 @@ namespace BSOA.Test.Model.V2
             this._table = table;
             this._index = index;
         }
+
+        partial void Init();
 
         public IList<Person> People
         {

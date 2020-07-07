@@ -23,15 +23,14 @@ namespace BSOA.Demo.Model.BSOA
         public FileSystem() : this(new FileSystemDatabase().FileSystem)
         { }
 
-        public FileSystem(FileSystem other) : this(new FileSystemDatabase().FileSystem, other)
-        { }
-
-        internal FileSystem(FileSystemTable table) : this(table, table.Add()._index)
-        { }
-
-        internal FileSystem(FileSystemTable table, FileSystem other) : this(table)
+        public FileSystem(FileSystem other) : this(new FileSystemDatabase().FileSystem)
         {
             CopyFrom(other);
+        }
+
+        internal FileSystem(FileSystemTable table) : this(table, table.Add()._index)
+        {
+            Init();
         }
 
         internal FileSystem(FileSystemTable table, int index)
@@ -39,6 +38,8 @@ namespace BSOA.Demo.Model.BSOA
             this._table = table;
             this._index = index;
         }
+
+        partial void Init();
 
         public IList<Folder> Folders
         {

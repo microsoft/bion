@@ -22,15 +22,14 @@ namespace BSOA.Test.Model.V2
         public Person(Community root) : this(root.Database.Person)
         { }
 
-        public Person(Community root, Person other) : this(root.Database.Person, other)
-        { }
-
-        internal Person(PersonTable table) : this(table, table.Add()._index)
-        { }
-
-        internal Person(PersonTable table, Person other) : this(table ?? PersonDatabase.Current.Person)
+        public Person(Community root, Person other) : this(root)
         {
             CopyFrom(other);
+        }
+
+        internal Person(PersonTable table) : this(table, table.Add()._index)
+        {
+            Init();
         }
 
         internal Person(PersonTable table, int index)
@@ -38,6 +37,8 @@ namespace BSOA.Test.Model.V2
             this._table = table;
             this._index = index;
         }
+
+        partial void Init();
 
         public DateTime Birthdate
         {

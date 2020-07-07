@@ -23,15 +23,14 @@ namespace BSOA.Generator.Templates
         public Company() : this(new CompanyDatabase().Company)
         { }
 
-        public Company(Company other) : this(new CompanyDatabase().Company, other)
-        { }
-
-        internal Company(CompanyTable table) : this(table, table.Add()._index)
-        { }
-
-        internal Company(CompanyTable table, Company other) : this(table)
+        public Company(Company other) : this(new CompanyDatabase().Company)
         {
             CopyFrom(other);
+        }
+
+        internal Company(CompanyTable table) : this(table, table.Add()._index)
+        {
+            Init();
         }
 
         internal Company(CompanyTable table, int index)
@@ -39,6 +38,8 @@ namespace BSOA.Generator.Templates
             this._table = table;
             this._index = index;
         }
+
+        partial void Init();
 
         // <ColumnList>
         //   <SimpleColumn>

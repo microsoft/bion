@@ -23,15 +23,14 @@ namespace BSOA.Generator.Templates
         public Employee(Company root) : this(root.Database.Employee)
         { }
 
-        public Employee(Company root, Employee other) : this(root.Database.Employee, other)
-        { }
-
-        internal Employee(EmployeeTable table) : this(table, table.Add()._index)
-        { }
-
-        internal Employee(EmployeeTable table, Employee other) : this(table ?? CompanyDatabase.Current.Employee)
+        public Employee(Company root, Employee other) : this(root)
         {
             CopyFrom(other);
+        }
+
+        internal Employee(EmployeeTable table) : this(table, table.Add()._index)
+        {
+            Init();
         }
 
         internal Employee(EmployeeTable table, int index)
@@ -39,6 +38,8 @@ namespace BSOA.Generator.Templates
             this._table = table;
             this._index = index;
         }
+
+        partial void Init();
 
         public string Name
         {
