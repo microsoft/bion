@@ -61,7 +61,7 @@ namespace BSOA.Generator.Templates
         public Employee Owner
         {
             get => _table.Database.Employee.Get(_table.Owner[_index]);
-            set => _table.Owner[_index] = _table.LocalIndex(value);
+            set => _table.Owner[_index] = _table.Database.Employee.LocalIndex(value);
         }
 
         //   </RefColumn>

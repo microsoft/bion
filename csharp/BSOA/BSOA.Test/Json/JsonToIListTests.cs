@@ -19,12 +19,13 @@ namespace BSOA.Test.Json
         public void JsonToIList_Basics()
         {
             Action<JsonWriter, IList<int>> writeValueOnly = (w, v) => JsonToIList<int>.Write(w, v, JsonToInt.Write);
-            Action<JsonWriter, string, IList<int>, IList<int>> writeNameAndValue = (w, pn, v, dv) => JsonToIList<int>.Write(w, pn, v, JsonToInt.Write);
+            Action<JsonWriter, string, IList<int>, IList<int>, bool> writeNameAndValue = (w, pn, v, dv, r) => JsonToIList<int>.Write(w, pn, v, JsonToInt.Write, r);
 
             // Lists can be read either by taking the return value, or by passing a list to fill as the argument
             Func<JsonReader, Database, IList<int>> readViaReturnValue = (r, db) => JsonToIList<int>.Read(r, db, null, JsonToInt.Read);
             Func<JsonReader, Database, IList<int>> readViaArgument = (r, db) =>
             {
+                if (r.TokenType == JsonToken.Null) { return null; }
                 IList<int> result = new List<int>();
                 JsonToIList<int>.Read(r, db, result, JsonToInt.Read);
                 return result;

@@ -36,9 +36,9 @@ namespace BSOA.Demo.Model.BSOA
             return item;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, File item)
+        public static void Write(JsonWriter writer, string propertyName, File item, bool required = false)
         {
-            if (item != null)
+            if (required || item != null)
             {
                 writer.WritePropertyName(propertyName);
                 Write(writer, item);

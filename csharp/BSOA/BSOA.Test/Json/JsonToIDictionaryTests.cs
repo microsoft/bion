@@ -20,12 +20,13 @@ namespace BSOA.Test.Json
         public void JsonToIDictionary_Basics()
         {
             Action<JsonWriter, IDictionary<string, string>> writeValueOnly = (w, v) => JsonToIDictionary<string, string>.Write(w, v, JsonToString.Write);
-            Action<JsonWriter, string, IDictionary<string, string>, IDictionary<string, string>> writeNameAndValue = (w, pn, v, dv) => JsonToIDictionary<string, string>.Write(w, pn, v, JsonToString.Write);
+            Action<JsonWriter, string, IDictionary<string, string>, IDictionary<string, string>, bool> writeNameAndValue = (w, pn, v, dv, r) => JsonToIDictionary<string, string>.Write(w, pn, v, JsonToString.Write, r);
 
             // Dictionaries can be read by taking the return value or passing a Dictionary to fill as the argument
             Func<JsonReader, Database, IDictionary<string, string>> readViaReturnValue = (r, db) => JsonToIDictionary<string, string>.Read(r, db, null, JsonToString.Read);
             Func<JsonReader, Database, IDictionary<string, string>> readViaArgument = (r, db) =>
             {
+                if (r.TokenType == JsonToken.Null) { return null; }
                 IDictionary<string, string> result = new Dictionary<string, string>();
                 JsonToIDictionary<string, string>.Read(r, db, result, JsonToString.Read);
                 return result;

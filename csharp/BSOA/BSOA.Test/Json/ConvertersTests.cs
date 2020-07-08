@@ -30,7 +30,7 @@ namespace BSOA.Test.Json
 
             JsonRoundTrip.ValueOnly(now, JsonToDateTime.Write, JsonToDateTime.Read);
 
-            JsonRoundTrip.NameAndValue(now, DateTime.MinValue, JsonToDateTime.Write, JsonToDateTime.Read);
+            JsonRoundTrip.NameAndValue(now, DateTime.MinValue.ToUniversalTime(), JsonToDateTime.Write, JsonToDateTime.Read);
             JsonRoundTrip.NameAndValue(ToMillisecond(DateTime.MinValue.ToUniversalTime()), now, JsonToDateTime.Write, JsonToDateTime.Read);
             JsonRoundTrip.NameAndValue(ToMillisecond(DateTime.MaxValue.ToUniversalTime()), now, JsonToDateTime.Write, JsonToDateTime.Read);
 

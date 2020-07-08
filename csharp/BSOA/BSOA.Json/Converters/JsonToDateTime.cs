@@ -24,9 +24,9 @@ namespace BSOA.Json.Converters
             }
         }
 
-        public static void Write(JsonWriter writer, string propertyName, DateTime item, DateTime defaultValue = default(DateTime))
+        public static void Write(JsonWriter writer, string propertyName, DateTime item, DateTime defaultValue = default(DateTime), bool required = false)
         {
-            if (item.ToUniversalTime() != defaultValue.ToUniversalTime())
+            if (required || item.ToUniversalTime() != defaultValue.ToUniversalTime())
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item.ToUniversalTime().ToString(DateTimeFormat));

@@ -29,9 +29,9 @@ namespace BSOA.Json.Converters
             return result;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, IList<TItem> list, Action<JsonWriter, TItem> writeItem)
+        public static void Write(JsonWriter writer, string propertyName, IList<TItem> list, Action<JsonWriter, TItem> writeItem, bool required = false)
         {
-            if (list?.Count > 0)
+            if (required || list?.Count > 0)
             {
                 writer.WritePropertyName(propertyName);
                 Write(writer, list, writeItem);

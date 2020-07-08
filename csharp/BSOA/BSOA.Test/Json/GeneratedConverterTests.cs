@@ -21,7 +21,7 @@ namespace BSOA.Test.Json
             // Serialization via typed methods
             JsonRoundTrip.ValueOnly(p, JsonToPerson.Write, (r, db) => JsonToPerson.Read(r, readRoot));
             JsonRoundTrip.ValueOnly(null, JsonToPerson.Write, (r, db) => JsonToPerson.Read(r, readRoot));
-            JsonRoundTrip.NameAndValue(p, null, (w, pn, v, dv) => JsonToPerson.Write(w, pn, v), (r, db) => JsonToPerson.Read(r, readRoot));
+            JsonRoundTrip.NameAndValue(p, null, (w, pn, v, dv, req) => JsonToPerson.Write(w, pn, v, req), (r, db) => JsonToPerson.Read(r, readRoot));
 
             // JsonConverter.CanConvert (not called by default serialization)
             JsonToPerson converter = new JsonToPerson();

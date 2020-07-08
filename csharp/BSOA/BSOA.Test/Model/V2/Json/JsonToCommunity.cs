@@ -39,9 +39,9 @@ namespace BSOA.Test.Model.V2
             return item;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, Community item)
+        public static void Write(JsonWriter writer, string propertyName, Community item, bool required = false)
         {
-            if (item != null)
+            if (required || item != null)
             {
                 writer.WritePropertyName(propertyName);
                 Write(writer, item);

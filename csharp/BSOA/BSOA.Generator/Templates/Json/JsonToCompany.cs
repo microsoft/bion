@@ -52,9 +52,9 @@ namespace BSOA.Generator.Templates
             return item;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, Company item)
+        public static void Write(JsonWriter writer, string propertyName, Company item, bool required = false)
         {
-            if (item != null)
+            if (required || item != null)
             {
                 writer.WritePropertyName(propertyName);
                 Write(writer, item);
