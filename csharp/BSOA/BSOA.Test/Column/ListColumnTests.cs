@@ -17,13 +17,23 @@ namespace BSOA.Test
         [Fact]
         public void ListColumn_Basics()
         {
-            ListColumn<int> column = new ListColumn<int>(new NumberColumn<int>(-1));
+            ListColumn<int> column = new ListColumn<int>(new NumberColumn<int>(-1), nullByDefault: false);
             column[0].Add(1);
             column[0].Add(2);
             column[0].Add(3);
 
-            // Test the outer column
-            Column.Basics(() => new ListColumn<int>(new NumberColumn<int>(-1)), ColumnList<int>.Empty, column[0], (index) =>
+            // Test the outer column (non-nullable)
+            Column.Basics(() => new ListColumn<int>(new NumberColumn<int>(-1), nullByDefault: false), ColumnList<int>.Empty, column[0], (index) =>
+            {
+                IList<int> other = column[column.Count];
+                other.Add(index);
+                other.Add(index + 1);
+                other.Add(index + 2);
+                return other;
+            });
+
+            // Test the outer column (nullable)
+            Column.Basics(() => new ListColumn<int>(new NumberColumn<int>(-1), nullByDefault: true), null, column[0], (index) =>
             {
                 IList<int> other = column[column.Count];
                 other.Add(index);
@@ -46,7 +56,7 @@ namespace BSOA.Test
             Assert.False(empty != ColumnList<int>.Empty);
 
             // ColumnList.GetHashCode and Equals w/nulls
-            ListColumn<string> stringColumn = new ListColumn<string>(new StringColumn());
+            ListColumn<string> stringColumn = new ListColumn<string>(new StringColumn(), nullByDefault: false);
             
             ColumnList<string> first = (ColumnList<string>)stringColumn[0];
             first.Add("One");
@@ -63,6 +73,12 @@ namespace BSOA.Test
             second[1] = "NotNull";
             Assert.NotEqual(second.GetHashCode(), first.GetHashCode());
             Assert.False(second == first);
+
+            // Set to null, add to cached copy
+            stringColumn[1] = null;
+            Assert.True(second.Count == 0);
+            second.Add("One");
+            Assert.Single(second);
         }
     }
 }

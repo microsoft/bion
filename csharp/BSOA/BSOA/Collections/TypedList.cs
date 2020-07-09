@@ -29,7 +29,7 @@ namespace BSOA.Collections
 
         public static TypedList<TItem> Get(Table<TItem> table, IColumn<NumberList<int>> column, int index)
         {
-            NumberList<int> indices = column?[index];
+            NumberList<int> indices = column[index];
             return (indices == null ? null : new TypedList<TItem>(indices, (i) => table.Get(i), (v) => table.LocalIndex(v)));
         }
 
@@ -70,8 +70,6 @@ namespace BSOA.Collections
             get => _toInstance(_inner[index]);
             set => _inner[index] = _toIndex(value);
         }
-
-        public NumberList<int> Indices => _inner;
 
         public int Count => _inner?.Count ?? 0;
         public bool IsReadOnly => false;

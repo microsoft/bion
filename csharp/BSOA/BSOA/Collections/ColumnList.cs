@@ -37,7 +37,7 @@ namespace BSOA
         public static ColumnList<T> Get(ListColumn<T> column, int index)
         {
             if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
-            return new ColumnList<T>(column, index);
+            return (column._indices[index] == null ? null : new ColumnList<T>(column, index));
         }
 
         public static void Set(ListColumn<T> column, int index, IEnumerable<T> value)
@@ -50,8 +50,6 @@ namespace BSOA
             }
             else
             {
-                // Setting List to empty 'coerces' list creation in correct column
-                if (column._indices[index] == null) { column._indices[index] = NumberList<int>.Empty; }
                 new ColumnList<T>(column, index).SetTo(value);
             }
         }
@@ -87,7 +85,6 @@ namespace BSOA
             }
 
             Clear();
-            Init();
 
             if (other != null)
             {
@@ -111,17 +108,18 @@ namespace BSOA
 
         public void Clear()
         {
+            // Clear values (still need to reclaim space later)
             if (Count > 0)
             {
-                // Clear values (still need to reclaim space later)
                 foreach (int index in Indices)
                 {
                     Values[index] = default(T);
                 }
-
-                // Clear indices
-                Indices.Clear();
             }
+
+            // Clear indices
+            Init();
+            Indices.Clear();
         }
 
         public bool Contains(T item)
