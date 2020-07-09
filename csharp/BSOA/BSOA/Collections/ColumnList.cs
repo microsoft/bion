@@ -28,15 +28,42 @@ namespace BSOA
 
         public static ColumnList<T> Empty = new ColumnList<T>(null, 0);
 
-        public ColumnList(ListColumn<T> column, int index)
+        protected ColumnList(ListColumn<T> column, int index)
         {
-            if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
             _column = column;
             _rowIndex = index;
         }
 
-        internal ArraySlice<int> Indices => _column?._indices[_rowIndex] ?? ArraySlice<int>.Empty;
-        internal IColumn<T> Values => _column?._values;
+        public static ColumnList<T> Get(ListColumn<T> column, int index)
+        {
+            if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
+            return new ColumnList<T>(column, index);
+        }
+
+        public static void Set(ListColumn<T> column, int index, IEnumerable<T> value)
+        {
+            if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
+
+            if (value == null)
+            {
+                column._indices[index] = null;
+            }
+            else
+            {
+                // Setting List to empty 'coerces' list creation in correct column
+                if (column._indices[index] == null) { column._indices[index] = NumberList<int>.Empty; }
+                new ColumnList<T>(column, index).SetTo(value);
+            }
+        }
+
+        private void Init()
+        {
+            // Setting List to empty 'coerces' list creation in correct column
+            if (_column._indices[_rowIndex] == null) { _column._indices[_rowIndex] = NumberList<int>.Empty; }
+        }
+
+        private NumberList<int> Indices => _column?._indices[_rowIndex];
+        private IColumn<T> Values => _column?._values;
 
         public T this[int indexWithinList]
         {
@@ -44,12 +71,23 @@ namespace BSOA
             set => Values[Indices[indexWithinList]] = value;
         }
 
-        public int Count => Indices.Count;
+        public int Count => Indices?.Count ?? 0;
         public bool IsReadOnly => false;
 
         public void SetTo(IEnumerable<T> other)
         {
+            if (other is ColumnList<T>)
+            {
+                // Avoid Clear() on SetTo(self)
+                ColumnList<T> otherList = (ColumnList<T>)other;
+                if (object.ReferenceEquals(this._column, otherList._column) && this._rowIndex == otherList._rowIndex)
+                {
+                    return;
+                }
+            }
+
             Clear();
+            Init();
 
             if (other != null)
             {
@@ -67,46 +105,23 @@ namespace BSOA
             Values[Values.Count] = item;
 
             // Add a new index to the list of indices pointing to this value
-            ArraySlice<int> indices = Indices;
-            int nextIndex = indices.Index + indices.Count;
-
-            if (indices.IsExpandable && nextIndex < indices.Array.Length)
-            {
-                // If array can be added to and isn't full, append in place
-                indices.Array[nextIndex] = newValueIndex;
-
-                // Record new length
-                _column._indices[_rowIndex] = new ArraySlice<int>(indices.Array, indices.Index, indices.Count + 1, indices.IsExpandable);
-            }
-            else
-            {
-                // Otherwise, allocate a new array and copy items
-                int newSize = Math.Max(MinimumSize, indices.Count + indices.Count / 2);
-                int[] newArray = new int[newSize];
-
-                if (indices.Count > 0)
-                {
-                    Array.Copy(indices.Array, indices.Index, newArray, 0, indices.Count);
-                }
-
-                // Add new item
-                newArray[indices.Count] = newValueIndex;
-
-                // Record new expandable slice with new array and length
-                _column._indices[_rowIndex] = new ArraySlice<int>(newArray, 0, indices.Count + 1, isExpandable: true);
-            }
+            Init();
+            Indices.Add(newValueIndex);
         }
 
         public void Clear()
         {
-            // Clear values (still need to reclaim space later)
-            foreach (int index in Indices)
+            if (Count > 0)
             {
-                Values[index] = default(T);
-            }
+                // Clear values (still need to reclaim space later)
+                foreach (int index in Indices)
+                {
+                    Values[index] = default(T);
+                }
 
-            // Clear indices
-            _column._indices[_rowIndex] = ArraySlice<int>.Empty;
+                // Clear indices
+                Indices.Clear();
+            }
         }
 
         public bool Contains(T item)
@@ -121,16 +136,19 @@ namespace BSOA
 
         public int IndexOf(T item)
         {
-            IColumn<T> values = Values;
-
-            ArraySlice<int> indices = Indices;
-            int[] indicesArray = indices.Array;
-            int end = indices.Index + indices.Count;
-
-            for (int i = indices.Index; i < end; ++i)
+            if (Count > 0)
             {
-                int indexOfValue = indicesArray[i];
-                if (values[indexOfValue].Equals(item)) { return i - indices.Index; }
+                IColumn<T> values = Values;
+
+                ArraySlice<int> indices = Indices.Slice;
+                int[] indicesArray = indices.Array;
+                int end = indices.Index + indices.Count;
+
+                for (int i = indices.Index; i < end; ++i)
+                {
+                    int indexOfValue = indicesArray[i];
+                    if (values[indexOfValue].Equals(item)) { return i - indices.Index; }
+                }
             }
 
             return -1;
@@ -138,24 +156,13 @@ namespace BSOA
 
         public void Insert(int index, T item)
         {
-            ArraySlice<int> indices = Indices;
-            if (index < 0 || index >= indices.Count) { throw new IndexOutOfRangeException(nameof(index)); }
+            // Add the new value itself
+            int newValueIndex = Values.Count;
+            Values[Values.Count] = item;
 
-            // Use add to resize array (inserting to-be-overwritten value)
-            Add(item);
-            indices = Indices;
-            int newValueIndex = indices[indices.Count - 1];
-
-            // Shift items from index forward one
-            int[] array = indices.Array;
-            int realIndex = indices.Index + index;
-            int countFromIndex = indices.Count - index;
-            Array.Copy(array, realIndex, array, realIndex + 1, countFromIndex);
-
-            // Insert item at desired index
-            array[realIndex] = newValueIndex;
-
-            // New slice length already recorded by Add()
+            // Insert the index in the correct position
+            Init();
+            Indices.Insert(index, newValueIndex);
         }
 
         public bool Remove(T item)
@@ -174,21 +181,13 @@ namespace BSOA
 
         public void RemoveAt(int index)
         {
-            ArraySlice<int> indices = Indices;
-            if (index < 0 || index >= indices.Count) { throw new IndexOutOfRangeException(nameof(index)); }
-
-            int[] array = indices.Array;
-            int realIndex = indices.Index + index;
-            int countAfterIndex = indices.Count - 1 - index;
+            if (index < 0 || index >= Count) { throw new IndexOutOfRangeException(nameof(index)); }
 
             // Remove item
-            Values[indices[index]] = default(T);
+            Values[Indices[index]] = default(T);
 
-            // Shift items after index back one
-            Array.Copy(indices.Array, realIndex + 1, indices.Array, realIndex, countAfterIndex);
-
-            // Record shortened length
-            _column._indices[_rowIndex] = new ArraySlice<int>(indices.Array, indices.Index, indices.Count - 1, indices.IsExpandable);
+            // Remove index
+            Indices.RemoveAt(index);
         }
 
         public IEnumerator<T> GetEnumerator()

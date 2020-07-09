@@ -20,7 +20,7 @@ namespace BSOA.Collections
         private readonly Func<int, TItem> _toInstance;
         private readonly Func<TItem, int> _toIndex;
 
-        private TypedList(NumberList<int> indices, Func<int, TItem> toInstance, Func<TItem, int> toIndex)
+        protected TypedList(NumberList<int> indices, Func<int, TItem> toInstance, Func<TItem, int> toIndex)
         {
             _inner = indices;
             _toInstance = toInstance;

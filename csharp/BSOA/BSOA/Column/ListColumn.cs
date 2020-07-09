@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 
+using BSOA.Collections;
 using BSOA.IO;
 using BSOA.Model;
 
@@ -15,14 +16,14 @@ namespace BSOA.Column
     /// </summary>
     public class ListColumn<T> : LimitedList<IList<T>>, IColumn<IList<T>>
     {
-        internal ArraySliceColumn<int> _indices;
+        internal NullableColumn<NumberList<int>> _indices;
         internal IColumn<T> _values;
 
         public override int Count => _indices.Count;
 
-        public ListColumn(IColumn<T> values)
+        public ListColumn(IColumn<T> values, bool nullByDefault = true)
         {
-            _indices = new ArraySliceColumn<int>();
+            _indices = new NullableColumn<NumberList<int>>(new NumberListColumn<int>(), nullByDefault);
             _values = values;
         }
 
@@ -32,8 +33,8 @@ namespace BSOA.Column
 
         public override IList<T> this[int index]
         {
-            get => new ColumnList<T>(this, index);
-            set => new ColumnList<T>(this, index).SetTo(value);
+            get => ColumnList<T>.Get(this, index);
+            set => ColumnList<T>.Set(this, index, value);
         }
 
         public override void Swap(int index1, int index2)
@@ -58,7 +59,7 @@ namespace BSOA.Column
             _indices.Trim();
 
             // Find any unused values and remove them
-            GarbageCollector.Collect<int, T>(_indices, _values);
+            GarbageCollector.Collect<int, T>((INumberColumn<int>)_indices.Values, _values);
 
             // Trim values afterward to clean up any newly unused space
             _values.Trim();

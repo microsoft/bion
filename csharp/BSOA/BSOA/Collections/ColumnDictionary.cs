@@ -19,7 +19,7 @@ namespace BSOA.Collections
 
         public static ColumnDictionary<TKey, TValue> Empty = new ColumnDictionary<TKey, TValue>(null, 0);
 
-        private ColumnDictionary(DictionaryColumn<TKey, TValue> column, int index)
+        protected ColumnDictionary(DictionaryColumn<TKey, TValue> column, int index)
         {
             _column = column;
             _rowIndex = index;
