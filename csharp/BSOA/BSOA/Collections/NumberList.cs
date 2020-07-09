@@ -191,11 +191,21 @@ namespace BSOA.Collections
 
         public static bool operator ==(NumberList<T> left, NumberList<T> right)
         {
+            if (object.ReferenceEquals(left, null))
+            {
+                return object.ReferenceEquals(right, null);
+            }
+
             return left.Equals(right);
         }
 
         public static bool operator !=(NumberList<T> left, NumberList<T> right)
         {
+            if (object.ReferenceEquals(left, null))
+            {
+                return !object.ReferenceEquals(right, null);
+            }
+
             return !(left == right);
         }
     }
