@@ -3,6 +3,8 @@
 
 using BSOA.Test.Model.V1;
 
+using System.Collections.Generic;
+
 using Xunit;
 
 namespace BSOA.Test.Model
@@ -43,21 +45,24 @@ namespace BSOA.Test.Model
         {
             V1.Community other = new V1.Community();
             V1.Community v1 = new V1.Community();
-           
+
+            v1.People = new List<Person>();
+            IList<Person> people = v1.People;
+
             // Add item already in correct instance
-            v1.People.Add(new V1.Person(v1) { Age = 39, Name = "Scott" });
-            Assert.Equal("Scott", v1.People[0].Name);
+            people.Add(new V1.Person(v1) { Age = 39, Name = "Scott" });
+            Assert.Equal("Scott", people[0].Name);
 
             // Add item copied from other instance
-            v1.People.Add(new V1.Person(other) { Age = 36, Name = "Adam" });
-            Assert.Equal("Adam", v1.People[1].Name);
+            people.Add(new V1.Person(other) { Age = 36, Name = "Adam" });
+            Assert.Equal("Adam", people[1].Name);
 
             // Try setter from other DB
             V1.Person dave = new V1.Person(other) { Age = 45, Name = "Dave" };
-            Assert.Equal(2, v1.People.Count);
-            v1.People[1] = dave;
-            Assert.Equal(2, v1.People.Count);
-            Assert.Equal("Dave", v1.People[1].Name);
+            Assert.Equal(2, people.Count);
+            people[1] = dave;
+            Assert.Equal(2, people.Count);
+            Assert.Equal("Dave", people[1].Name);
 
             // Set to already correct instance
             v1.People[1] = v1.People[1];

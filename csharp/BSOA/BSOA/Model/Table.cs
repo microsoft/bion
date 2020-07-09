@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-using BSOA.Collections;
 using BSOA.IO;
 
 namespace BSOA.Model
@@ -73,10 +72,7 @@ namespace BSOA.Model
             }
         }
 
-        public TypedList<T> List(NumberList<int> indices)
-        {
-            return new TypedList<T>(indices, (index) => this.Get(index), (value) => this.LocalIndex(value));
-        }
+
 
         /// <summary>
         ///  Add a new item to the end of this table.

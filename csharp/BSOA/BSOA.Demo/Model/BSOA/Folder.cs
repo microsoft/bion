@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 
+using BSOA.Collections;
 using BSOA.Model;
 
 namespace BSOA.Demo.Model.BSOA

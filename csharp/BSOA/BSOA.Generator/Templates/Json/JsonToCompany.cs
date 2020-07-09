@@ -30,7 +30,7 @@ namespace BSOA.Generator.Templates
             ["owner"] = (reader, root, me) => me.Owner = JsonToEmployee.Read(reader, root),
             //   </RefSetter>
             //   <RefListSetter>
-            ["members"] = (reader, root, me) => JsonToIList<Employee>.Read(reader, root, me.Members, JsonToEmployee.Read),
+            ["members"] = (reader, root, me) => me.Members = JsonToIList<Employee>.Read(reader, root, null, JsonToEmployee.Read),
             //   </RefListSetter>
             // </SetterList>
         };

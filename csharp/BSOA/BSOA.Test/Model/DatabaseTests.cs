@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -20,6 +21,8 @@ namespace BSOA.Test.Model
         public void Database_Basics()
         {
             V1.Community community = new V1.Community();
+            community.People = new List<V1.Person>();
+
             community.People.Add(new V1.Person() { Age = 39, Name = "Scott" });
             community.People.Add(new V1.Person() { Age = 36, Name = "Adam" });
 
@@ -56,7 +59,7 @@ namespace BSOA.Test.Model
 
             // Verify Database.Clear works
             community.DB.Clear();
-            Assert.Empty(community.People);
+            Assert.Null(community.People);
         }
 
         [Fact]
@@ -65,6 +68,8 @@ namespace BSOA.Test.Model
             // Test saving a database and then loading it into a different object model with added and removed columns.
             
             V1.Community v1 = new V1.Community();
+            v1.People = new List<V1.Person>();
+
             v1.People.Add(new V1.Person() { Age = 39, Name = "Scott" });
             v1.People.Add(new V1.Person() { Age = 36, Name = "Adam" });
 
@@ -118,6 +123,8 @@ namespace BSOA.Test.Model
             // These use generated JsonConverter classes to serialize using safe constructors and good default behaviors.
 
             V1.Community v1 = new V1.Community();
+            v1.People = new List<V1.Person>();
+
             v1.People.Add(new V1.Person() { Age = 39, Name = "Scott" });
             v1.People.Add(new V1.Person() { Age = 36, Name = "Adam" });
 

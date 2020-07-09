@@ -119,7 +119,7 @@ namespace BSOA.Test.Collections
 
             if (!Debugger.IsAttached)
             {
-                Assert.Throws<IndexOutOfRangeException>(() => new ColumnDictionary<string, string>(null, -1));
+                Assert.Throws<IndexOutOfRangeException>(() => ColumnDictionary<string, string>.Get(null, -1));
             }
         }
     }

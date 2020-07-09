@@ -75,7 +75,7 @@ namespace BSOA.Generator
         {
             postReplacements.Replacements.Add(new PostReplacement(
                 replace: "me.([^ ]+) = JsonToIList<([^>]+)>.Read\\(reader, root\\)",
-                with: "JsonToIList<$2>.Read(reader, root, me.$1, JsonTo$2.Read)"
+                with: "me.$1 = JsonToIList<$2>.Read(reader, root, null, JsonTo$2.Read)"
             ));
 
             postReplacements.Replacements.Add(new PostReplacement(

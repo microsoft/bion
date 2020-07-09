@@ -100,55 +100,5 @@ namespace BSOA.Test
             // Column range check
             Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
         }
-
-        [Fact]
-        public void NumberListColumn_TypeList_Basics()
-        {
-            // Set up column with sample values, roundtrip, re-verify
-            NumberListColumn<int> column = BuildSampleColumn();
-
-            // Verify second value is in a shared array, not at index zero, not expandable (yet), not ReadOnly
-            NumberList<int> row1List = column[1];
-            TypedList<int> row1Typed = new TypedList<int>(row1List, (index) => index, (index) => index);
-
-            // Test second sample row slice IList members on NumberListConverter
-            CollectionChangeVerifier.VerifyList(row1Typed, (index) => index % 20);
-
-            // Verify values are re-merged and re-loaded properly
-            string values = string.Join(", ", row1List);
-            column = TreeSerializer.RoundTrip(column, TreeFormat.Binary);
-            Assert.Equal(values, string.Join(", ", column[1]));
-
-            // TypedList Equality
-            TypedList<int> row1 = new TypedList<int>(column[1], (index) => index, (index) => index);
-            TypedList<int> row0 = new TypedList<int>(column[0], (index) => index, (index) => index);
-            Assert.True(row1.Equals(row1));
-            Assert.False(row1.Equals(row0));
-            Assert.False(row1 == row0);
-            Assert.True(row1 != row0);
-            Assert.False(null == row0);
-            Assert.True(null != row0);
-            Assert.Equal(row1.GetHashCode(), row1.GetHashCode());
-
-            // TypedList.Indices
-            Assert.Equal(row1.Indices, column[1]);
-
-            // SetTo(other)
-            TypedList<int> firstRow = new TypedList<int>(column[0], (index) => index, (index) => index);
-            row1Typed.SetTo(firstRow);
-            Assert.Equal(string.Join(", ", firstRow), string.Join(", ", row1Typed));
-
-            // SetTo(null)
-            row1Typed.SetTo(null);
-            Assert.Empty(row1Typed);
-
-            // SetTo(IList)
-            row1Typed.SetTo(new int[] { 2, 3, 4, 5 });
-            Assert.Equal("2, 3, 4, 5", string.Join(", ", row1Typed));
-
-            // SetTo(empty)
-            row1Typed.SetTo(Array.Empty<int>());
-            Assert.Empty(row1Typed);
-        }
     }
 }

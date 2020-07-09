@@ -19,8 +19,8 @@ namespace BSOA.Demo.Model.BSOA
     {
         private static Dictionary<string, Action<JsonReader, FileSystem, FileSystem>> setters = new Dictionary<string, Action<JsonReader, FileSystem, FileSystem>>()
         {
-            ["folders"] = (reader, root, me) => JsonToIList<Folder>.Read(reader, root, me.Folders, JsonToFolder.Read),
-            ["files"] = (reader, root, me) => JsonToIList<File>.Read(reader, root, me.Files, JsonToFile.Read)
+            ["folders"] = (reader, root, me) => me.Folders = JsonToIList<Folder>.Read(reader, root, null, JsonToFolder.Read),
+            ["files"] = (reader, root, me) => me.Files = JsonToIList<File>.Read(reader, root, null, JsonToFile.Read)
         };
 
         public static FileSystem Read(JsonReader reader, FileSystem root = null)

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 
+using BSOA.Collections;
 using BSOA.IO;
 using BSOA.Model;
 
@@ -43,8 +44,8 @@ namespace BSOA.Test.Model.V2
 
         public IList<Person> People
         {
-            get => _table.Database.Person.List(_table.People[_index]);
-            set => _table.Database.Person.List(_table.People[_index]).SetTo(value);
+            get => TypedList<Person>.Get(_table.Database.Person, _table.People, _index);
+            set => TypedList<Person>.Set(_table.Database.Person, _table.People, _index, value);
         }
 
         #region IEquatable<Community>

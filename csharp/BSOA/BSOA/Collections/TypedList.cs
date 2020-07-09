@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using BSOA.Extensions;
+using BSOA.Model;
 
 namespace BSOA.Collections
 {
@@ -13,17 +14,55 @@ namespace BSOA.Collections
     ///  TypedList wraps a NumberList and converts it from the internal int (an index of some entity)
     ///  to instances of the entity type for external use.
     /// </summary>
-    public class TypedList<TItem> : IList<TItem>, IReadOnlyList<TItem>
+    public class TypedList<TItem> : IList<TItem>, IReadOnlyList<TItem> where TItem: IRow<TItem>
     {
         private readonly NumberList<int> _inner;
         private readonly Func<int, TItem> _toInstance;
         private readonly Func<TItem, int> _toIndex;
 
-        public TypedList(NumberList<int> indices, Func<int, TItem> toInstance, Func<TItem, int> toIndex)
+        private TypedList(NumberList<int> indices, Func<int, TItem> toInstance, Func<TItem, int> toIndex)
         {
             _inner = indices;
             _toInstance = toInstance;
             _toIndex = toIndex;
+        }
+
+        public static TypedList<TItem> Get(Table<TItem> table, IColumn<NumberList<int>> column, int index)
+        {
+            NumberList<int> indices = column?[index];
+            return (indices == null ? null : new TypedList<TItem>(indices, (i) => table.Get(i), (v) => table.LocalIndex(v)));
+        }
+
+        public static void Set(Table<TItem> table, IColumn<NumberList<int>> column, int index, ICollection<TItem> toValue)
+        {
+            if (toValue == null)
+            {
+                column[index] = null;
+            }
+            else if (toValue.Count == 0)
+            {
+                column[index] = NumberList<int>.Empty;
+            }
+            else
+            {
+                int[] indices = new int[toValue.Count];
+                int i = 0;
+                foreach (TItem value in toValue)
+                {
+                    indices[i++] = table.LocalIndex(value);
+                }
+
+                NumberList<int> current = column[index];
+
+                // Setting to empty coerces list creation in correct column
+                if (current == null)
+                {
+                    column[index] = NumberList<int>.Empty;
+                    current = column[index];
+                }
+
+                current.SetTo(new ArraySlice<int>(indices));
+            }
         }
 
         public TItem this[int index]
@@ -34,7 +73,7 @@ namespace BSOA.Collections
 
         public NumberList<int> Indices => _inner;
 
-        public int Count => _inner.Count;
+        public int Count => _inner?.Count ?? 0;
         public bool IsReadOnly => false;
 
         public void SetTo(IEnumerable<TItem> list)

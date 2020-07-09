@@ -1,6 +1,8 @@
 ﻿using BSOA.Collections;
 using BSOA.Column;
+using BSOA.Test.Model.V1;
 
+using System;
 using System.Collections.Generic;
 
 using Xunit;
@@ -10,38 +12,50 @@ namespace BSOA.Test.Collections
     public class TypedListTests
     {
         [Fact]
-        public void TypeList_Basics()
+        public void TypedList_Basics()
         {
-            List<string> strings = new List<string> { "One", "Two", "Three" };
+            Community c = new Community();
 
-            NumberListColumn<int> column = new NumberListColumn<int>();
-            TypedList<string> list = new TypedList<string>(column[0], (i) => strings[i], (text) => strings.IndexOf(text));
+            List<Person> people = new List<Person> 
+            {
+                new Person(c) { Name = "One" },
+                new Person(c) { Name = "Two" },
+                new Person(c) { Name = "Three" }
+            };
 
+            // Null by default
+            Assert.Null(c.People);
+            
+            // Settable to Empty
+            c.People = Array.Empty<Person>();
+            
+            TypedList<Person> list = (TypedList<Person>)c.People;
             Assert.Empty(list);
 
-            list.Add("One");
+            list.Add(people[0]);
             Assert.Single(list);
-            Assert.Equal(0, column[0][0]);
 
-            list.Add("Two");
-            Assert.True(list.Equals(new string[] { "One", "Two" }));
-            Assert.Equal(1, column[0][1]);
+            list.Add(people[1]);
+            list.Add(people[2]);
+            CollectionReadVerifier.VerifySame(people, list);
 
             // SetTo self works properly
             list.SetTo(list);
-            Assert.True(list.Equals(new string[] { "One", "Two" }));
-
-            // SetTo other works
-            list.SetTo(new List<string>() { "One" });
-            Assert.True(list.Equals(new string[] { "One" }));
-
-            // SetTo empty works
-            list.SetTo(new string[0]);
-            Assert.Empty(list);
+            CollectionReadVerifier.VerifySame(people, list);
 
             // SetTo null works
             list.SetTo(null);
             Assert.Empty(list);
+
+            // SetTo other works
+            list.SetTo(people);
+            CollectionReadVerifier.VerifySame(people, list);
+
+            // SetTo empty works
+            list.SetTo(new List<Person>());
+            Assert.Empty(list);
+
+            CollectionChangeVerifier.VerifyList(c.People, (i) => new Person(c) { Age = (byte)i });
         }
     }
 }

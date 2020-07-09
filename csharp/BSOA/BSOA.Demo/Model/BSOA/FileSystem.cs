@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 
+using BSOA.Collections;
 using BSOA.IO;
 using BSOA.Model;
 
@@ -43,14 +44,14 @@ namespace BSOA.Demo.Model.BSOA
 
         public IList<Folder> Folders
         {
-            get => _table.Database.Folder.List(_table.Folders[_index]);
-            set => _table.Database.Folder.List(_table.Folders[_index]).SetTo(value);
+            get => TypedList<Folder>.Get(_table.Database.Folder, _table.Folders, _index);
+            set => TypedList<Folder>.Set(_table.Database.Folder, _table.Folders, _index, value);
         }
 
         public IList<File> Files
         {
-            get => _table.Database.File.List(_table.Files[_index]);
-            set => _table.Database.File.List(_table.Files[_index]).SetTo(value);
+            get => TypedList<File>.Get(_table.Database.File, _table.Files, _index);
+            set => TypedList<File>.Set(_table.Database.File, _table.Files, _index, value);
         }
 
         #region IEquatable<FileSystem>
