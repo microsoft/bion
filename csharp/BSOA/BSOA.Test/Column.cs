@@ -99,6 +99,10 @@ namespace BSOA.Test
             column[1] = valueProvider(1);
             Assert.Equal(valueProvider(1), column[1]);
 
+            // Set to self
+            column[1] = column[1];
+            Assert.Equal(valueProvider(1), column[1]);
+
             // Add() without instance
             T item = column.Add();
             Assert.Equal(defaultValue, item);
@@ -197,6 +201,9 @@ namespace BSOA.Test
             {
                 // Verify indexer range check (< 0 only; columns auto-size for bigger values)
                 Assert.Throws<IndexOutOfRangeException>(() => column[-1]);
+
+                // Verify indexer range check (< 0 only; columns auto-size for bigger values)
+                Assert.Throws<IndexOutOfRangeException>(() => column[-1] = defaultValue);
 
                 // Verify Remove throws (not expected to be implemented)
                 Assert.Throws<NotSupportedException>(() => column.Remove(defaultValue));

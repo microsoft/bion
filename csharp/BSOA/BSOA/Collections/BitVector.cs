@@ -42,6 +42,8 @@ namespace BSOA.Collections
             }
             set
             {
+                if (index < 0) { throw new IndexOutOfRangeException(); }
+
                 if (index >= Capacity)
                 {
                     if (DefaultValue) { Count += (index + 1 - Capacity); }

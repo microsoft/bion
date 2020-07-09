@@ -91,23 +91,18 @@ namespace BSOA.Test.Collections
             row2[secondName] = secondValue;
             row2[sampleName] = sampleValue;
 
-            // Equals (order-independent)
-            Assert.True(row.Equals(row));
-            Assert.True(row.Equals(row2));
-            Assert.False(row.Equals(ColumnDictionary<string, string>.Empty));
-            Assert.False(row.Equals(null));
+            // Test Equals and GetHashCode
+            CollectionReadVerifier.VerifyEqualityMembers<ColumnDictionary<string, string>>(row, row2);
 
-            // Operators
+            // Test equality operators
             Assert.True(row == row2);
-            Assert.False(row == ColumnDictionary<string, string>.Empty);
-            Assert.True(ColumnDictionary<string, string>.Empty != row);
-            Assert.False(row2 != row);
-            Assert.True((ColumnDictionary<string, string>)null == null);
-            Assert.False((ColumnDictionary<string, string>)null != null);
+            Assert.False(row != row2);
 
-            // GetHashCode (order-independent)
-            Assert.Equal(row.GetHashCode(), row2.GetHashCode());
-            Assert.NotEqual(row.GetHashCode(), ColumnDictionary<string, string>.Empty.GetHashCode());
+            Assert.False(row == null);
+            Assert.True(row != null);
+
+            Assert.False(null == row);
+            Assert.True(null != row);
 
             // GetHashCode handles null key/values safely
             row[null] = null;

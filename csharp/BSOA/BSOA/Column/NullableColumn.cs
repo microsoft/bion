@@ -55,8 +55,13 @@ namespace BSOA.Column
 
         public override void RemoveFromEnd(int count)
         {
-            IsNull.RemoveFromEnd(count);
             Values.RemoveFromEnd(count);
+
+            int isNullToRemove = IsNull.Count - Values.Count;
+            if (isNullToRemove > 0)
+            {
+                IsNull.RemoveFromEnd(isNullToRemove);
+            }
         }
 
         public void Trim()

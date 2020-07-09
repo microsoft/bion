@@ -42,6 +42,7 @@ namespace BSOA.Model
 
             set
             {
+                if (index < 0) { throw new IndexOutOfRangeException(); }
                 if (index >= Count) { _count = index + 1; }
                 Get(index).CopyFrom(value);
             }

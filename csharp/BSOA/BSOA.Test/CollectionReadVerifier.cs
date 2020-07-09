@@ -165,5 +165,14 @@ namespace BSOA.Test
 
             Assert.False(aUntyped.MoveNext());
         }
+
+        public static void VerifyEqualityMembers<T>(T value, T equivalent) where T : class
+        {
+            Assert.True(value.Equals(value));
+            Assert.True(value.Equals(equivalent));
+
+            Assert.Equal(value.GetHashCode(), value.GetHashCode());
+            Assert.Equal(value.GetHashCode(), equivalent.GetHashCode());
+        }
     }
 }
