@@ -16,11 +16,11 @@ namespace BSOA.Generator
         public TemplateType Type { get; set; }
         public string Code { get; set; }
         public Dictionary<string, string> Templates { get; set; }
-        public Dictionary<string, string> PostReplacements { get; set; }
+        public PostReplacements PostReplacements { get; set; }
 
         public string OutputPathFormatString { get; set; }
 
-        public ClassGenerator(TemplateType type, string templateFilePath, string outputPathFormatString, Dictionary<string, string> postReplacements = null)
+        public ClassGenerator(TemplateType type, string templateFilePath, string outputPathFormatString, PostReplacements postReplacements = null)
         {
             Type = type;
             Code = File.ReadAllText(templateFilePath);
@@ -100,11 +100,12 @@ namespace BSOA.Generator
                 finalCode = finalCode.Replace(TemplateDefaults.TableName, table.Name);
             }
 
+            string filePath = Path.Combine(outputFolder, string.Format(OutputPathFormatString, table?.Name ?? database.Name));
+
             // Make any post-replacements
-            finalCode = CodeSection.MakeReplacements(finalCode, PostReplacements);
+            finalCode = PostReplacements.Apply(filePath, finalCode);
 
             // Write to desired output folder
-            string filePath = Path.Combine(outputFolder, string.Format(OutputPathFormatString, table?.Name ?? database.Name));
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             File.WriteAllText(filePath, finalCode);
         }

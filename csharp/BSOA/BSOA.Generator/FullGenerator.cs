@@ -2,7 +2,6 @@
 using BSOA.Json;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -35,18 +34,14 @@ namespace BSOA.Generator
             if (Directory.Exists(OutputFolder)) { Directory.Delete(OutputFolder, true); }
             Directory.CreateDirectory(OutputFolder);
 
-            Dictionary<string, string> postReplacements = new Dictionary<string, string>();
+            PostReplacements postReplacements = new PostReplacements();
             if (PostReplacementsPath != null)
             {
-                postReplacements = AsJson.Load<Dictionary<string, string>>(PostReplacementsPath);
+                postReplacements = AsJson.Load<PostReplacements>(PostReplacementsPath);
             }
 
             // List and Dictionary read and write methods need a writeValue delegate passed
-            postReplacements["me.([^ ]+) = JsonToIList<([^>]+)>.Read\\(reader, root\\)"] = "JsonToIList<$2>.Read(reader, root, me.$1, JsonTo$2.Read)";
-            postReplacements["JsonToIList<([^>]+)>.Write\\(writer, ([^,]+), item.([^,]+), default\\);"] = "JsonToIList<$1>.Write(writer, $2, item.$3, JsonTo$1.Write);";
-
-            postReplacements["me.([^ ]+) = JsonToIDictionary<String, ([^>]+)>.Read\\(reader, root\\)"] = @"me.$1 = JsonToIDictionary<String, $2>.Read(reader, root, null, JsonTo$2.Read)";
-            postReplacements["JsonToIDictionary<String, ([^>]+)>.Write\\(writer, ([^,]+), item.([^,]+), default\\);"] = "JsonToIDictionary<String, $1>.Write(writer, $2, item.$3, JsonTo$1.Write);";
+            AddDefaultPostReplacements(postReplacements);
 
             // Generate Database class
             new ClassGenerator(TemplateType.Database, TemplatePath(@"Internal\CompanyDatabase.cs"), @"Internal\{0}.cs", postReplacements)
@@ -74,6 +69,29 @@ namespace BSOA.Generator
 
             Console.WriteLine("Done.");
             Console.WriteLine();
+        }
+
+        private static void AddDefaultPostReplacements(PostReplacements postReplacements)
+        {
+            postReplacements.Replacements.Add(new PostReplacement(
+                replace: "me.([^ ]+) = JsonToIList<([^>]+)>.Read\\(reader, root\\)",
+                with: "JsonToIList<$2>.Read(reader, root, me.$1, JsonTo$2.Read)"
+            ));
+
+            postReplacements.Replacements.Add(new PostReplacement(
+                replace: "JsonToIList<([^>]+)>.Write\\(writer, ([^,]+), item.([^,]+), default\\);",
+                with: "JsonToIList<$1>.Write(writer, $2, item.$3, JsonTo$1.Write);"
+            ));
+
+            postReplacements.Replacements.Add(new PostReplacement(
+                replace: "me.([^ ]+) = JsonToIDictionary<String, ([^>]+)>.Read\\(reader, root\\)",
+                with: @"me.$1 = JsonToIDictionary<String, $2>.Read(reader, root, null, JsonTo$2.Read)"
+            ));
+
+            postReplacements.Replacements.Add(new PostReplacement(
+                replace: "JsonToIDictionary<String, ([^>]+)>.Write\\(writer, ([^,]+), item.([^,]+), default\\);",
+                with: "JsonToIDictionary<String, $1>.Write(writer, $2, item.$3, JsonTo$1.Write);"
+            ));
         }
 
         private string FindTemplateDefaultPath()

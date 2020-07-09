@@ -141,18 +141,5 @@ namespace BSOA.Generator
 
             return populated;
         }
-
-        public static string MakeReplacements(string code, Dictionary<string, string> replacements)
-        {
-            if (replacements?.Count > 0)
-            {
-                foreach (KeyValuePair<string, string> replacement in replacements)
-                {
-                    code = Regex.Replace(code, replacement.Key, replacement.Value, Options);
-                }
-            }
-
-            return code;
-        }
     }
 }
