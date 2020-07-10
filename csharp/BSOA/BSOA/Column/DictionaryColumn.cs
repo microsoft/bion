@@ -24,7 +24,7 @@ namespace BSOA.Column
         }
 
         // ColumnFactory untyped constructor
-        public DictionaryColumn(IColumn keys, IColumn values) : this((IColumn<TKey>)keys, (IColumn<TValue>)values)
+        public DictionaryColumn(IColumn keys, IColumn values, object defaultValue) : this((IColumn<TKey>)keys, (IColumn<TValue>)values, (defaultValue == null))
         { }
 
         public override IDictionary<TKey, TValue> this[int index] 

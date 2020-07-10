@@ -28,7 +28,7 @@ namespace BSOA.Column
         }
 
         // ColumnFactory untyped constructor
-        public ListColumn(IColumn values) : this((IColumn<T>)values)
+        public ListColumn(IColumn values, object defaultValue) : this((IColumn<T>)values, (defaultValue == null))
         { }
 
         public override IList<T> this[int index]
