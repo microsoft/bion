@@ -26,9 +26,9 @@ namespace BSOA.Json.Converters
             }
         }
 
-        public static void Write(JsonWriter writer, string propertyName, Uri item, Uri defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, Uri item, Uri defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item?.OriginalString);

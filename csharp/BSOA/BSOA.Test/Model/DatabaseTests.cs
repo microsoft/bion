@@ -2,8 +2,10 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Text;
+using System.Runtime.CompilerServices;
 
 using BSOA.IO;
 using BSOA.Json;
@@ -19,6 +21,8 @@ namespace BSOA.Test.Model
         public void Database_Basics()
         {
             V1.Community community = new V1.Community();
+            community.People = new List<V1.Person>();
+
             community.People.Add(new V1.Person() { Age = 39, Name = "Scott" });
             community.People.Add(new V1.Person() { Age = 36, Name = "Adam" });
 
@@ -47,9 +51,15 @@ namespace BSOA.Test.Model
             community.DB.Trim();
             CollectionReadVerifier.VerifySame(community.People, roundTripped.People);
 
+            // Verify Copy constructor recursively copies (List.SetTo -> LocalIndex -> CopyFrom construction)
+            V1.Community copy = new V1.Community(community);
+            CollectionReadVerifier.VerifySame(community.People, copy.People);
+            community.People[0].Age += 10;
+            Assert.NotEqual(community.People[0].Age, copy.People[0].Age);
+
             // Verify Database.Clear works
             community.DB.Clear();
-            Assert.Empty(community.People);
+            Assert.Null(community.People);
         }
 
         [Fact]
@@ -58,6 +68,8 @@ namespace BSOA.Test.Model
             // Test saving a database and then loading it into a different object model with added and removed columns.
             
             V1.Community v1 = new V1.Community();
+            v1.People = new List<V1.Person>();
+
             v1.People.Add(new V1.Person() { Age = 39, Name = "Scott" });
             v1.People.Add(new V1.Person() { Age = 36, Name = "Adam" });
 
@@ -98,7 +110,10 @@ namespace BSOA.Test.Model
             Assert.Equal(0, v1RoundTrip.People[0].Age);
 
             // Read with TreeSerializationSettings.Strict and verify error
-            Assert.Throws<IOException>(() => v1RoundTrip.DB.Load(filePath, TreeFormat.Binary, new BSOA.IO.TreeSerializationSettings() { Strict = true }));
+            if (Debugger.IsAttached)
+            {
+                Assert.Throws<IOException>(() => v1RoundTrip.DB.Load(filePath, TreeFormat.Binary, new BSOA.IO.TreeSerializationSettings() { Strict = true }));
+            }
         }
 
         [Fact]
@@ -108,6 +123,8 @@ namespace BSOA.Test.Model
             // These use generated JsonConverter classes to serialize using safe constructors and good default behaviors.
 
             V1.Community v1 = new V1.Community();
+            v1.People = new List<V1.Person>();
+
             v1.People.Add(new V1.Person() { Age = 39, Name = "Scott" });
             v1.People.Add(new V1.Person() { Age = 36, Name = "Adam" });
 

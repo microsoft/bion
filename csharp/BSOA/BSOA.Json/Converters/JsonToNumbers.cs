@@ -19,9 +19,9 @@ namespace BSOA.Json.Converters
             return (byte)(long)reader.Value;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, byte item, byte defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, byte item, byte defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);
@@ -46,9 +46,9 @@ namespace BSOA.Json.Converters
             return (sbyte)(long)reader.Value;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, sbyte item, sbyte defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, sbyte item, sbyte defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);
@@ -73,9 +73,9 @@ namespace BSOA.Json.Converters
             return (short)(long)reader.Value;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, short item, short defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, short item, short defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);
@@ -100,9 +100,9 @@ namespace BSOA.Json.Converters
             return (ushort)(long)reader.Value;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, ushort item, ushort defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, ushort item, ushort defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);
@@ -127,9 +127,9 @@ namespace BSOA.Json.Converters
             return (int)(long)reader.Value;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, int item, int defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, int item, int defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);
@@ -154,9 +154,9 @@ namespace BSOA.Json.Converters
             return (uint)(long)reader.Value;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, uint item, uint defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, uint item, uint defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);
@@ -181,9 +181,9 @@ namespace BSOA.Json.Converters
             return (long)reader.Value;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, long item, long defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, long item, long defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);
@@ -215,9 +215,9 @@ namespace BSOA.Json.Converters
             }
         }
 
-        public static void Write(JsonWriter writer, string propertyName, ulong item, ulong defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, ulong item, ulong defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);
@@ -242,9 +242,9 @@ namespace BSOA.Json.Converters
             return (float)(double)reader.Value;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, float item, float defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, float item, float defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);
@@ -269,9 +269,9 @@ namespace BSOA.Json.Converters
             return (double)reader.Value;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, double item, double defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, double item, double defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);

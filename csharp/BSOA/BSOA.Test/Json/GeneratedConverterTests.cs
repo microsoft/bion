@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 
 using BSOA.Json;
 using BSOA.Test.Model.V2;
@@ -21,7 +22,7 @@ namespace BSOA.Test.Json
             // Serialization via typed methods
             JsonRoundTrip.ValueOnly(p, JsonToPerson.Write, (r, db) => JsonToPerson.Read(r, readRoot));
             JsonRoundTrip.ValueOnly(null, JsonToPerson.Write, (r, db) => JsonToPerson.Read(r, readRoot));
-            JsonRoundTrip.NameAndValue(p, null, (w, pn, v, dv) => JsonToPerson.Write(w, pn, v), (r, db) => JsonToPerson.Read(r, readRoot));
+            JsonRoundTrip.NameAndValue(p, null, (w, pn, v, dv, req) => JsonToPerson.Write(w, pn, v, req), (r, db) => JsonToPerson.Read(r, readRoot));
 
             // JsonConverter.CanConvert (not called by default serialization)
             JsonToPerson converter = new JsonToPerson();
@@ -43,9 +44,10 @@ namespace BSOA.Test.Json
             string communityPath = "Community.NewtonsoftDefault.json";
             AsJson.Save(communityPath, readRoot);
             Community roundTripCommunity = AsJson.Load<Community>(communityPath);
-            Assert.Empty(roundTripCommunity.People);
+            Assert.Null(roundTripCommunity.People);
 
             // Serialize root with Person
+            readRoot.People = new List<Person>();
             readRoot.People.Add(p);
             AsJson.Save(communityPath, readRoot);
             roundTripCommunity = AsJson.Load<Community>(communityPath);

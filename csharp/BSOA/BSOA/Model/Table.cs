@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
-using BSOA.Collections;
 using BSOA.IO;
 
 namespace BSOA.Model
@@ -18,19 +18,19 @@ namespace BSOA.Model
     ///  See BSOA.Demo
     /// </remarks>
     /// <typeparam name="T">SoA Item type this is a Table of</typeparam>
-    public abstract class Table<T> : LimitedList<T>, ITable<T> where T : IRow
+    public abstract class Table<T> : LimitedList<T>, ITable<T> where T : IRow<T>
     {
         private int _count;
         protected Dictionary<string, IColumn> Columns { get; private set; }
 
-        public Table()
+        protected Table()
         {
             Columns = new Dictionary<string, IColumn>();
         }
 
-        public override int Count => _count;
-
         public abstract T Get(int index);
+
+        public override int Count => _count;
 
         public override T this[int index]
         {
@@ -42,19 +42,9 @@ namespace BSOA.Model
 
             set
             {
+                if (index < 0) { throw new IndexOutOfRangeException(); }
                 if (index >= Count) { _count = index + 1; }
-
-                IRow row = (IRow)value;
-                if (object.ReferenceEquals(this, row.Table) && row.Index == index)
-                {
-                    // Already here
-                    return;
-                }
-                else
-                {
-                    // Copy from other table
-                    CopyItem(index, row.Table, row.Index);
-                }
+                Get(index).CopyFrom(value);
             }
         }
 
@@ -68,24 +58,22 @@ namespace BSOA.Model
         {
             if (value == null) { return -1; }
 
-            IRow row = (IRow)value;
-            if (object.ReferenceEquals(this, row.Table))
+            if (object.ReferenceEquals(value.Table, this))
             {
                 // Already here
-                return row.Index;
+                return value.Index;
             }
             else
             {
                 // Copy from other table
-                CopyItem(_count, row.Table, row.Index);
-                return _count++;
+                T result = Add();
+                result.CopyFrom(value);
+
+                return result.Index;
             }
         }
 
-        public TypedList<T> List(NumberList<int> indices)
-        {
-            return new TypedList<T>(indices, (index) => this.Get(index), (value) => this.LocalIndex(value));
-        }
+
 
         /// <summary>
         ///  Add a new item to the end of this table.
@@ -93,20 +81,15 @@ namespace BSOA.Model
         /// <returns>New SoA item instance</returns>
         public override T Add()
         {
-            _count++;
-            return this[Count - 1];
+            int newIndex = Interlocked.Increment(ref _count) - 1;
+            return Get(newIndex);
         }
 
         public override void Add(T item)
         {
-            IRow row = (IRow)item;
-            if (object.ReferenceEquals(this, row.Table))
+            if (!object.ReferenceEquals(item.Table, this) || item.Index != Count - 1)
             {
-                return;
-            }
-            else
-            {
-                this[Count] = item;
+                Add().CopyFrom(item);
             }
         }
 
@@ -126,17 +109,6 @@ namespace BSOA.Model
         {
             Columns[name] = column;
             return column;
-        }
-
-        public override void CopyItem(int toIndex, ILimitedList fromList, int fromIndex)
-        {
-            Table<T> other = fromList as Table<T>;
-            if (other == null) { throw new ArgumentException(nameof(fromList)); }
-
-            foreach (var pair in Columns)
-            {
-                pair.Value.CopyItem(toIndex, other.Columns[pair.Key], fromIndex);
-            }
         }
 
         public override void Swap(int index1, int index2)

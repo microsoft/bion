@@ -15,9 +15,9 @@ namespace BSOA.Json.Converters
             return (TEnum)_enumConverter.ReadJson(reader, typeof(TEnum), null, null);
         }
 
-        public static void Write(JsonWriter writer, string propertyName, TEnum item, TEnum defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, TEnum item, TEnum defaultValue = default, bool required = false)
         {
-            if (!item.Equals(defaultValue))
+            if (required || !item.Equals(defaultValue))
             {
                 writer.WritePropertyName(propertyName);
                 _enumConverter.WriteJson(writer, item, null);

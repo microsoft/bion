@@ -20,7 +20,7 @@ namespace BSOA.Column
         public override NumberList<T> this[int index] 
         {
             get => new NumberList<T>(Inner, index);
-            set => Inner[index] = value.Slice;
+            set => Inner[index] = value?.Slice ?? ArraySlice<T>.Empty;
         }
 
         public void ForEach(Action<ArraySlice<T>> action)

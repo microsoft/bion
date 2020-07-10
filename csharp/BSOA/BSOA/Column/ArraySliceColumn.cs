@@ -54,6 +54,7 @@ namespace BSOA.Column
 
             set
             {
+                if (index < 0) { throw new IndexOutOfRangeException(); }
                 int chapterIndex = index / ArraySliceChapter<T>.ChapterRowCount;
                 int indexInChapter = index % ArraySliceChapter<T>.ChapterRowCount;
 

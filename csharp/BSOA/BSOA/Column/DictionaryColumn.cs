@@ -14,23 +14,23 @@ namespace BSOA.Column
     {
         internal IColumn<TKey> _keys;
         internal IColumn<TValue> _values;
-        internal NumberListColumn<int> _pairs;
+        internal NullableColumn<NumberList<int>> _pairs;
 
-        public DictionaryColumn(IColumn<TKey> keys, IColumn<TValue> values)
+        public DictionaryColumn(IColumn<TKey> keys, IColumn<TValue> values, bool nullByDefault = true)
         {
             _keys = keys;
             _values = values;
-            _pairs = new NumberListColumn<int>();
+            _pairs = new NullableColumn<NumberList<int>>(new NumberListColumn<int>(), nullByDefault);
         }
 
         // ColumnFactory untyped constructor
-        public DictionaryColumn(IColumn keys, IColumn values) : this((IColumn<TKey>)keys, (IColumn<TValue>)values)
+        public DictionaryColumn(IColumn keys, IColumn values, object defaultValue) : this((IColumn<TKey>)keys, (IColumn<TValue>)values, (defaultValue == null))
         { }
 
         public override IDictionary<TKey, TValue> this[int index] 
         {
-            get => new ColumnDictionary<TKey, TValue>(this, index);
-            set => new ColumnDictionary<TKey, TValue>(this, index).SetTo(value);
+            get => ColumnDictionary<TKey, TValue>.Get(this, index);
+            set => ColumnDictionary<TKey, TValue>.Set(this, index, value);
         }
 
         public override int Count => _pairs.Count;
@@ -57,8 +57,8 @@ namespace BSOA.Column
             _pairs.Trim();
 
             // Remove any keys and values which are no longer referenced
-            GarbageCollector.Collect(_pairs, _keys);
-            GarbageCollector.Collect(_pairs, _values);
+            GarbageCollector.Collect((INumberColumn<int>)_pairs.Values, _keys);
+            GarbageCollector.Collect((INumberColumn<int>)_pairs.Values, _values);
 
             _keys.Trim();
             _values.Trim();

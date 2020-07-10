@@ -21,12 +21,12 @@ namespace BSOA.Column
 
         private static DateTime Convert(long value)
         {
-            return new DateTime(value, DateTimeKind.Utc);
+            return (value == 0L ? DateTime.MinValue : new DateTime(value, DateTimeKind.Utc));
         }
 
         private static long Convert(DateTime value)
         {
-            return value.ToUniversalTime().Ticks;
+            return (value == DateTime.MinValue ? 0L : value.ToUniversalTime().Ticks);
         }
     }
 }

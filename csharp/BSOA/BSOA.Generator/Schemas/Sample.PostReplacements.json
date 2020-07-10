@@ -1,0 +1,20 @@
+{
+  "replacements": [
+    {
+      "replace": "me.([^ ]+) = JsonToIList<([^>]+)>.Read\\(reader, root\\)",
+      "with": "JsonToIList<$2>.Read(reader, root, me.$1, JsonTo$2.Read)"
+    },
+    {
+      "replace": "JsonToIList<([^>]+)>.Write\\(writer, ([^,]+), item.([^,]+), default\\);",
+      "with": "JsonToIList<$1>.Write(writer, $2, item.$3, JsonTo$1.Write);"
+    },
+    {
+      "replace": "me.([^ ]+) = JsonToIDictionary<String, ([^>]+)>.Read\\(reader, root\\)",
+      "with": "me.$1 = JsonToIDictionary<String, $2>.Read(reader, root, null, JsonTo$2.Read)"
+    },
+    {
+      "replace": "JsonToIDictionary<String, ([^>]+)>.Write\\(writer, ([^,]+), item.([^,]+), default\\);",
+      "with": "JsonToIDictionary<String, $1>.Write(writer, $2, item.$3, JsonTo$1.Write);"
+    }
+  ]
+}

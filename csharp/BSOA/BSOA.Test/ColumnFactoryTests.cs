@@ -40,6 +40,16 @@ namespace BSOA.Test
             IColumn<IDictionary<string, string>> dictionaryColumn = (IColumn<IDictionary<string, string>>)(ColumnFactory.Build(typeof(IDictionary<string, string>), null));
             Assert.NotNull(dictionaryColumn);
 
+            // Verify collections are null by default if null passed as default
+            Assert.Null(listColumn[0]);
+            Assert.Null(dictionaryColumn[0]);
+
+            // Verify collections not null by default if non-null passed as default
+            listColumn = (IColumn<IList<string>>)ColumnFactory.Build(typeof(IList<string>), new object());
+            dictionaryColumn = (IColumn<IDictionary<string, string>>)(ColumnFactory.Build(typeof(IDictionary<string, string>), new object()));
+            Assert.NotNull(listColumn[0]);
+            Assert.NotNull(dictionaryColumn[0]);
+
             if (!Debugger.IsAttached)
             {
                 Assert.Throws<NotImplementedException>(() => ColumnFactory.Build(typeof(Decimal)));

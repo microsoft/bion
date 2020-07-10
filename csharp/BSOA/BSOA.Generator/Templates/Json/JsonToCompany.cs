@@ -30,7 +30,7 @@ namespace BSOA.Generator.Templates
             ["owner"] = (reader, root, me) => me.Owner = JsonToEmployee.Read(reader, root),
             //   </RefSetter>
             //   <RefListSetter>
-            ["members"] = (reader, root, me) => JsonToIList<Employee>.Read(reader, root, me.Members, JsonToEmployee.Read),
+            ["members"] = (reader, root, me) => me.Members = JsonToIList<Employee>.Read(reader, root, null, JsonToEmployee.Read),
             //   </RefListSetter>
             // </SetterList>
         };
@@ -52,9 +52,9 @@ namespace BSOA.Generator.Templates
             return item;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, Company item)
+        public static void Write(JsonWriter writer, string propertyName, Company item, bool required = false)
         {
-            if (item != null)
+            if (required || item != null)
             {
                 writer.WritePropertyName(propertyName);
                 Write(writer, item);

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 
+using BSOA.Collections;
 using BSOA.Model;
 
 namespace BSOA.Test.Model.V1
@@ -11,10 +12,10 @@ namespace BSOA.Test.Model.V1
     /// <summary>
     ///  BSOA GENERATED Entity for 'Person'
     /// </summary>
-    public partial class Person : IRow, IEquatable<Person>
+    public partial class Person : IRow<Person>, IEquatable<Person>
     {
-        private PersonTable _table;
-        private int _index;
+        private readonly PersonTable _table;
+        private readonly int _index;
 
         public Person() : this(PersonDatabase.Current.Person)
         { }
@@ -22,33 +23,23 @@ namespace BSOA.Test.Model.V1
         public Person(Community root) : this(root.Database.Person)
         { }
 
-        internal Person(PersonTable table) : this(table, table.Count)
+        public Person(Community root, Person other) : this(root.Database.Person)
         {
-            table.Add();
+            CopyFrom(other);
         }
-        
+
+        internal Person(PersonTable table) : this(table, table.Add()._index)
+        {
+            Init();
+        }
+
         internal Person(PersonTable table, int index)
         {
             this._table = table;
             this._index = index;
         }
 
-        public Person(
-            byte age,
-            string name
-        ) 
-            : this(PersonDatabase.Current.Person)
-        {
-            Age = age;
-            Name = name;
-        }
-
-        public Person(Person other) 
-            : this(PersonDatabase.Current.Person)
-        {
-            Age = other.Age;
-            Name = other.Name;
-        }
+        partial void Init();
 
         public byte Age
         {
@@ -67,8 +58,8 @@ namespace BSOA.Test.Model.V1
         {
             if (other == null) { return false; }
 
-            if (this.Age != other.Age) { return false; }
-            if (this.Name != other.Name) { return false; }
+            if (!object.Equals(this.Age, other.Age)) { return false; }
+            if (!object.Equals(this.Name, other.Name)) { return false; }
 
             return true;
         }
@@ -122,12 +113,13 @@ namespace BSOA.Test.Model.V1
         #endregion
 
         #region IRow
-        ITable IRow.Table => _table;
-        int IRow.Index => _index;
+        ITable IRow<Person>.Table => _table;
+        int IRow<Person>.Index => _index;
 
-        void IRow.Next()
+        public void CopyFrom(Person other)
         {
-            _index++;
+            Age = other.Age;
+            Name = other.Name;
         }
         #endregion
     }

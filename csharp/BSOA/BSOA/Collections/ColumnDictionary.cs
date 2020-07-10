@@ -14,18 +14,38 @@ namespace BSOA.Collections
     {
         private readonly DictionaryColumn<TKey, TValue> _column;
         private readonly int _rowIndex;
+        private NumberList<int> Pairs => _column?._pairs[_rowIndex] ?? NumberList<int>.Empty;
+        private TValue Value(int pairIndex) => _column._values[_column._pairs[_rowIndex][pairIndex]];
 
         public static ColumnDictionary<TKey, TValue> Empty = new ColumnDictionary<TKey, TValue>(null, 0);
 
-        public ColumnDictionary(DictionaryColumn<TKey, TValue> column, int index)
+        protected ColumnDictionary(DictionaryColumn<TKey, TValue> column, int index)
         {
-            if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
             _column = column;
             _rowIndex = index;
         }
 
-        private NumberList<int> Pairs => _column?._pairs[_rowIndex] ?? NumberList<int>.Empty;
-        private TValue Value(int pairIndex) => _column._values[_column._pairs[_rowIndex][pairIndex]];
+        public static ColumnDictionary<TKey, TValue> Get(DictionaryColumn<TKey, TValue> column, int index)
+        {
+            if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
+            return (column?._pairs?[index] == null ? null : new ColumnDictionary<TKey, TValue>(column, index));
+        }
+
+        public static void Set(DictionaryColumn<TKey, TValue> column, int index, IDictionary<TKey, TValue> value)
+        {
+            if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
+
+            if (value == null)
+            {
+                column._pairs[index] = null;
+            }
+            else
+            {
+                // Setting List to empty 'coerces' list creation in correct column
+                if (column._pairs[index] == null) { column._pairs[index] = NumberList<int>.Empty; }
+                new ColumnDictionary<TKey, TValue>(column, index).SetTo(value);
+            }
+        }
 
         public bool IsReadOnly => false;
         public int Count => Pairs.Count;
@@ -44,14 +64,14 @@ namespace BSOA.Collections
 
             set
             {
-                int index = InternalIndexOfKey(key);
-                if (index == -1)
+                int pairIndex = InternalIndexOfKey(key);
+                if (pairIndex == -1)
                 {
                     AddInternal(key, value);
                 }
                 else
                 {
-                    _column._values[index] = value;
+                    _column._values[Pairs[pairIndex]] = value;
                 }
             }
         }
@@ -61,6 +81,16 @@ namespace BSOA.Collections
 
         public void SetTo(IDictionary<TKey, TValue> other)
         {
+            if (other is ColumnDictionary<TKey, TValue>)
+            {
+                // Avoid Clear() on SetTo(self)
+                ColumnDictionary<TKey, TValue> otherDictionary = (ColumnDictionary<TKey, TValue>)other;
+                if (object.ReferenceEquals(this._column, otherDictionary._column) && this._rowIndex == otherDictionary._rowIndex)
+                {
+                    return;
+                }
+            }
+
             Clear();
 
             if (other != null)
@@ -257,6 +287,6 @@ namespace BSOA.Collections
             return !left.Equals(right);
         }
 
-        
+
     }
 }

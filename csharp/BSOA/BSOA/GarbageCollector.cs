@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 
 using BSOA.Collections;
-using BSOA.Column;
 using BSOA.Model;
 
 namespace BSOA

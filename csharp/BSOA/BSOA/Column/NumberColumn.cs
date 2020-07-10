@@ -42,6 +42,8 @@ namespace BSOA.Column
 
             set
             {
+                if (index < 0) { throw new IndexOutOfRangeException(); }
+
                 // Track logical count
                 if (index >= Count) { _count = index + 1; }
 

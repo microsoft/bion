@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 
+using BSOA.Collections;
 using BSOA.IO;
 using BSOA.Model;
 
@@ -13,10 +13,10 @@ namespace BSOA.Generator.Templates
     /// <summary>
     ///  BSOA GENERATED Root Entity for 'Company'
     /// </summary>
-    public partial class Company : IRow
+    public partial class Company : IRow<Company>, IEquatable<Company>
     {
-        private CompanyTable _table;
-        private int _index;
+        private readonly CompanyTable _table;
+        private readonly int _index;
 
         internal CompanyDatabase Database => _table.Database;
         public ITreeSerializable DB => _table.Database;
@@ -24,9 +24,14 @@ namespace BSOA.Generator.Templates
         public Company() : this(new CompanyDatabase().Company)
         { }
 
-        internal Company(CompanyTable table) : this(table, table.Count)
+        public Company(Company other) : this(new CompanyDatabase().Company)
         {
-            table.Add();
+            CopyFrom(other);
+        }
+
+        internal Company(CompanyTable table) : this(table, table.Add()._index)
+        {
+            Init();
         }
 
         internal Company(CompanyTable table, int index)
@@ -34,6 +39,8 @@ namespace BSOA.Generator.Templates
             this._table = table;
             this._index = index;
         }
+
+        partial void Init();
 
         // <ColumnList>
         //   <SimpleColumn>
@@ -55,24 +62,20 @@ namespace BSOA.Generator.Templates
         //  <RefColumn>
         public Employee Owner
         {
-            get => _table.Database.Employee[_table.Owner[_index]];
+            get => _table.Database.Employee.Get(_table.Owner[_index]);
+            set => _table.Owner[_index] = _table.Database.Employee.LocalIndex(value);
         }
+
         //  </RefColumn>
         //  <RefListColumn>
         public IList<Employee> Members
         {
-            get => _table.Database.Employee.List(_table.Members[_index]);
-            set => _table.Database.Employee.List(_table.Members[_index]).SetTo(value);
+            get => TypedList<Employee>.Get(_table.Database.Employee, _table.Members, _index);
+            set => TypedList<Employee>.Set(_table.Database.Employee, _table.Members, _index, value);
         }
 
         //  </RefListColumn>
-        public IList<Team> Teams
-        {
-            get => _table.Database.Team.List(_table.Teams[_index]);
-            set => _table.Database.Team.List(_table.Teams[_index]).SetTo(value);
-        }
         // </ColumnList>
-
 
         #region IEquatable<Company>
         public bool Equals(Company other)
@@ -81,11 +84,11 @@ namespace BSOA.Generator.Templates
 
             // <EqualsList>
             //  <Equals>
-            if (this.Id != other.Id) { return false; }
+            if (!object.Equals(this.Id, other.Id)) { return false; }
             //  </Equals>
-            if (this.JoinPolicy != other.JoinPolicy) { return false; }
-            if (this.Owner != other.Owner) { return false; }
-            if (this.Members != other.Members) { return false; }
+            if (!object.Equals(this.JoinPolicy, other.JoinPolicy)) { return false; }
+            if (!object.Equals(this.Owner, other.Owner)) { return false; }
+            if (!object.Equals(this.Members, other.Members)) { return false; }
             // </EqualsList>
 
             return true;
@@ -154,17 +157,24 @@ namespace BSOA.Generator.Templates
         #endregion
 
         #region IRow
-        ITable IRow.Table => _table;
-        int IRow.Index => _index;
+        ITable IRow<Company>.Table => _table;
+        int IRow<Company>.Index => _index;
 
-        void IRow.Next()
+        public void CopyFrom(Company other)
         {
-            _index++;
+            // <OtherAssignmentList>
+            //  <OtherAssignment>
+            Id = other.Id;
+            //  </OtherAssignment>
+            JoinPolicy = other.JoinPolicy;
+            Owner = other.Owner;
+            Members = other.Members;
+            // </OtherAssignmentList>
         }
         #endregion
 
         #region Easy Serialization
-        public void WriteBsoa(Stream stream)
+        public void WriteBsoa(System.IO.Stream stream)
         {
             using (BinaryTreeWriter writer = new BinaryTreeWriter(stream))
             {
@@ -174,10 +184,10 @@ namespace BSOA.Generator.Templates
 
         public void WriteBsoa(string filePath)
         {
-            WriteBsoa(File.Create(filePath));
+            WriteBsoa(System.IO.File.Create(filePath));
         }
 
-        public static Company ReadBsoa(Stream stream)
+        public static Company ReadBsoa(System.IO.Stream stream)
         {
             using (BinaryTreeReader reader = new BinaryTreeReader(stream))
             {
@@ -189,15 +199,15 @@ namespace BSOA.Generator.Templates
 
         public static Company ReadBsoa(string filePath)
         {
-            return ReadBsoa(File.OpenRead(filePath));
+            return ReadBsoa(System.IO.File.OpenRead(filePath));
         }
 
         public static TreeDiagnostics Diagnostics(string filePath)
         {
-            return Diagnostics(File.OpenRead(filePath));
+            return Diagnostics(System.IO.File.OpenRead(filePath));
         }
 
-        public static TreeDiagnostics Diagnostics(Stream stream)
+        public static TreeDiagnostics Diagnostics(System.IO.Stream stream)
         {
             using (BinaryTreeReader btr = new BinaryTreeReader(stream))
             using (TreeDiagnosticsReader reader = new TreeDiagnosticsReader(btr))

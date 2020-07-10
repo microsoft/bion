@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 
+using BSOA.Collections;
 using BSOA.IO;
 using BSOA.Model;
 
@@ -13,10 +13,10 @@ namespace BSOA.Test.Model.V1
     /// <summary>
     ///  BSOA GENERATED Root Entity for 'Community'
     /// </summary>
-    public partial class Community : IRow
+    public partial class Community : IRow<Community>, IEquatable<Community>
     {
-        private CommunityTable _table;
-        private int _index;
+        private readonly CommunityTable _table;
+        private readonly int _index;
 
         internal PersonDatabase Database => _table.Database;
         public ITreeSerializable DB => _table.Database;
@@ -24,9 +24,14 @@ namespace BSOA.Test.Model.V1
         public Community() : this(new PersonDatabase().Community)
         { }
 
-        internal Community(CommunityTable table) : this(table, table.Count)
+        public Community(Community other) : this(new PersonDatabase().Community)
         {
-            table.Add();
+            CopyFrom(other);
+        }
+
+        internal Community(CommunityTable table) : this(table, table.Add()._index)
+        {
+            Init();
         }
 
         internal Community(CommunityTable table, int index)
@@ -35,19 +40,20 @@ namespace BSOA.Test.Model.V1
             this._index = index;
         }
 
+        partial void Init();
+
         public IList<Person> People
         {
-            get => _table.Database.Person.List(_table.People[_index]);
-            set => _table.Database.Person.List(_table.People[_index]).SetTo(value);
+            get => TypedList<Person>.Get(_table.Database.Person, _table.People, _index);
+            set => TypedList<Person>.Set(_table.Database.Person, _table.People, _index, value);
         }
-
 
         #region IEquatable<Community>
         public bool Equals(Community other)
         {
             if (other == null) { return false; }
 
-            if (this.People != other.People) { return false; }
+            if (!object.Equals(this.People, other.People)) { return false; }
 
             return true;
         }
@@ -96,17 +102,17 @@ namespace BSOA.Test.Model.V1
         #endregion
 
         #region IRow
-        ITable IRow.Table => _table;
-        int IRow.Index => _index;
+        ITable IRow<Community>.Table => _table;
+        int IRow<Community>.Index => _index;
 
-        void IRow.Next()
+        public void CopyFrom(Community other)
         {
-            _index++;
+            People = other.People;
         }
         #endregion
 
         #region Easy Serialization
-        public void WriteBsoa(Stream stream)
+        public void WriteBsoa(System.IO.Stream stream)
         {
             using (BinaryTreeWriter writer = new BinaryTreeWriter(stream))
             {
@@ -116,10 +122,10 @@ namespace BSOA.Test.Model.V1
 
         public void WriteBsoa(string filePath)
         {
-            WriteBsoa(File.Create(filePath));
+            WriteBsoa(System.IO.File.Create(filePath));
         }
 
-        public static Community ReadBsoa(Stream stream)
+        public static Community ReadBsoa(System.IO.Stream stream)
         {
             using (BinaryTreeReader reader = new BinaryTreeReader(stream))
             {
@@ -131,15 +137,15 @@ namespace BSOA.Test.Model.V1
 
         public static Community ReadBsoa(string filePath)
         {
-            return ReadBsoa(File.OpenRead(filePath));
+            return ReadBsoa(System.IO.File.OpenRead(filePath));
         }
 
         public static TreeDiagnostics Diagnostics(string filePath)
         {
-            return Diagnostics(File.OpenRead(filePath));
+            return Diagnostics(System.IO.File.OpenRead(filePath));
         }
 
-        public static TreeDiagnostics Diagnostics(Stream stream)
+        public static TreeDiagnostics Diagnostics(System.IO.Stream stream)
         {
             using (BinaryTreeReader btr = new BinaryTreeReader(stream))
             using (TreeDiagnosticsReader reader = new TreeDiagnosticsReader(btr))

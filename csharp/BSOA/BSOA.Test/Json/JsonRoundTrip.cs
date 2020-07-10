@@ -16,7 +16,7 @@ namespace BSOA.Test.Json
 {
     public static class JsonRoundTrip
     {
-        public static void NameAndValue<TItem>(TItem value, TItem defaultValue, Action<JsonWriter, string, TItem, TItem> write, Func<JsonReader, Database, TItem> read)
+        public static void NameAndValue<TItem>(TItem value, TItem defaultValue, Action<JsonWriter, string, TItem, TItem, bool> write, Func<JsonReader, Database, TItem> read)
         {
             TItem roundTripped = default;
 
@@ -28,10 +28,13 @@ namespace BSOA.Test.Json
                     jtw.WriteStartObject();
 
                     // Write PropertyName and Value
-                    write(jtw, "propertyName", value, defaultValue);
+                    write(jtw, "propertyName", value, defaultValue, false);
 
                     // Write PropertyName and Default (nothing should be written)
-                    write(jtw, "propertyWithDefault", defaultValue, defaultValue);
+                    write(jtw, "propertyWithDefault", defaultValue, defaultValue, false);
+
+                    // Write PropertyName and Default, Required (default should be written)
+                    write(jtw, "requiredWithDefault", defaultValue, defaultValue, true);
 
                     jtw.WriteEndObject();
                 }
@@ -45,14 +48,20 @@ namespace BSOA.Test.Json
                     jtr.Read();
                     Assert.Equal(JsonToken.StartObject, jtr.TokenType);
 
-                    // Confirm Property Name was written
+                    // Confirm Property Name and value
                     jtr.Read();
                     Assert.Equal(JsonToken.PropertyName, jtr.TokenType);
                     Assert.Equal("propertyName", (string)jtr.Value);
-
-                    // Read value
                     jtr.Read();
                     roundTripped = read(jtr, default(Database));
+
+                    // Confirm RequiredWithDefault written (and PropertyWithDefault *not*)
+                    jtr.Read();
+                    Assert.Equal(JsonToken.PropertyName, jtr.TokenType);
+                    Assert.Equal("requiredWithDefault", (string)jtr.Value);
+                    jtr.Read();
+                    TItem roundTrippedDefault = read(jtr, default(Database));
+                    Assert.Equal(defaultValue, roundTrippedDefault);
 
                     // Confirm end object (propertyWithDefault not written)
                     jtr.Read();

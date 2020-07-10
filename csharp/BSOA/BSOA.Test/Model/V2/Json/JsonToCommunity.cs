@@ -19,7 +19,7 @@ namespace BSOA.Test.Model.V2
     {
         private static Dictionary<string, Action<JsonReader, Community, Community>> setters = new Dictionary<string, Action<JsonReader, Community, Community>>()
         {
-            ["people"] = (reader, root, me) => JsonToIList<Person>.Read(reader, root, me.People, JsonToPerson.Read)
+            ["people"] = (reader, root, me) => me.People = JsonToIList<Person>.Read(reader, root, null, JsonToPerson.Read)
         };
 
         public static Community Read(JsonReader reader, Community root = null)
@@ -39,9 +39,9 @@ namespace BSOA.Test.Model.V2
             return item;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, Community item)
+        public static void Write(JsonWriter writer, string propertyName, Community item, bool required = false)
         {
-            if (item != null)
+            if (required || item != null)
             {
                 writer.WritePropertyName(propertyName);
                 Write(writer, item);

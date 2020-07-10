@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,7 +14,7 @@ namespace BSOA.Column
     /// <summary>
     ///  StringColumn stores strings as UTF-8.
     /// </summary>
-    public class StringColumn : LimitedList<string>, IColumn<string>
+    public class StringColumn : LimitedList<string>, IColumn<string>, INumberColumn<byte>
     {
         private const int SavedValueCountLimit = 128;
         private Dictionary<int, string> _savedValues;
@@ -89,6 +90,13 @@ namespace BSOA.Column
 
                 _savedValues.Clear();
             }
+        }
+
+
+        public void ForEach(Action<ArraySlice<byte>> action)
+        {
+            PushSavedValues();
+            Values.ForEach(action);
         }
 
         public override void Clear()

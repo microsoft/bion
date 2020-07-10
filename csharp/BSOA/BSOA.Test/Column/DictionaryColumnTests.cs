@@ -16,15 +16,20 @@ namespace BSOA.Test
         {
             DictionaryColumn<string, string> column = new DictionaryColumn<string, string>(
                 new DistinctColumn<string>(new StringColumn(), null),
-                new StringColumn());
+                new StringColumn(),
+                nullByDefault: false);
 
-            return (ColumnDictionary<string, string>)column[0];
+            ColumnDictionary<string, string> first = (ColumnDictionary<string, string>)column[0];
+            first["One"] = "One";
+            first["Two"] = "Two";
+
+            return (ColumnDictionary<string, string>)column[1];
         }
 
         [Fact]
         public void DictionaryColumn_Basics()
         {
-            DictionaryColumn<string, string> scratch = new DictionaryColumn<string, string>(new StringColumn(), new StringColumn());
+            DictionaryColumn<string, string> scratch = new DictionaryColumn<string, string>(new StringColumn(), new StringColumn(), nullByDefault: false);
             ColumnDictionary<string, string> defaultValue = ColumnDictionary<string, string>.Empty;
 
             ColumnDictionary<string, string> otherValue = SampleRow();
@@ -37,7 +42,28 @@ namespace BSOA.Test
             Column.Basics<IDictionary<string, string>>(
                 () => new DictionaryColumn<string, string>(
                     new DistinctColumn<string>(new StringColumn()),
-                    new StringColumn()),
+                    new StringColumn(),
+                    nullByDefault: false),
+                defaultValue,
+                otherValue,
+                (i) =>
+                {
+                    if (scratch[i].Count == 0)
+                    {
+                        scratch[i][(i % 10).ToString()] = i.ToString();
+                        scratch[i][((i + 1) % 10).ToString()] = i.ToString();
+                    }
+
+                    return scratch[i];
+                }
+            );
+
+            defaultValue = null;
+            Column.Basics<IDictionary<string, string>>(
+                () => new DictionaryColumn<string, string>(
+                    new DistinctColumn<string>(new StringColumn()),
+                    new StringColumn(),
+                    nullByDefault: true),
                 defaultValue,
                 otherValue,
                 (i) =>

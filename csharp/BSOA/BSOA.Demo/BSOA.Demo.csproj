@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BSOA.Json\BSOA.Json.csproj" />
+    <ProjectReference Include="..\BSOA\BSOA.csproj" />
+  </ItemGroup>
+
+</Project>

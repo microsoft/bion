@@ -23,6 +23,15 @@ namespace BSOA.Test
                 otherValue,
                 (i) => otherValue.AddDays(-i)
             );
+
+            // Support both DateTime.MinValue and DateTime.MinValue.ToUniversalTime() as successfully roundtripped defaults
+            defaultValue = DateTime.MinValue;
+            Column.Basics<DateTime>(
+                () => new DateTimeColumn(defaultValue),
+                defaultValue,
+                otherValue,
+                (i) => otherValue.AddDays(-i)
+            );
         }
     }
 }

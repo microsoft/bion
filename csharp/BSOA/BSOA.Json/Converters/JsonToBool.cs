@@ -12,9 +12,9 @@ namespace BSOA.Json.Converters
             return (bool)reader.Value;
         }
 
-        public static void Write(JsonWriter writer, string propertyName, bool item, bool defaultValue = default)
+        public static void Write(JsonWriter writer, string propertyName, bool item, bool defaultValue = default, bool required = false)
         {
-            if (item != defaultValue)
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);
