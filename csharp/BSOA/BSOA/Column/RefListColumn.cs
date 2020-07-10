@@ -17,8 +17,5 @@ namespace BSOA.Column
         {
             ReferencedTableName = referencedTableName;
         }
-
-        public RefListColumn(string referencedTableName, object defaultValue) : this(referencedTableName, (defaultValue == null))
-        { }
     }
 }
