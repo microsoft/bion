@@ -23,7 +23,7 @@ steps:
     command: custom
     projects: 'csharp/BSOA/**/*.csproj'
     custom: pack
-    arguments: '-c $(buildConfiguration) -o $(outFolder)/NuGet --include-source'
+    arguments: '-c $(buildConfiguration) -o $(outFolder)/NuGet'
 
 - task: EsrpCodeSigning@1
   displayName: 'Sign Binaries'
@@ -77,7 +77,7 @@ steps:
     command: custom
     projects: 'csharp/BSOA/**/*.csproj'
     custom: pack
-    arguments: '--no-build -c $(buildConfiguration) -o $(outFolder)/NuGet --include-source'
+    arguments: '--no-build -c $(buildConfiguration) -o $(outFolder)/NuGet'
 
 - task: EsrpCodeSigning@1
   displayName: 'Sign NuGet Packages'
