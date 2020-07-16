@@ -38,4 +38,38 @@ namespace BSOA
         public const string Keys = "k";
         public const string Pairs = "p";
     }
+
+    //// Verbose form
+    //public static class Names
+    //{
+    //    // IColumn standard and wrapped columns
+    //    public const string Count = "Count";
+    //    public const string Values = "Values";
+
+    //    // Columns containing direct arrays
+    //    public const string Array = "Array";
+
+    //    // Columns containing int indices to other rows
+    //    public const string Indices = "Indices";
+
+    //    // Table
+    //    public const string Columns = "Columns";
+
+    //    // NullableColumn
+    //    public const string IsNull = "IsNull";
+
+    //    // BitVector
+    //    public const string Capacity = "Capacity";
+
+    //    // NumberListColumn
+    //    public const string Chapters = "Chapters";
+    //    public const string PageStart = "PageStart";
+    //    public const string ValueEnd = "ValueEnd";
+    //    public const string SmallValues = "SmallValues";
+    //    public const string LargeValues = "LargeValues";
+
+    //    // DictionaryColumn
+    //    public const string Keys = "Keys";
+    //    public const string Pairs = "Pairs";
+    //}
 }

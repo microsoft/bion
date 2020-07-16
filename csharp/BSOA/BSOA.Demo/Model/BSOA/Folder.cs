@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -24,6 +25,11 @@ namespace BSOA.Demo.Model.BSOA
         { }
 
         public Folder(FileSystem root, Folder other) : this(root.Database.Folder)
+        {
+            CopyFrom(other);
+        }
+
+        internal Folder(FileSystemDatabase database, Folder other) : this(database.Folder)
         {
             CopyFrom(other);
         }
@@ -120,6 +126,11 @@ namespace BSOA.Demo.Model.BSOA
         {
             ParentIndex = other.ParentIndex;
             Name = other.Name;
+        }
+
+        internal static Folder Copy(FileSystemDatabase database, Folder other)
+        {
+            return (other == null ? null : new Folder(database, other));
         }
         #endregion
     }

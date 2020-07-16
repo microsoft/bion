@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using BSOA.Collections;
 using BSOA.IO;
@@ -107,7 +108,7 @@ namespace BSOA.Test.Model.V2
 
         public void CopyFrom(Community other)
         {
-            People = other.People;
+            People = other.People?.Select((item) => Person.Copy(_table.Database, item)).ToList();
         }
         #endregion
 

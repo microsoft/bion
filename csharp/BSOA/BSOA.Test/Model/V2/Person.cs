@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -24,6 +25,11 @@ namespace BSOA.Test.Model.V2
         { }
 
         public Person(Community root, Person other) : this(root.Database.Person)
+        {
+            CopyFrom(other);
+        }
+
+        internal Person(PersonDatabase database, Person other) : this(database.Person)
         {
             CopyFrom(other);
         }
@@ -120,6 +126,11 @@ namespace BSOA.Test.Model.V2
         {
             Birthdate = other.Birthdate;
             Name = other.Name;
+        }
+
+        internal static Person Copy(PersonDatabase database, Person other)
+        {
+            return (other == null ? null : new Person(database, other));
         }
         #endregion
     }
