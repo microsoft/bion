@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -24,6 +25,11 @@ namespace BSOA.Generator.Templates
         { }
 
         public Team(Company root, Team other) : this(root.Database.Team)
+        {
+            CopyFrom(other);
+        }
+
+        internal Team(CompanyDatabase database, Team other) : this(database.Team)
         {
             CopyFrom(other);
         }
@@ -166,9 +172,18 @@ namespace BSOA.Generator.Templates
             Id = other.Id;
             //  </OtherAssignment>
             JoinPolicy = other.JoinPolicy;
-            Owner = other.Owner;
-            Members = other.Members;
+            //  <RefOtherAssignment>
+            Owner = Employee.Copy(_table.Database, other.Owner);
+            //  </RefOtherAssignment>
+            //  <RefListOtherAssignment>
+            Members = other.Members?.Select((item) => Employee.Copy(_table.Database, item)).ToList();
+            //  </RefListOtherAssignment>
             // </OtherAssignmentList>
+        }
+
+        internal static Team Copy(CompanyDatabase database, Team other)
+        {
+            return (other == null ? null : new Team(database, other));
         }
         #endregion
     }

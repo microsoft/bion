@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -24,6 +25,11 @@ namespace BSOA.Demo.Model.BSOA
         { }
 
         public File(FileSystem root, File other) : this(root.Database.File)
+        {
+            CopyFrom(other);
+        }
+
+        internal File(FileSystemDatabase database, File other) : this(database.File)
         {
             CopyFrom(other);
         }
@@ -172,6 +178,11 @@ namespace BSOA.Demo.Model.BSOA
             CreatedUtc = other.CreatedUtc;
             Attributes = other.Attributes;
             Length = other.Length;
+        }
+
+        internal static File Copy(FileSystemDatabase database, File other)
+        {
+            return (other == null ? null : new File(database, other));
         }
         #endregion
     }

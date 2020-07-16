@@ -20,7 +20,7 @@ namespace BSOA.Json.Converters
 
         public static void Write(JsonWriter writer, string propertyName, string item, string defaultValue = default, bool required = false)
         {
-            if (required || (item != defaultValue && item != null))
+            if (required || item != defaultValue)
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);

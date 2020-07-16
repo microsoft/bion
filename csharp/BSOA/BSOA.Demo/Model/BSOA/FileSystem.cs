@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using BSOA.Collections;
 using BSOA.IO;
@@ -119,8 +120,8 @@ namespace BSOA.Demo.Model.BSOA
 
         public void CopyFrom(FileSystem other)
         {
-            Folders = other.Folders;
-            Files = other.Files;
+            Folders = other.Folders?.Select((item) => Folder.Copy(_table.Database, item)).ToList();
+            Files = other.Files?.Select((item) => File.Copy(_table.Database, item)).ToList();
         }
         #endregion
 
