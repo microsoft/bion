@@ -22,7 +22,7 @@ namespace Newtonsoft.Json
             return (jtr == null ? $"{reader.Path}" : $"{reader.Path} ({jtr.LineNumber:n0}, {jtr.LinePosition:n0})");
         }
 
-        public static void ReadObject<TItem, TRoot>(this JsonReader reader, TRoot root, TItem item, Dictionary<string, Action<JsonReader, TRoot, TItem>> setters)
+        public static void ReadObject<TItem, TRoot>(this JsonReader reader, TRoot root, TItem item, Dictionary<string, Action<JsonReader, TRoot, TItem>> setters, bool throwOnUnknown = true)
         {
             if (reader.TokenType == JsonToken.Null) { return; }
 
@@ -34,13 +34,23 @@ namespace Newtonsoft.Json
                 string propertyName = (string)reader.Value;
                 reader.Read();
 
-                if (!setters.TryGetValue(propertyName, out var setter))
+                if (setters.TryGetValue(propertyName, out var setter))
                 {
-                    throw new JsonReaderException($"Unknown property {typeof(TItem).Name}.{propertyName}.");
+                    setter(reader, root, item);
+                    reader.Read();
                 }
-
-                setter(reader, root, item);
-                reader.Read();
+                else
+                {
+                    if (throwOnUnknown)
+                    {
+                        throw new JsonReaderException($"Unknown property {typeof(TItem).Name}.{propertyName} at {Position(reader)}.");
+                    }
+                    else
+                    {
+                        reader.Skip();
+                        reader.Read();
+                    }
+                }
             }
 
             reader.Expect(JsonToken.EndObject);

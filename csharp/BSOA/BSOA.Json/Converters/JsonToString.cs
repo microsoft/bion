@@ -14,12 +14,13 @@ namespace BSOA.Json.Converters
 
         public static string Read(JsonReader reader)
         {
-            return (string)reader.Value;
+            // Handle null, strings, and DateTime -> string
+            return reader.Value?.ToString();
         }
 
         public static void Write(JsonWriter writer, string propertyName, string item, string defaultValue = default, bool required = false)
         {
-            if (required || item != defaultValue)
+            if (required || (item != defaultValue && item != null))
             {
                 writer.WritePropertyName(propertyName);
                 writer.WriteValue(item);
