@@ -123,7 +123,17 @@ namespace BSOA.Collections
 
         public void Clear()
         {
-            Pairs.Clear();
+            NumberList<int> pairs = Pairs;
+
+            // Clear Keys and Values to conserve space
+            foreach (int pairIndex in pairs)
+            {
+                _column._keys[pairIndex] = default;
+                _column._values[pairIndex] = default;
+            }
+
+            // Clear pairs to empty the collection
+            pairs.Clear();
         }
 
         public bool ContainsKey(TKey key)
