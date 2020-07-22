@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- Version for all BSOA binaries and packages -->
-    <Version>0.5.2</Version>
+    <Version>0.5.3</Version>
     <TargetFramework>netstandard2.0</TargetFramework>
 
     <!-- Ensure all outputs and intermediates go to bld\, providing easy cleanup and signing for pipeline builds -->

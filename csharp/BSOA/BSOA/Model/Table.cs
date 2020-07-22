@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
+using BSOA.Column;
 using BSOA.IO;
 
 namespace BSOA.Model
@@ -82,6 +83,7 @@ namespace BSOA.Model
         public override T Add()
         {
             int newIndex = Interlocked.Increment(ref _count) - 1;
+            if ((newIndex % ArraySliceChapter<byte>.ChapterRowCount) == 0) { Trim(); }
             return Get(newIndex);
         }
 
