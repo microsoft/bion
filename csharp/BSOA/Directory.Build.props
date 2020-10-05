@@ -10,8 +10,9 @@
     <OutputPath>..\bld\bin\$(Configuration)\$(MSBuildProjectName)</OutputPath>
 
     <!-- BSOA binaries are delay-signed with the Microsoft managed code key -->
-    <SignAssembly>true</SignAssembly>
+    <!-- Skip signing for Benchmark.NET generated projects (generated in a deeper folder) -->
     <AssemblyOriginatorKeyFile>..\..\Microsoft.ManagedKey.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly Condition="Exists('$(AssemblyOriginatorKeyFile)')">true</SignAssembly>
 
     <!-- Set binary ownership information -->
     <Company Condition=" '$(Company)' == '' ">Microsoft</Company>
