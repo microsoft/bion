@@ -1,14 +1,14 @@
-﻿using BenchmarkDotNet.Running;
-
-namespace BSOA.Benchmarks
+﻿namespace BSOA.Benchmarks
 {
     class Program
     {
         static void Main(string[] args)
         {
-            new Generator().Build();
+            // Ensure sample file created
+            Generator.EnsureSampleBuilt();
 
-            BenchmarkRunner.Run<Operations>();
+            Measure.Run<Operations>();
+            //BenchmarkRunner.Run<Operations>();
         }
     }
 }

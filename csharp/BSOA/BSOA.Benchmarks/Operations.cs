@@ -1,27 +1,22 @@
 ﻿using BenchmarkDotNet.Attributes;
 
 using BSOA.Benchmarks.Model;
-using BSOA.IO;
-
-using System.IO;
 
 namespace BSOA.Benchmarks
 {
     public class Operations
     {
-        public const string SampleFilePath = "Sample.Run.bsoa";
         private Run _run;
 
         public Operations()
         {
-            Run run = new Generator().Build();
+            _run = Generator.CreateOrLoad();
+        }
 
-            using (BinaryTreeWriter writer = new BinaryTreeWriter(File.Create(SampleFilePath)))
-            {
-                run.DB.Write(writer);
-            }
+        [Benchmark]
+        public void Nothing()
+        {
 
-            _run = run;
         }
 
         [Benchmark]
@@ -33,7 +28,7 @@ namespace BSOA.Benchmarks
         [Benchmark]
         public void StringOperation()
         {
-            SumOfStartLine(_run);
+            SumOfMessageLength(_run);
         }
 
         private long SumOfStartLine(Run run)

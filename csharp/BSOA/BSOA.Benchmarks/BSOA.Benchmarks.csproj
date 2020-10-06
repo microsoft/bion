@@ -14,4 +14,8 @@
     <ProjectReference Include="..\BSOA\BSOA.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Diagnostics\" />
+  </ItemGroup>
+
 </Project>

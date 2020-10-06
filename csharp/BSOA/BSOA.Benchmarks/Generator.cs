@@ -1,27 +1,28 @@
 ﻿using BSOA.Benchmarks.Model;
 
-using Microsoft.Diagnostics.Tracing.Parsers.FrameworkEventSource;
-
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace BSOA.Benchmarks
 {
     public class Generator
     {
-        public const int RuleCount = 20;
-        public const int ResultCount = 1000;
+        public const string SampleFilePath = "SampleRun.bsoa";
 
-        public static readonly string[] Messages = new string[]
+        private const int RuleCount = 20;
+        private const int ResultCount = 1000;
+
+        private static readonly string[] Messages = new string[]
         {
             "This is the first message option",
             "Here is another message option",
             "Messages can be quite long sometimes, though other times they aren't so long at all."
         };
 
-        public static readonly string[] Commits = new string[] { "105adc4", "105adc4", "f56a516", "f3181ce", "2579f8d", "3b22a90", "cd18eb6" };
+        private static readonly string[] Commits = new string[] { "105adc4", "105adc4", "f56a516", "f3181ce", "2579f8d", "3b22a90", "cd18eb6" };
 
-        public Run Build()
+        private Run Build()
         {
             DateTime when = DateTime.UtcNow;
             Random r = new Random();
@@ -57,7 +58,32 @@ namespace BSOA.Benchmarks
                 run.Results.Add(result);
             }
 
+            run.DB.Trim();
+
             return run;
+        }
+
+        public static Run CreateOrLoad()
+        {
+            if (!File.Exists(SampleFilePath))
+            {
+                Run run = new Generator().Build();
+                run.WriteBsoa(SampleFilePath);
+                return run;
+            }
+            else
+            {
+                return Run.ReadBsoa(SampleFilePath);
+            }
+        }
+
+        public static void EnsureSampleBuilt()
+        {
+            if (!File.Exists(SampleFilePath))
+            {
+                Run run = new Generator().Build();
+                run.WriteBsoa(SampleFilePath);
+            }
         }
     }
 }
