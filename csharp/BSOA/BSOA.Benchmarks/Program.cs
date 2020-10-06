@@ -1,4 +1,4 @@
-﻿using BSOA.Benchmarks.Diagnostics;
+﻿using BenchmarkDotNet.Running;
 
 namespace BSOA.Benchmarks
 {
@@ -9,8 +9,14 @@ namespace BSOA.Benchmarks
             // Ensure sample file created
             Generator.EnsureSampleBuilt();
 
-            QuickBenchmarker.Run<Operations>();
-            //BenchmarkRunner.Run<Operations>();
+            if (args.Length > 0 && args[0].ToLowerInvariant() == "quick")
+            {
+                QuickBenchmarker.Run<Operations>();
+            }
+            else
+            {
+                BenchmarkRunner.Run<Operations>();
+            }
         }
     }
 }
