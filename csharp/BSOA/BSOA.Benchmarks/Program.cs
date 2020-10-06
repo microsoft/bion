@@ -1,4 +1,6 @@
-﻿namespace BSOA.Benchmarks
+﻿using BSOA.Benchmarks.Diagnostics;
+
+namespace BSOA.Benchmarks
 {
     class Program
     {
@@ -7,7 +9,7 @@
             // Ensure sample file created
             Generator.EnsureSampleBuilt();
 
-            Measure.Run<Operations>();
+            QuickBenchmarker.Run<Operations>();
             //BenchmarkRunner.Run<Operations>();
         }
     }

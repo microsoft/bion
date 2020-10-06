@@ -34,6 +34,11 @@ namespace BSOA.Benchmarks
             this(columnNames.Select((name) => new ConsoleColumn(name)).ToArray())
         { }
 
+        public void AppendRow(IEnumerable<string> values)
+        {
+            AppendRow(values.ToArray());
+        }
+
         public void AppendRow(params string[] values)
         {
             Rows.Add(values);

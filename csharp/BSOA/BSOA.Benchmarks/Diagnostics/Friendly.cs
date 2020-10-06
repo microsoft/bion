@@ -8,9 +8,9 @@ namespace BSOA.Benchmarks
         public const double Megabyte = 1024 * 1024;
         public const double Gigabyte = 1024 * 1024 * 1024;
 
-        public static string Rate(long sizeInBytes, TimeSpan elapsedTime)
+        public static string Rate(long sizeInBytes, TimeSpan elapsedTime, long iterations = 1)
         {
-            return $"{Size((long)(sizeInBytes / elapsedTime.TotalSeconds))}/s";
+            return $"{Size((long)((iterations * sizeInBytes) / elapsedTime.TotalSeconds))}/s";
         }
 
         public static string Size(long sizeInBytes)

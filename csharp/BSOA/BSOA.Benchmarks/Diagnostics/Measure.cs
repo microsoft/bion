@@ -2,10 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 
 namespace BSOA.Benchmarks
 {
@@ -15,39 +12,6 @@ namespace BSOA.Benchmarks
     /// </summary>
     public static class Measure
     {
-        public static void Run<T>(MeasureSettings settings = null) where T : new()
-        {
-            Dictionary<string, Action> benchmarkMethods = BenchmarkMethods<T>();
-
-            ConsoleTable table = new ConsoleTable(new ConsoleColumn("Name"), new ConsoleColumn("Mean", Align.Right, Highlight.On));
-            foreach (string methodName in benchmarkMethods.Keys)
-            {
-                MeasureResult result = Operation(benchmarkMethods[methodName], settings);
-                table.AppendRow(methodName, Friendly.Time(result.SecondsPerIteration));
-            }
-        }
-
-        public static Dictionary<string, Action> BenchmarkMethods<T>() where T : new()
-        {
-            Dictionary<string, Action> methods = new Dictionary<string, Action>();
-
-            // Create an instance of the desired class (triggering any initialization)
-            T instance = new T();
-
-            // Find all public methods with no arguments and a 'Benchmark' attribute
-            Type tType = typeof(T);
-            foreach (MethodInfo method in tType.GetMethods())
-            {
-                if (method.IsPublic && method.GetParameters().Length == 0 && method.GetCustomAttributes().Where((a) => a.GetType().Name == "BenchmarkAttribute").Any())
-                {
-                    Action operation = (Action)method.CreateDelegate(typeof(Action), instance);
-                    methods[method.Name] = operation;
-                }
-            }
-
-            return methods;
-        }
-
         public static MeasureResult Operation(Action operation, MeasureSettings settings = null)
         {
             settings = settings ?? MeasureSettings.Default;
@@ -103,7 +67,7 @@ namespace BSOA.Benchmarks
         {
             T output = default(T);
 
-            MeasureResult inner = Operation(() => output = operation(), settings);
+            MeasureResult inner = Operation(() => { output = operation(); }, settings);
 
             return new MeasureResult<T>()
             {
@@ -125,6 +89,12 @@ namespace BSOA.Benchmarks
     {
         // Measure at least once, then up to 16 passes or 2 seconds, whichever comes first
         public static MeasureSettings Default = new MeasureSettings(TimeSpan.FromSeconds(2), 1, 10, false);
+
+        // Load once, measuring RAM
+        public static MeasureSettings LoadOnce = new MeasureSettings(TimeSpan.Zero, 1, 1, true);
+
+        // Load a few times, measuring RAM
+        public static MeasureSettings Load = new MeasureSettings(TimeSpan.FromSeconds(2), 2, 5, true);
 
         public TimeSpan WithinTime { get; set; }
         public int MinIterations { get; set; }
