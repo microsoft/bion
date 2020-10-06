@@ -1,4 +1,6 @@
-﻿using BSOA.Benchmarks.Model;
+﻿using BenchmarkDotNet.Attributes;
+
+using BSOA.Benchmarks.Model;
 
 namespace BSOA.Benchmarks
 {
@@ -11,19 +13,19 @@ namespace BSOA.Benchmarks
             _run = Generator.CreateOrLoad();
         }
 
-        [BenchmarkDotNet.Attributes.Benchmark]
+        [Benchmark]
         public void Nothing()
         {
 
         }
 
-        [BenchmarkDotNet.Attributes.Benchmark]
+        [Benchmark]
         public void IntegerOperation()
         {
             SumOfStartLine(_run);
         }
 
-        [BenchmarkDotNet.Attributes.Benchmark]
+        [Benchmark]
         public void StringOperation()
         {
             SumOfMessageLength(_run);

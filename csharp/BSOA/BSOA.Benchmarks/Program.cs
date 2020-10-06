@@ -1,5 +1,7 @@
 ﻿using BenchmarkDotNet.Running;
 
+using System;
+
 namespace BSOA.Benchmarks
 {
     class Program
@@ -9,13 +11,14 @@ namespace BSOA.Benchmarks
             // Ensure sample file created
             Generator.EnsureSampleBuilt();
 
-            if (args.Length > 0 && args[0].ToLowerInvariant() == "quick")
+            if (args.Length > 0 && args[0].ToLowerInvariant().Contains("detailed"))
             {
-                QuickBenchmarker.Run<Operations>();
+                BenchmarkRunner.Run<Operations>();
             }
             else
             {
-                BenchmarkRunner.Run<Operations>();
+                Console.WriteLine("Quick benchmarks. Pass --detailed for Benchmark.net numbers.");
+                QuickBenchmarker.Run<Operations>();
             }
         }
     }
