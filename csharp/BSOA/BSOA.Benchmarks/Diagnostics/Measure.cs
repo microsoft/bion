@@ -124,7 +124,7 @@ namespace BSOA.Benchmarks
     public class MeasureSettings
     {
         // Measure at least once, then up to 16 passes or 2 seconds, whichever comes first
-        public static MeasureSettings Default = new MeasureSettings(TimeSpan.FromSeconds(2), 1, 16, false);
+        public static MeasureSettings Default = new MeasureSettings(TimeSpan.FromSeconds(2), 1, 10, false);
 
         public TimeSpan WithinTime { get; set; }
         public int MinIterations { get; set; }

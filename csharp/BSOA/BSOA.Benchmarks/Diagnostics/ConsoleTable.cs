@@ -6,9 +6,8 @@ using System.Linq;
 namespace BSOA.Benchmarks
 {
     /// <summary>
-    ///  ConsoleTable draws a formatted table of data to the console.
-    ///  It supports highlighed columns, left and right-alignment,
-    ///  and sizes the columns to the content.
+    ///  ConsoleTable writes formatted tables in the console, supporting highlighting and right-aligned columns.
+    ///  Output is Markdown compatible for easy copy and paste.
     /// </summary>
     public class ConsoleTable
     {
@@ -67,7 +66,7 @@ namespace BSOA.Benchmarks
             WriteRow(Columns.Select((c) => c.Heading));
 
             // Write separator row
-            WriteRow(Columns.Select((c) => new string('-', c.Width)));
+            WriteRow(Columns.Select((c) => Separator(c)));
         }
 
         private void WriteRow(IEnumerable<string> values)
@@ -118,6 +117,18 @@ namespace BSOA.Benchmarks
 
             Console.ForegroundColor = DefaultColor;
             Console.Write(" | ");
+        }
+
+        private string Separator(ConsoleColumn column)
+        {
+            if (column.Align == Align.Right)
+            {
+                return new string('-', Math.Max(3, column.Width - 1)) + ":";
+            }
+            else
+            {
+                return new string('-', Math.Max(3, column.Width));
+            }
         }
     }
 
