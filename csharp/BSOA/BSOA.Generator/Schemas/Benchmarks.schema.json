@@ -11,6 +11,10 @@
           "type": "string"
         },
         {
+          "name": "IsActive",
+          "type": "bool"
+        },
+        {
           "name": "Message",
           "type": "string"
         },

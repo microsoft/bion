@@ -65,25 +65,21 @@ namespace BSOA.Benchmarks
 
         public static Run CreateOrLoad()
         {
-            if (!File.Exists(SampleFilePath))
+            if (File.Exists(SampleFilePath))
             {
-                Run run = new Generator().Build();
-                run.WriteBsoa(SampleFilePath);
-                return run;
+                try
+                {
+                    return Run.ReadBsoa(SampleFilePath);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Could not load BSOA log from prior run. Rebuilding. Exception: \r\n{ex}.");
+                }
             }
-            else
-            {
-                return Run.ReadBsoa(SampleFilePath);
-            }
-        }
 
-        public static void EnsureSampleBuilt()
-        {
-            if (!File.Exists(SampleFilePath))
-            {
-                Run run = new Generator().Build();
-                run.WriteBsoa(SampleFilePath);
-            }
+            Run run = new Generator().Build();
+            run.WriteBsoa(SampleFilePath);
+            return run;
         }
     }
 }

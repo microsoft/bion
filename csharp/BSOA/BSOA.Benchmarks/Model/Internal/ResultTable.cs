@@ -17,6 +17,7 @@ namespace BSOA.Benchmarks.Model
         internal RunDatabase Database;
 
         internal IColumn<string> RuleId;
+        internal IColumn<bool> IsActive;
         internal IColumn<string> Message;
         internal IColumn<int> StartLine;
         internal IColumn<DateTime> WhenDetectedUtc;
@@ -29,6 +30,7 @@ namespace BSOA.Benchmarks.Model
             Database = database;
 
             RuleId = AddColumn(nameof(RuleId), database.BuildColumn<string>(nameof(Result), nameof(RuleId), default));
+            IsActive = AddColumn(nameof(IsActive), database.BuildColumn<bool>(nameof(Result), nameof(IsActive), default));
             Message = AddColumn(nameof(Message), database.BuildColumn<string>(nameof(Result), nameof(Message), default));
             StartLine = AddColumn(nameof(StartLine), database.BuildColumn<int>(nameof(Result), nameof(StartLine), default));
             WhenDetectedUtc = AddColumn(nameof(WhenDetectedUtc), database.BuildColumn<DateTime>(nameof(Result), nameof(WhenDetectedUtc), default));

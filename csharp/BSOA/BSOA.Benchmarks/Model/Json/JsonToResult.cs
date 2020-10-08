@@ -20,6 +20,7 @@ namespace BSOA.Benchmarks.Model
         private static Dictionary<string, Action<JsonReader, Run, Result>> setters = new Dictionary<string, Action<JsonReader, Run, Result>>()
         {
             ["ruleId"] = (reader, root, me) => me.RuleId = JsonToString.Read(reader, root),
+            ["isActive"] = (reader, root, me) => me.IsActive = JsonToBool.Read(reader, root),
             ["message"] = (reader, root, me) => me.Message = JsonToString.Read(reader, root),
             ["startLine"] = (reader, root, me) => me.StartLine = JsonToInt.Read(reader, root),
             ["whenDetectedUtc"] = (reader, root, me) => me.WhenDetectedUtc = JsonToDateTime.Read(reader, root),
@@ -56,6 +57,7 @@ namespace BSOA.Benchmarks.Model
             {
                 writer.WriteStartObject();
                 JsonToString.Write(writer, "ruleId", item.RuleId, default);
+                JsonToBool.Write(writer, "isActive", item.IsActive, default);
                 JsonToString.Write(writer, "message", item.Message, default);
                 JsonToInt.Write(writer, "startLine", item.StartLine, default);
                 JsonToDateTime.Write(writer, "whenDetectedUtc", item.WhenDetectedUtc, default);

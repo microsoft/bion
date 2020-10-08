@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 
 namespace BSOA.Benchmarks.Attributes
 {

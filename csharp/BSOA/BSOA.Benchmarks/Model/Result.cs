@@ -53,6 +53,12 @@ namespace BSOA.Benchmarks.Model
             set => _table.RuleId[_index] = value;
         }
 
+        public bool IsActive
+        {
+            get => _table.IsActive[_index];
+            set => _table.IsActive[_index] = value;
+        }
+
         public string Message
         {
             get => _table.Message[_index];
@@ -95,6 +101,7 @@ namespace BSOA.Benchmarks.Model
             if (other == null) { return false; }
 
             if (!object.Equals(this.RuleId, other.RuleId)) { return false; }
+            if (!object.Equals(this.IsActive, other.IsActive)) { return false; }
             if (!object.Equals(this.Message, other.Message)) { return false; }
             if (!object.Equals(this.StartLine, other.StartLine)) { return false; }
             if (!object.Equals(this.WhenDetectedUtc, other.WhenDetectedUtc)) { return false; }
@@ -116,6 +123,11 @@ namespace BSOA.Benchmarks.Model
                 if (RuleId != default(string))
                 {
                     result = (result * 31) + RuleId.GetHashCode();
+                }
+
+                if (IsActive != default(bool))
+                {
+                    result = (result * 31) + IsActive.GetHashCode();
                 }
 
                 if (Message != default(string))
@@ -185,6 +197,7 @@ namespace BSOA.Benchmarks.Model
         public void CopyFrom(Result other)
         {
             RuleId = other.RuleId;
+            IsActive = other.IsActive;
             Message = other.Message;
             StartLine = other.StartLine;
             WhenDetectedUtc = other.WhenDetectedUtc;
