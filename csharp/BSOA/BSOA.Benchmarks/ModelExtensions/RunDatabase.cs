@@ -9,7 +9,7 @@ namespace BSOA.Benchmarks.Model
     {
         public override IColumn BuildColumn(string tableName, string columnName, Type type, object defaultValue = null)
         {
-            if (columnName == "Message")
+            if (type == typeof(string))
             {
                 return new DistinctColumn<string>(new StringColumn());
             }

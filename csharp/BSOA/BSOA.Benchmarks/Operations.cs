@@ -18,6 +18,24 @@ namespace BSOA.Benchmarks
             _results = _run.Results.ToList();
         }
 
+        // Benchmark Costs (1,000 elements)
+        // ================================
+        //  Non-BSOA List<struct>     , sum int             4.00 us
+        //  BSOA class, cached in List, sum int             5.75 us (BSOA int retrieval very cheap)
+        //                            , sum DateTime        8.00 us (DateTime construction cheap)
+        //                            , sum bool            6.75 us (bool cheap)
+        //                            , sum enum            7.80 us (enum cast cheap)
+        //   [all strings cached]     , sum string length  16.50 us
+        //  DistinctColumn, cached strings, sum length      
+
+        //  List as IEnumerable<T> enumerate               10.00 us (2x strongly-typed List enumerate)
+        //  BSOA List enumerate                            20.00 us (more expensive, but not if several operations on each item)
+
+        // Improvements
+        // ============
+        //  - ListEnumerator caches length (65 -> 40 us)
+        //  - EnumeratorConverter          (40 -> 20 us)
+
         //[Benchmark]
         public void Nothing()
         {
@@ -34,7 +52,7 @@ namespace BSOA.Benchmarks
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void IntegerSum()
         {
             long sum = 0;
@@ -65,6 +83,26 @@ namespace BSOA.Benchmarks
         }
 
         [Benchmark]
+        public void BooleanCachedList()
+        {
+            long sum = 0;
+            foreach (Result result in _results)
+            {
+                sum += (result.IsActive ? 1 : 0);
+            }
+        }
+
+        //[Benchmark]
+        public void EnumCachedList()
+        {
+            long sum = 0;
+            foreach (Result result in _results)
+            {
+                sum += (result.BaselineState == BaselineState.Unchanged ? 1 : 0);
+            }
+        }
+
+        [Benchmark]
         public void StringCachedList()
         {
             long sum = 0;
@@ -74,8 +112,8 @@ namespace BSOA.Benchmarks
             }
         }
 
-        [Benchmark]
-        public void StringOperation2x()
+        //[Benchmark]
+        public void StringCached2x()
         {
             long sum = 0;
             foreach (Result result in _run.Results)
@@ -83,19 +121,6 @@ namespace BSOA.Benchmarks
                 sum += result.Message.Length + result.Message.Length;
             }
         }
-
-        // Conclusions:
-        //  - IntColumn value retrieval cost is minimal vs. normal integer field on List<struct>.
-        //  - DateTime conversion is still extremely cheap.
-
-        // Normal classes with 1,000 Results (NonBsoaModel)
-        //  foreach (Result result in run.Results) { sum += result.StartLine; }         4 us.
-        //  foreach (Result result in run.Results) { sum += result.Message.Length; }    4 us.
-        
-        // IntColumn retrieve with pre-cached List:                                   5.6 us.
-        // IntColumn retrieve with pre-cached List via IEnumerable<Result>:          10.6 us.
-        // DateTimeColumn retrieve with pre-cached List:                              9.0 us.
-        // String, cached in Dictionary, pre-cached List:                            22.5 us.
 
         // BSOA Model (default, pre-optimizations):
         //  foreach (Result result in run.Results) { sum += result.StartLine; }       66 us.
