@@ -6,6 +6,10 @@ using System.Collections.Generic;
 
 namespace BSOA.Collections
 {
+    /// <summary>
+    ///  ListEnumerator provides enumeration over any IReadOnlyList.
+    /// </summary>
+    /// <typeparam name="T">List Item type</typeparam>
     public struct ListEnumerator<T> : IEnumerator<T>
     {
         private IReadOnlyList<T> _list;
@@ -16,6 +20,8 @@ namespace BSOA.Collections
         {
             _list = column;
             _index = -1;
+
+            // Note: Cache count to avoid potential recalculation per MoveNext().
             _count = _list.Count;
         }
 
@@ -29,8 +35,7 @@ namespace BSOA.Collections
 
         public bool MoveNext()
         {
-            _index++;
-            return _index < _count;
+            return ++_index < _count;
         }
 
         public void Reset()

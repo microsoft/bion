@@ -171,11 +171,13 @@ namespace BSOA.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
+            // Return the enumerator for the inner ArraySlice, to ensure we aren't constructing it repeatedly.
             return Slice.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
+            // Return the enumerator for the inner ArraySlice, to ensure we aren't constructing it repeatedly.
             return Slice.GetEnumerator();
         }
 
