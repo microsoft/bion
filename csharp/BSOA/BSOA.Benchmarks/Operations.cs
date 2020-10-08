@@ -26,7 +26,7 @@ namespace BSOA.Benchmarks
         //                            , sum bool            6.75 us (bool cheap)
         //                            , sum enum            7.80 us (enum cast cheap)
         //   [all strings cached]     , sum string length  16.50 us
-        //  DistinctColumn, cached strings, sum length      
+        //  DistinctColumn<string> (cached), sum length     9.00 us (faster than in StringColumn; List lookup vs. Dictionary underneath)
 
         //  List as IEnumerable<T> enumerate               10.00 us (2x strongly-typed List enumerate)
         //  BSOA List enumerate                            20.00 us (more expensive, but not if several operations on each item)
@@ -35,7 +35,15 @@ namespace BSOA.Benchmarks
         // ============
         //  - ListEnumerator caches length (65 -> 40 us)
         //  - EnumeratorConverter          (40 -> 20 us)
+        //  - DistinctColumn caching       (83 ->  9 us for Message.Length Sum)
 
+        // Learnings
+        // =========
+        //  - In StringColumn, IsNull check first is worthwhile (much faster for all null columns, minimal impact on no-null columns).
+        //  - DistinctColumn caching is very worthwhile (string form of values kept anyway to look up index on set; keeping another list of references saves all conversions on get).
+        //  - StringColumn caching too expensive with "remove oldest from cache" (remove too expensive vs. convert)
+        //  - StringColumn caching only worthwhile if the cache hits relatively often; usage pattern will vary.
+        
         //[Benchmark]
         public void Nothing()
         {
@@ -62,8 +70,8 @@ namespace BSOA.Benchmarks
             }
         }
 
-        [Benchmark]
-        public void IntegerSumCachedList()
+        //[Benchmark]
+        public void IntegerSumCached()
         {
             long sum = 0;
             foreach (Result result in _results)
@@ -73,7 +81,7 @@ namespace BSOA.Benchmarks
         }
 
         //[Benchmark]
-        public void DateTimeCachedList()
+        public void DateTimeCached()
         {
             long sum = 0;
             foreach (Result result in _results)
@@ -82,8 +90,8 @@ namespace BSOA.Benchmarks
             }
         }
 
-        [Benchmark]
-        public void BooleanCachedList()
+        //[Benchmark]
+        public void BooleanCached()
         {
             long sum = 0;
             foreach (Result result in _results)
@@ -93,7 +101,7 @@ namespace BSOA.Benchmarks
         }
 
         //[Benchmark]
-        public void EnumCachedList()
+        public void EnumCached()
         {
             long sum = 0;
             foreach (Result result in _results)
@@ -102,8 +110,18 @@ namespace BSOA.Benchmarks
             }
         }
 
+        //[Benchmark]
+        public void StringNulls()
+        {
+            long sum = 0;
+            foreach (Result result in _results)
+            {
+                sum += result.RuleId?.Length ?? 0;
+            }
+        }
+
         [Benchmark]
-        public void StringCachedList()
+        public void StringCached()
         {
             long sum = 0;
             foreach (Result result in _results)
@@ -112,7 +130,7 @@ namespace BSOA.Benchmarks
             }
         }
 
-        //[Benchmark]
+        [Benchmark]
         public void StringCached2x()
         {
             long sum = 0;

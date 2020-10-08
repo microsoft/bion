@@ -15,11 +15,17 @@ namespace BSOA.Column
     ///  only once. It reverts to storing values individually if there are too many
     ///  distinct values.
     /// </summary>
+    /// <remarks>
+    ///  Values must be cached in their original form to quickly find the index for a
+    ///  value on set. They are also kept in a list for fast gets, which especially
+    ///  benefits string columns.
+    /// </remarks>
     /// <typeparam name="T">Type of values in column</typeparam>
     public class DistinctColumn<T> : LimitedList<T>, IColumn<T>
     {
         private T _defaultValue;
-        private Dictionary<T, byte> _distinct;
+        private Dictionary<T, byte> _distinctValueToIndex;
+        private List<T> _distinctValues;
         private IColumn<T> _values;
         private NumberColumn<byte> _indices;
         private bool _requiresTrim;
@@ -35,13 +41,13 @@ namespace BSOA.Column
         public DistinctColumn(IColumn values, object defaultValue) : this((IColumn<T>)values, (T)defaultValue)
         { }
 
-        public bool IsMappingValues => (_distinct != null);
-        public int DistinctCount => (IsMappingValues ? _distinct.Count + 1 : -1);
+        public bool IsMappingValues => (_distinctValueToIndex != null);
+        public int DistinctCount => (IsMappingValues ? _distinctValueToIndex.Count + 1 : -1);
         public override int Count => (IsMappingValues ? _indices.Count : _values.Count);
 
         public override T this[int index]
         {
-            get => (IsMappingValues ? _values[_indices[index]] : _values[index]);
+            get => (IsMappingValues ? _distinctValues[_indices[index]] : _values[index]);
 
             set
             {
@@ -63,7 +69,7 @@ namespace BSOA.Column
             if (value == null) { return _defaultValue == null; }
             if (_defaultValue != null && value.Equals(_defaultValue)) { return true; }
 
-            if (_distinct.TryGetValue(value, out index))
+            if (_distinctValueToIndex.TryGetValue(value, out index))
             {
                 // Existing value - return current index
                 return true;
@@ -71,9 +77,11 @@ namespace BSOA.Column
             else if (DistinctCount <= 256)
             {
                 // New value, count still ok - add and return new index
-                index = (byte)(_distinct.Count + 1);
-                _distinct[value] = index;
+                index = (byte)(_distinctValueToIndex.Count + 1);
                 _values[index] = value;
+                _distinctValueToIndex[value] = index;
+                _distinctValues.Add(value);
+
                 return true;
             }
             else
@@ -87,7 +95,8 @@ namespace BSOA.Column
                 }
 
                 _indices = null;
-                _distinct = null;
+                _distinctValueToIndex = null;
+                _distinctValues = null;
                 _requiresTrim = false;
                 return false;
             }
@@ -99,9 +108,12 @@ namespace BSOA.Column
             _indices = new NumberColumn<byte>(0);
 
             // One distinct value; the default
-            _distinct = new Dictionary<T, byte>();
+            _distinctValueToIndex = new Dictionary<T, byte>();
+            _distinctValues = new List<T>();
+
             _values.Clear();
             _values[0] = _defaultValue;
+            _distinctValues.Add(_defaultValue);
 
             _requiresTrim = false;
         }
@@ -145,11 +157,16 @@ namespace BSOA.Column
 
         private void RebuildDistinctDictionary()
         {
-            _distinct.Clear();
+            _distinctValueToIndex.Clear();
+            
+            _distinctValues.Clear();
+            _distinctValues.Add(_defaultValue);
 
             for (int i = 1; i < _values.Count; ++i)
             {
-                _distinct[_values[i]] = (byte)i;
+                T value = _values[i];
+                _distinctValueToIndex[value] = (byte)i;
+                _distinctValues.Add(value);
             }
         }
 
@@ -172,7 +189,8 @@ namespace BSOA.Column
             {
                 // If it has no indices and more than one value (the default is always added), it is non-mapped
                 _indices = null;
-                _distinct = null;
+                _distinctValueToIndex = null;
+                _distinctValues = null;
             }
         }
 

@@ -44,7 +44,7 @@ namespace BSOA.Benchmarks
             for (int i = 0; i < ResultCount; ++i)
             {
                 Result result = new Result();
-                result.RuleId = $"SCAN{r.Next(RuleCount - 2):D4}";
+                result.RuleId = null; // $"SCAN{r.Next(RuleCount - 2):D4}";
                 result.IsActive = (i % 3 == 0);
                 result.BaselineState = (i % 10 == 4 ? BaselineState.New : BaselineState.Unchanged);
                 result.StartLine = r.Next(1000);
