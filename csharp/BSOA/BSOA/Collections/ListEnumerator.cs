@@ -10,11 +10,13 @@ namespace BSOA.Collections
     {
         private IReadOnlyList<T> _list;
         private int _index;
+        private int _count;
 
         public ListEnumerator(IReadOnlyList<T> column)
         {
             _list = column;
             _index = -1;
+            _count = _list.Count;
         }
 
         public T Current => _list[_index];
@@ -28,7 +30,7 @@ namespace BSOA.Collections
         public bool MoveNext()
         {
             _index++;
-            return _index < _list.Count;
+            return _index < _count;
         }
 
         public void Reset()
