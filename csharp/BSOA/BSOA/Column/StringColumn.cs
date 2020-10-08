@@ -37,8 +37,10 @@ namespace BSOA.Column
                 if (_savedValues != null && _savedValues.TryGetValue(index, out string result)) { return result; }
                 if (IsNull[index]) { return null; }
 
-                ArraySlice<byte> value = Values[index];
-                return (value.Count == 0 ? string.Empty : Encoding.UTF8.GetString(value.Array, value.Index, value.Count));
+                ArraySlice<byte> bytes = Values[index];
+                string value = (bytes.Count == 0 ? string.Empty : Encoding.UTF8.GetString(bytes.Array, bytes.Index, bytes.Count));
+
+                return value;
             }
 
             set
