@@ -16,16 +16,25 @@ namespace BSOA.Column
     /// </summary>
     public class StringColumn : LimitedList<string>, IColumn<string>, INumberColumn<byte>
     {
+        private BooleanColumn IsNull;
+        private ArraySliceColumn<byte> Values;
+
+        // Accumulate changed values and convert into UTF-8 in a shared array
+        // to reduce array overhead and allocation time per set value.
         private const int SavedValueCountLimit = 128;
         private Dictionary<int, string> _savedValues;
 
-        private BooleanColumn IsNull;
-        private ArraySliceColumn<byte> Values;
+        // Cache the most recently read value in .NET string form.
+        // This helps in common situations (repeated reads) with minimal impact in others.
+        // More complex caching mechanisms cost more than the string conversions unless the usage pattern is ideal.
+        private int _lastReadIndex;
+        private string _lastReadValue;
 
         public StringColumn()
         {
             IsNull = new BooleanColumn(true);
             Values = new ArraySliceColumn<byte>();
+            _lastReadIndex = -1;
         }
 
         public override int Count => IsNull.Count;
@@ -34,17 +43,26 @@ namespace BSOA.Column
         {
             get
             {
+                if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
+                if (_lastReadIndex == index) { return _lastReadValue; }
                 if (_savedValues != null && _savedValues.TryGetValue(index, out string result)) { return result; }
                 if (IsNull[index]) { return null; }
 
                 ArraySlice<byte> bytes = Values[index];
                 string value = (bytes.Count == 0 ? string.Empty : Encoding.UTF8.GetString(bytes.Array, bytes.Index, bytes.Count));
 
+                // Cache the last converted value (faster for repeat requests but otherwise very low overhead)
+                _lastReadIndex = index;
+                _lastReadValue = value;
+
                 return value;
             }
 
             set
             {
+                // Update cached value only if also last read value
+                if (_lastReadIndex == index) { _lastReadValue = value; }
+
                 // Always set IsNull; IsNull tracks Count cheaply
                 IsNull[index] = (value == null);
 
@@ -103,6 +121,8 @@ namespace BSOA.Column
 
         public override void Clear()
         {
+            _lastReadIndex = -1;
+            _lastReadValue = null;
             _savedValues = null;
 
             IsNull.Clear();

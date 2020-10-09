@@ -43,6 +43,7 @@ namespace BSOA.Benchmarks
         //  - DistinctColumn caching is very worthwhile (string form of values kept anyway to look up index on set; keeping another list of references saves all conversions on get).
         //  - StringColumn caching too expensive with "remove oldest from cache" (remove too expensive vs. convert)
         //  - StringColumn caching only worthwhile if the cache hits relatively often; usage pattern will vary.
+        //  - StringColumn "cache last read" is often helpful and minimal overhead otherwise.
         
         //[Benchmark]
         public void Nothing()
@@ -110,7 +111,7 @@ namespace BSOA.Benchmarks
             }
         }
 
-        //[Benchmark]
+        [Benchmark]
         public void StringNulls()
         {
             long sum = 0;
