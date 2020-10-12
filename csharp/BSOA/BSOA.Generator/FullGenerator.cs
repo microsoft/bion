@@ -92,6 +92,27 @@ namespace BSOA.Generator
                 replace: "JsonToIDictionary<String, ([^>]+)>.Write\\(writer, ([^,]+), item.([^,]+), default\\);",
                 with: "JsonToIDictionary<String, $1>.Write(writer, $2, item.$3, JsonTo$1.Write);"
             ));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonTobyte.", with: "JsonToByte.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonTosbyte.", with: "JsonToSByte.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToshort.", with: "JsonToShort.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToushort.", with: "JsonToUShort.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToint.", with: "JsonToInt.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonTouint.", with: "JsonToUInt.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonTolong.", with: "JsonToLong.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToulong.", with: "JsonToULong.", arePlainText: true));
+
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonTofloat.", with: "JsonToFloat.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonTodouble.", with: "JsonToDouble.", arePlainText: true));
+
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToInt8.", with: "JsonToSByte.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToUInt8.", with: "JsonToByte.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToInt16.", with: "JsonToShort.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToUInt16.", with: "JsonToUShort.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToInt32.", with: "JsonToInt.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToUInt32.", with: "JsonToUInt.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToInt64.", with: "JsonToLong.", arePlainText: true));
+            postReplacements.Replacements.Add(new PostReplacement(replace: "JsonToUInt64.", with: "JsonToULong.", arePlainText: true));
+
         }
 
         private string FindTemplateDefaultPath()

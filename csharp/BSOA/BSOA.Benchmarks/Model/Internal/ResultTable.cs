@@ -23,7 +23,7 @@ namespace BSOA.Benchmarks.Model
         internal IColumn<DateTime> WhenDetectedUtc;
         internal IColumn<int> BaselineState;
         internal IColumn<IDictionary<String, String>> Properties;
-        internal IColumn<IList<String>> Tags;
+        internal IColumn<IList<int>> Tags;
 
         internal ResultTable(RunDatabase database) : base()
         {
@@ -36,7 +36,7 @@ namespace BSOA.Benchmarks.Model
             WhenDetectedUtc = AddColumn(nameof(WhenDetectedUtc), database.BuildColumn<DateTime>(nameof(Result), nameof(WhenDetectedUtc), default));
             BaselineState = AddColumn(nameof(BaselineState), database.BuildColumn<int>(nameof(Result), nameof(BaselineState), (int)default(BaselineState)));
             Properties = AddColumn(nameof(Properties), database.BuildColumn<IDictionary<String, String>>(nameof(Result), nameof(Properties), default));
-            Tags = AddColumn(nameof(Tags), database.BuildColumn<IList<String>>(nameof(Result), nameof(Tags), default));
+            Tags = AddColumn(nameof(Tags), database.BuildColumn<IList<int>>(nameof(Result), nameof(Tags), default));
         }
 
         public override Result Get(int index)

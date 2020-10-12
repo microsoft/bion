@@ -26,7 +26,7 @@ namespace BSOA.Benchmarks.Model
             ["whenDetectedUtc"] = (reader, root, me) => me.WhenDetectedUtc = JsonToDateTime.Read(reader, root),
             ["baselineState"] = (reader, root, me) => me.BaselineState = JsonToEnum<BaselineState>.Read(reader, root),
             ["properties"] = (reader, root, me) => me.Properties = JsonToIDictionary<String, String>.Read(reader, root, null, JsonToString.Read),
-            ["tags"] = (reader, root, me) => me.Tags = JsonToIList<String>.Read(reader, root, null, JsonToString.Read)
+            ["tags"] = (reader, root, me) => me.Tags = JsonToIList<int>.Read(reader, root, null, JsonToInt.Read)
         };
 
         public static Result Read(JsonReader reader, Run root = null)
@@ -63,7 +63,7 @@ namespace BSOA.Benchmarks.Model
                 JsonToDateTime.Write(writer, "whenDetectedUtc", item.WhenDetectedUtc, default);
                 JsonToEnum<BaselineState>.Write(writer, "baselineState", item.BaselineState, default(BaselineState));
                 JsonToIDictionary<String, String>.Write(writer, "properties", item.Properties, JsonToString.Write);
-                JsonToIList<String>.Write(writer, "tags", item.Tags, JsonToString.Write);
+                JsonToIList<int>.Write(writer, "tags", item.Tags, JsonToInt.Write);
                 writer.WriteEndObject();
             }
         }

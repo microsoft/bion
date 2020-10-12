@@ -89,7 +89,7 @@ namespace BSOA.Benchmarks.Model
             set => _table.Properties[_index] = value;
         }
 
-        public IList<String> Tags
+        public IList<int> Tags
         {
             get => _table.Tags[_index];
             set => _table.Tags[_index] = value;
@@ -155,7 +155,7 @@ namespace BSOA.Benchmarks.Model
                     result = (result * 31) + Properties.GetHashCode();
                 }
 
-                if (Tags != default(IList<String>))
+                if (Tags != default(IList<int>))
                 {
                     result = (result * 31) + Tags.GetHashCode();
                 }

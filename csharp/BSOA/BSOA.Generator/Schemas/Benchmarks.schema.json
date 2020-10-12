@@ -39,7 +39,7 @@
         },
         {
           "name": "Tags",
-          "type": "IList<String>"
+          "type": "IList<int>"
         }
       ]
     },
