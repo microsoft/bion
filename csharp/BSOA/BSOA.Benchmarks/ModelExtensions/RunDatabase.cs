@@ -9,11 +9,12 @@ namespace BSOA.Benchmarks.Model
     {
         public override IColumn BuildColumn(string tableName, string columnName, Type type, object defaultValue = null)
         {
-            //if (type == typeof(string))
-            //{
-            //    return new DistinctColumn<string>(new StringColumn());
-            //}
-            //else
+            if (columnName == "RuleId")
+            {
+                // RuleId column is a DistinctColumn to test DistinctColumn caching
+                return new DistinctColumn<string>(new StringColumn());
+            }
+            else
             {
                 return base.BuildColumn(tableName, columnName, type, defaultValue);
             }

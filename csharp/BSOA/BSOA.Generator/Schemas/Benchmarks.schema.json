@@ -11,6 +11,10 @@
           "type": "string"
         },
         {
+          "name": "Guid",
+          "type": "string"
+        },
+        {
           "name": "IsActive",
           "type": "bool"
         },

@@ -17,6 +17,7 @@ namespace BSOA.Benchmarks.Model
         internal RunDatabase Database;
 
         internal IColumn<string> RuleId;
+        internal IColumn<string> Guid;
         internal IColumn<bool> IsActive;
         internal IColumn<string> Message;
         internal IColumn<int> StartLine;
@@ -30,6 +31,7 @@ namespace BSOA.Benchmarks.Model
             Database = database;
 
             RuleId = AddColumn(nameof(RuleId), database.BuildColumn<string>(nameof(Result), nameof(RuleId), default));
+            Guid = AddColumn(nameof(Guid), database.BuildColumn<string>(nameof(Result), nameof(Guid), default));
             IsActive = AddColumn(nameof(IsActive), database.BuildColumn<bool>(nameof(Result), nameof(IsActive), default));
             Message = AddColumn(nameof(Message), database.BuildColumn<string>(nameof(Result), nameof(Message), default));
             StartLine = AddColumn(nameof(StartLine), database.BuildColumn<int>(nameof(Result), nameof(StartLine), default));

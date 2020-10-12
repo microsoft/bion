@@ -27,6 +27,7 @@ namespace BSOA.Benchmarks
             Columns = columns;
             Rows = new List<string[]>();
 
+            Console.WriteLine();
             Start = new Point(Console.CursorLeft, Console.CursorTop);
         }
 
