@@ -87,7 +87,7 @@ namespace BSOA.Collections
             if (value != DefaultValue)
             {
                 int edge = (Capacity & 31);
-                if (edge < 31)
+                if (edge > 0)
                 {
                     _array[blocksToSet - 1] ^= (~0U) >> edge;
                 }
