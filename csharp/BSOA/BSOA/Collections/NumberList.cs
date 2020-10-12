@@ -188,6 +188,9 @@ namespace BSOA.Collections
 
         public override bool Equals(object obj)
         {
+            NumberList<T> other = obj as NumberList<T>;
+            if (other != null && object.ReferenceEquals(other._column, this._column) && other._index == this._index) { return true; }
+
             return ReadOnlyListExtensions.AreEqual(this, obj as IReadOnlyList<T>);
         }
 
@@ -208,7 +211,7 @@ namespace BSOA.Collections
                 return !object.ReferenceEquals(right, null);
             }
 
-            return !(left == right);
+            return !left.Equals(right);
         }
     }
 }

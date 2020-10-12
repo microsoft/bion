@@ -10,6 +10,18 @@ using BSOA.Model;
 
 namespace BSOA.Column
 {
+    /// <summary>
+    ///  DictionaryColumn stores a Dictionary for each row.
+    /// </summary>
+    /// <remarks>
+    ///  DictionaryColumn really stores a huge flat list of Key/Value pairs across every per-row Dictionary.
+    ///  
+    ///  To find the Key/Value pairs in one particular row's Dictionary, we get the 'Pairs' list.
+    ///  Each integer in the pairs list is the index of a Key and Value in the Keys and Values column which matches
+    ///  and which belongs to the outer row's Dictionary.
+    /// </remarks>
+    /// <typeparam name="TKey">Type of Dictionary entry keys</typeparam>
+    /// <typeparam name="TValue">Type of Dictionary entry values</typeparam>
     public class DictionaryColumn<TKey, TValue> : LimitedList<IDictionary<TKey, TValue>>, IColumn<IDictionary<TKey, TValue>> where TKey : IEquatable<TKey>
     {
         internal IColumn<TKey> _keys;

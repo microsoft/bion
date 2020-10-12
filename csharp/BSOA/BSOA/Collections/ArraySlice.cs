@@ -119,7 +119,7 @@ namespace BSOA.Collections
 
         public static bool operator !=(ArraySlice<T> left, ArraySlice<T> right)
         {
-            return !(left == right);
+            return !left.Equals(right);
         }
     }
 }

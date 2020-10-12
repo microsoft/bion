@@ -11,25 +11,43 @@ using BSOA.Model;
 
 namespace BSOA.Collections
 {
+    /// <summary>
+    ///  ColumnDictionary represents a Dictionary in a BSOA object model.
+    /// </summary>
+    /// <remarks>
+    ///  DictionaryColumn stores a Dictionary for every (outer) row.
+    ///  It keeps a single list of Key/Value pairs across all Dictionaries in Keys and Values columns.
+    ///  It also keeps a List&lt;int&gt; for each row, called 'Pairs',
+    ///  which identifies which Key/Value pairs belong to the Dictionary for a given (outer) row.
+    ///  
+    ///  So, to get the 'keyIndex'th KeyValuePair for row 'outerRow':
+    ///  int innerRowIndex = _column._pairs[outerRow][keyIndex];
+    ///  new KeyValuePair&lt;TKey, TValue&gt;(_column._keys[innerRowIndex], _column._values[innerRowIndex]);
+    /// </remarks>
+    /// <typeparam name="TKey">Type of Dictionary keys</typeparam>
+    /// <typeparam name="TValue">Type of Dictionary values</typeparam>
     public class ColumnDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : IEquatable<TKey>
     {
         private readonly DictionaryColumn<TKey, TValue> _column;
         private readonly int _rowIndex;
-        private NumberList<int> Pairs => _column?._pairs[_rowIndex] ?? NumberList<int>.Empty;
+        private NumberList<int> _pairs;
         private TValue Value(int innerRow) => _column._values[innerRow];
 
-        public static ColumnDictionary<TKey, TValue> Empty = new ColumnDictionary<TKey, TValue>(null, 0);
+        public static ColumnDictionary<TKey, TValue> Empty = new ColumnDictionary<TKey, TValue>(null, 0, NumberList<int>.Empty);
 
-        protected ColumnDictionary(DictionaryColumn<TKey, TValue> column, int index)
+        protected ColumnDictionary(DictionaryColumn<TKey, TValue> column, int index, NumberList<int> pairs)
         {
             _column = column;
             _rowIndex = index;
+            _pairs = pairs;
         }
 
         public static ColumnDictionary<TKey, TValue> Get(DictionaryColumn<TKey, TValue> column, int index)
         {
             if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
-            return (column?._pairs?[index] == null ? null : new ColumnDictionary<TKey, TValue>(column, index));
+            
+            NumberList<int> pairs = column._pairs[index];
+            return (pairs == null ? null : new ColumnDictionary<TKey, TValue>(column, index, pairs));
         }
 
         public static void Set(DictionaryColumn<TKey, TValue> column, int index, IDictionary<TKey, TValue> value)
@@ -43,13 +61,20 @@ namespace BSOA.Collections
             else
             {
                 // Setting List to empty 'coerces' list creation in correct column
-                if (column._pairs[index] == null) { column._pairs[index] = NumberList<int>.Empty; }
-                new ColumnDictionary<TKey, TValue>(column, index).SetTo(value);
+                NumberList<int> pairs = column._pairs[index];
+
+                if (pairs == null) 
+                { 
+                    column._pairs[index] = NumberList<int>.Empty;
+                    pairs = column._pairs[index];
+                }
+
+                new ColumnDictionary<TKey, TValue>(column, index, pairs).SetTo(value);
             }
         }
 
         public bool IsReadOnly => false;
-        public int Count => Pairs.Count;
+        public int Count => _pairs.Count;
 
         public TValue this[TKey key]
         {
@@ -77,8 +102,8 @@ namespace BSOA.Collections
             }
         }
 
-        public ICollection<TKey> Keys => new IndirectCollection<TKey>(_column._keys, Pairs.Slice);
-        public ICollection<TValue> Values => new IndirectCollection<TValue>(_column._values, Pairs.Slice);
+        public ICollection<TKey> Keys => new IndirectCollection<TKey>(_column._keys, _pairs.Slice);
+        public ICollection<TValue> Values => new IndirectCollection<TValue>(_column._values, _pairs.Slice);
 
         public void SetTo(IDictionary<TKey, TValue> other)
         {
@@ -119,12 +144,12 @@ namespace BSOA.Collections
             int innerRow = _column._values.Count;
             _column._keys[innerRow] = key;
             _column._values[innerRow] = value;
-            Pairs.Add(innerRow);
+            _pairs.Add(innerRow);
         }
 
         public void Clear()
         {
-            NumberList<int> pairs = Pairs;
+            NumberList<int> pairs = _pairs;
 
             // Clear Keys and Values to conserve space
             foreach (int innerRow in pairs)
@@ -148,7 +173,7 @@ namespace BSOA.Collections
 
             if (innerRow != -1)
             {
-                Pairs.Remove(innerRow);
+                _pairs.Remove(innerRow);
                 return true;
             }
 
@@ -161,7 +186,7 @@ namespace BSOA.Collections
 
             if (innerRow != -1 && object.Equals(Value(innerRow), item.Value))
             {
-                Pairs.Remove(innerRow);
+                _pairs.Remove(innerRow);
                 return true;
             }
 
@@ -193,7 +218,7 @@ namespace BSOA.Collections
         {
             IColumn<TKey> keys = _column._keys;
 
-            ArraySlice<int> pairs = Pairs.Slice;
+            ArraySlice<int> pairs = _pairs.Slice;
             int[] array = pairs.Array;
             int end = pairs.Index + pairs.Count;
             
@@ -213,12 +238,12 @@ namespace BSOA.Collections
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return new DictionaryEnumerator<TKey, TValue>(_column, Pairs.Slice);
+            return new DictionaryEnumerator<TKey, TValue>(_column, _pairs.Slice);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new DictionaryEnumerator<TKey, TValue>(_column, Pairs.Slice);
+            return new DictionaryEnumerator<TKey, TValue>(_column, _pairs.Slice);
         }
 
         public override int GetHashCode()

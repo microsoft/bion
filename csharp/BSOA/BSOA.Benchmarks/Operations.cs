@@ -57,7 +57,7 @@ namespace BSOA.Benchmarks
 
         }
 
-        //[Benchmark]
+        [Benchmark]
         public void Enumerate()
         {
             // NOTE: ForEach is much faster for BSOA, as it can retrieve the real index list once.
@@ -160,7 +160,7 @@ namespace BSOA.Benchmarks
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void DictionaryReadSuccess()
         {
             long sum = 0;
@@ -174,6 +174,19 @@ namespace BSOA.Benchmarks
                 else
                 {
                     badCount++;
+                }
+            }
+        }
+
+        [Benchmark]
+        public void DictionaryReadFail()
+        {
+            long sum = 0;
+            foreach (Result result in _results)
+            {
+                if (result.Properties.TryGetValue("NotThere", out string commit))
+                {
+                    sum += commit.Length;
                 }
             }
         }
