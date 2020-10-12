@@ -1,6 +1,4 @@
-﻿using BSOA.Benchmarks.Model;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace BSOA.Benchmarks.NonBsoaModel
@@ -14,6 +12,6 @@ namespace BSOA.Benchmarks.NonBsoaModel
         public DateTime WhenDetectedUtc { get; set; }
         public BaselineState BaselineState { get; set; }
         public IDictionary<string, string> Properties { get; set; }
-        public IList<string> Tags { get; set; }
+        public IList<int> Tags { get; set; }
     }
 }

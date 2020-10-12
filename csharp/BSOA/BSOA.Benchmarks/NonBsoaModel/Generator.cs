@@ -53,6 +53,11 @@ namespace BSOA.Benchmarks.NonBsoaModel
                 result.Properties["LastDetectedUtc"] = $"{when.AddMinutes(r.Next(-500000, 0)):u}";
                 result.Properties["Commit"] = Commits[r.Next(Commits.Length)];
 
+                result.Tags = new List<int>();
+                result.Tags.Add(i);
+                result.Tags.Add(i + 1);
+                result.Tags.Add(i - 1);
+
                 run.Results.Add(result);
             }
 

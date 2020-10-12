@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 
+// Uncomment line for model to test (they're signature identical)
 using BSOA.Benchmarks.Model;
 //using BSOA.Benchmarks.NonBsoaModel;
 
@@ -18,9 +19,6 @@ namespace BSOA.Benchmarks
             _run = Generator.CreateOrLoad();
             _results = _run.Results.ToList();
         }
-
-        // TODO:
-        //  Add test for enumerate Dictionary and List columns; try for loop for List column. Look for caching opportunities.
 
         // Benchmark Costs (1,000 elements)
         // ================================
@@ -50,7 +48,7 @@ namespace BSOA.Benchmarks
         //  - StringColumn caching only worthwhile if the cache hits relatively often; usage pattern will vary.
         //  - StringColumn "cache last read" is often helpful and minimal overhead otherwise.
         //  - Columns 
-        
+
         //[Benchmark]
         public void Nothing()
         {
@@ -160,25 +158,18 @@ namespace BSOA.Benchmarks
             }
         }
 
-        //[Benchmark]
+        [Benchmark]
         public void DictionaryReadSuccess()
         {
             long sum = 0;
-            int badCount = 0;
+
             foreach (Result result in _results)
             {
-                if (result.Properties.TryGetValue("Commit", out string commit) && commit != null)
-                {
-                    sum += commit.Length;
-                }
-                else
-                {
-                    badCount++;
-                }
+                sum += result.Properties["Commit"].Length;
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void DictionaryReadFail()
         {
             long sum = 0;
@@ -187,6 +178,46 @@ namespace BSOA.Benchmarks
                 if (result.Properties.TryGetValue("NotThere", out string commit))
                 {
                     sum += commit.Length;
+                }
+            }
+        }
+
+        //[Benchmark]
+        public void ListColumnEnumerate()
+        {
+            long sum = 0;
+            foreach (Result result in _results)
+            {
+                foreach (int value in result.Tags)
+                {
+                    sum += value;
+                }
+            }
+        }
+
+        //[Benchmark]
+        public void ListColumnFor()
+        {
+            long sum = 0;
+            foreach (Result result in _results)
+            {
+                for(int i = 0; i < result.Tags.Count; ++i)
+                {
+                    sum += result.Tags[i];
+                }
+            }
+        }
+
+        //[Benchmark]
+        public void ListColumnForCached()
+        {
+            long sum = 0;
+            foreach (Result result in _results)
+            {
+                IList<int> tags = result.Tags;
+                for (int i = 0; i < tags.Count; ++i)
+                {
+                    sum += tags[i];
                 }
             }
         }
