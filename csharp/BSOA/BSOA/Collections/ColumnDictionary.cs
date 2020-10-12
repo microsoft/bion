@@ -296,7 +296,5 @@ namespace BSOA.Collections
 
             return !left.Equals(right);
         }
-
-
     }
 }

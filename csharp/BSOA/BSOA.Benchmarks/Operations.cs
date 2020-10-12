@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 
 using BSOA.Benchmarks.Model;
+//using BSOA.Benchmarks.NonBsoaModel;
 
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +40,7 @@ namespace BSOA.Benchmarks
         //  - ListEnumerator caches length (65 -> 40 us)
         //  - EnumeratorConverter          (40 -> 20 us)
         //  - DistinctColumn caching       (83 ->  9 us for Message.Length Sum)
+        //  - For Loop, no list caching    (178 -> 70 us)
 
         // Learnings
         // =========
@@ -47,6 +49,7 @@ namespace BSOA.Benchmarks
         //  - StringColumn caching too expensive with "remove oldest from cache" (remove too expensive vs. convert)
         //  - StringColumn caching only worthwhile if the cache hits relatively often; usage pattern will vary.
         //  - StringColumn "cache last read" is often helpful and minimal overhead otherwise.
+        //  - Columns 
         
         //[Benchmark]
         public void Nothing()
@@ -57,6 +60,7 @@ namespace BSOA.Benchmarks
         //[Benchmark]
         public void Enumerate()
         {
+            // NOTE: ForEach is much faster for BSOA, as it can retrieve the real index list once.
             long count = 0;
             foreach (Result result in _run.Results)
             {
@@ -64,9 +68,10 @@ namespace BSOA.Benchmarks
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void ForLoop()
         {
+            // NOTE: Slower; each access of Count and indexer must re-retrieve the real index list.
             long count = 0;
             for (int i = 0; i < _run.Results.Count; ++i)
             {
@@ -149,40 +154,28 @@ namespace BSOA.Benchmarks
         public void StringCached2x()
         {
             long sum = 0;
-            foreach (Result result in _run.Results)
+            foreach (Result result in _results)
             {
                 sum += result.Message.Length + result.Message.Length;
             }
         }
 
-        // BSOA Model (default, pre-optimizations):
-        //  foreach (Result result in run.Results) { sum += result.StartLine; }       66 us.
-        //  foreach (Result result in run.Results) { sum += result.Message.Length; }  150 us.
-
-        // BSOA ListEnumerator cache count:
-        //  foreach (Result result in run.Results) { sum += result.StartLine; }       40 us.
-        //  foreach (Result result in run.Results) { sum += result.Message.Length; }  122 us.
-
-        // BSOA EnumeratorConverter:
-        //  foreach (Result result in run.Results) { sum += result.StartLine; }           22 us.
-        //  foreach (Result result in run.Results) { sum += result.Message.Length; }      98 us.
-        //  foreach (Result result in run.Results) { 2x sum += result.Message.Length; }  166 us.
-
-        // BSOA struct-y Result: (Reverted)
-        //  foreach (Result result in run.Results) { sum += result.StartLine; }       19 us.
-        //  foreach (Result result in run.Results) { sum += result.Message.Length; }  90 us.
-
-        // BSOA DistinctColumn; string cache on read:
-        //  foreach (Result result in run.Results) { sum += result.Message.Length; }     34 us.
-        //  foreach (Result result in run.Results) { 2x sum += result.Message.Length; }  58 us.
-
-        // BSOA DistinctColumn but no cache:
-        //  foreach (Result result in run.Results) { sum += result.Message.Length; }     112 us.
-        //  foreach (Result result in run.Results) { 2x sum += result.Message.Length; }  190 us.
-
-        // Ensure Messages Unique:
-        //  foreach (Result result in run.Results) { sum += result.StartLine; }           22 us.
-        //  foreach (Result result in run.Results) { sum += result.Message.Length; }      98 us.
-        //  foreach (Result result in run.Results) { 2x sum += result.Message.Length; }  161 us.
+        [Benchmark]
+        public void DictionaryReadSuccess()
+        {
+            long sum = 0;
+            int badCount = 0;
+            foreach (Result result in _results)
+            {
+                if (result.Properties.TryGetValue("Commit", out string commit) && commit != null)
+                {
+                    sum += commit.Length;
+                }
+                else
+                {
+                    badCount++;
+                }
+            }
+        }
     }
 }

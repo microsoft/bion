@@ -1,14 +1,11 @@
-﻿using BSOA.Benchmarks.Model;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
-namespace BSOA.Benchmarks
+namespace BSOA.Benchmarks.NonBsoaModel
 {
     public class Generator
     {
-        public const string SampleFilePath = "SampleRun.bsoa";
+        // NOTE: Copy these from BSOA 'Generator' class to get identical measurements
 
         private const int RuleCount = 20;
         private const int ResultCount = 1000;
@@ -59,28 +56,12 @@ namespace BSOA.Benchmarks
                 run.Results.Add(result);
             }
 
-            run.DB.Trim();
-
             return run;
         }
 
         public static Run CreateOrLoad()
         {
-            if (File.Exists(SampleFilePath))
-            {
-                try
-                {
-                    return Run.ReadBsoa(SampleFilePath);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Could not load BSOA log from prior run. Rebuilding. Exception: \r\n{ex}.");
-                }
-            }
-
-            Run run = new Generator().Build();
-            run.WriteBsoa(SampleFilePath);
-            return run;
+            return new Generator().Build();
         }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
 
-using BSOA.Column;
-
 using System;
 
 namespace BSOA.Benchmarks
@@ -10,9 +8,6 @@ namespace BSOA.Benchmarks
     {
         static void Main(string[] args)
         {
-            // Ensure sample file created
-            Generator.CreateOrLoad();
-
             if (args.Length > 0 && args[0].ToLowerInvariant().Contains("detailed"))
             {
                 BenchmarkRunner.Run<Operations>();
