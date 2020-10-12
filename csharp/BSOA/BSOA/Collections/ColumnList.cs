@@ -26,18 +26,26 @@ namespace BSOA
         private readonly ListColumn<T> _column;
         private readonly int _rowIndex;
 
-        public static ColumnList<T> Empty = new ColumnList<T>(null, 0);
+        private NumberList<int> _indices;
+        private IColumn<T> _values;
 
-        protected ColumnList(ListColumn<T> column, int index)
+        public static ColumnList<T> Empty = new ColumnList<T>(null, 0, NumberList<int>.Empty);
+
+        protected ColumnList(ListColumn<T> column, int index, NumberList<int> indices)
         {
             _column = column;
             _rowIndex = index;
+
+            _indices = indices ?? NumberList<int>.Empty;
+            _values = _column?._values;
         }
 
         public static ColumnList<T> Get(ListColumn<T> column, int index)
         {
             if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
-            return (column._indices[index] == null ? null : new ColumnList<T>(column, index));
+
+            NumberList<int> indices = column._indices[index];
+            return (indices == null ? null : new ColumnList<T>(column, index, indices));
         }
 
         public static void Set(ListColumn<T> column, int index, IEnumerable<T> value)
@@ -50,26 +58,28 @@ namespace BSOA
             }
             else
             {
-                new ColumnList<T>(column, index).SetTo(value);
+                NumberList<int> indices = column._indices[index];
+                new ColumnList<T>(column, index, indices).SetTo(value);
             }
         }
 
         private void Init()
         {
             // Setting List to empty 'coerces' list creation in correct column
-            if (_column._indices[_rowIndex] == null) { _column._indices[_rowIndex] = NumberList<int>.Empty; }
+            if (_indices.Count == 0)
+            {
+                _column._indices[_rowIndex] = NumberList<int>.Empty;
+                _indices = _column._indices[_rowIndex];
+            }
         }
-
-        private NumberList<int> Indices => _column?._indices[_rowIndex];
-        private IColumn<T> Values => _column?._values;
 
         public T this[int indexWithinList]
         {
-            get => Values[Indices[indexWithinList]];
-            set => Values[Indices[indexWithinList]] = value;
+            get => _values[_indices[indexWithinList]];
+            set => _values[_indices[indexWithinList]] = value;
         }
 
-        public int Count => Indices?.Count ?? 0;
+        public int Count => _indices.Count;
         public bool IsReadOnly => false;
 
         public void SetTo(IEnumerable<T> other)
@@ -98,12 +108,12 @@ namespace BSOA
         public void Add(T item)
         {
             // Add the new value itself
-            int newValueIndex = Values.Count;
-            Values[Values.Count] = item;
+            int newValueIndex = _values.Count;
+            _values[newValueIndex] = item;
 
             // Add a new index to the list of indices pointing to this value
             Init();
-            Indices.Add(newValueIndex);
+            _indices.Add(newValueIndex);
         }
 
         public void Clear()
@@ -111,15 +121,15 @@ namespace BSOA
             // Clear values (still need to reclaim space later)
             if (Count > 0)
             {
-                foreach (int index in Indices)
+                foreach (int index in _indices)
                 {
-                    Values[index] = default(T);
+                    _values[index] = default(T);
                 }
             }
 
             // Clear indices
             Init();
-            Indices.Clear();
+            _indices.Clear();
         }
 
         public bool Contains(T item)
@@ -134,19 +144,14 @@ namespace BSOA
 
         public int IndexOf(T item)
         {
-            if (Count > 0)
+            ArraySlice<int> indices = _indices.Slice;
+            int[] indicesArray = indices.Array;
+            int end = indices.Index + indices.Count;
+
+            for (int i = indices.Index; i < end; ++i)
             {
-                IColumn<T> values = Values;
-
-                ArraySlice<int> indices = Indices.Slice;
-                int[] indicesArray = indices.Array;
-                int end = indices.Index + indices.Count;
-
-                for (int i = indices.Index; i < end; ++i)
-                {
-                    int indexOfValue = indicesArray[i];
-                    if (values[indexOfValue].Equals(item)) { return i - indices.Index; }
-                }
+                int indexOfValue = indicesArray[i];
+                if (_values[indexOfValue].Equals(item)) { return i - indices.Index; }
             }
 
             return -1;
@@ -155,12 +160,12 @@ namespace BSOA
         public void Insert(int index, T item)
         {
             // Add the new value itself
-            int newValueIndex = Values.Count;
-            Values[Values.Count] = item;
+            int newValueIndex = _values.Count;
+            _values[_values.Count] = item;
 
             // Insert the index in the correct position
             Init();
-            Indices.Insert(index, newValueIndex);
+            _indices.Insert(index, newValueIndex);
         }
 
         public bool Remove(T item)
@@ -182,20 +187,25 @@ namespace BSOA
             if (index < 0 || index >= Count) { throw new IndexOutOfRangeException(nameof(index)); }
 
             // Remove item
-            Values[Indices[index]] = default(T);
+            _values[_indices[index]] = default(T);
 
             // Remove index
-            Indices.RemoveAt(index);
+            _indices.RemoveAt(index);
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new ListEnumerator<T>(this);
+            return new EnumeratorConverter<int, T>(_indices.GetEnumerator(), GetValue);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new ListEnumerator<T>(this);
+            return new EnumeratorConverter<int, T>(_indices.GetEnumerator(), GetValue);
+        }
+
+        private T GetValue(int index)
+        {
+            return _values[index];
         }
 
         public override int GetHashCode()
@@ -210,12 +220,14 @@ namespace BSOA
 
         public static bool operator ==(ColumnList<T> left, IReadOnlyList<T> right)
         {
+            if (object.ReferenceEquals(left, null)) { return object.ReferenceEquals(right, null); }
             return left.Equals(right);
         }
 
         public static bool operator !=(ColumnList<T> left, IReadOnlyList<T> right)
         {
-            return !(left == right);
+            if (object.ReferenceEquals(left, null)) { return object.ReferenceEquals(right, null); }
+            return !left.Equals(right);
         }
     }
 }

@@ -66,8 +66,7 @@ namespace BSOA.Column
                 // VariableLengthColumn can't pass out of range values
                 // if (index < 0 || index >= ChapterRowCount) { throw new ArgumentOutOfRangeException("index"); }
 
-                ArraySlice<T> result = default;
-                if (_largeValueDictionary != null && _largeValueDictionary.TryGetValue(index, out result)) { return result; }
+                if (_largeValueDictionary != null && _largeValueDictionary.TryGetValue(index, out ArraySlice<T> result)) { return result; }
 
                 if (index < _valueEndInPage?.Length)
                 {
