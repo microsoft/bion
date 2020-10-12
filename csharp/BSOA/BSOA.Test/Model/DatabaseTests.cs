@@ -59,7 +59,7 @@ namespace BSOA.Test.Model
 
             // Verify Database.Clear works
             community.DB.Clear();
-            Assert.Null(community.People);
+            Assert.Empty(community.People);
         }
 
         [Fact]

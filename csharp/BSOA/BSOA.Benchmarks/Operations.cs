@@ -18,6 +18,9 @@ namespace BSOA.Benchmarks
             _results = _run.Results.ToList();
         }
 
+        // TODO:
+        //  Add test for enumerate Dictionary and List columns; try for loop for List column. Look for caching opportunities.
+
         // Benchmark Costs (1,000 elements)
         // ================================
         //  Non-BSOA List<struct>     , sum int             4.00 us
@@ -57,6 +60,17 @@ namespace BSOA.Benchmarks
             long count = 0;
             foreach (Result result in _run.Results)
             {
+                count++;
+            }
+        }
+
+        [Benchmark]
+        public void ForLoop()
+        {
+            long count = 0;
+            for (int i = 0; i < _run.Results.Count; ++i)
+            {
+                Result result = _run.Results[i];
                 count++;
             }
         }
@@ -111,7 +125,7 @@ namespace BSOA.Benchmarks
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void StringNulls()
         {
             long sum = 0;
@@ -121,7 +135,7 @@ namespace BSOA.Benchmarks
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void StringCached()
         {
             long sum = 0;
@@ -131,7 +145,7 @@ namespace BSOA.Benchmarks
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void StringCached2x()
         {
             long sum = 0;

@@ -43,16 +43,34 @@ namespace BSOA.Demo.Model.BSOA
 
         partial void Init();
 
+        private TypedList<Folder> _folders;
         public IList<Folder> Folders
         {
-            get => TypedList<Folder>.Get(_table.Database.Folder, _table.Folders, _index);
-            set => TypedList<Folder>.Set(_table.Database.Folder, _table.Folders, _index, value);
+            get
+            {
+                if (_folders == null) { _folders = TypedList<Folder>.Get(_table.Database.Folder, _table.Folders, _index); }
+                return _folders;
+            }
+            set
+            {
+                TypedList<Folder>.Set(_table.Database.Folder, _table.Folders, _index, value);
+                _folders = null;
+            }
         }
 
+        private TypedList<File> _files;
         public IList<File> Files
         {
-            get => TypedList<File>.Get(_table.Database.File, _table.Files, _index);
-            set => TypedList<File>.Set(_table.Database.File, _table.Files, _index, value);
+            get
+            {
+                if (_files == null) { _files = TypedList<File>.Get(_table.Database.File, _table.Files, _index); }
+                return _files;
+            }
+            set
+            {
+                TypedList<File>.Set(_table.Database.File, _table.Files, _index, value);
+                _files = null;
+            }
         }
 
         #region IEquatable<FileSystem>

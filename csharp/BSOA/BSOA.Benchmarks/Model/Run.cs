@@ -43,16 +43,34 @@ namespace BSOA.Benchmarks.Model
 
         partial void Init();
 
+        private TypedList<Result> _results;
         public IList<Result> Results
         {
-            get => TypedList<Result>.Get(_table.Database.Result, _table.Results, _index);
-            set => TypedList<Result>.Set(_table.Database.Result, _table.Results, _index, value);
+            get
+            {
+                if (_results == null) { _results = TypedList<Result>.Get(_table.Database.Result, _table.Results, _index); }
+                return _results;
+            }
+            set
+            {
+                TypedList<Result>.Set(_table.Database.Result, _table.Results, _index, value);
+                _results = null;
+            }
         }
 
+        private TypedList<Rule> _rules;
         public IList<Rule> Rules
         {
-            get => TypedList<Rule>.Get(_table.Database.Rule, _table.Rules, _index);
-            set => TypedList<Rule>.Set(_table.Database.Rule, _table.Rules, _index, value);
+            get
+            {
+                if (_rules == null) { _rules = TypedList<Rule>.Get(_table.Database.Rule, _table.Rules, _index); }
+                return _rules;
+            }
+            set
+            {
+                TypedList<Rule>.Set(_table.Database.Rule, _table.Rules, _index, value);
+                _rules = null;
+            }
         }
 
         #region IEquatable<Run>
