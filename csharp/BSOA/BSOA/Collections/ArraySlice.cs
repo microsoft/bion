@@ -68,12 +68,12 @@ namespace BSOA.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new ListEnumerator<T>(this);
+            return new ArraySliceEnumerator<T>(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new ListEnumerator<T>(this);
+            return new ArraySliceEnumerator<T>(this);
         }
 
         public override int GetHashCode()

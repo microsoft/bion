@@ -8,7 +8,7 @@ using BSOA.Model;
 
 namespace BSOA.Collections
 {
-    public struct IndirectEnumerator<T> : IEnumerator<T>
+    public sealed class IndirectEnumerator<T> : IEnumerator<T>
     {
         private IColumn<T> _values;
         private ArraySlice<int> _indices;
@@ -24,11 +24,6 @@ namespace BSOA.Collections
         public T Current => _values[_indices[_index]];
         object IEnumerator.Current => _values[_indices[_index]];
 
-        public void Dispose()
-        {
-            // Nothing to Dispose
-        }
-
         public bool MoveNext()
         {
             _index++;
@@ -38,6 +33,11 @@ namespace BSOA.Collections
         public void Reset()
         {
             _index = -1;
+        }
+
+        public void Dispose()
+        {
+            // Nothing to Dispose
         }
     }
 }

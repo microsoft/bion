@@ -10,7 +10,7 @@ namespace BSOA.Collections
     ///  ListEnumerator provides enumeration over any IReadOnlyList.
     /// </summary>
     /// <typeparam name="T">List Item type</typeparam>
-    public struct ListEnumerator<T> : IEnumerator<T>
+    public sealed class ListEnumerator<T> : IEnumerator<T>
     {
         private IReadOnlyList<T> _list;
         private int _index;
@@ -28,11 +28,6 @@ namespace BSOA.Collections
         public T Current => _list[_index];
         object IEnumerator.Current => _list[_index];
 
-        public void Dispose()
-        {
-            // Nothing to Dispose
-        }
-
         public bool MoveNext()
         {
             return ++_index < _count;
@@ -41,6 +36,11 @@ namespace BSOA.Collections
         public void Reset()
         {
             _index = -1;
+        }
+
+        public void Dispose()
+        {
+            // Nothing to Dispose
         }
     }
 }

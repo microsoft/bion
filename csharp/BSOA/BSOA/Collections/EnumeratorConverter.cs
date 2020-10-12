@@ -10,7 +10,7 @@ namespace BSOA.Collections
     /// </summary>
     /// <typeparam name="TInner">Inner enumerator type (index)</typeparam>
     /// <typeparam name="TOuter">Exposed enumerator type (object model instance)</typeparam>
-    public struct EnumeratorConverter<TInner, TOuter> : IEnumerator<TOuter>
+    public sealed class EnumeratorConverter<TInner, TOuter> : IEnumerator<TOuter>
     {
         private Func<TInner, TOuter> _toInstance;
         private IEnumerator<TInner> _inner;
@@ -24,12 +24,6 @@ namespace BSOA.Collections
         public TOuter Current => _toInstance(_inner.Current);
         object IEnumerator.Current => _toInstance(_inner.Current);
 
-        public void Dispose()
-        {
-            _inner?.Dispose();
-            _inner = null;
-        }
-
         public bool MoveNext()
         {
             return _inner.MoveNext();
@@ -38,6 +32,12 @@ namespace BSOA.Collections
         public void Reset()
         {
             _inner.Reset();
+        }
+
+        public void Dispose()
+        {
+            _inner?.Dispose();
+            _inner = null;
         }
     }
 }
