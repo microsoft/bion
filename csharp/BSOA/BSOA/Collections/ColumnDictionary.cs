@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 using BSOA.Column;
 using BSOA.Extensions;
+using BSOA.Model;
 
 namespace BSOA.Collections
 {
@@ -15,7 +16,7 @@ namespace BSOA.Collections
         private readonly DictionaryColumn<TKey, TValue> _column;
         private readonly int _rowIndex;
         private NumberList<int> Pairs => _column?._pairs[_rowIndex] ?? NumberList<int>.Empty;
-        private TValue Value(int pairIndex) => _column._values[_column._pairs[_rowIndex][pairIndex]];
+        private TValue Value(int innerRow) => _column._values[innerRow];
 
         public static ColumnDictionary<TKey, TValue> Empty = new ColumnDictionary<TKey, TValue>(null, 0);
 
@@ -64,14 +65,14 @@ namespace BSOA.Collections
 
             set
             {
-                int pairIndex = InternalIndexOfKey(key);
-                if (pairIndex == -1)
+                int innerRow = InnerRowOfKey(key);
+                if (innerRow == -1)
                 {
                     AddInternal(key, value);
                 }
                 else
                 {
-                    _column._values[Pairs[pairIndex]] = value;
+                    _column._values[innerRow] = value;
                 }
             }
         }
@@ -115,10 +116,10 @@ namespace BSOA.Collections
 
         private void AddInternal(TKey key, TValue value)
         {
-            int newPairIndex = _column._values.Count;
-            _column._keys[newPairIndex] = key;
-            _column._values[newPairIndex] = value;
-            Pairs.Add(newPairIndex);
+            int innerRow = _column._values.Count;
+            _column._keys[innerRow] = key;
+            _column._values[innerRow] = value;
+            Pairs.Add(innerRow);
         }
 
         public void Clear()
@@ -126,10 +127,10 @@ namespace BSOA.Collections
             NumberList<int> pairs = Pairs;
 
             // Clear Keys and Values to conserve space
-            foreach (int pairIndex in pairs)
+            foreach (int innerRow in pairs)
             {
-                _column._keys[pairIndex] = default;
-                _column._values[pairIndex] = default;
+                _column._keys[innerRow] = default;
+                _column._values[innerRow] = default;
             }
 
             // Clear pairs to empty the collection
@@ -138,16 +139,16 @@ namespace BSOA.Collections
 
         public bool ContainsKey(TKey key)
         {
-            return InternalIndexOfKey(key) != -1;
+            return InnerRowOfKey(key) != -1;
         }
 
         public bool Remove(TKey key)
         {
-            int pairIndex = InternalIndexOfKey(key);
+            int innerRow = InnerRowOfKey(key);
 
-            if (pairIndex != -1)
+            if (innerRow != -1)
             {
-                Pairs.RemoveAt(pairIndex);
+                Pairs.Remove(innerRow);
                 return true;
             }
 
@@ -156,11 +157,11 @@ namespace BSOA.Collections
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            int pairIndex = InternalIndexOfKey(item.Key);
+            int innerRow = InnerRowOfKey(item.Key);
 
-            if (pairIndex != -1 && object.Equals(Value(pairIndex), item.Value))
+            if (innerRow != -1 && object.Equals(Value(innerRow), item.Value))
             {
-                Pairs.RemoveAt(pairIndex);
+                Pairs.Remove(innerRow);
                 return true;
             }
 
@@ -171,10 +172,10 @@ namespace BSOA.Collections
         {
             value = default(TValue);
 
-            int pairIndex = InternalIndexOfKey(key);
-            if (pairIndex == -1) { return false; }
+            int innerRow = InnerRowOfKey(key);
+            if (innerRow == -1) { return false; }
 
-            value = Value(pairIndex);
+            value = Value(innerRow);
             return true;
         }
 
@@ -188,14 +189,18 @@ namespace BSOA.Collections
             return false;
         }
 
-        private int InternalIndexOfKey(TKey key)
+        private int InnerRowOfKey(TKey key)
         {
-            int pairIndex = 0;
+            IColumn<TKey> keys = _column._keys;
 
-            foreach (KeyValuePair<TKey, TValue> pair in this)
+            ArraySlice<int> pairs = Pairs.Slice;
+            int[] array = pairs.Array;
+            int end = pairs.Index + pairs.Count;
+            
+            for (int i = pairs.Index; i < end; ++i)
             {
-                if (pair.Key.Equals(key)) { return pairIndex; }
-                pairIndex++;
+                int innerRow = array[i];
+                if (keys[innerRow].Equals(key)) { return innerRow; }
             }
 
             return -1;
