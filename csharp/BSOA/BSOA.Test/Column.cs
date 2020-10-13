@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 using BSOA.Column;
 using BSOA.Model;
@@ -66,7 +67,7 @@ namespace BSOA.Test
                 Assert.DoesNotContain(notInList, column);
                 Assert.Equal(-1, column.IndexOf(notInList));
             }
-            
+
             Assert.Contains(valueProvider(1), column);
             Assert.Equal(1, column.IndexOf(valueProvider(1)));
 
@@ -88,6 +89,17 @@ namespace BSOA.Test
             other = new T[column.Count];
             column.CopyTo((Array)other, 0);
             CollectionReadVerifier.VerifySame(other, column, quick: true);
+
+            // Verify multi-threaded reads return correct values (no read-only threading problems)
+            Parallel.For(0, 8, (instance) =>
+            {
+                Random r = new Random(instance);
+                for (int i = 0; i < column.Count * 20; ++i)
+                {
+                    int rowIndex = r.Next(column.Count);
+                    Assert.Equal(expected[rowIndex], column[rowIndex]);
+                }
+            });
 
             // Change existing value
             column[1] = otherValue;
