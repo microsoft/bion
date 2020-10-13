@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using BSOA.Collections;
+using BSOA.Model;
 
 namespace BSOA.Column
 {

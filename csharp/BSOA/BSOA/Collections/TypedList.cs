@@ -137,14 +137,14 @@ namespace BSOA.Collections
         {
             // Use an EnumeratorConverter and get the NumberList -> ArraySlice enumerator once,
             // ensuring we don't keep reconstructing it on every MoveNext().
-            return new EnumeratorConverter<int, TItem>(_inner.GetEnumerator(), _toInstance);
+            return new EnumeratorConverter<TItem, int>(_inner.GetEnumerator(), _toInstance);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             // Use an EnumeratorConverter and get the NumberList -> ArraySlice enumerator once,
             // ensuring we don't keep reconstructing it on every MoveNext().
-            return new EnumeratorConverter<int, TItem>(_inner.GetEnumerator(), _toInstance);
+            return new EnumeratorConverter<TItem, int>(_inner.GetEnumerator(), _toInstance);
         }
 
         public override int GetHashCode()

@@ -16,20 +16,22 @@ namespace BSOA.Column
     /// </summary>
     public class ListColumn<T> : LimitedList<IList<T>>, IColumn<IList<T>>
     {
-        internal NullableColumn<NumberList<int>> _indices;
-        internal IColumn<T> _values;
         private ColumnList<T> _cached;
+        private NumberListColumn<int> _indicesInner;
+        internal IColumn<NumberList<int>> _indices;
+        internal IColumn<T> _values;
 
         public override int Count => _indices.Count;
 
-        public ListColumn(IColumn<T> values, bool nullByDefault = true)
+        public ListColumn(IColumn<T> values, Nullability nullability = Nullability.DefaultToNull)
         {
-            _indices = new NullableColumn<NumberList<int>>(new NumberListColumn<int>(), nullByDefault);
+            _indicesInner = new NumberListColumn<int>();
+            _indices = NullableColumn<NumberList<int>>.Wrap(_indicesInner, nullability);
             _values = values;
         }
 
         // ColumnFactory untyped constructor
-        public ListColumn(IColumn values, object defaultValue) : this((IColumn<T>)values, (defaultValue == null))
+        public ListColumn(IColumn values, object defaultValue) : this((IColumn<T>)values, (defaultValue == null ? Nullability.DefaultToNull : Nullability.DefaultToEmpty))
         { }
 
         public override IList<T> this[int index]
@@ -78,7 +80,7 @@ namespace BSOA.Column
             _indices.Trim();
 
             // Find any unused values and remove them
-            GarbageCollector.Collect<int, T>((INumberColumn<int>)_indices.Values, _values);
+            GarbageCollector.Collect<int, T>(_indicesInner, _values);
 
             // Trim values afterward to clean up any newly unused space
             _values.Trim();

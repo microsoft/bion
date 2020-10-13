@@ -10,7 +10,7 @@ namespace BSOA.Collections
     /// </summary>
     /// <typeparam name="TInner">Inner enumerator type (index)</typeparam>
     /// <typeparam name="TOuter">Exposed enumerator type (object model instance)</typeparam>
-    public sealed class EnumeratorConverter<TInner, TOuter> : IEnumerator<TOuter>
+    public sealed class EnumeratorConverter<TOuter, TInner> : IEnumerator<TOuter>
     {
         private Func<TInner, TOuter> _toInstance;
         private IEnumerator<TInner> _inner;

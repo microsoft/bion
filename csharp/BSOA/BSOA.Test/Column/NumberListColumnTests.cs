@@ -42,6 +42,30 @@ namespace BSOA.Test
             Assert.True(column[1].Equals(asArray));
         }
 
+        [Fact]
+        public void GenericNumberListColumn_Basics()
+        {
+            List<int> empty = new List<int>();
+
+            GenericNumberListColumn<int> column = new GenericNumberListColumn<int>();
+            column[0] = new int[] { 0, 1, 2 };
+
+            TreeDiagnostics diagnostics = TreeSerializer.Diagnostics(column, TreeFormat.Binary);
+            int tinyColumnLength = (int)diagnostics.Length;
+
+            Column.Basics(() => new GenericNumberListColumn<int>(), null, column[0], (index) =>
+            {
+                IList<int> values = column[index];
+                if (values == null || values.Count == 0)
+                {
+                    column[index] = new int[] { index, index + 1, index + 2 };
+                    values = column[index];
+                }
+
+                return values;
+            });
+        }
+
         private NumberListColumn<int> BuildSampleColumn()
         {
             List<ArraySlice<int>> expected = new List<ArraySlice<int>>();

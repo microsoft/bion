@@ -195,12 +195,12 @@ namespace BSOA
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new EnumeratorConverter<int, T>(_indices.GetEnumerator(), GetValue);
+            return new EnumeratorConverter<T, int>(_indices.GetEnumerator(), GetValue);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new EnumeratorConverter<int, T>(_indices.GetEnumerator(), GetValue);
+            return new EnumeratorConverter<T, int>(_indices.GetEnumerator(), GetValue);
         }
 
         private T GetValue(int index)

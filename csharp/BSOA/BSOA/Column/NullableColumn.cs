@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 
 using BSOA.IO;
@@ -19,10 +20,25 @@ namespace BSOA.Column
         protected BooleanColumn IsNull;
         internal IColumn<T> Values;
 
-        public NullableColumn(IColumn<T> values, bool nullByDefault)
+        protected NullableColumn(IColumn<T> values, bool nullByDefault)
         {
             IsNull = new BooleanColumn(nullByDefault);
             Values = values;
+        }
+
+        public static IColumn<T> Wrap(IColumn<T> values, Nullability nullability)
+        {
+            switch (nullability)
+            {
+                case Nullability.DefaultToNull:
+                    return new NullableColumn<T>(values, nullByDefault: true);
+                case Nullability.DefaultToEmpty:
+                    return new NullableColumn<T>(values, nullByDefault: false);
+                case Nullability.NullsDisallowed:
+                    return values;
+                default:
+                    throw new NotImplementedException($"NullableColumn.Wrap not implemented for Nullability {nullability}.");
+            }
         }
 
         public override int Count => Values.Count;

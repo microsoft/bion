@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -26,6 +28,48 @@ namespace BSOA.Column
         public void ForEach(Action<ArraySlice<T>> action)
         {
             ((ArraySliceColumn<T>)Inner).ForEach(action);
+        }
+    }
+    
+    /// <summary>
+    ///  GenericNumberListColumn exposes NumberListColumn as an IColumn&lt;IList&lt;T&gt;&gt; for use
+    ///  within an object model which needs to expose generic lists.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class GenericNumberListColumn<T> : WrappingColumn<IList<T>, NumberList<T>>, INumberColumn<T> where T : unmanaged, IEquatable<T>
+    {
+        public GenericNumberListColumn() : this(Nullability.DefaultToNull)
+        { }
+
+        public GenericNumberListColumn(Nullability nullability) : base(NullableColumn<NumberList<T>>.Wrap(new NumberListColumn<T>(), nullability))
+        { }
+
+        public override IList<T> this[int index]
+        {
+            get => Inner[index];
+            set
+            {
+                if (value == null)
+                {
+                    Inner[index] = null;
+                }
+                else
+                {
+                    NumberList<T> item = Inner[index];
+                    if(item == null)
+                    {
+                        Inner[index] = NumberList<T>.Empty;
+                        item = Inner[index];
+                    }
+
+                    item.SetTo(new ArraySlice<T>(value.ToArray()));
+                }
+            }
+        }
+
+        public void ForEach(Action<ArraySlice<T>> action)
+        {
+            ((NumberListColumn<T>)Inner).ForEach(action);
         }
     }
 }

@@ -54,11 +54,14 @@ namespace BSOA.Test
             CollectionReadVerifier.VerifySame<T>(expected, column);
 
             // Verify item type supports equatability (needed for IndexOf, Contains to work)
-            Assert.True(otherValue.Equals(otherValue));
-            Assert.Equal(otherValue.GetHashCode(), otherValue.GetHashCode());
-            Assert.False(otherValue.Equals(defaultValue));
-            Assert.NotEqual(otherValue.GetHashCode(), defaultValue?.GetHashCode() ?? 0);
-            Assert.False(otherValue.Equals(1.45d));
+            if (otherValue != null)
+            {
+                Assert.True(otherValue.Equals(otherValue));
+                Assert.Equal(otherValue.GetHashCode(), otherValue.GetHashCode());
+                Assert.False(otherValue.Equals(defaultValue));
+                Assert.NotEqual(otherValue.GetHashCode(), defaultValue?.GetHashCode() ?? 0);
+                Assert.False(otherValue.Equals(1.45d));
+            }
 
             // Contains / IndexOf
             T notInList = valueProvider(50);

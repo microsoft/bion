@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using BSOA.Collections;
 using BSOA.Column;
+using BSOA.Model;
 
 using Xunit;
 
@@ -17,7 +18,7 @@ namespace BSOA.Test
             DictionaryColumn<string, string> column = new DictionaryColumn<string, string>(
                 new DistinctColumn<string>(new StringColumn(), null),
                 new StringColumn(),
-                nullByDefault: false);
+                Nullability.NullsDisallowed);
 
             ColumnDictionary<string, string> first = (ColumnDictionary<string, string>)column[0];
             first["One"] = "One";
@@ -29,7 +30,7 @@ namespace BSOA.Test
         [Fact]
         public void DictionaryColumn_Basics()
         {
-            DictionaryColumn<string, string> scratch = new DictionaryColumn<string, string>(new StringColumn(), new StringColumn(), nullByDefault: false);
+            DictionaryColumn<string, string> scratch = new DictionaryColumn<string, string>(new StringColumn(), new StringColumn(), Nullability.DefaultToEmpty);
             ColumnDictionary<string, string> defaultValue = ColumnDictionary<string, string>.Empty;
 
             ColumnDictionary<string, string> otherValue = SampleRow();
@@ -43,7 +44,7 @@ namespace BSOA.Test
                 () => new DictionaryColumn<string, string>(
                     new DistinctColumn<string>(new StringColumn()),
                     new StringColumn(),
-                    nullByDefault: false),
+                    Nullability.DefaultToEmpty),
                 defaultValue,
                 otherValue,
                 (i) =>
@@ -63,7 +64,7 @@ namespace BSOA.Test
                 () => new DictionaryColumn<string, string>(
                     new DistinctColumn<string>(new StringColumn()),
                     new StringColumn(),
-                    nullByDefault: true),
+                    Nullability.DefaultToNull),
                 defaultValue,
                 otherValue,
                 (i) =>
