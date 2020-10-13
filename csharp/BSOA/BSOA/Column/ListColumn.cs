@@ -18,6 +18,7 @@ namespace BSOA.Column
     {
         internal NullableColumn<NumberList<int>> _indices;
         internal IColumn<T> _values;
+        private ColumnList<T> _cached;
 
         public override int Count => _indices.Count;
 
@@ -33,22 +34,40 @@ namespace BSOA.Column
 
         public override IList<T> this[int index]
         {
-            get => ColumnList<T>.Get(this, index);
-            set => ColumnList<T>.Set(this, index, value);
+            get
+            {
+                ColumnList<T> value = _cached;
+                if (value?._rowIndex != index)
+                {
+                    value = ColumnList<T>.Get(this, index);
+                    _cached = value;
+                }
+
+                return value;
+            }
+
+            set
+            {
+                _cached = default;
+                ColumnList<T>.Set(this, index, value);
+            }
         }
 
         public override void Swap(int index1, int index2)
         {
+            _cached = default;
             _indices.Swap(index1, index2);
         }
 
         public override void RemoveFromEnd(int count)
         {
+            _cached = default;
             _indices.RemoveFromEnd(count);
         }
 
         public override void Clear()
         {
+            _cached = default;
             _indices.Clear();
             _values.Clear();
         }

@@ -24,7 +24,7 @@ namespace BSOA
     {
         private const int MinimumSize = 16;
         private readonly ListColumn<T> _column;
-        private readonly int _rowIndex;
+        internal readonly int _rowIndex;
 
         private NumberList<int> _indices;
         private IColumn<T> _values;

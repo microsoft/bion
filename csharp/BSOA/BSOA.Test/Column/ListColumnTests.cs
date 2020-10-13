@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using BSOA.Column;
 
@@ -79,6 +80,33 @@ namespace BSOA.Test
             Assert.True(second.Count == 0);
             second.Add("One");
             Assert.Single(second);
+        }
+
+        [Fact]
+        public void ListColumn_CacheThreadSafety()
+        {
+            ListColumn<int> column = new ListColumn<int>(new NumberColumn<int>(0));
+            List<int> empty = new List<int>();
+
+            for (int i = 0; i < 100; ++i)
+            {
+                // Set to non-null
+                column[i] = empty;
+
+                // Retrieve list and set up
+                IList<int> current = column[i];
+                current.Add(i - 1);
+                current.Add(i);
+                current.Add(i + 1);
+            }
+
+            // Verify list across multiple threads to confirm read-only use works safely
+            Parallel.For(0, column.Count * 100, (i) =>
+            {
+                int rowIndex = i % 100;
+                IList<int> current = column[rowIndex];
+                Assert.Equal(rowIndex - 1, current[0]);
+            });
         }
     }
 }
