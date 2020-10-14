@@ -19,19 +19,34 @@ namespace BSOA.Benchmarks
 
     // Improvements
     // ============
-    //  - ListEnumerator caches length (65 -> 40 us)
-    //  - EnumeratorConverter          (40 -> 20 us)
-    //  - DistinctColumn caching       (83 ->  9 us for Message.Length Sum)
-    //  - For Loop, no list caching    (178 -> 70 us)
+    //  - ListEnumerator caches length               (65 -> 40 us)
+    //  - EnumeratorConverter                        (40 -> 20 us)
+    //  - ArraySliceEnumerator; enumerators classes  (20 -> 14 us)
+    //  - DistinctColumn caching                     (83 ->  9 us for Message.Length Sum)
+    //  - For Loop, no list caching                  (178 -> 70 us)
+    //  - Dictionary DistinctColumn key caching      (700 -> 500 us)
+    //  - Dictionary walk Keys, not pairs            (500 -> 350 us)
+    //  - Dictionary innerRow, not pairIndex         (350 -> 300 us)
+    //  - Dictionary optimized key Slice loop        (300 -> 250 us)
+    //  - ListColumn<int> (1000 x 4)                 (277 / 543 / 217) -> (142 / 263 / 166) (foreach, for, for w/cached List+count)
+    //    - ColumnList caches NumberList             (277 -> 196)
+    //    - ColumnList uses EnumeratorConverter      (196 -> 154)
+    //    - ColumnList.Get doesn't get NumList 2x    (154 -> 146)
+    //  - GenericNumberListColumn<int> not-nullable  (67 / 263 / 122)
+    //  
 
     // Learnings
     // =========
+    //  - ForEach enumeration is best for BSOA, because ArraySlice and count can be 'snapped' and used for full loop.
     //  - In StringColumn, IsNull check first is worthwhile (much faster for all null columns, minimal impact on no-null columns).
     //  - DistinctColumn caching is very worthwhile (string form of values kept anyway to look up index on set; keeping another list of references saves all conversions on get).
     //  - StringColumn caching too expensive with "remove oldest from cache" (remove too expensive vs. convert)
     //  - StringColumn caching only worthwhile if the cache hits relatively often; usage pattern will vary.
     //  - StringColumn "cache last read" is often helpful and minimal overhead otherwise.
-    //  - Columns 
+    //  - Can cache last read key in columns by using a class holding the value and rowIndex; changing the class reference is atomic.
+    //  - Dictionary walk of Key/Value pairs is very expensive (UTF-8 converting every value)
+    //  - Optimized ArraySlice enumeration is still faster than ArraySliceEnumerator.
+
 
     class Program
     {
@@ -49,8 +64,8 @@ namespace BSOA.Benchmarks
                 MeasureSettings settings = new MeasureSettings(TimeSpan.FromSeconds(5), 1, 10000, false);
 
                 //QuickBenchmarker.Run<Basics>(settings);
-                QuickBenchmarker.Run<Strings>(settings);
-                //QuickBenchmarker.Run<Collections>(settings);
+                //QuickBenchmarker.Run<Strings>(settings);
+                QuickBenchmarker.Run<Collections>(settings);
             }
         }
     }

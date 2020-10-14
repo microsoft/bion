@@ -32,7 +32,7 @@ namespace BSOA.Benchmarks
             }
         }
 
-        //[Benchmark]
+        [Benchmark]
         public void DictionaryReadFail()
         {
             // Benchmark reading a string from a Dictionary which is not there
@@ -48,6 +48,25 @@ namespace BSOA.Benchmarks
         }
 
         [Benchmark]
+        public void Dictionary2x()
+        {
+            // Benchmark reading a string from a Dictionary which is not there
+            // [Requires checking all keys, but no value decoding]
+            long sum = 0;
+            foreach (Result result in _results)
+            {
+                sum += result.Properties.Count;
+                if (result.Properties.ContainsKey("NotThere"))
+                {
+                    sum += 1;
+                }
+            }
+        }
+
+        // TODO: Dictionary, non-string
+        // TODO: Dictionary, string keys exceed DistinctColumn limit (will be terrible)
+
+        [Benchmark]
         public void ListColumnEnumerate()
         {
             // Enumerate a list column (best case ListColumn / ColumnList enumeration speeds)
@@ -61,20 +80,20 @@ namespace BSOA.Benchmarks
             }
         }
 
-        //[Benchmark]
+        [Benchmark]
         public void ListColumnFor()
         {
             long sum = 0;
             foreach (Result result in _results)
             {
-                for(int i = 0; i < result.Tags.Count; ++i)
+                for (int i = 0; i < result.Tags.Count; ++i)
                 {
                     sum += result.Tags[i];
                 }
             }
         }
 
-        //[Benchmark]
+        [Benchmark]
         public void ListColumnForCached()
         {
             long sum = 0;

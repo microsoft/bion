@@ -14,6 +14,11 @@ namespace BSOA.Benchmarks.Model
                 // RuleId column is a DistinctColumn to test DistinctColumn caching
                 return new DistinctColumn<string>(new StringColumn());
             }
+            else if (columnName == "Tags")
+            {
+                // Instead of a nullable ListColumn, use a typed GenericNumberListColumn with NullsDisallowed to avoid wrapping NullableColumn
+                return new GenericNumberListColumn<int>(Nullability.NullsDisallowed);
+            }
             else
             {
                 return base.BuildColumn(tableName, columnName, type, defaultValue);

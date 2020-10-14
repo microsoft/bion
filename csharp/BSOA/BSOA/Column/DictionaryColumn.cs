@@ -28,6 +28,7 @@ namespace BSOA.Column
         internal IColumn<TValue> _values;
         internal IColumn<NumberList<int>> _pairs;
         private NumberListColumn<int> _pairsInner;
+        private CacheItem<ColumnDictionary<TKey, TValue>> _cache;
 
         public DictionaryColumn(IColumn<TKey> keys, IColumn<TValue> values, Nullability nullability = Nullability.DefaultToNull)
         {
@@ -41,16 +42,32 @@ namespace BSOA.Column
         public DictionaryColumn(IColumn keys, IColumn values, object defaultValue) : this((IColumn<TKey>)keys, (IColumn<TValue>)values, (defaultValue == null ? Nullability.DefaultToNull : Nullability.DefaultToEmpty))
         { }
 
-        public override IDictionary<TKey, TValue> this[int index] 
+        public override IDictionary<TKey, TValue> this[int index]
         {
-            get => ColumnDictionary<TKey, TValue>.Get(this, index);
-            set => ColumnDictionary<TKey, TValue>.Set(this, index, value);
+            get
+            {
+                CacheItem<ColumnDictionary<TKey, TValue>> item = _cache;
+                if (item?.RowIndex != index)
+                {
+                    item = new CacheItem<ColumnDictionary<TKey, TValue>>(index, ColumnDictionary<TKey, TValue>.Get(this, index));
+                    _cache = item;
+                }
+
+                return item.Value;
+            }
+
+            set
+            {
+                _cache = default;
+                ColumnDictionary<TKey, TValue>.Set(this, index, value);
+            }
         }
 
         public override int Count => _pairs.Count;
 
         public override void Clear()
         {
+            _cache = default;
             _keys.Clear();
             _values.Clear();
             _pairs.Clear();
@@ -58,11 +75,13 @@ namespace BSOA.Column
 
         public override void Swap(int index1, int index2)
         {
+            _cache = default;
             _pairs.Swap(index1, index2);
         }
 
         public override void RemoveFromEnd(int count)
         {
+            _cache = default;
             _pairs.RemoveFromEnd(count);
         }
 
