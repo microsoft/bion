@@ -49,7 +49,20 @@ namespace BSOA.Benchmarks.Model
                 result.StartLine = r.Next(1000);
                 result.Message = Messages[r.Next(Messages.Length)];
 
+                // Add properties; more properties will show Dictionary performance more clearly. Real CloudMine data has 11 properties.
                 result.Properties = new Dictionary<string, string>();
+
+                result.Properties["EtlHashCode"] = "1";
+                result.Properties["EtlIngestDate"] = $"{when:u}";
+                result.Properties["EtlEntity"] = "WorkItem";
+                result.Properties["EtlProcessDate"] = $"{when:u}";
+                result.Properties["EtlScanDate"] = $"{when:u}";
+
+                result.Properties["State"] = "Valid";
+                result.Properties["StartIndex"] = $"{r.Next(10000)}";
+                result.Properties["EndIndex"] = $"{r.Next(10000)}";
+                result.Properties["MatchedPatternIndex"] = $"{r.Next(5)}";
+
                 result.Properties["ProjectName"] = "BSOA";
                 result.Properties["FirstDetectedUtc"] = $"{when.AddMinutes(r.Next(-100000, -10000)):u}";
                 result.Properties["LastDetectedUtc"] = $"{when.AddMinutes(r.Next(-500000, 0)):u}";

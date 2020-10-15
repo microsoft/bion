@@ -28,7 +28,8 @@ namespace BSOA.Benchmarks
             long sum = 0;
             foreach (Result result in _results)
             {
-                sum += result.Properties["Commit"].Length;
+                // Read a key near the middle when sorted but late in insertion order
+                sum += result.Properties["FirstDetectedUtc"].Length;
             }
         }
 
@@ -60,6 +61,22 @@ namespace BSOA.Benchmarks
                 {
                     sum += 1;
                 }
+            }
+        }
+
+        [Benchmark]
+        public void DictionaryAddRemove()
+        {
+            // Benchmark adding and removing a key
+            foreach (Result result in _results)
+            {
+                IDictionary<string, string> properties = result.Properties;
+
+                // Add a key
+                properties["OrganizationName"] = "mseng";
+
+                // Remove it
+                properties.Remove("OrganizationName");
             }
         }
 
