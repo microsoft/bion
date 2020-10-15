@@ -28,6 +28,8 @@ namespace BSOA.Benchmarks
     //  - Dictionary walk Keys, not pairs            (500 -> 350 us)
     //  - Dictionary innerRow, not pairIndex         (350 -> 300 us)
     //  - Dictionary optimized key Slice loop        (300 -> 250 us)
+    //  - Dictionary 4 -> 13 keys
+    //  - Dictionary sort keys, cache Comparer       (275 -> 221 us)
     //  - ListColumn<int> (1000 x 4)                 (277 / 543 / 217) -> (142 / 263 / 166) (foreach, for, for w/cached List+count)
     //    - ColumnList caches NumberList             (277 -> 196)
     //    - ColumnList uses EnumeratorConverter      (196 -> 154)
@@ -44,8 +46,10 @@ namespace BSOA.Benchmarks
     //  - StringColumn caching only worthwhile if the cache hits relatively often; usage pattern will vary.
     //  - StringColumn "cache last read" is often helpful and minimal overhead otherwise.
     //  - Can cache last read key in columns by using a class holding the value and rowIndex; changing the class reference is atomic.
-    //  - Dictionary walk of Key/Value pairs is very expensive (UTF-8 converting every value)
     //  - Optimized ArraySlice enumeration is still faster than ArraySliceEnumerator.
+    //  - Dictionary walk of Key/Value pairs is very expensive (UTF-8 converting every value)
+    //  - Dictionary sorting by Key is only worthwhile if IComparer is cached in column. (Adding an extra object construction is too expensive).
+    //  - Dictionary Binary Search of keys ties linear for 13 string keys (search is fewer comparisons, but CompareTo is slower than Equals, which can return early on GetHashCode non-match)
 
 
     class Program
@@ -55,17 +59,19 @@ namespace BSOA.Benchmarks
             if (args.Length > 0 && args[0].ToLowerInvariant().Contains("detailed"))
             {
                 BenchmarkRunner.Run<Basics>();
-                BenchmarkRunner.Run<Strings>();
-                BenchmarkRunner.Run<Collections>();
+                BenchmarkRunner.Run<Strings>(); 
+                BenchmarkRunner.Run<List>();
+                BenchmarkRunner.Run<Dictionary>();
             }
             else
             {
                 Console.WriteLine("Quick benchmarks. Pass --detailed for Benchmark.net numbers.");
                 MeasureSettings settings = new MeasureSettings(TimeSpan.FromSeconds(5), 1, 10000, false);
 
-                //QuickBenchmarker.Run<Basics>(settings);
-                //QuickBenchmarker.Run<Strings>(settings);
-                QuickBenchmarker.Run<Collections>(settings);
+                QuickBenchmarker.Run<Basics>(settings);
+                QuickBenchmarker.Run<Strings>(settings);
+                QuickBenchmarker.Run<List>(settings);
+                QuickBenchmarker.Run<Dictionary>(settings);
             }
         }
     }

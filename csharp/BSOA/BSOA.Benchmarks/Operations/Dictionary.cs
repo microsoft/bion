@@ -1,5 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
 
+using BSOA.Column;
+using BSOA.Model;
+
 // Uncomment line for model to test (they're signature identical)
 using BSOA.Benchmarks.Model;
 //using BSOA.Benchmarks.NonBsoaModel;
@@ -7,17 +10,36 @@ using BSOA.Benchmarks.Model;
 using System.Collections.Generic;
 using System.Linq;
 
+
 namespace BSOA.Benchmarks
 {
-    public class Collections
+    public class Dictionary
     {
         private Run _run;
         private List<Result> _results;
 
-        public Collections()
+        private DictionaryColumn<int, int> _nonStringColumn;
+
+        public Dictionary()
         {
             _run = Generator.CreateOrLoad();
             _results = _run.Results.ToList();
+            NonStringDictionarySetup();
+        }
+
+        private void NonStringDictionarySetup()
+        {
+            _nonStringColumn = new DictionaryColumn<int, int>(new NumberColumn<int>(0), new NumberColumn<int>(0), Nullability.NullsDisallowed);
+
+            for (int row = 0; row < 1000; ++row)
+            {
+                IDictionary<int, int> dictionary = _nonStringColumn[row];
+
+                for (int key = 0; key < 128; ++key)
+                {
+                    dictionary[key * 2] = key * 4;
+                }
+            }
         }
 
         [Benchmark]
@@ -80,49 +102,20 @@ namespace BSOA.Benchmarks
             }
         }
 
-        // TODO: Dictionary, non-string
-        // TODO: Dictionary, string keys exceed DistinctColumn limit (will be terrible)
-
         [Benchmark]
-        public void ListColumnEnumerate()
+        public void DictionaryInt2x()
         {
-            // Enumerate a list column (best case ListColumn / ColumnList enumeration speeds)
+            // Benchmark reading from a Dictionary<int, int>; one key which is there and one which isn't
+            int rows = _nonStringColumn.Count;
             long sum = 0;
-            foreach (Result result in _results)
+            for (int row = 0; row < rows; ++row)
             {
-                foreach (int value in result.Tags)
-                {
-                    sum += value;
-                }
+                IDictionary<int, int> dictionary = _nonStringColumn[row];
+                sum += dictionary[30];
+                if (dictionary.TryGetValue(21, out int value)) { sum += value; }
             }
         }
 
-        [Benchmark]
-        public void ListColumnFor()
-        {
-            long sum = 0;
-            foreach (Result result in _results)
-            {
-                for (int i = 0; i < result.Tags.Count; ++i)
-                {
-                    sum += result.Tags[i];
-                }
-            }
-        }
-
-        [Benchmark]
-        public void ListColumnForCached()
-        {
-            long sum = 0;
-            foreach (Result result in _results)
-            {
-                IList<int> tags = result.Tags;
-                int count = tags.Count;
-                for (int i = 0; i < count; ++i)
-                {
-                    sum += tags[i];
-                }
-            }
-        }
+        // TODO: Dictionary, string keys exceed DistinctColumn limit (will be terrible, but better with sorted keys)
     }
 }
