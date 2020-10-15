@@ -121,20 +121,23 @@ namespace BSOA.Collections
         public void Insert(int index, T item)
         {
             ArraySlice<T> slice = Slice;
-            if (index < 0 || index >= slice.Count) { throw new IndexOutOfRangeException(nameof(index)); }
+            if (index < 0 || index > slice.Count) { throw new IndexOutOfRangeException(nameof(index)); }
 
             // Use add to resize array (inserting to-be-overwritten value)
             Add(item);
             slice = Slice;
 
-            // Shift items from index forward one
-            T[] array = slice.Array;
-            int realIndex = slice.Index + index;
-            int countFromIndex = slice.Count - index;
-            Array.Copy(array, realIndex, array, realIndex + 1, countFromIndex);
+            if (index < slice.Count - 1)
+            {
+                // Shift items from index forward one
+                T[] array = slice.Array;
+                int realIndex = slice.Index + index;
+                int countFromIndex = slice.Count - index;
+                Array.Copy(array, realIndex, array, realIndex + 1, countFromIndex);
 
-            // Insert item at desired index
-            array[realIndex] = item;
+                // Insert item at desired index
+                array[realIndex] = item;
+            }
 
             // New slice length already recorded by Add()
         }
