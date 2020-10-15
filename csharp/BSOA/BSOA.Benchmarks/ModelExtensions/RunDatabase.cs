@@ -16,7 +16,7 @@ namespace BSOA.Benchmarks.Model
             }
             else if (columnName == "Tags")
             {
-                // Instead of a nullable ListColumn, use a typed GenericNumberListColumn with NullsDisallowed to avoid wrapping NullableColumn
+                // Instead of nullable GenericNumberListColumn, configure with NullsDisallowed to avoid wrapping NullableColumn
                 return new GenericNumberListColumn<int>(Nullability.NullsDisallowed);
             }
             else
