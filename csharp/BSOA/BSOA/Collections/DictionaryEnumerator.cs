@@ -9,7 +9,7 @@ using BSOA.Column;
 
 namespace BSOA.Collections
 {
-    public sealed class DictionaryEnumerator<TKey, TValue> : IEnumerator<KeyValuePair<TKey, TValue>> where TKey : IEquatable<TKey>
+    public sealed class DictionaryEnumerator<TKey, TValue> : IEnumerator<KeyValuePair<TKey, TValue>> where TKey : IComparable<TKey>
     {
         private DictionaryColumn<TKey, TValue> _column;
         private ArraySlice<int> _indices;
