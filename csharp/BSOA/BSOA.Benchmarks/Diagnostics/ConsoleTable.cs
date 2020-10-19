@@ -12,12 +12,11 @@ namespace BSOA.Benchmarks
     /// </summary>
     public class ConsoleTable
     {
-        private IReadOnlyList<ConsoleColumn> Columns { get; set; }
+        public IReadOnlyList<ConsoleColumn> Columns { get; private set; }
         private List<string[]> Rows { get; set; }
 
         private ConsoleColor DefaultColor { get; set; }
         private ConsoleColor HighlightColor { get; set; }
-
         private Point Start { get; set; }
 
         public ConsoleTable(params ConsoleColumn[] columns)
