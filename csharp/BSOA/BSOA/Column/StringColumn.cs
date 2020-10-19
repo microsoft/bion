@@ -110,7 +110,6 @@ namespace BSOA.Column
             }
         }
 
-
         public void ForEach(Action<ArraySlice<byte>> action)
         {
             PushSavedValues();

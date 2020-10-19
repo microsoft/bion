@@ -132,12 +132,14 @@ namespace BSOA.Column
 
             foreach (var pair in _largeValueDictionary)
             {
-                int length = pair.Value.Count;
-                if (length <= MaximumSmallValueLength)
+                int index = pair.Key;
+                int newLength = pair.Value.Count;
+                int oldLength = ((index < _valueEndInPage?.Length) ? EndPosition(index) - StartPosition(index) : 0);
+
+                newSmallValueLength -= oldLength;
+                if (newLength <= MaximumSmallValueLength)
                 {
-                    int index = pair.Key;
-                    int oldLength = ((index < _valueEndInPage?.Length) ? EndPosition(index) - StartPosition(index) : 0);
-                    newSmallValueLength += (length - oldLength);
+                    newSmallValueLength += newLength;
                 }
             }
 
