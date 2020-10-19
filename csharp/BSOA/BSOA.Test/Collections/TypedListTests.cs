@@ -77,6 +77,14 @@ namespace BSOA.Test.Collections
             c.People = null;
             Assert.Null(c.People);
             Assert.Equal(0, cachedPeople.Count);
+
+            // SetTo TypedList from another DB/Table
+            Community c2 = new Community();
+            c2.People = new List<Person>();
+            c2.People.Add(new Person(c2) { Name = "Other" });
+            list.SetTo(c2.People);
+
+            Assert.Equal("Other", list[0].Name);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace BSOA.Test.Model.V2
             if (reader.TokenType == JsonToken.Null) { return null; }
             
             Person item = (root == null ? new Person() : new Person(root));
-            reader.ReadObject(root, item, setters);
+            reader.ReadObject(root, item, setters, throwOnUnknown: false);
             return item;
         }
 

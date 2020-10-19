@@ -141,6 +141,9 @@ namespace BSOA.Test
                 }
 
                 Assert.False(aTyped.MoveNext());
+
+                // Double dispose check
+                aTyped.Dispose();
             }
 
             // Verify untyped enumerator

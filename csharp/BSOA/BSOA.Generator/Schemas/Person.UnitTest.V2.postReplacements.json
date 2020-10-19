@@ -1,0 +1,11 @@
+{
+  "replacements": [
+    {
+      "description": "Request non-strict JSON parsing of Person to silently ignore V1 object model attributes.",
+      "files": "JsonToPerson.cs",
+      "arePlainText": true,
+      "replace": "reader.ReadObject(root, item, setters);",
+      "with": "reader.ReadObject(root, item, setters, throwOnUnknown: false);"
+    }
+  ]
+}

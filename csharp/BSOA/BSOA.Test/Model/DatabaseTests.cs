@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.CompilerServices;
 
 using BSOA.IO;
 using BSOA.Json;
@@ -66,7 +65,7 @@ namespace BSOA.Test.Model
         public void Database_ReplaceColumn()
         {
             // Test saving a database and then loading it into a different object model with added and removed columns.
-            
+
             V1.Community v1 = new V1.Community();
             v1.People = new List<V1.Person>();
 
@@ -74,22 +73,26 @@ namespace BSOA.Test.Model
             v1.People.Add(new V1.Person() { Age = 36, Name = "Adam" });
 
             string filePath = "People.bsoa.bin";
+            string jsonPath = "People.bsoa.json";
 
             // Save V1 (Age and Name)
             v1.DB.Save(filePath, TreeFormat.Binary);
+            v1.DB.Save(jsonPath, TreeFormat.Json);
 
-            // Load as V2 (BirthDate and Name)
+            // Load as V2 (BirthDate and Name), verify count, Names loaded
             V2.Community v2 = new V2.Community();
             v2.DB.Load(filePath, TreeFormat.Binary);
-
-            // Verify row count the same, Name loaded properly
             Assert.Equal(v1.People.Count, v2.People.Count);
             Assert.Equal(v1.People[0].Name, v2.People[0].Name);
 
-            DateTime birthdate = DateTime.Parse("1981-01-01").ToUniversalTime();
-            v2.People[0].Birthdate = birthdate;
+            // Load as V2 from JSON
+            v2.DB.Load(jsonPath, TreeFormat.Json);
+            Assert.Equal(v1.People.Count, v2.People.Count);
+            Assert.Equal(v1.People[0].Name, v2.People[0].Name);
 
             // Verify new database serializes new column
+            DateTime birthdate = DateTime.Parse("1981-01-01").ToUniversalTime();
+            v2.People[0].Birthdate = birthdate;
             V2.Community v2RoundTrip = new V2.Community();
 
             v2.DB.Save(filePath, TreeFormat.Binary);
@@ -110,7 +113,7 @@ namespace BSOA.Test.Model
             Assert.Equal(0, v1RoundTrip.People[0].Age);
 
             // Read with TreeSerializationSettings.Strict and verify error
-            if (Debugger.IsAttached)
+            if (!Debugger.IsAttached)
             {
                 Assert.Throws<IOException>(() => v1RoundTrip.DB.Load(filePath, TreeFormat.Binary, new BSOA.IO.TreeSerializationSettings() { Strict = true }));
             }
@@ -137,6 +140,11 @@ namespace BSOA.Test.Model
             AsJson.Save(serializeToPath, v1, verbose: true);
             roundTrip = AsJson.Load<V1.Community>(serializeToPath);
             CollectionReadVerifier.VerifySame(v1.People, roundTrip.People);
+
+            // Verify V2 object model will load community (post-replacements make Person parsing non-strict)
+            V2.Community v2 = AsJson.Load<V2.Community>(serializeToPath);
+            Assert.Equal(2, v2.People.Count);
+            Assert.Equal(v1.People[0].Name, v2.People[0].Name);
         }
     }
 }
