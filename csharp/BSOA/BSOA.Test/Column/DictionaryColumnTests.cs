@@ -34,11 +34,18 @@ namespace BSOA.Test
             ColumnDictionary<string, string> defaultValue = ColumnDictionary<string, string>.Empty;
 
             ColumnDictionary<string, string> otherValue = SampleRow();
-            otherValue.SetTo(new Dictionary<string, string>()
+            Dictionary<string, string> model = new Dictionary<string, string>()
             {
                 ["Name"] = "Scott",
                 ["City"] = "Redmond"
-            });
+            };
+
+            otherValue.SetTo(model);
+            
+            // Test ColumnDictionary.Equals against non-ColumnDictionary IDictionary (slower compare path)
+            Assert.True(otherValue.Equals(model));
+            model["City"] = "Bellevue";
+            Assert.False(otherValue.Equals(model));
 
             Column.Basics<IDictionary<string, string>>(
                 () => new DictionaryColumn<string, string>(

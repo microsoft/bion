@@ -299,20 +299,20 @@ namespace BSOA.Collections
                     countCompared++;
                 }
 
-                // If we got fully through the lists, they match
-                if (countCompared == this.Count)
+                if (countCompared < this.Count)
                 {
-                    return true;
+                    // If remaining keys aren't in order, finish comparison by looking up each remaining key in other
+                    do
+                    {
+                        KeyValuePair<TKey, TValue> pair = thisEnumerator.Current;
+                        if (!other.Contains(pair)) { return false; }
+                        countCompared++;
+                    } while (thisEnumerator.MoveNext());
                 }
-            }
 
-            // Otherwise, retrieve values by key (any order) and compare values)
-            foreach (KeyValuePair<TKey, TValue> pair in this)
-            {
-                if (!other.Contains(pair)) { return false; }
+                // If we got fully through the lists, they match
+                return (countCompared == this.Count);
             }
-
-            return true;
         }
 
         public static bool operator ==(ColumnDictionary<TKey, TValue> left, ColumnDictionary<TKey, TValue> right)
