@@ -65,7 +65,11 @@ namespace BSOA.Benchmarks
 
         public static string Time(double seconds)
         {
-            if (seconds < 0.0000001)
+            if(seconds <= 0.0)
+            {
+                return "-";
+            }
+            else if (seconds < 0.0000001)
             {
                 return $"{seconds * 1000 * 1000 * 1000:n1} ns";
             }
@@ -111,12 +115,36 @@ namespace BSOA.Benchmarks
             }
         }
 
+        public static double ParseTime(string time)
+        {
+            string[] parts = time.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            double number = double.Parse(parts[0]);
+            string units = parts[1];
+
+            switch (units)
+            {
+                case "ns":
+                    return number / (1000 * 1000 * 1000);
+                case "us":
+                    return number / (1000 * 1000);
+                case "ms":
+                    return number / 1000;
+                case "s":
+                    return number;
+                case "min":
+                    return number * 60;
+                default:
+                    throw new FormatException($"\"{time}\" units, '{units}', were not recognized. Expecting: (min, s, ms, us, ns)");
+            }
+        }
+
         public static string Percentage(double numerator, double denominator)
         {
             if (denominator == 0.0) { return "NaN"; }
             if (numerator < 0.0 || denominator < 0.0 || numerator > denominator) { return "Invalid"; }
 
             double ratio = numerator / denominator;
+
             if (ratio < 0.01)
             {
                 return $"{ratio:p2}";
@@ -128,6 +156,33 @@ namespace BSOA.Benchmarks
             else
             {
                 return $"{ratio:p0}";
+            }
+        }
+
+        public static string Ratio(double current, double baseline)
+        {
+            if (baseline == 0.0 || current == 0.0)
+            {
+                return "-";
+            }
+
+            double ratio = (current / baseline);
+
+            if (ratio < 1)
+            {
+                return $"{ratio:n3}x";
+            }
+            else if (ratio < 10)
+            {
+                return $"{ratio:n2}x";
+            }
+            else if (ratio < 100)
+            {
+                return $"{ratio:n1}x";
+            }
+            else
+            {
+                return $"{ratio:n0}x";
             }
         }
 

@@ -65,6 +65,8 @@ namespace BSOA.Benchmarks
             else
             {
                 Console.WriteLine("Quick benchmarks. Pass --detailed for Benchmark.net numbers.");
+                Console.WriteLine("Replace Baseline.md with latest Benchmarks.md output to reset baseline.");
+
                 QuickBenchmarker runner = new QuickBenchmarker(new MeasureSettings(TimeSpan.FromSeconds(5), 1, 10000, false));
 
                 runner.Run<Basics>();

@@ -16,7 +16,6 @@ namespace BSOA.Benchmarks
 {
     internal static class BenchmarkReflector
     {
-
         /// <summary>
         ///  Reflection magic to get public methods with the [Benchmark] attribute
         ///  matching the desired signature.
