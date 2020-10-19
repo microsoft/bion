@@ -22,7 +22,7 @@ namespace BSOA.Test
 
             ColumnDictionary<string, string> first = (ColumnDictionary<string, string>)column[0];
             first["One"] = "One";
-            first["Two"] = "Two";
+            first.Add("Two", "Two");
 
             return (ColumnDictionary<string, string>)column[1];
         }
@@ -78,6 +78,20 @@ namespace BSOA.Test
                     return scratch[i];
                 }
             );
+        }
+
+        [Fact]
+        public void DictionaryColumn_NonString()
+        {
+            DictionaryColumn<int, int> column = new DictionaryColumn<int, int>(new NumberColumn<int>(-1), new NumberColumn<int>(-1), Nullability.NullsDisallowed);
+            IDictionary<int, int> dictionary = column[0];
+
+            dictionary[5] = 5;
+            dictionary[10] = 10;
+
+            Assert.Equal(10, dictionary[10]);
+            Assert.Equal(5, dictionary[5]);
+            Assert.False(dictionary.ContainsKey(6));
         }
     }
 }

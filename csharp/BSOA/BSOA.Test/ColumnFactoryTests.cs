@@ -34,6 +34,18 @@ namespace BSOA.Test
             AssertBuild<double>((double)1);
             AssertBuild<char>((char)1);
 
+            AssertBuild<IList<byte>>(null);
+            AssertBuild<IList<sbyte>>(null);
+            AssertBuild<IList<ushort>>(null);
+            AssertBuild<IList<short>>(null);
+            AssertBuild<IList<uint>>(null);
+            AssertBuild<IList<int>>(null);
+            AssertBuild<IList<ulong>>(null);
+            AssertBuild<IList<long>>(null);
+            AssertBuild<IList<float>>(null);
+            AssertBuild<IList<double>>(null);
+            AssertBuild<IList<char>>(null);
+
             IColumn<IList<string>> listColumn = (IColumn<IList<string>>)ColumnFactory.Build(typeof(IList<string>), null);
             Assert.NotNull(listColumn);
 
@@ -53,6 +65,7 @@ namespace BSOA.Test
             if (!Debugger.IsAttached)
             {
                 Assert.Throws<NotImplementedException>(() => ColumnFactory.Build(typeof(Decimal)));
+                Assert.Throws<NotImplementedException>(() => ColumnFactory.Build(typeof(ISet<int>)));
                 Assert.Throws<NotSupportedException>(() => ColumnFactory.Build(typeof(DayOfWeek), DayOfWeek.Sunday));
             }
         }

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 
+using BSOA.Collections;
 using BSOA.Column;
 using BSOA.Model;
 
