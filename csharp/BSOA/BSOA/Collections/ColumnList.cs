@@ -5,12 +5,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using BSOA.Collections;
 using BSOA.Column;
 using BSOA.Extensions;
 using BSOA.Model;
 
-namespace BSOA
+namespace BSOA.Collections
 {
     /// <summary>
     ///  List exposes a mutable IList on top of ListColumn.
@@ -226,7 +225,7 @@ namespace BSOA
 
         public static bool operator !=(ColumnList<T> left, IReadOnlyList<T> right)
         {
-            if (object.ReferenceEquals(left, null)) { return object.ReferenceEquals(right, null); }
+            if (object.ReferenceEquals(left, null)) { return !object.ReferenceEquals(right, null); }
             return !left.Equals(right);
         }
     }

@@ -19,7 +19,7 @@ namespace BSOA.Column
         public NumberListColumn() : base(new ArraySliceColumn<T>())
         { }
 
-        public override NumberList<T> this[int index] 
+        public override NumberList<T> this[int index]
         {
             get => new NumberList<T>(Inner, index);
             set => Inner[index] = value?.Slice ?? ArraySlice<T>.Empty;
@@ -30,7 +30,7 @@ namespace BSOA.Column
             ((ArraySliceColumn<T>)Inner).ForEach(action);
         }
     }
-    
+
     /// <summary>
     ///  GenericNumberListColumn exposes NumberListColumn as an IColumn&lt;IList&lt;T&gt;&gt; for use
     ///  within an object model which needs to expose generic lists.
@@ -56,7 +56,7 @@ namespace BSOA.Column
                 else
                 {
                     NumberList<T> item = Inner[index];
-                    if(item == null)
+                    if (item == null)
                     {
                         Inner[index] = NumberList<T>.Empty;
                         item = Inner[index];
@@ -69,7 +69,13 @@ namespace BSOA.Column
 
         public void ForEach(Action<ArraySlice<T>> action)
         {
-            ((NumberListColumn<T>)Inner).ForEach(action);
+            IColumn inner = Inner;
+            if (inner is NullableColumn<NumberList<T>>)
+            {
+                inner = ((NullableColumn<NumberList<T>>)inner).Values;
+            }
+
+            ((NumberListColumn<T>)inner).ForEach(action);
         }
     }
 }

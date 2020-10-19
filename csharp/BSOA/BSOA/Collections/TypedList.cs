@@ -20,6 +20,8 @@ namespace BSOA.Collections
         private readonly Func<int, TItem> _toInstance;
         private readonly Func<TItem, int> _toIndex;
 
+        public static TypedList<TItem> Empty = new TypedList<TItem>(NumberList<int>.Empty, null, null);
+
         protected TypedList(NumberList<int> indices, Func<int, TItem> toInstance, Func<TItem, int> toIndex)
         {
             _inner = indices;
@@ -71,7 +73,7 @@ namespace BSOA.Collections
             set => _inner[index] = _toIndex(value);
         }
 
-        public int Count => _inner?.Count ?? 0;
+        public int Count => _inner.Count;
         public bool IsReadOnly => false;
 
         public void SetTo(IEnumerable<TItem> list)
@@ -159,21 +161,13 @@ namespace BSOA.Collections
 
         public static bool operator ==(TypedList<TItem> left, TypedList<TItem> right)
         {
-            if (object.ReferenceEquals(left, null))
-            {
-                return object.ReferenceEquals(right, null);
-            }
-
+            if (object.ReferenceEquals(left, null)) { return object.ReferenceEquals(right, null); }
             return left.Equals(right);
         }
 
         public static bool operator !=(TypedList<TItem> left, TypedList<TItem> right)
         {
-            if (object.ReferenceEquals(left, null))
-            {
-                return !object.ReferenceEquals(right, null);
-            }
-
+            if (object.ReferenceEquals(left, null)) { return !object.ReferenceEquals(right, null); }
             return !left.Equals(right);
         }
     }

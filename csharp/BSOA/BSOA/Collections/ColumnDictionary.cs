@@ -317,21 +317,13 @@ namespace BSOA.Collections
 
         public static bool operator ==(ColumnDictionary<TKey, TValue> left, ColumnDictionary<TKey, TValue> right)
         {
-            if (object.ReferenceEquals(left, null))
-            {
-                return object.ReferenceEquals(right, null);
-            }
-
+            if (object.ReferenceEquals(left, null)) { return object.ReferenceEquals(right, null); }
             return left.Equals(right);
         }
 
         public static bool operator !=(ColumnDictionary<TKey, TValue> left, ColumnDictionary<TKey, TValue> right)
         {
-            if (object.ReferenceEquals(left, null))
-            {
-                return !object.ReferenceEquals(right, null);
-            }
-
+            if (object.ReferenceEquals(left, null)) { return !object.ReferenceEquals(right, null); }
             return !left.Equals(right);
         }
     }
