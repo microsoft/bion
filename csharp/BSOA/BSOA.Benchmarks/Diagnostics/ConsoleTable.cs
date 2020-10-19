@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 
 namespace BSOA.Benchmarks
@@ -57,72 +58,91 @@ namespace BSOA.Benchmarks
 
             if (redrawRequired)
             {
-                WriteTable();
+                WriteTable(Console.Out);
             }
             else
             {
-                if (Rows.Count == 1) { WriteHeader(); }
-                WriteRow(values);
+                if (Rows.Count == 1) { WriteHeader(Console.Out); }
+                WriteRow(Console.Out, values);
             }
         }
 
-        private void WriteHeader()
+        public void Save(Stream stream)
         {
-            // Write column headings
-            WriteRow(Columns.Select((c) => c.Heading));
-
-            // Write separator row
-            WriteRow(Columns.Select((c) => Separator(c)));
+            using (stream)
+            using (StreamWriter writer = new StreamWriter(stream))
+            {
+                WriteTable(writer);
+            }
         }
 
-        private void WriteRow(IEnumerable<string> values)
+        private void WriteTable(TextWriter writer)
         {
-            Console.Write(" | ");
+            if (writer == Console.Out)
+            {
+                Console.CursorTop = Start.Y;
+                Console.CursorLeft = Start.X;
+            }
+
+            WriteHeader(writer);
+
+            foreach (string[] row in Rows)
+            {
+                WriteRow(writer, row);
+            }
+        }
+
+        private void WriteHeader(TextWriter writer)
+        {
+            // Write column headings
+            WriteRow(writer, Columns.Select((c) => c.Heading));
+
+            // Write separator row
+            WriteRow(writer, Columns.Select((c) => Separator(c)));
+        }
+
+        private void WriteRow(TextWriter writer, IEnumerable<string> values)
+        {
+            writer.Write(" | ");
 
             int i = 0;
             foreach (string value in values)
             {
-                WriteCell(value, Columns[i]);
+                WriteCell(writer, value, Columns[i]);
                 i++;
             }
 
-            Console.WriteLine();
+            writer.WriteLine();
         }
 
-        private void WriteTable()
-        {
-            Console.CursorTop = Start.Y;
-            Console.CursorLeft = Start.X;
-
-            WriteHeader();
-
-            foreach (string[] row in Rows)
-            {
-                WriteRow(row);
-            }
-        }
-
-        private void WriteCell(string value, ConsoleColumn column)
+        private void WriteCell(TextWriter writer, string value, ConsoleColumn column)
         {
             if (value == null) { value = "<null>"; }
 
-            Console.ForegroundColor = (column.Highlight == Highlight.On ? HighlightColor : DefaultColor);
+            if (writer == Console.Out)
+            {
+                Console.ForegroundColor = (column.Highlight == Highlight.On ? HighlightColor : DefaultColor);
+            }
 
             int padLength = Math.Max(0, column.Width - value.Length);
             if (padLength > 0 && column.Align == Align.Right)
             {
-                Console.Write(new string(' ', padLength));
+                writer.Write(new string(' ', padLength));
             }
 
-            Console.Write(value);
+            writer.Write(value);
 
             if (padLength > 0 && column.Align != Align.Right)
             {
-                Console.Write(new string(' ', padLength));
+                writer.Write(new string(' ', padLength));
             }
 
-            Console.ForegroundColor = DefaultColor;
-            Console.Write(" | ");
+            if (writer == Console.Out)
+            {
+                Console.ForegroundColor = DefaultColor;
+            }
+
+            writer.Write(" | ");
         }
 
         private string Separator(ConsoleColumn column)
