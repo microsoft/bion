@@ -1,11 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace BSOA.Benchmarks
 {
-    public static class QuickBenchmarker
+    public class QuickBenchmarker
     {
-        private static ConsoleTable _currentTable;
+        private MeasureSettings _settings;
+        private ConsoleTable _table;
+        private DateTime _start;
+
+        public QuickBenchmarker(MeasureSettings settings)
+        {
+            _settings = settings;
+            _table = new ConsoleTable(new ConsoleColumn("Name"), new ConsoleColumn("Mean", Align.Right, Highlight.On));
+            _start = DateTime.UtcNow;
+        }
 
         /// <summary>
         ///  Similar to a fast, simple Benchmark.net Benchmarker.Run.
@@ -14,20 +24,17 @@ namespace BSOA.Benchmarks
         /// </summary>
         /// <param name="typeWithBenchmarkMethods">Type containing methods to benchmark</typeparam>
         /// <param name="settings">Measurement settings, or null for defaults</param>
-        public static void Run(Type typeWithBenchmarkMethods, MeasureSettings settings = null)
+        public void Run(Type typeWithBenchmarkMethods)
         {
             Dictionary<string, Action> benchmarkMethods = BenchmarkReflector.BenchmarkMethods<Action>(typeWithBenchmarkMethods);
 
-            if (_currentTable == null)
-            {
-                _currentTable = new ConsoleTable(new ConsoleColumn("Name"), new ConsoleColumn("Mean", Align.Right, Highlight.On));
-            }
-
             foreach (string methodName in benchmarkMethods.Keys)
             {
-                MeasureResult result = Measure.Operation(benchmarkMethods[methodName], settings);
-                _currentTable.AppendRow(methodName, Friendly.Time(result.SecondsPerIteration));
+                MeasureResult result = Measure.Operation(benchmarkMethods[methodName], _settings);
+                _table.AppendRow(methodName, Friendly.Time(result.SecondsPerIteration));
             }
+
+            _table.Save(File.Create($"Benchmarks_{_start:yyyyMMddhhmmss}.md"));
         }
 
         /// <summary>
@@ -37,9 +44,9 @@ namespace BSOA.Benchmarks
         /// </summary>
         /// <typeparam name="T">Type containing methods to benchmark</typeparam>
         /// <param name="settings">Measurement settings, or null for defaults</param>
-        public static void Run<T>(MeasureSettings settings = null)
+        public void Run<T>()
         {
-            Run(typeof(T), settings);
+            Run(typeof(T));
         }
     }
 }

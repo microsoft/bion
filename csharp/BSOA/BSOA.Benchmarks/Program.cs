@@ -51,7 +51,6 @@ namespace BSOA.Benchmarks
     //  - Dictionary sorting by Key is only worthwhile if IComparer is cached in column. (Adding an extra object construction is too expensive).
     //  - Dictionary Binary Search of keys ties linear for 13 string keys (search is fewer comparisons, but CompareTo is slower than Equals, which can return early on GetHashCode non-match)
 
-
     class Program
     {
         static void Main(string[] args)
@@ -66,12 +65,12 @@ namespace BSOA.Benchmarks
             else
             {
                 Console.WriteLine("Quick benchmarks. Pass --detailed for Benchmark.net numbers.");
-                MeasureSettings settings = new MeasureSettings(TimeSpan.FromSeconds(5), 1, 10000, false);
+                QuickBenchmarker runner = new QuickBenchmarker(new MeasureSettings(TimeSpan.FromSeconds(5), 1, 10000, false));
 
-                QuickBenchmarker.Run<Basics>(settings);
-                QuickBenchmarker.Run<Strings>(settings);
-                QuickBenchmarker.Run<List>(settings);
-                QuickBenchmarker.Run<Dictionary>(settings);
+                runner.Run<Basics>();
+                runner.Run<Strings>();
+                runner.Run<List>();
+                runner.Run<Dictionary>();
             }
         }
     }
