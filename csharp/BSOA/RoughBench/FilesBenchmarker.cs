@@ -71,7 +71,7 @@ namespace RoughBench
         ///  If it's a folder, list the files directly in the folder.
         ///  If it's a file, return just that file.
         /// </summary>
-        internal static IEnumerable<string> FilesForPath(string inputPath)
+        public static IEnumerable<string> FilesForPath(string inputPath)
         {
             if (Directory.Exists(inputPath))
             {
