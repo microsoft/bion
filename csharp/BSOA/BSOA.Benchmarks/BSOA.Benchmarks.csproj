@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BSOA.Json\BSOA.Json.csproj" />
     <ProjectReference Include="..\BSOA\BSOA.csproj" />
+    <ProjectReference Include="..\RoughBench\RoughBench.csproj" />
   </ItemGroup>
 
 </Project>

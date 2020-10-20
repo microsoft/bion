@@ -4,7 +4,7 @@
 using System;
 using System.Diagnostics;
 
-namespace BSOA.Benchmarks
+namespace RoughBench
 {
     /// <summary>
     ///  Measure.Operation provides and easy way to measure runtime, throughput, and memory use.
@@ -88,7 +88,7 @@ namespace BSOA.Benchmarks
     public class MeasureSettings
     {
         // Measure at least once, then up to 16 passes or 2 seconds, whichever comes first
-        public static MeasureSettings Default = new MeasureSettings(TimeSpan.FromSeconds(2), 1, 10, false);
+        public static MeasureSettings Default = new MeasureSettings(TimeSpan.FromSeconds(5), 1, 10000, false);
 
         // Load once, measuring RAM
         public static MeasureSettings LoadOnce = new MeasureSettings(TimeSpan.Zero, 1, 1, true);

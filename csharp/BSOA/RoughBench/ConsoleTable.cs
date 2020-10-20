@@ -4,7 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 
-namespace BSOA.Benchmarks
+namespace RoughBench
 {
     /// <summary>
     ///  ConsoleTable writes formatted tables in the console, supporting highlighting and right-aligned columns.

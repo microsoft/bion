@@ -4,11 +4,20 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace BSOA.Benchmarks
+namespace RoughBench
 {
-    public class QuickBenchmarker
+    /// <summary>
+    ///  Benchmarker is compatible with Benchmark.net's BenchmarkRunner,
+    ///  but favors quick results over accuracy and is designed for fast
+    ///  "inner dev loop" code tuning and to provide performance regression tests.
+    ///  
+    ///  Benchmarker will run methods on each class with an attribute called [Benchmark].
+    ///  It logs the results to the Console and a Markdown file (Results/Benchmark.yyyyMMddhhmmss.md).
+    ///  It compares current results with Baseline.md in the output folder and the previou run.
+    ///  Copy a result file to 'Baseline.md' to update the Baseline.
+    /// </summary>
+    public class Benchmarker
     {
-        // Baseline file to compare against and failure threshold (< 80% of baseline speed)
         public const string OutputFolderPath = "Reports";
         public const string BaselinePath = "Baseline.md";
         public const string BaselineColumnName = "Baseline";
@@ -23,9 +32,9 @@ namespace BSOA.Benchmarks
         public bool HasFailures { get; private set; }
         public string OutputPath { get; }
 
-        public QuickBenchmarker(MeasureSettings settings)
+        public Benchmarker(MeasureSettings settings = null)
         {
-            _settings = settings;
+            _settings = settings ?? MeasureSettings.Default;
             _baselines = LoadBaselines();
 
             List<TableCell> columns = new List<TableCell>();
@@ -44,6 +53,24 @@ namespace BSOA.Benchmarks
             OutputPath = Path.GetFullPath($"{OutputFolderPath}/Benchmarks.{DateTime.UtcNow:yyyyMMddhhmmss}.md");
 
             Calibrate();
+        }
+
+        public void WriteSummary()
+        {
+            _table.Save(File.Create(OutputPath));
+
+            Console.WriteLine();
+            Console.WriteLine($"Saved as: \"{OutputPath}\"");
+            Console.WriteLine($"To update baseline, replace \"{BaselinePath}\" with latest.");
+
+            if (HasFailures)
+            {
+                Console.WriteLine("FAIL: At least one benchmark regressed versus baseline.");
+            }
+            else
+            {
+                Console.WriteLine("PASS: All benchmarks fast enough versus baseline.");
+            }
         }
 
         /// <summary>
@@ -73,8 +100,6 @@ namespace BSOA.Benchmarks
             {
                 Run(method.Key, method.Value);
             }
-
-            _table.Save(File.Create(OutputPath));
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BSOA.Benchmarks
+namespace RoughBench
 {
     /// <summary>
     ///  Format provides helper methods to human-format common values like
@@ -131,7 +131,7 @@ namespace BSOA.Benchmarks
 
         public static double ParseTime(string time)
         {
-            string[] parts = time.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = time.Trim().Split(' ');
             
             string numberString = parts[0];
             if (numberString == "-") { return 0.0d; }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace BSOA.Benchmarks.Attributes
+namespace RoughBench.Attributes
 {
     /// <summary>
     ///  [Benchmark] attribute for methods, in case Benchmark.net isn't referenced.
@@ -12,7 +12,7 @@ namespace BSOA.Benchmarks.Attributes
     { }
 }
 
-namespace BSOA.Benchmarks
+namespace RoughBench
 {
     internal static class BenchmarkReflector
     {
@@ -48,9 +48,9 @@ namespace BSOA.Benchmarks
                 if (!method.ReturnType.Equals(returnType)) { continue; }
                 if (!arguments.SequenceEqual(method.GetParameters().Select((pi) => pi.ParameterType))) { continue; }
 
-                if (!method.IsStatic)
+                if (!method.IsStatic && instance == null)
                 {
-                    instance ??= fromType.GetConstructor(new Type[0]).Invoke(null);
+                    instance = fromType.GetConstructor(new Type[0]).Invoke(null);
                 }
 
                 methods[method.Name] = (WithSignature)(object)method.CreateDelegate(delegateOrFuncType, instance);

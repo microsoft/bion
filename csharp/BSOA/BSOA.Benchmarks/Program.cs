@@ -1,21 +1,24 @@
 ﻿using BenchmarkDotNet.Running;
 
+using RoughBench;
+
 using System;
 
 namespace BSOA.Benchmarks
 {
-    // Benchmark Costs (1,000 elements)
-    // ================================
-    //  Non-BSOA List<struct>     , sum int             4.00 us
-    //  BSOA class, cached in List, sum int             5.75 us (BSOA int retrieval very cheap)
-    //                            , sum DateTime        8.00 us (DateTime construction cheap)
-    //                            , sum bool            6.75 us (bool cheap)
-    //                            , sum enum            7.80 us (enum cast cheap)
-    //   [all strings cached]     , sum string length  16.50 us
-    //  DistinctColumn<string> (cached), sum length     9.00 us (faster than in StringColumn; List lookup vs. Dictionary underneath)
-
-    //  List as IEnumerable<T> enumerate               10.00 us (2x strongly-typed List enumerate)
-    //  BSOA List enumerate                            20.00 us (more expensive, but not if several operations on each item)
+    // Learnings
+    // =========
+    //  - ForEach enumeration is best for BSOA, because ArraySlice and count can be 'snapped' and used for full loop.
+    //  - In StringColumn, IsNull check first is worthwhile (much faster for all null columns, minimal impact on no-null columns).
+    //  - DistinctColumn caching is very worthwhile (string form of values kept anyway to look up index on set; keeping another list of references saves all conversions on get).
+    //  - StringColumn caching too expensive with "remove oldest from cache" (remove too expensive vs. convert)
+    //  - StringColumn caching only worthwhile if the cache hits relatively often; usage pattern will vary.
+    //  - StringColumn "cache last read" is often helpful and minimal overhead otherwise.
+    //  - Can cache last read key in columns by using a class holding the value and rowIndex; changing the class reference is atomic.
+    //  - Optimized ArraySlice enumeration is still faster than ArraySliceEnumerator.
+    //  - Dictionary walk of Key/Value pairs is very expensive (UTF-8 converting every value)
+    //  - Dictionary sorting by Key is only worthwhile if IComparer is cached in column. (Adding an extra object construction is too expensive).
+    //  - Dictionary Binary Search of keys ties linear for 13 string keys (search is fewer comparisons, but CompareTo is slower than Equals, which can return early on GetHashCode non-match)
 
     // Improvements
     // ============
@@ -37,20 +40,6 @@ namespace BSOA.Benchmarks
     //  - GenericNumberListColumn<int> not-nullable  (67 / 263 / 122)
     //  
 
-    // Learnings
-    // =========
-    //  - ForEach enumeration is best for BSOA, because ArraySlice and count can be 'snapped' and used for full loop.
-    //  - In StringColumn, IsNull check first is worthwhile (much faster for all null columns, minimal impact on no-null columns).
-    //  - DistinctColumn caching is very worthwhile (string form of values kept anyway to look up index on set; keeping another list of references saves all conversions on get).
-    //  - StringColumn caching too expensive with "remove oldest from cache" (remove too expensive vs. convert)
-    //  - StringColumn caching only worthwhile if the cache hits relatively often; usage pattern will vary.
-    //  - StringColumn "cache last read" is often helpful and minimal overhead otherwise.
-    //  - Can cache last read key in columns by using a class holding the value and rowIndex; changing the class reference is atomic.
-    //  - Optimized ArraySlice enumeration is still faster than ArraySliceEnumerator.
-    //  - Dictionary walk of Key/Value pairs is very expensive (UTF-8 converting every value)
-    //  - Dictionary sorting by Key is only worthwhile if IComparer is cached in column. (Adding an extra object construction is too expensive).
-    //  - Dictionary Binary Search of keys ties linear for 13 string keys (search is fewer comparisons, but CompareTo is slower than Equals, which can return early on GetHashCode non-match)
-
     class Program
     {
         static int Main(string[] args)
@@ -65,26 +54,15 @@ namespace BSOA.Benchmarks
             else
             {
                 Console.WriteLine("Quick benchmarks. Pass --detailed for Benchmark.net numbers.");
-                QuickBenchmarker runner = new QuickBenchmarker(new MeasureSettings(TimeSpan.FromSeconds(5), 1, 10000, false));
+                Benchmarker runner = new Benchmarker();
 
                 runner.Run<Basics>();
                 runner.Run<Strings>();
                 runner.Run<List>();
                 runner.Run<Dictionary>();
 
-                Console.WriteLine();
-                Console.WriteLine($"Saved as: \"{runner.OutputPath}\"");
-                Console.WriteLine($"To update baseline, replace \"{QuickBenchmarker.BaselinePath}\" with latest.");
-
-                if (runner.HasFailures)
-                {
-                    Console.WriteLine("FAIL: At least one benchmark regressed versus baseline.");
-                    return -1;
-                }
-                else
-                {
-                    Console.WriteLine("PASS: All benchmarks fast enough versus baseline.");
-                }
+                runner.WriteSummary();
+                return (runner.HasFailures ? -1 : 0);
             }
 
             return 0;
