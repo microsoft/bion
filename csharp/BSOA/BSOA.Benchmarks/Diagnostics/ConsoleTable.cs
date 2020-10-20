@@ -12,60 +12,94 @@ namespace BSOA.Benchmarks
     /// </summary>
     public class ConsoleTable
     {
-        public IReadOnlyList<ConsoleColumn> Columns { get; private set; }
-        private List<string[]> Rows { get; set; }
+        public IReadOnlyList<TableCell> Columns { get; }
+        private List<TableCell[]> Rows { get; }
+        private int[] ColumnWidths { get; }
 
-        private ConsoleColor DefaultColor { get; set; }
-        private ConsoleColor HighlightColor { get; set; }
+        private TableColor DefaultColor { get; set; }
         private Point Start { get; set; }
 
-        public ConsoleTable(params ConsoleColumn[] columns)
-        {
-            DefaultColor = Console.ForegroundColor;
-            HighlightColor = ConsoleColor.Green;
-
-            Columns = columns;
-            Rows = new List<string[]>();
-
-            Console.WriteLine();
-            Start = new Point(Console.CursorLeft, Console.CursorTop);
-        }
+        public ConsoleTable(IEnumerable<string> columnNames) :
+            this(columnNames.Select((name) => new TableCell(name)).ToArray())
+        { }
 
         public ConsoleTable(params string[] columnNames) :
-            this(columnNames.Select((name) => new ConsoleColumn(name)).ToArray())
+            this(columnNames.Select((name) => new TableCell(name)).ToArray())
         { }
+
+        public ConsoleTable(IEnumerable<TableCell> columns) : this(columns.ToArray())
+        { }
+
+        public ConsoleTable(params TableCell[] columns)
+        {
+            Columns = columns;
+            Rows = new List<TableCell[]>();
+            ColumnWidths = columns.Select((col) => col.Text?.Length ?? 0).ToArray();
+        }
 
         public void AppendRow(IEnumerable<string> values)
         {
-            AppendRow(values.ToArray());
+            AppendRow(values.Select((text) => new TableCell(text)).ToArray());
         }
 
         public void AppendRow(params string[] values)
         {
+            AppendRow(values.Select((text) => new TableCell(text)).ToArray());
+        }
+
+        public void AppendRow(IEnumerable<TableCell> values)
+        {
+            AppendRow(values.ToArray());
+        }
+
+        public void AppendRow(params TableCell[] values)
+        {
+            if (values.Length > Columns.Count) { throw new FormatException($"Row had too many columns. ({Columns.Count} columns, {values.Length} in this row"); }
+            
             Rows.Add(values);
 
-            bool redrawRequired = false;
-            for (int i = 0; i < values.Length; ++i)
-            {
-                int valueLength = values[i]?.Length ?? 0;
-                if (Columns[i].Width < valueLength)
-                {
-                    redrawRequired = true;
-                    Columns[i].Width = valueLength;
-                }
-            }
+            bool redrawRequired = UpdateColumnWidths(values);
 
-            if (redrawRequired)
+            if (Rows.Count == 1)
+            {
+                // If this is the first row, capture the start position and color (just in time)
+                DefaultColor = (TableColor)Console.ForegroundColor;
+                Start = new Point(Console.CursorLeft, Console.CursorTop);
+
+                WriteHeader(Console.Out);
+                WriteRow(Console.Out, values);
+
+            }
+            else if (redrawRequired)
             {
                 WriteTable(Console.Out);
             }
             else
             {
-                if (Rows.Count == 1) { WriteHeader(Console.Out); }
                 WriteRow(Console.Out, values);
             }
         }
 
+        private bool UpdateColumnWidths(TableCell[] values)
+        {
+            bool redrawRequired = false;
+            for (int i = 0; i < ColumnWidths.Length; ++i)
+            {
+                int valueLength = values[i].Text.Length;
+                if (ColumnWidths[i] < valueLength)
+                {
+                    redrawRequired = true;
+                    ColumnWidths[i] = valueLength;
+                }
+            }
+
+            return redrawRequired;
+        }
+
+        /// <summary>
+        ///  Save a copy of the Table (so far) to a stream.
+        /// </summary>
+        /// <param name="stream">Stream to write table copy to</param>
         public void Save(Stream stream)
         {
             using (stream)
@@ -85,7 +119,7 @@ namespace BSOA.Benchmarks
 
             WriteHeader(writer);
 
-            foreach (string[] row in Rows)
+            foreach (TableCell[] row in Rows)
             {
                 WriteRow(writer, row);
             }
@@ -93,95 +127,199 @@ namespace BSOA.Benchmarks
 
         private void WriteHeader(TextWriter writer)
         {
+            if (writer == Console.Out)
+            {
+                Console.WriteLine();
+            }
+
             // Write column headings
-            WriteRow(writer, Columns.Select((c) => c.Heading));
+            WriteRow(writer, Columns);
 
             // Write separator row
-            WriteRow(writer, Columns.Select((c) => Separator(c)));
+            WriteRow(writer, Separators());
         }
 
-        private void WriteRow(TextWriter writer, IEnumerable<string> values)
+        private void WriteRow(TextWriter writer, IReadOnlyList<TableCell> row)
         {
             writer.Write(" | ");
 
-            int i = 0;
-            foreach (string value in values)
+            for (int i = 0; i < row.Count; ++i)
             {
-                WriteCell(writer, value, Columns[i]);
-                i++;
+                WriteCell(writer, row[i], i);
             }
 
             writer.WriteLine();
         }
 
-        private void WriteCell(TextWriter writer, string value, ConsoleColumn column)
+        private void WriteCell(TextWriter writer, TableCell cell, int columnIndex)
         {
-            if (value == null) { value = "<null>"; }
+            // Resolve Alignment and Color to column values, if cell has defaulted them
+            TableCell resolved = cell.Resolve(Columns[columnIndex]);
+            int padLength = Math.Max(0, ColumnWidths[columnIndex] - cell.Text.Length);
 
-            if (writer == Console.Out)
+            // Set color, if needed
+            if (resolved.Color != TableColor.Default && writer == Console.Out)
             {
-                Console.ForegroundColor = (column.Highlight == Highlight.On ? HighlightColor : DefaultColor);
+                Console.ForegroundColor = (ConsoleColor)resolved.Color;
             }
 
-            int padLength = Math.Max(0, column.Width - value.Length);
-            if (padLength > 0 && column.Align == Align.Right)
-            {
-                writer.Write(new string(' ', padLength));
-            }
-
-            writer.Write(value);
-
-            if (padLength > 0 && column.Align != Align.Right)
+            // Write any left padding
+            if (padLength > 0 && cell.Align == Align.Right)
             {
                 writer.Write(new string(' ', padLength));
             }
 
-            if (writer == Console.Out)
+            // Write text
+            writer.Write(cell.Text);
+
+            // Write any right padding
+            if (padLength > 0 && cell.Align != Align.Right)
             {
-                Console.ForegroundColor = DefaultColor;
+                writer.Write(new string(' ', padLength));
             }
 
+            // Reset color, if required
+            if (resolved.Color != TableColor.Default && writer == Console.Out)
+            {
+                Console.ForegroundColor = (ConsoleColor)DefaultColor;
+            }
+
+            // Write cell delimiter
             writer.Write(" | ");
         }
 
-        private string Separator(ConsoleColumn column)
+        // Return Markdown-compatible separators for each column (indicating alignment)
+        private TableCell[] Separators()
         {
-            if (column.Align == Align.Right)
+            TableCell[] separators = new TableCell[Columns.Count];
+
+            for (int i = 0; i < Columns.Count; ++i)
             {
-                return new string('-', Math.Max(3, column.Width - 1)) + ":";
+                char lastTick = (Columns[i].Align == Align.Right ? ':' : '-');
+                separators[i] = new TableCell(new string('-', ColumnWidths[i] - 1) + lastTick);
+            }
+
+            return separators;
+        }
+    }
+
+    /// <summary>
+    ///  TableCell defines a value to draw in a ConsoleTable: the text, alignment, and color.
+    /// </summary>
+    public struct TableCell
+    {
+        public string Text { get; }
+        public Align Align { get; }
+        public TableColor Color { get; }
+
+        public TableCell(string text, Align align = Align.Default, TableColor color = TableColor.Default)
+        {
+            Text = text ?? "<null>";
+            Align = align;
+            Color = color;
+        }
+
+        // Return a TableCell with the text, alignment, and color to draw (the column values if the cell specifies 'Default')
+        public TableCell Resolve(TableCell column)
+        {
+            return new TableCell(
+                Text,
+                (Align != Align.Default ? Align : column.Align),
+                (Color != TableColor.Default ? Color : column.Color));
+        }
+
+        public static TableCell String(string text)
+        {
+            return new TableCell(text);
+        }
+
+        public static TableCell Size(long sizeInBytes)
+        {
+            return new TableCell(Format.Size(sizeInBytes), Align.Right);
+        }
+
+        public static TableCell Time(double seconds)
+        {
+            return new TableCell(Format.Time(seconds), Align.Right);
+        }
+
+        public static TableCell Percentage(double numerator, double denominator)
+        {
+            return new TableCell(Format.Percentage(numerator, denominator), Align.Right);
+        }
+
+        public static TableCell Rate(long sizeInBytes, double elapsedSeconds)
+        {
+            return new TableCell(Format.Rate(sizeInBytes, elapsedSeconds), Align.Right);
+        }
+
+        public static TableCell Ratio(double current, double baseline)
+        {
+            bool unused = false;
+            return Ratio(current, baseline, 0.8d, ref unused);
+        }
+
+        public static TableCell Ratio(double current, double baseline, double failThreshold, ref bool failed)
+        {
+            return new TableCell(Format.Ratio(current, baseline), Align.Right, RatioColor(current, baseline, failThreshold, ref failed));
+        }
+
+        private static TableColor RatioColor(double numerator, double denominator, double failThreshold, ref bool failed)
+        {
+            if (numerator <= 0.0 || denominator <= 0.0)
+            {
+                return TableColor.Default;
+            }
+
+            double ratio = numerator / denominator;
+            if (ratio > (1 / failThreshold))
+            {
+                return TableColor.Green;
+            }
+            else if (ratio < failThreshold)
+            {
+                failed = true;
+                return TableColor.Red;
             }
             else
             {
-                return new string('-', Math.Max(3, column.Width));
+                return TableColor.Default;
             }
         }
     }
 
-    public class ConsoleColumn
+    /// <summary>
+    ///  Enum for ConsoleTable cell alignments (left/right).
+    /// </summary>
+    public enum Align : byte
     {
-        public string Heading { get; set; }
-        public Align Align { get; set; }
-        public Highlight Highlight { get; set; }
-        public int Width { get; set; }
-
-        public ConsoleColumn(string heading, Align align = Align.Left, Highlight highlight = Highlight.Off)
-        {
-            Heading = heading;
-            Align = align;
-            Highlight = highlight;
-            Width = heading?.Length ?? 0;
-        }
+        Default = 0,
+        Left = 1,
+        Right = 2
     }
 
-    public enum Align
+    /// <summary>
+    ///  Enum for ConsoleTable colors; same as ConsoleColor but with a 'Default' value to inherit from Column.
+    /// </summary>
+    public enum TableColor : byte
     {
-        Left = 0,
-        Right = 1
-    }
+        Black = ConsoleColor.Black,
+        DarkBlue = ConsoleColor.DarkBlue,
+        DarkGreen = ConsoleColor.DarkGreen,
+        DarkCyan = ConsoleColor.DarkCyan,
+        DarkRed = ConsoleColor.DarkRed,
+        DarkMagenta = ConsoleColor.DarkMagenta,
+        DarkYellow = ConsoleColor.DarkYellow,
+        Gray = ConsoleColor.Gray,
+        DarkGray = ConsoleColor.DarkGray,
+        Blue = ConsoleColor.Blue,
+        Green = ConsoleColor.Green,
+        Cyan = ConsoleColor.Cyan,
+        Red = ConsoleColor.Red,
+        Magenta = ConsoleColor.Magenta,
+        Yellow = ConsoleColor.Yellow,
+        White = ConsoleColor.White,
 
-    public enum Highlight
-    {
-        Off = 0,
-        On = 1
+        Default = 255
     }
 }

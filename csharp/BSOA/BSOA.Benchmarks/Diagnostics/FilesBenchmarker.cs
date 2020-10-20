@@ -20,17 +20,17 @@ namespace BSOA.Benchmarks.Diagnostics
             // Find all [Benchmark] methods which take an ArgumentClass.
             Dictionary<string, Action<ArgumentClass>> benchmarkMethods = BenchmarkReflector.BenchmarkMethods<Action<ArgumentClass>>(operationsClass);
 
-            List<ConsoleColumn> columns = new List<ConsoleColumn>()
+            List<TableCell> columns = new List<TableCell>()
             {
-                new ConsoleColumn("File"),
-                new ConsoleColumn("Size", Align.Right),
-                new ConsoleColumn("Load", Align.Right),
-                new ConsoleColumn("RAM", Align.Right, Highlight.On)
+                new TableCell("File"),
+                new TableCell("Size", Align.Right),
+                new TableCell("Load", Align.Right),
+                new TableCell("RAM", Align.Right, TableColor.Green)
             };
 
             foreach (string key in benchmarkMethods.Keys)
             {
-                columns.Add(new ConsoleColumn(key, Align.Right, Highlight.On));
+                columns.Add(new TableCell(key, Align.Right, TableColor.Green));
             }
 
             ConsoleTable table = new ConsoleTable(columns.ToArray());
@@ -40,21 +40,21 @@ namespace BSOA.Benchmarks.Diagnostics
                 long fileLengthBytes = new FileInfo(filePath).Length;
 
                 ArgumentClass instance = default(ArgumentClass);
-                List<string> row = new List<string>();
+                List<TableCell> row = new List<TableCell>();
 
                 // Use the loader to load the file; log name, size, load rate.
                 MeasureResult load = Measure.Operation(() => instance = loader(filePath), MeasureSettings.Load);
-                row.Add(Path.GetFileName(filePath));
-                row.Add(Friendly.Size(fileLengthBytes));
-                row.Add(Friendly.Rate(fileLengthBytes, load.Elapsed / load.Iterations));
-                row.Add(Friendly.Size(load.AddedMemoryBytes));
+                row.Add(TableCell.String(Path.GetFileName(filePath)));
+                row.Add(TableCell.Size(fileLengthBytes));
+                row.Add(TableCell.Rate(fileLengthBytes, load.SecondsPerIteration));
+                row.Add(TableCell.Size(load.AddedMemoryBytes));
 
                 // Log action time per operation.
                 foreach (string key in benchmarkMethods.Keys)
                 {
                     Action<ArgumentClass> operation = benchmarkMethods[key];
                     MeasureResult opResult = Measure.Operation(() => operation(instance));
-                    row.Add(Friendly.Time(opResult.SecondsPerIteration));
+                    row.Add(TableCell.Time(opResult.SecondsPerIteration));
                 }
 
                 table.AppendRow(row);

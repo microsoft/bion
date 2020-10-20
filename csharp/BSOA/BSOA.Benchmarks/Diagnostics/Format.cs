@@ -2,15 +2,19 @@
 
 namespace BSOA.Benchmarks
 {
-    public static class Friendly
+    /// <summary>
+    ///  Format provides helper methods to human-format common values like
+    ///  file sizes, rates, and time intervals.
+    /// </summary>
+    public static class Format
     {
         public const double Kilobyte = 1024;
         public const double Megabyte = 1024 * 1024;
         public const double Gigabyte = 1024 * 1024 * 1024;
 
-        public static string Rate(long sizeInBytes, TimeSpan elapsedTime, long iterations = 1)
+        public static string Rate(long sizeInBytes, double elapsedSeconds, long iterations = 1)
         {
-            return $"{Size((long)((iterations * sizeInBytes) / elapsedTime.TotalSeconds))}/s";
+            return $"{Size((long)((iterations * sizeInBytes) / elapsedSeconds))}/s";
         }
 
         public static string Size(long sizeInBytes)
@@ -63,12 +67,22 @@ namespace BSOA.Benchmarks
             return Time(elapsed.TotalSeconds);
         }
 
+        /// <summary>
+        ///  Return a formatted time.
+        ///  Argument is fractional seconds to accurately support values too small for TimeSpan (< 2 us).
+        /// </summary>
+        /// <param name="seconds"></param>
+        /// <returns></returns>
         public static string Time(double seconds)
         {
-            if(seconds <= 0.0)
+            if (seconds <= 0.0)
             {
                 return "-";
             }
+            else if (seconds < 0.00000001)
+            {
+                return $"{seconds * 1000 * 1000 * 1000:n2} ns";
+            } 
             else if (seconds < 0.0000001)
             {
                 return $"{seconds * 1000 * 1000 * 1000:n1} ns";
@@ -118,9 +132,13 @@ namespace BSOA.Benchmarks
         public static double ParseTime(string time)
         {
             string[] parts = time.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            double number = double.Parse(parts[0]);
-            string units = parts[1];
+            
+            string numberString = parts[0];
+            if (numberString == "-") { return 0.0d; }
 
+            double number = double.Parse(numberString);
+
+            string units = parts[1];
             switch (units)
             {
                 case "ns":
@@ -159,24 +177,27 @@ namespace BSOA.Benchmarks
             }
         }
 
-        public static string Ratio(double current, double baseline)
+        public static string Ratio(double numerator, double denominator)
         {
-            if (baseline == 0.0 || current == 0.0)
+            if (denominator == 0.0 || numerator == 0.0)
             {
                 return "-";
             }
 
-            double ratio = (current / baseline);
+            double ratio = (numerator / denominator);
 
-            if (ratio < 1)
+            // Report two significant figures, but an extra digit if the first digit is one.
+            // (155, 31, 20, 15.5, 9.1, 5.0, 2.0, 1.55, 0.97, 0.31, 0.199, 0.150, ...)
+
+            if (ratio < 0.2)
             {
                 return $"{ratio:n3}x";
             }
-            else if (ratio < 10)
+            else if (ratio < 2)
             {
                 return $"{ratio:n2}x";
             }
-            else if (ratio < 100)
+            else if (ratio < 20)
             {
                 return $"{ratio:n1}x";
             }
@@ -188,12 +209,12 @@ namespace BSOA.Benchmarks
 
         public static void HighlightLine(params string[] values)
         {
-            ConsoleColor normal = Console.ForegroundColor;
+            System.ConsoleColor normal = Console.ForegroundColor;
 
             for (int i = 0; i < values.Length; ++i)
             {
                 Console.Write(values[i]);
-                Console.ForegroundColor = (i % 2 == 0 ? ConsoleColor.Green : normal);
+                Console.ForegroundColor = (i % 2 == 0 ? System.ConsoleColor.Green : normal);
             }
 
             Console.WriteLine();

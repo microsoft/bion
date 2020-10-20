@@ -53,27 +53,41 @@ namespace BSOA.Benchmarks
 
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             if (args.Length > 0 && args[0].ToLowerInvariant().Contains("detailed"))
             {
                 BenchmarkRunner.Run<Basics>();
-                BenchmarkRunner.Run<Strings>(); 
+                BenchmarkRunner.Run<Strings>();
                 BenchmarkRunner.Run<List>();
                 BenchmarkRunner.Run<Dictionary>();
             }
             else
             {
                 Console.WriteLine("Quick benchmarks. Pass --detailed for Benchmark.net numbers.");
-                Console.WriteLine("Replace Baseline.md with latest Benchmarks.md output to reset baseline.");
-
                 QuickBenchmarker runner = new QuickBenchmarker(new MeasureSettings(TimeSpan.FromSeconds(5), 1, 10000, false));
 
                 runner.Run<Basics>();
                 runner.Run<Strings>();
                 runner.Run<List>();
                 runner.Run<Dictionary>();
+
+                Console.WriteLine();
+                Console.WriteLine($"Saved as: \"{runner.OutputPath}\"");
+                Console.WriteLine($"To update baseline, replace \"{QuickBenchmarker.BaselinePath}\" with latest.");
+
+                if (runner.HasFailures)
+                {
+                    Console.WriteLine("FAIL: At least one benchmark regressed versus baseline.");
+                    return -1;
+                }
+                else
+                {
+                    Console.WriteLine("PASS: All benchmarks fast enough versus baseline.");
+                }
             }
+
+            return 0;
         }
     }
 }

@@ -21,12 +21,6 @@ namespace BSOA.Benchmarks
         }
 
         [Benchmark]
-        public void Nothing()
-        {
-            // Test overhead of benchmarking infrastructure
-        }
-
-        [Benchmark]
         public void Enumerate()
         {
             // Benchmark enumerating a collection (RefList to another table) using a foreach loop.
