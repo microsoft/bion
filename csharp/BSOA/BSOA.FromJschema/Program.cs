@@ -7,8 +7,8 @@ using System.IO;
 
 using BSOA.Generator.Extensions;
 using BSOA.Generator.Schema;
-using BSOA.Json;
 using SColumn = BSOA.Generator.Schema.Column;
+using BSOA.Json;
 
 using Microsoft.Json.Schema;
 

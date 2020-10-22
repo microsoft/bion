@@ -12,10 +12,13 @@ namespace BSOA.Column
     {
         private static Dictionary<Type, Func<object, IColumn>> Builders = new Dictionary<Type, Func<object, IColumn>>()
         {
+            // Use available typed columns
             [typeof(string)] = (defaultValue) => new StringColumn(),
             [typeof(bool)] = (defaultValue) => new BooleanColumn((bool)(defaultValue ?? default(bool))),
             [typeof(Uri)] = (defaultValue) => new UriColumn(),
             [typeof(DateTime)] = (defaultValue) => new DateTimeColumn((DateTime)(defaultValue ?? default(DateTime))),
+
+            // Use NumberColumn for all numeric types
             [typeof(byte)] = (defaultValue) => new NumberColumn<byte>((byte)(defaultValue ?? default(byte))),
             [typeof(sbyte)] = (defaultValue) => new NumberColumn<sbyte>((sbyte)(defaultValue ?? default(sbyte))),
             [typeof(short)] = (defaultValue) => new NumberColumn<short>((short)(defaultValue ?? default(short))),
@@ -27,6 +30,19 @@ namespace BSOA.Column
             [typeof(float)] = (defaultValue) => new NumberColumn<float>((float)(defaultValue ?? default(float))),
             [typeof(double)] = (defaultValue) => new NumberColumn<double>((double)(defaultValue ?? default(double))),
             [typeof(char)] = (defaultValue) => new NumberColumn<char>((char)(defaultValue ?? default(char))),
+
+            // Use GenericNumberListColumn (rather than ListColumn) for IList<number>
+            [typeof(IList<byte>)] = (defaultValue) => new GenericNumberListColumn<byte>(),
+            [typeof(IList<sbyte>)] = (defaultValue) => new GenericNumberListColumn<sbyte>(),
+            [typeof(IList<short>)] = (defaultValue) => new GenericNumberListColumn<short>(),
+            [typeof(IList<ushort>)] = (defaultValue) => new GenericNumberListColumn<ushort>(),
+            [typeof(IList<int>)] = (defaultValue) => new GenericNumberListColumn<int>(),
+            [typeof(IList<uint>)] = (defaultValue) => new GenericNumberListColumn<uint>(),
+            [typeof(IList<long>)] = (defaultValue) => new GenericNumberListColumn<long>(),
+            [typeof(IList<ulong>)] = (defaultValue) => new GenericNumberListColumn<ulong>(),
+            [typeof(IList<float>)] = (defaultValue) => new GenericNumberListColumn<float>(),
+            [typeof(IList<double>)] = (defaultValue) => new GenericNumberListColumn<double>(),
+            [typeof(IList<char>)] = (defaultValue) => new GenericNumberListColumn<char>(),
         };
 
         public static IColumn<T> BuildTyped<T>(T defaultValue = default, Func<Type, object, IColumn> recurseTo = null)

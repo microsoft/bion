@@ -1,4 +1,7 @@
-﻿using BSOA.Demo.Model.BSOA;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using BSOA.Demo.Model.BSOA;
 
 namespace BSOA.Demo
 {

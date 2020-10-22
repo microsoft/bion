@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using BSOA.Test.Model.V1;
-
 using System.Collections.Generic;
+
+using BSOA.Test.Model.V1;
 
 using Xunit;
 

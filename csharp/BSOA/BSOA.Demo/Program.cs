@@ -1,10 +1,13 @@
-﻿using BSOA.Demo.Model.BSOA;
-using BSOA.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+
+using BSOA.Demo.Model.BSOA;
+using BSOA.Json;
 
 namespace BSOA.Demo
 {

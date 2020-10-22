@@ -68,12 +68,12 @@ namespace BSOA.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new ListEnumerator<T>(this);
+            return new ArraySliceEnumerator<T>(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new ListEnumerator<T>(this);
+            return new ArraySliceEnumerator<T>(this);
         }
 
         public override int GetHashCode()
@@ -119,7 +119,7 @@ namespace BSOA.Collections
 
         public static bool operator !=(ArraySlice<T> left, ArraySlice<T> right)
         {
-            return !(left == right);
+            return !left.Equals(right);
         }
     }
 }

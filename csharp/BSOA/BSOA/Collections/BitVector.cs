@@ -36,9 +36,10 @@ namespace BSOA.Collections
         {
             get
             {
-                if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
-                if (_array == null || _array.Length <= (index >> 5)) { return DefaultValue; }
-                return (_array[index >> 5] & (FirstBit >> (index & 31))) != 0UL;
+                int arrayIndex = (index >> 5);
+                if (arrayIndex < 0) { throw new IndexOutOfRangeException(nameof(index)); }
+                if (_array == null || _array.Length <= arrayIndex) { return DefaultValue; }
+                return (_array[arrayIndex] & (FirstBit >> (index & 31))) != 0UL;
             }
             set
             {
@@ -86,7 +87,7 @@ namespace BSOA.Collections
             if (value != DefaultValue)
             {
                 int edge = (Capacity & 31);
-                if (edge < 31)
+                if (edge > 0)
                 {
                     _array[blocksToSet - 1] ^= (~0U) >> edge;
                 }

@@ -1,0 +1,85 @@
+{
+  "name": "RunDatabase",
+  "namespace": "BSOA.Benchmarks.Model",
+  "rootTableName": "Run",
+  "tables": [
+    {
+      "name": "Result",
+      "columns": [
+        {
+          "name": "RuleId",
+          "type": "string"
+        },
+        {
+          "name": "Guid",
+          "type": "string"
+        },
+        {
+          "name": "IsActive",
+          "type": "bool"
+        },
+        {
+          "name": "Message",
+          "type": "string"
+        },
+        {
+          "name": "StartLine",
+          "type": "int"
+        },
+        {
+          "name": "WhenDetectedUtc",
+          "type": "DateTime"
+        },
+        {
+          "category": "Enum",
+          "name": "BaselineState",
+          "type": "BaselineState",
+          "default": "default(BaselineState)",
+          "underlyingType": "int"
+        },
+        {
+          "name": "Properties",
+          "type": "IDictionary<String, String>"
+        },
+        {
+          "name": "Tags",
+          "type": "IList<int>"
+        }
+      ]
+    },
+    {
+      "name": "Rule",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "string"
+        },
+        {
+          "name": "Guid",
+          "type": "String"
+        },
+        {
+          "name": "HelpUri",
+          "type": "Uri"
+        }
+      ]
+    },
+    {
+      "name": "Run",
+      "columns": [
+        {
+          "category": "RefList",
+          "name": "Results",
+          "type": "IList<Result>",
+          "referencedTableName": "Result"
+        },
+        {
+          "category": "RefList",
+          "name": "Rules",
+          "type": "IList<Rule>",
+          "referencedTableName": "Rule"
+        }
+      ]
+    }
+  ]
+}

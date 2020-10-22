@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
+using System.Text;
 
 using BSOA.Column;
 using BSOA.IO;
@@ -146,6 +147,25 @@ namespace BSOA.Test
             Assert.Equal(101, column.Count);
             Assert.Equal("Centennial", column[100]);
             Assert.Null(column[99]);
+
+            // Check ForEach enumeration
+            int totalLength = 0;
+            for (int i = 0; i < column.Count; ++i)
+            {
+                string value = column[i];
+                if (value?.Length > 0)
+                {
+                    totalLength += Encoding.UTF8.GetByteCount(value);
+                }
+            }
+
+            int forEachLength = 0;
+            column.ForEach((slice) =>
+            {
+                forEachLength += slice.Count;
+            });
+
+            Assert.Equal(totalLength, forEachLength);
         }
     }
 }

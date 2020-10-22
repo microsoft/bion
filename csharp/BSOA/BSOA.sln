@@ -13,7 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Generator", "BSOA.Gene
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.FromJSchema", "BSOA.FromJSchema\BSOA.FromJSchema.csproj", "{047F6B6A-A3C6-45A9-90A3-51986B7F5F1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSOA.Demo", "BSOA.Demo\BSOA.Demo.csproj", "{1BBE7333-2B65-445D-ADCE-B10D4AFCC1CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Demo", "BSOA.Demo\BSOA.Demo.csproj", "{1BBE7333-2B65-445D-ADCE-B10D4AFCC1CE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSOA.Benchmarks", "BSOA.Benchmarks\BSOA.Benchmarks.csproj", "{88D0F478-140B-4A7E-916C-CECCE3D37164}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoughBench", "RoughBench\RoughBench.csproj", "{3018D1A3-8D14-4506-A93E-922A5A94EF75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +49,14 @@ Global
 		{1BBE7333-2B65-445D-ADCE-B10D4AFCC1CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BBE7333-2B65-445D-ADCE-B10D4AFCC1CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BBE7333-2B65-445D-ADCE-B10D4AFCC1CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88D0F478-140B-4A7E-916C-CECCE3D37164}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88D0F478-140B-4A7E-916C-CECCE3D37164}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88D0F478-140B-4A7E-916C-CECCE3D37164}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88D0F478-140B-4A7E-916C-CECCE3D37164}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3018D1A3-8D14-4506-A93E-922A5A94EF75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3018D1A3-8D14-4506-A93E-922A5A94EF75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3018D1A3-8D14-4506-A93E-922A5A94EF75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3018D1A3-8D14-4506-A93E-922A5A94EF75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

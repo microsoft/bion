@@ -102,10 +102,25 @@ namespace BSOA.Test.Collections
             vector.SetAll(true);
             Assert.Equal(vector.Capacity, vector.Count);
             Assert.False(vector[vector.Capacity]);
+            Assert.True(vector[vector.Capacity - 1]);
 
             vector.SetAll(false);
             Assert.Equal(0, vector.Count);
             Assert.False(vector[vector.Capacity]);
+
+            // SetAll (exact multiple of 32)
+            vector.Clear();
+            vector[3999] = true;
+
+            vector.SetAll(true);
+            Assert.Equal(vector.Capacity, vector.Count);
+            Assert.False(vector[vector.Capacity]);
+            Assert.True(vector[vector.Capacity - 1]);
+
+            vector.SetAll(false);
+            Assert.Equal(0, vector.Count);
+            Assert.False(vector[vector.Capacity]);
+            Assert.False(vector[vector.Capacity - 1]);
         }
 
         [Fact]
@@ -142,6 +157,17 @@ namespace BSOA.Test.Collections
             vector.SetAll(false);
             Assert.Equal(0, vector.Count);
             Assert.True(vector[vector.Capacity]);
+
+            // SetAll, length exact multiple of 32.
+            vector.Clear();
+            vector[3999] = false;
+            vector.SetAll(false);
+            Assert.False(vector[3999]);
+            Assert.True(vector[4000]);
+
+            vector.SetAll(true);
+            Assert.True(vector[3999]);
+            Assert.True(vector[4000]);
         }
 
         private void VerifySame(HashSet<int> expected, BitVector actual)

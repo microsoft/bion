@@ -16,12 +16,13 @@ namespace BSOA.Test.Collections
         [Fact]
         public void ColumnDictionary_Basics()
         {
-            string sampleName = "Name";
-            string sampleValue = "Scott";
+            // Note: ColumnDictionary sorts in key order, so must add to expected Dictionary in key-sorted-order for collection order to match
+            string sampleName = "City";
+            string sampleValue = "Redmond";
             string retrievedValue = null;
 
-            string secondName = "City";
-            string secondValue = "Redmond";
+            string secondName = "Name";
+            string secondValue = "Scott";
 
             string unusedName = "Unused";
 
@@ -110,7 +111,8 @@ namespace BSOA.Test.Collections
 
             // Verify other collection manipulation
             // NOTE: Must use unique keys, because Add(KeyValuePair) will throw for a duplicate key
-            CollectionChangeVerifier.VerifyCollection(row, (i) => new KeyValuePair<string, string>(i.ToString(), i.ToString()));
+            // NOTE: Must generate keys in ascending sorted order after existing values; Dictionary sorts by key
+            CollectionChangeVerifier.VerifyCollection(row, (i) => new KeyValuePair<string, string>($"Z{i:d2}", $"Z{i:d2}"));
 
             if (!Debugger.IsAttached)
             {

@@ -16,39 +16,60 @@ namespace BSOA.Column
     /// </summary>
     public class ListColumn<T> : LimitedList<IList<T>>, IColumn<IList<T>>
     {
-        internal NullableColumn<NumberList<int>> _indices;
+        private ColumnList<T> _cached;
+        private NumberListColumn<int> _indicesInner;
+        internal IColumn<NumberList<int>> _indices;
         internal IColumn<T> _values;
 
         public override int Count => _indices.Count;
 
-        public ListColumn(IColumn<T> values, bool nullByDefault = true)
+        public ListColumn(IColumn<T> values, Nullability nullability = Nullability.DefaultToNull)
         {
-            _indices = new NullableColumn<NumberList<int>>(new NumberListColumn<int>(), nullByDefault);
+            _indicesInner = new NumberListColumn<int>();
+            _indices = NullableColumn<NumberList<int>>.Wrap(_indicesInner, nullability);
             _values = values;
         }
 
         // ColumnFactory untyped constructor
-        public ListColumn(IColumn values, object defaultValue) : this((IColumn<T>)values, (defaultValue == null))
+        public ListColumn(IColumn values, object defaultValue) : this((IColumn<T>)values, (defaultValue == null ? Nullability.DefaultToNull : Nullability.DefaultToEmpty))
         { }
 
         public override IList<T> this[int index]
         {
-            get => ColumnList<T>.Get(this, index);
-            set => ColumnList<T>.Set(this, index, value);
+            get
+            {
+                ColumnList<T> value = _cached;
+                if (value?._rowIndex != index)
+                {
+                    value = ColumnList<T>.Get(this, index);
+                    _cached = value;
+                }
+
+                return value;
+            }
+
+            set
+            {
+                _cached = default;
+                ColumnList<T>.Set(this, index, value);
+            }
         }
 
         public override void Swap(int index1, int index2)
         {
+            _cached = default;
             _indices.Swap(index1, index2);
         }
 
         public override void RemoveFromEnd(int count)
         {
+            _cached = default;
             _indices.RemoveFromEnd(count);
         }
 
         public override void Clear()
         {
+            _cached = default;
             _indices.Clear();
             _values.Clear();
         }
@@ -59,7 +80,7 @@ namespace BSOA.Column
             _indices.Trim();
 
             // Find any unused values and remove them
-            GarbageCollector.Collect<int, T>((INumberColumn<int>)_indices.Values, _values);
+            GarbageCollector.Collect<int, T>(_indicesInner, _values);
 
             // Trim values afterward to clean up any newly unused space
             _values.Trim();

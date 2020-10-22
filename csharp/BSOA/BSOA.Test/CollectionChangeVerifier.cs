@@ -112,7 +112,7 @@ namespace BSOA.Test
             if (!Debugger.IsAttached)
             {
                 Assert.Throws<IndexOutOfRangeException>(() => row.Insert(-1, notInExpected));
-                Assert.Throws<IndexOutOfRangeException>(() => row.Insert(row.Count, notInExpected));
+                Assert.Throws<IndexOutOfRangeException>(() => row.Insert(row.Count + 1, notInExpected));
             }
 
             // Clear; verify empty, read-only static instance

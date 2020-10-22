@@ -66,8 +66,7 @@ namespace BSOA.Column
                 // VariableLengthColumn can't pass out of range values
                 // if (index < 0 || index >= ChapterRowCount) { throw new ArgumentOutOfRangeException("index"); }
 
-                ArraySlice<T> result = default;
-                if (_largeValueDictionary != null && _largeValueDictionary.TryGetValue(index, out result)) { return result; }
+                if (_largeValueDictionary != null && _largeValueDictionary.TryGetValue(index, out ArraySlice<T> result)) { return result; }
 
                 if (index < _valueEndInPage?.Length)
                 {
@@ -133,12 +132,14 @@ namespace BSOA.Column
 
             foreach (var pair in _largeValueDictionary)
             {
-                int length = pair.Value.Count;
-                if (length <= MaximumSmallValueLength)
+                int index = pair.Key;
+                int newLength = pair.Value.Count;
+                int oldLength = ((index < _valueEndInPage?.Length) ? EndPosition(index) - StartPosition(index) : 0);
+
+                newSmallValueLength -= oldLength;
+                if (newLength <= MaximumSmallValueLength)
                 {
-                    int index = pair.Key;
-                    int oldLength = ((index < _valueEndInPage?.Length) ? EndPosition(index) - StartPosition(index) : 0);
-                    newSmallValueLength += (length - oldLength);
+                    newSmallValueLength += newLength;
                 }
             }
 

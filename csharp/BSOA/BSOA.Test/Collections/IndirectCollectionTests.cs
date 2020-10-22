@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using BSOA.Collections;
 
@@ -15,12 +16,13 @@ namespace BSOA.Test.Collections
         [Fact]
         public void IndirectCollection_Basics()
         {
+            // Note: ColumnDictionary now sorts keys internally, so collections will come in sorted order, not insertion order
             IDictionary<string, string> row = DictionaryColumnTests.SampleRow();
-            row["Name"] = "Scott";
             row["City"] = "Redmond";
+            row["Name"] = "Scott";
 
-            List<string> keys = new List<string>() { "Name", "City" };
-            List<string> values = new List<string>() { "Scott", "Redmond" };
+            List<string> keys = new List<string>() { "City", "Name" };
+            List<string> values = new List<string>() { "Redmond", "Scott" };
 
             IndirectCollection<string> collection = (IndirectCollection<string>)row.Keys;
 
@@ -44,8 +46,8 @@ namespace BSOA.Test.Collections
             // CopyTo
             string[] names = new string[3];
             collection.CopyTo(names, 1);
-            Assert.Equal("Name", names[1]);
-            Assert.Equal("City", names[2]);
+            Assert.Equal("City", names[1]);
+            Assert.Equal("Name", names[2]);
             Assert.Throws<ArgumentNullException>(() => collection.CopyTo(null, 0));
             Assert.Throws<ArgumentOutOfRangeException>(() => collection.CopyTo(names, -1));
             Assert.Throws<ArgumentException>(() => collection.CopyTo(names, 2));

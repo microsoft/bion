@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
-using System.Linq;
 
 using BSOA.Collections;
 using BSOA.IO;
@@ -15,13 +14,26 @@ namespace BSOA.Column
     ///  only once. It reverts to storing values individually if there are too many
     ///  distinct values.
     /// </summary>
+    /// <remarks>
+    ///  Values must be cached in their original form to quickly find the index for a
+    ///  value on set. They are also kept in a list for fast gets, which especially
+    ///  benefits string columns.
+    /// </remarks>
     /// <typeparam name="T">Type of values in column</typeparam>
     public class DistinctColumn<T> : LimitedList<T>, IColumn<T>
     {
         private T _defaultValue;
-        private Dictionary<T, byte> _distinct;
+        
+        // Map index to value and value to index when there are few distinct values.
+        private List<T> _distinctValues;
+        private Dictionary<T, byte> _distinctValueToIndex;
+
+        // Store values (if many) or non-default distinct values (if few)
         private IColumn<T> _values;
+
+        // Store index of the value for each row (when few distinct values)
         private NumberColumn<byte> _indices;
+
         private bool _requiresTrim;
 
         public DistinctColumn(IColumn<T> values, T defaultValue = default)
@@ -35,13 +47,15 @@ namespace BSOA.Column
         public DistinctColumn(IColumn values, object defaultValue) : this((IColumn<T>)values, (T)defaultValue)
         { }
 
-        public bool IsMappingValues => (_distinct != null);
-        public int DistinctCount => (IsMappingValues ? _distinct.Count + 1 : -1);
+        // NOTE: _distinctValues is the safe source for all DistinctValues; _distinctValueToIndex and _values omit the default to save space
+        public bool IsMappingValues => (_distinctValues != null);
+        public int DistinctCount => (IsMappingValues ? _distinctValues.Count : -1);
+
         public override int Count => (IsMappingValues ? _indices.Count : _values.Count);
 
         public override T this[int index]
         {
-            get => (IsMappingValues ? _values[_indices[index]] : _values[index]);
+            get => (IsMappingValues ? _distinctValues[_indices[index]] : _values[index]);
 
             set
             {
@@ -63,31 +77,40 @@ namespace BSOA.Column
             if (value == null) { return _defaultValue == null; }
             if (_defaultValue != null && value.Equals(_defaultValue)) { return true; }
 
-            if (_distinct.TryGetValue(value, out index))
+            // Initialize Distinct Value Dictionary just in time (first non-default value being set)
+            if (_distinctValueToIndex == null)
+            {
+                _distinctValueToIndex = new Dictionary<T, byte>();
+            }
+
+            if (_distinctValueToIndex.TryGetValue(value, out index))
             {
                 // Existing value - return current index
                 return true;
             }
-            else if (DistinctCount <= 256)
+            else if (DistinctCount < 256)
             {
                 // New value, count still ok - add and return new index
-                index = (byte)(_distinct.Count + 1);
-                _distinct[value] = index;
+                index = (byte)(_distinctValues.Count);
+
+                _distinctValues.Add(value);
+                _distinctValueToIndex[value] = index;
                 _values[index] = value;
+
                 return true;
             }
             else
             {
                 // Too many values - convert to per-value
-                List<T> distinctValues = _values.ToList();
                 _values.Clear();
                 for (int i = 0; i < _indices.Count; ++i)
                 {
-                    _values[i] = distinctValues[_indices[i]];
+                    _values[i] = _distinctValues[_indices[i]];
                 }
 
                 _indices = null;
-                _distinct = null;
+                _distinctValueToIndex = null;
+                _distinctValues = null;
                 _requiresTrim = false;
                 return false;
             }
@@ -95,13 +118,18 @@ namespace BSOA.Column
 
         public override void Clear()
         {
-            // Indices empty but non-null
+            // Indices empty but not null (available to read into)
             _indices = new NumberColumn<byte>(0);
 
-            // One distinct value; the default
-            _distinct = new Dictionary<T, byte>();
+            // Clear any values
             _values.Clear();
-            _values[0] = _defaultValue;
+
+            // Reset Distinct value list
+            _distinctValues = new List<T>();
+            _distinctValues.Add(_defaultValue);
+
+            // Empty Distinct value lookup (default not added here or in Values column)
+            _distinctValueToIndex = null;
 
             _requiresTrim = false;
         }
@@ -145,11 +173,21 @@ namespace BSOA.Column
 
         private void RebuildDistinctDictionary()
         {
-            _distinct.Clear();
+            _distinctValueToIndex = null;
 
-            for (int i = 1; i < _values.Count; ++i)
+            _distinctValues.Clear();
+            _distinctValues.Add(_defaultValue);
+
+            if (_values.Count > 0)
             {
-                _distinct[_values[i]] = (byte)i;
+                _distinctValueToIndex = new Dictionary<T, byte>();
+
+                for (int i = 1; i < _values.Count; ++i)
+                {
+                    T value = _values[i];
+                    _distinctValueToIndex[value] = (byte)i;
+                    _distinctValues.Add(value);
+                }
             }
         }
 
@@ -172,7 +210,8 @@ namespace BSOA.Column
             {
                 // If it has no indices and more than one value (the default is always added), it is non-mapped
                 _indices = null;
-                _distinct = null;
+                _distinctValueToIndex = null;
+                _distinctValues = null;
             }
         }
 

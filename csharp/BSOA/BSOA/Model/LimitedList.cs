@@ -90,10 +90,15 @@ namespace BSOA.Model
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new ListEnumerator<T>(this);
+            return GetEnumeratorInternal();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumeratorInternal();
+        }
+
+        protected virtual IEnumerator<T> GetEnumeratorInternal()
         {
             return new ListEnumerator<T>(this);
         }

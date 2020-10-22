@@ -16,34 +16,52 @@ namespace BSOA.Column
     /// </summary>
     public class StringColumn : LimitedList<string>, IColumn<string>, INumberColumn<byte>
     {
-        private const int SavedValueCountLimit = 128;
-        private Dictionary<int, string> _savedValues;
-
         private BooleanColumn IsNull;
         private ArraySliceColumn<byte> Values;
 
+        // Accumulate changed values and convert into UTF-8 in a shared array
+        // to reduce array overhead and allocation time per set value.
+        private const int SavedValueCountLimit = 128;
+        private Dictionary<int, string> _savedValues;
+
+        // Cache the most recently read value in .NET string form.
+        // This helps in common situations (repeated reads) with minimal impact in others.
+        // More complex caching mechanisms cost more than the string conversions unless the usage pattern is ideal.
+        private CacheItem<string> _cache;
+
         public StringColumn()
         {
-            IsNull = new BooleanColumn(true);
-            Values = new ArraySliceColumn<byte>();
+            // Members initialized just-in-time to save unused StringColumn space
         }
 
-        public override int Count => IsNull.Count;
+        public override int Count => IsNull?.Count ?? 0;
 
         public override string this[int index]
         {
             get
             {
-                if (_savedValues != null && _savedValues.TryGetValue(index, out string result)) { return result; }
-                if (IsNull[index]) { return null; }
+                if (index < 0) { throw new IndexOutOfRangeException(nameof(index)); }
 
-                ArraySlice<byte> value = Values[index];
-                return (value.Count == 0 ? string.Empty : Encoding.UTF8.GetString(value.Array, value.Index, value.Count));
+                CacheItem<string> item = _cache;
+                if (item?.RowIndex == index) { return item.Value; }
+
+                if (_savedValues != null && _savedValues.TryGetValue(index, out string result)) { return result; }
+                if (IsNull == null || IsNull[index]) { return null; }
+
+                ArraySlice<byte> bytes = Values[index];
+                item = new CacheItem<string>(index, (bytes.Count == 0 ? string.Empty : Encoding.UTF8.GetString(bytes.Array, bytes.Index, bytes.Count)));
+
+                _cache = item;
+
+                return item.Value;
             }
 
             set
             {
+                _cache = default;
+
                 // Always set IsNull; IsNull tracks Count cheaply
+                Init();
                 IsNull[index] = (value == null);
 
                 int length = value?.Length ?? 0;
@@ -64,10 +82,21 @@ namespace BSOA.Column
             }
         }
 
+        private void Init()
+        {
+            if (IsNull == null)
+            {
+                IsNull = new BooleanColumn(true);
+                Values = new ArraySliceColumn<byte>();
+            }
+        }
+
         private void PushSavedValues()
         {
             if (_savedValues?.Count > 0)
             {
+                Init();
+
                 // Find combined UTF-8 length of pending values
                 int totalLength = 0;
                 foreach (KeyValuePair<int, string> pair in _savedValues)
@@ -92,54 +121,57 @@ namespace BSOA.Column
             }
         }
 
-
         public void ForEach(Action<ArraySlice<byte>> action)
         {
             PushSavedValues();
-            Values.ForEach(action);
+            Values?.ForEach(action);
         }
 
         public override void Clear()
         {
+            _cache = default;
             _savedValues = null;
 
-            IsNull.Clear();
-            Values.Clear();
+            IsNull = null;
+            Values = null;
         }
 
         public override void RemoveFromEnd(int count)
         {
             PushSavedValues();
-            IsNull.RemoveFromEnd(count);
-            Values.RemoveFromEnd(count);
+            IsNull?.RemoveFromEnd(count);
+            Values?.RemoveFromEnd(count);
         }
 
         public void Trim()
         {
             PushSavedValues();
-            Values.Trim();
+            Values?.Trim();
         }
 
         private static Dictionary<string, Setter<StringColumn>> setters = new Dictionary<string, Setter<StringColumn>>()
         {
-            [Names.IsNull] = (r, me) => me.IsNull.Read(r),
-            [Names.Values] = (r, me) => me.Values.Read(r)
+            [Names.IsNull] = (r, me) => { me.Init(); me.IsNull.Read(r); },
+            [Names.Values] = (r, me) => { me.Init(); me.Values.Read(r); }
         };
 
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters);
 
-            if (IsNull.Count == 0 && Values.Count > 0)
+            if (IsNull != null)
             {
-                // Only wrote values means all values are non-null
-                IsNull[Values.Count - 1] = false;
-                IsNull.SetAll(false);
-            }
-            else if (IsNull.Count > 0 && Values.Count == 0)
-            {
-                // Only wrote nulls means all values are null
-                Values[IsNull.Count - 1] = ArraySlice<byte>.Empty;
+                if (IsNull.Count == 0 && Values.Count > 0)
+                {
+                    // Only wrote values means all values are non-null
+                    IsNull[Values.Count - 1] = false;
+                    IsNull.SetAll(false);
+                }
+                else if (IsNull.Count > 0 && Values.Count == 0)
+                {
+                    // Only wrote nulls means all values are null
+                    Values[IsNull.Count - 1] = ArraySlice<byte>.Empty;
+                }
             }
         }
 

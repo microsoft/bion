@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- Version for all BSOA binaries and packages -->
-    <Version>0.5.4</Version>
+    <Version Condition="'$(Version)' == ''">0.6.0</Version>
     <TargetFramework>netstandard2.0</TargetFramework>
 
     <!-- Ensure all outputs and intermediates go to bld\, providing easy cleanup and signing for pipeline builds -->
@@ -10,8 +10,9 @@
     <OutputPath>..\bld\bin\$(Configuration)\$(MSBuildProjectName)</OutputPath>
 
     <!-- BSOA binaries are delay-signed with the Microsoft managed code key -->
-    <SignAssembly>true</SignAssembly>
+    <!-- Skip signing for Benchmark.NET generated projects (generated in a deeper folder) -->
     <AssemblyOriginatorKeyFile>..\..\Microsoft.ManagedKey.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly Condition="Exists('$(AssemblyOriginatorKeyFile)')">true</SignAssembly>
 
     <!-- Set binary ownership information -->
     <Company Condition=" '$(Company)' == '' ">Microsoft</Company>

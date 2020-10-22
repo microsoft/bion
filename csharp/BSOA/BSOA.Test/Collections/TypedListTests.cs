@@ -1,9 +1,12 @@
-﻿using BSOA.Collections;
-using BSOA.Column;
-using BSOA.Test.Model.V1;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.Collections.Generic;
+
+using BSOA.Collections;
+using BSOA.Column;
+using BSOA.Test.Model.V1;
 
 using Xunit;
 
@@ -77,6 +80,14 @@ namespace BSOA.Test.Collections
             c.People = null;
             Assert.Null(c.People);
             Assert.Equal(0, cachedPeople.Count);
+
+            // SetTo TypedList from another DB/Table
+            Community c2 = new Community();
+            c2.People = new List<Person>();
+            c2.People.Add(new Person(c2) { Name = "Other" });
+            list.SetTo(c2.People);
+
+            Assert.Equal("Other", list[0].Name);
         }
     }
 }

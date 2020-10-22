@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 using BSOA.Column;
 using BSOA.Model;
@@ -53,11 +54,14 @@ namespace BSOA.Test
             CollectionReadVerifier.VerifySame<T>(expected, column);
 
             // Verify item type supports equatability (needed for IndexOf, Contains to work)
-            Assert.True(otherValue.Equals(otherValue));
-            Assert.Equal(otherValue.GetHashCode(), otherValue.GetHashCode());
-            Assert.False(otherValue.Equals(defaultValue));
-            Assert.NotEqual(otherValue.GetHashCode(), defaultValue?.GetHashCode() ?? 0);
-            Assert.False(otherValue.Equals(1.45d));
+            if (otherValue != null)
+            {
+                Assert.True(otherValue.Equals(otherValue));
+                Assert.Equal(otherValue.GetHashCode(), otherValue.GetHashCode());
+                Assert.False(otherValue.Equals(defaultValue));
+                Assert.NotEqual(otherValue.GetHashCode(), defaultValue?.GetHashCode() ?? 0);
+                Assert.False(otherValue.Equals(1.45d));
+            }
 
             // Contains / IndexOf
             T notInList = valueProvider(50);
@@ -66,7 +70,7 @@ namespace BSOA.Test
                 Assert.DoesNotContain(notInList, column);
                 Assert.Equal(-1, column.IndexOf(notInList));
             }
-            
+
             Assert.Contains(valueProvider(1), column);
             Assert.Equal(1, column.IndexOf(valueProvider(1)));
 
@@ -88,6 +92,17 @@ namespace BSOA.Test
             other = new T[column.Count];
             column.CopyTo((Array)other, 0);
             CollectionReadVerifier.VerifySame(other, column, quick: true);
+
+            // Verify multi-threaded reads return correct values (no read-only threading problems)
+            Parallel.For(0, 8, (instance) =>
+            {
+                Random r = new Random(instance);
+                for (int i = 0; i < column.Count * 20; ++i)
+                {
+                    int rowIndex = r.Next(column.Count);
+                    Assert.Equal(expected[rowIndex], column[rowIndex]);
+                }
+            });
 
             // Change existing value
             column[1] = otherValue;

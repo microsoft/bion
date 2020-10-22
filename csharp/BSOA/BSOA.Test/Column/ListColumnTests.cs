@@ -3,7 +3,9 @@
 
 using System.Collections.Generic;
 
+using BSOA.Collections;
 using BSOA.Column;
+using BSOA.Model;
 
 using Xunit;
 
@@ -17,13 +19,13 @@ namespace BSOA.Test
         [Fact]
         public void ListColumn_Basics()
         {
-            ListColumn<int> column = new ListColumn<int>(new NumberColumn<int>(-1), nullByDefault: false);
+            ListColumn<int> column = new ListColumn<int>(new NumberColumn<int>(-1), Nullability.DefaultToEmpty);
             column[0].Add(1);
             column[0].Add(2);
             column[0].Add(3);
 
             // Test the outer column (non-nullable)
-            Column.Basics(() => new ListColumn<int>(new NumberColumn<int>(-1), nullByDefault: false), ColumnList<int>.Empty, column[0], (index) =>
+            Column.Basics(() => new ListColumn<int>(new NumberColumn<int>(-1), Nullability.NullsDisallowed), ColumnList<int>.Empty, column[0], (index) =>
             {
                 IList<int> other = column[column.Count];
                 other.Add(index);
@@ -33,7 +35,17 @@ namespace BSOA.Test
             });
 
             // Test the outer column (nullable)
-            Column.Basics(() => new ListColumn<int>(new NumberColumn<int>(-1), nullByDefault: true), null, column[0], (index) =>
+            Column.Basics(() => new ListColumn<int>(new NumberColumn<int>(-1), Nullability.DefaultToNull), null, column[0], (index) =>
+            {
+                IList<int> other = column[column.Count];
+                other.Add(index);
+                other.Add(index + 1);
+                other.Add(index + 2);
+                return other;
+            });
+
+            // Test the outer column (nullable, default not null)
+            Column.Basics(() => new ListColumn<int>(new NumberColumn<int>(-1), Nullability.DefaultToEmpty), ColumnList<int>.Empty, null, (index) =>
             {
                 IList<int> other = column[column.Count];
                 other.Add(index);
@@ -56,7 +68,7 @@ namespace BSOA.Test
             Assert.False(empty != ColumnList<int>.Empty);
 
             // ColumnList.GetHashCode and Equals w/nulls
-            ListColumn<string> stringColumn = new ListColumn<string>(new StringColumn(), nullByDefault: false);
+            ListColumn<string> stringColumn = new ListColumn<string>(new StringColumn(), Nullability.DefaultToEmpty);
             
             ColumnList<string> first = (ColumnList<string>)stringColumn[0];
             first.Add("One");

@@ -9,7 +9,7 @@ using BSOA.Column;
 
 namespace BSOA.Collections
 {
-    public struct DictionaryEnumerator<TKey, TValue> : IEnumerator<KeyValuePair<TKey, TValue>> where TKey : IEquatable<TKey>
+    public sealed class DictionaryEnumerator<TKey, TValue> : IEnumerator<KeyValuePair<TKey, TValue>> where TKey : IComparable<TKey>
     {
         private DictionaryColumn<TKey, TValue> _column;
         private ArraySlice<int> _indices;
@@ -31,11 +31,6 @@ namespace BSOA.Collections
             return new KeyValuePair<TKey, TValue>(_column._keys[pairIndex], _column._values[pairIndex]);
         }
 
-        public void Dispose()
-        {
-            // Nothing to Dispose
-        }
-
         public bool MoveNext()
         {
             _index++;
@@ -45,6 +40,11 @@ namespace BSOA.Collections
         public void Reset()
         {
             _index = -1;
+        }
+
+        public void Dispose()
+        {
+            // Nothing to Dispose
         }
     }
 }

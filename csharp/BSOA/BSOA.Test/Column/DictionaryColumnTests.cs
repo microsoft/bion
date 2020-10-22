@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using BSOA.Collections;
 using BSOA.Column;
+using BSOA.Model;
 
 using Xunit;
 
@@ -17,11 +18,11 @@ namespace BSOA.Test
             DictionaryColumn<string, string> column = new DictionaryColumn<string, string>(
                 new DistinctColumn<string>(new StringColumn(), null),
                 new StringColumn(),
-                nullByDefault: false);
+                Nullability.NullsDisallowed);
 
             ColumnDictionary<string, string> first = (ColumnDictionary<string, string>)column[0];
             first["One"] = "One";
-            first["Two"] = "Two";
+            first.Add("Two", "Two");
 
             return (ColumnDictionary<string, string>)column[1];
         }
@@ -29,21 +30,28 @@ namespace BSOA.Test
         [Fact]
         public void DictionaryColumn_Basics()
         {
-            DictionaryColumn<string, string> scratch = new DictionaryColumn<string, string>(new StringColumn(), new StringColumn(), nullByDefault: false);
+            DictionaryColumn<string, string> scratch = new DictionaryColumn<string, string>(new StringColumn(), new StringColumn(), Nullability.DefaultToEmpty);
             ColumnDictionary<string, string> defaultValue = ColumnDictionary<string, string>.Empty;
 
             ColumnDictionary<string, string> otherValue = SampleRow();
-            otherValue.SetTo(new Dictionary<string, string>()
+            Dictionary<string, string> model = new Dictionary<string, string>()
             {
                 ["Name"] = "Scott",
                 ["City"] = "Redmond"
-            });
+            };
+
+            otherValue.SetTo(model);
+            
+            // Test ColumnDictionary.Equals against non-ColumnDictionary IDictionary (slower compare path)
+            Assert.True(otherValue.Equals(model));
+            model["City"] = "Bellevue";
+            Assert.False(otherValue.Equals(model));
 
             Column.Basics<IDictionary<string, string>>(
                 () => new DictionaryColumn<string, string>(
                     new DistinctColumn<string>(new StringColumn()),
                     new StringColumn(),
-                    nullByDefault: false),
+                    Nullability.DefaultToEmpty),
                 defaultValue,
                 otherValue,
                 (i) =>
@@ -63,7 +71,7 @@ namespace BSOA.Test
                 () => new DictionaryColumn<string, string>(
                     new DistinctColumn<string>(new StringColumn()),
                     new StringColumn(),
-                    nullByDefault: true),
+                    Nullability.DefaultToNull),
                 defaultValue,
                 otherValue,
                 (i) =>
@@ -77,6 +85,20 @@ namespace BSOA.Test
                     return scratch[i];
                 }
             );
+        }
+
+        [Fact]
+        public void DictionaryColumn_NonString()
+        {
+            DictionaryColumn<int, int> column = new DictionaryColumn<int, int>(new NumberColumn<int>(-1), new NumberColumn<int>(-1), Nullability.NullsDisallowed);
+            IDictionary<int, int> dictionary = column[0];
+
+            dictionary[5] = 5;
+            dictionary[10] = 10;
+
+            Assert.Equal(10, dictionary[10]);
+            Assert.Equal(5, dictionary[5]);
+            Assert.False(dictionary.ContainsKey(6));
         }
     }
 }

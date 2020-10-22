@@ -58,11 +58,15 @@ namespace BSOA.Column
                 int chapterIndex = index / ArraySliceChapter<T>.ChapterRowCount;
                 int indexInChapter = index % ArraySliceChapter<T>.ChapterRowCount;
 
-                if (index >= Count) { _count = index + 1; }
-
-                while (chapterIndex >= _chapters.Count)
+                if (index >= Count)
                 {
-                    _chapters.Add(new ArraySliceChapter<T>());
+                    _count = index + 1;
+
+                    if (_chapters == null) { _chapters = new List<ArraySliceChapter<T>>(); }
+                    while (chapterIndex >= _chapters.Count)
+                    {
+                        _chapters.Add(new ArraySliceChapter<T>());
+                    }
                 }
 
                 _chapters[chapterIndex][indexInChapter] = value;
@@ -72,7 +76,7 @@ namespace BSOA.Column
         public override void Clear()
         {
             _count = 0;
-            _chapters = new List<ArraySliceChapter<T>>();
+            _chapters = null;
         }
 
         public override void RemoveFromEnd(int count)
@@ -105,17 +109,23 @@ namespace BSOA.Column
 
         public void ForEach(Action<ArraySlice<T>> action)
         {
-            foreach (ArraySliceChapter<T> chapter in _chapters)
+            if (_chapters != null)
             {
-                chapter.ForEach(action);
+                foreach (ArraySliceChapter<T> chapter in _chapters)
+                {
+                    chapter.ForEach(action);
+                }
             }
         }
 
         public void Trim()
         {
-            foreach (ArraySliceChapter<T> chapter in _chapters)
+            if (_chapters != null)
             {
-                chapter.Trim();
+                foreach (ArraySliceChapter<T> chapter in _chapters)
+                {
+                    chapter.Trim();
+                }
             }
         }
 
