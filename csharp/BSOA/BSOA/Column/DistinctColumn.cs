@@ -41,13 +41,17 @@ namespace BSOA.Column
         public DistinctColumn(IColumn values, object defaultValue) : this((IColumn<T>)values, (T)defaultValue)
         { }
 
-        public bool IsMappingValues => (_distinctValueToIndex != null);
-        public int DistinctCount => (IsMappingValues ? _distinctValueToIndex.Count + 1 : -1);
+        public bool IsMappingValues => (_distinctValues != null);
+        public int DistinctCount => (IsMappingValues ? _distinctValues.Count : -1);
         public override int Count => (IsMappingValues ? _indices.Count : _values.Count);
 
         public override T this[int index]
         {
-            get => (IsMappingValues ? _distinctValues[_indices[index]] : _values[index]);
+            get
+            {
+                if (index >= Count) { return _defaultValue; }
+                return (IsMappingValues ? _distinctValues[_indices[index]] : _values[index]);
+            }
 
             set
             {
@@ -77,7 +81,7 @@ namespace BSOA.Column
             else if (DistinctCount <= 256)
             {
                 // New value, count still ok - add and return new index
-                index = (byte)(_distinctValueToIndex.Count + 1);
+                index = (byte)(_distinctValues.Count);
                 _values[index] = value;
                 _distinctValueToIndex[value] = index;
                 _distinctValues.Add(value);
@@ -158,7 +162,7 @@ namespace BSOA.Column
         private void RebuildDistinctDictionary()
         {
             _distinctValueToIndex.Clear();
-            
+
             _distinctValues.Clear();
             _distinctValues.Add(_defaultValue);
 
