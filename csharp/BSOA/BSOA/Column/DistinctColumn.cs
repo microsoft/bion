@@ -78,24 +78,24 @@ namespace BSOA.Column
                 // Existing value - return current index
                 return true;
             }
-            else if (DistinctCount <= 256)
+            else if (DistinctCount < 256)
             {
                 // New value, count still ok - add and return new index
                 index = (byte)(_distinctValues.Count);
-                _values[index] = value;
-                _distinctValueToIndex[value] = index;
+                
                 _distinctValues.Add(value);
+                _distinctValueToIndex[value] = index;
+                _values[index] = value;
 
                 return true;
             }
             else
             {
                 // Too many values - convert to per-value
-                List<T> distinctValues = _values.ToList();
                 _values.Clear();
                 for (int i = 0; i < _indices.Count; ++i)
                 {
-                    _values[i] = distinctValues[_indices[i]];
+                    _values[i] = _distinctValues[_indices[i]];
                 }
 
                 _indices = null;
@@ -111,12 +111,14 @@ namespace BSOA.Column
             // Indices empty but non-null
             _indices = new NumberColumn<byte>(0);
 
-            // One distinct value; the default
+            // Clear any values
+            _values.Clear();
+
+            // Reset Distinct value sets
             _distinctValueToIndex = new Dictionary<T, byte>();
             _distinctValues = new List<T>();
-
-            _values.Clear();
-            _values[0] = _defaultValue;
+            
+            // Re-add Default Value (in lookup List only; kept out of Dictionary and Values column to reduce empty DistinctColumn space use)
             _distinctValues.Add(_defaultValue);
 
             _requiresTrim = false;
