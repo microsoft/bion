@@ -55,11 +55,7 @@ namespace BSOA.Column
 
         public override T this[int index]
         {
-            get
-            {
-                if (index >= Count) { return _defaultValue; }
-                return (IsMappingValues ? _distinctValues[_indices[index]] : _values[index]);
-            }
+            get => (IsMappingValues ? _distinctValues[_indices[index]] : _values[index]);
 
             set
             {
