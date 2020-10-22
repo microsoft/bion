@@ -40,6 +40,11 @@ namespace BSOA.Benchmarks
     //  - GenericNumberListColumn<int> not-nullable  (67 / 263 / 122)
     //  
 
+    /// <summary>
+    ///  Run BSOA Benchmarks from the command line.
+    ///  Run without arguments for 'RoughBench' quick test; returns exit code zero for "PASS", -1 for "FAIL".
+    ///  Run with "--detailed" for Benchmark.NET high precision results.
+    /// </summary>
     class Program
     {
         static int Main(string[] args)
