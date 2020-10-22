@@ -253,38 +253,9 @@ namespace RoughBench
             return new TableCell(Format.Rate(sizeInBytes, elapsedSeconds), Align.Right);
         }
 
-        public static TableCell Ratio(double current, double baseline)
+        public static TableCell Ratio(double current, double baseline, TableColor color = TableColor.Default)
         {
-            bool unused = false;
-            return Ratio(current, baseline, 0.8d, ref unused);
-        }
-
-        public static TableCell Ratio(double current, double baseline, double failThreshold, ref bool failed)
-        {
-            return new TableCell(Format.Ratio(current, baseline), Align.Right, RatioColor(current, baseline, failThreshold, ref failed));
-        }
-
-        private static TableColor RatioColor(double numerator, double denominator, double failThreshold, ref bool failed)
-        {
-            if (numerator <= 0.0 || denominator <= 0.0)
-            {
-                return TableColor.Default;
-            }
-
-            double ratio = numerator / denominator;
-            if (ratio > (1 / failThreshold))
-            {
-                return TableColor.Green;
-            }
-            else if (ratio < failThreshold)
-            {
-                failed = true;
-                return TableColor.Red;
-            }
-            else
-            {
-                return TableColor.Default;
-            }
+            return new TableCell(Format.Ratio(current, baseline), Align.Right, color);
         }
     }
 

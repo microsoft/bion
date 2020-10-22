@@ -25,9 +25,11 @@ namespace RoughBench
         public const string CalibrationMethodName = "Calibration";
 
         private double _failThreshold = 0.8d;
+        private double _baselineAdjustment = 1.0d;
+
         private MeasureSettings _settings;
         private ConsoleTable _table;
-        private Dictionary<string, Dictionary<string, double>> _baselines;
+        private Dictionary<string, Dictionary<string, double>> _comparisons;
 
         public bool HasFailures { get; private set; }
         public string OutputPath { get; }
@@ -35,13 +37,13 @@ namespace RoughBench
         public Benchmarker(MeasureSettings settings = null)
         {
             _settings = settings ?? MeasureSettings.Default;
-            _baselines = LoadBaselines();
+            _comparisons = LoadComparisons();
 
             List<TableCell> columns = new List<TableCell>();
             columns.Add(new TableCell("Name"));
             columns.Add(new TableCell("Mean", Align.Right, TableColor.Green));
 
-            foreach (string baseline in _baselines.Keys)
+            foreach (string baseline in _comparisons.Keys)
             {
                 columns.Add(new TableCell(baseline, Align.Right));
                 columns.Add(new TableCell("/Mean", Align.Right));
@@ -121,20 +123,43 @@ namespace RoughBench
             row.Add(TableCell.Time(result.SecondsPerIteration));
 
             // Compare to each loaded benchmark
-            foreach (var baseline in _baselines)
+            foreach (var comparison in _comparisons)
             {
-                double baselineTime;
-                if (!baseline.Value.TryGetValue(methodName, out baselineTime)) { baselineTime = 0.0; }
+                bool isBaseline = comparison.Key == BaselineColumnName;
 
-                bool failed = false;
-                row.Add(TableCell.Time(baselineTime));
-                row.Add(TableCell.Ratio(baselineTime, result.SecondsPerIteration, _failThreshold, ref failed));
+                double comparisonTime;
+                if (!comparison.Value.TryGetValue(methodName, out comparisonTime)) { comparisonTime = 0.0; }
 
-                if (baseline.Key == BaselineColumnName) { HasFailures |= failed; }
+                row.Add(TableCell.Time(comparisonTime));
+                row.Add(BenchmarkRatio(comparisonTime, result.SecondsPerIteration, isBaseline));
+
+                if (isBaseline && row.Last().Color == TableColor.Red) { HasFailures = true; }
             }
 
             _table.AppendRow(row);
             return result;
+        }
+
+        private TableCell BenchmarkRatio(double comparisonTime, double currentTime, bool isBaseline)
+        {
+            TableColor color = TableColor.Default;
+
+            if (currentTime != 0.0)
+            {
+                double calibratedComparison = (isBaseline ? comparisonTime * _baselineAdjustment : comparisonTime);
+                double ratio = calibratedComparison / currentTime;
+
+                if (ratio > (1 / _failThreshold))
+                {
+                    color = TableColor.Green;
+                }
+                else if (ratio < _failThreshold)
+                {
+                    color = TableColor.Red;
+                }
+            }
+
+            return TableCell.Ratio(comparisonTime, currentTime, color);
         }
 
         internal void Calibrate()
@@ -144,11 +169,12 @@ namespace RoughBench
             // Ensure a "failure" in calibration isn't counted
             HasFailures = false;
 
-            // Calibrate fail threshold based on baseline (if Calibrate took twice as long, expect all other methods to as well)
-            Dictionary<string, double> baseline = _baselines.Values.FirstOrDefault();
-            if (baseline != null && baseline.TryGetValue(CalibrationMethodName, out double baselineSeconds))
+            // Save calibration ratio
+            Dictionary<string, double> baseline = _comparisons.Values.FirstOrDefault();
+            if (baseline != null && baseline.TryGetValue(CalibrationMethodName, out double baselineSeconds) && baselineSeconds >= 0.0)
             {
-                _failThreshold = _failThreshold * (calibrationResult.SecondsPerIteration / baselineSeconds);
+                // If current was 2x baseline, must multiply other baselines by 2x to get a scaled value to compare to.
+                _baselineAdjustment = (calibrationResult.SecondsPerIteration / baselineSeconds);
             }
         }
 
@@ -168,22 +194,22 @@ namespace RoughBench
             // (2.5 ns in Debug typical)
         }
 
-        internal static Dictionary<string, Dictionary<string, double>> LoadBaselines()
+        internal static Dictionary<string, Dictionary<string, double>> LoadComparisons()
         {
-            Dictionary<string, Dictionary<string, double>> baselines = new Dictionary<string, Dictionary<string, double>>();
-            Dictionary<string, double> baseline;
+            Dictionary<string, Dictionary<string, double>> reports = new Dictionary<string, Dictionary<string, double>>();
+            Dictionary<string, double> report;
 
-            if (TryLoadBaseline(BaselinePath, out baseline))
+            if (TryLoadReport(BaselinePath, out report))
             {
-                baselines[BaselineColumnName] = baseline;
+                reports[BaselineColumnName] = report;
             }
 
-            if (Directory.Exists(OutputFolderPath) && TryLoadBaseline(Directory.GetFiles(OutputFolderPath).LastOrDefault(), out baseline))
+            if (Directory.Exists(OutputFolderPath) && TryLoadReport(Directory.GetFiles(OutputFolderPath).LastOrDefault(), out report))
             {
-                baselines[LastColumnName] = baseline;
+                reports[LastColumnName] = report;
             }
 
-            return baselines;
+            return reports;
         }
 
         /// <summary>
@@ -194,32 +220,32 @@ namespace RoughBench
         /// <remarks>
         ///  Requires Function Name to be the first column and Mean to be the second column.
         /// </remarks>
-        /// <param name="baselineFilePath">File Path of Baseline ConsoleTable Markdown to load</param>
+        /// <param name="reportFilePath">File Path of Baseline ConsoleTable Markdown to load</param>
         /// <param name="result">Loaded baseline, if found and parsed successfully</param>
         /// <returns>True if baseline loaded, False otherwise</returns>
-        internal static bool TryLoadBaseline(string baselineFilePath, out Dictionary<string, double> result)
+        internal static bool TryLoadReport(string reportFilePath, out Dictionary<string, double> result)
         {
             result = null;
-            if (baselineFilePath == null || !File.Exists(baselineFilePath)) { return false; }
+            if (reportFilePath == null || !File.Exists(reportFilePath)) { return false; }
 
-            Dictionary<string, double> baseline = new Dictionary<string, double>();
+            Dictionary<string, double> report = new Dictionary<string, double>();
 
             try
             {
-                IEnumerable<string> baselineFileLines = File.ReadLines(baselineFilePath);
-                string headingLine = baselineFileLines.First();
+                IEnumerable<string> reportLines = File.ReadLines(reportFilePath);
+                string headingLine = reportLines.First();
 
                 List<string> columnNames = headingLine
                     .Split('|')
                     .Select((cell) => cell.Trim())
                     .ToList();
 
-                foreach (string contentLine in baselineFileLines.Skip(2))
+                foreach (string contentLine in reportLines.Skip(2))
                 {
                     string[] cells = contentLine.Split('|');
                     string functionName = cells[1].Trim();
                     double meanSeconds = Format.ParseTime(cells[2].Trim());
-                    baseline[functionName] = meanSeconds;
+                    report[functionName] = meanSeconds;
                 }
             }
             catch (FileNotFoundException)
@@ -230,11 +256,11 @@ namespace RoughBench
             catch (FormatException) when (!Debugger.IsAttached)
             {
                 // Return no baseline available
-                Console.WriteLine($"Unable to parse baseline \"{baselineFilePath}\". Excluding.");
+                Console.WriteLine($"Unable to parse baseline \"{reportFilePath}\". Excluding.");
                 return false;
             }
 
-            result = baseline;
+            result = report;
             return true;
         }
     }
