@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
-using System.Linq;
 
 using BSOA.Collections;
 using BSOA.IO;
@@ -24,10 +23,17 @@ namespace BSOA.Column
     public class DistinctColumn<T> : LimitedList<T>, IColumn<T>
     {
         private T _defaultValue;
-        private Dictionary<T, byte> _distinctValueToIndex;
+        
+        // Map index to value and value to index when there are few distinct values.
         private List<T> _distinctValues;
+        private Dictionary<T, byte> _distinctValueToIndex;
+
+        // Store values (if many) or non-default distinct values (if few)
         private IColumn<T> _values;
+
+        // Store index of the value for each row (when few distinct values)
         private NumberColumn<byte> _indices;
+
         private bool _requiresTrim;
 
         public DistinctColumn(IColumn<T> values, T defaultValue = default)
@@ -41,8 +47,10 @@ namespace BSOA.Column
         public DistinctColumn(IColumn values, object defaultValue) : this((IColumn<T>)values, (T)defaultValue)
         { }
 
+        // NOTE: _distinctValues is the safe source for all DistinctValues; _distinctValueToIndex and _values omit the default to save space
         public bool IsMappingValues => (_distinctValues != null);
         public int DistinctCount => (IsMappingValues ? _distinctValues.Count : -1);
+
         public override int Count => (IsMappingValues ? _indices.Count : _values.Count);
 
         public override T this[int index]
@@ -73,6 +81,12 @@ namespace BSOA.Column
             if (value == null) { return _defaultValue == null; }
             if (_defaultValue != null && value.Equals(_defaultValue)) { return true; }
 
+            // Initialize Distinct Value Dictionary just in time (first non-default value being set)
+            if (_distinctValueToIndex == null)
+            {
+                _distinctValueToIndex = new Dictionary<T, byte>();
+            }
+
             if (_distinctValueToIndex.TryGetValue(value, out index))
             {
                 // Existing value - return current index
@@ -82,7 +96,7 @@ namespace BSOA.Column
             {
                 // New value, count still ok - add and return new index
                 index = (byte)(_distinctValues.Count);
-                
+
                 _distinctValues.Add(value);
                 _distinctValueToIndex[value] = index;
                 _values[index] = value;
@@ -108,18 +122,18 @@ namespace BSOA.Column
 
         public override void Clear()
         {
-            // Indices empty but non-null
+            // Indices empty but not null (available to read into)
             _indices = new NumberColumn<byte>(0);
 
             // Clear any values
             _values.Clear();
 
-            // Reset Distinct value sets
-            _distinctValueToIndex = new Dictionary<T, byte>();
+            // Reset Distinct value list
             _distinctValues = new List<T>();
-            
-            // Re-add Default Value (in lookup List only; kept out of Dictionary and Values column to reduce empty DistinctColumn space use)
             _distinctValues.Add(_defaultValue);
+
+            // Empty Distinct value lookup (default not added here or in Values column)
+            _distinctValueToIndex = null;
 
             _requiresTrim = false;
         }
@@ -163,16 +177,21 @@ namespace BSOA.Column
 
         private void RebuildDistinctDictionary()
         {
-            _distinctValueToIndex.Clear();
+            _distinctValueToIndex = null;
 
             _distinctValues.Clear();
             _distinctValues.Add(_defaultValue);
 
-            for (int i = 1; i < _values.Count; ++i)
+            if (_values.Count > 0)
             {
-                T value = _values[i];
-                _distinctValueToIndex[value] = (byte)i;
-                _distinctValues.Add(value);
+                _distinctValueToIndex = new Dictionary<T, byte>();
+
+                for (int i = 1; i < _values.Count; ++i)
+                {
+                    T value = _values[i];
+                    _distinctValueToIndex[value] = (byte)i;
+                    _distinctValues.Add(value);
+                }
             }
         }
 
