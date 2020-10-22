@@ -31,11 +31,10 @@ namespace BSOA.Column
 
         public StringColumn()
         {
-            IsNull = new BooleanColumn(true);
-            Values = new ArraySliceColumn<byte>();
+            // Members initialized just-in-time to save unused StringColumn space
         }
 
-        public override int Count => IsNull.Count;
+        public override int Count => IsNull?.Count ?? 0;
 
         public override string this[int index]
         {
@@ -47,7 +46,7 @@ namespace BSOA.Column
                 if (item?.RowIndex == index) { return item.Value; }
 
                 if (_savedValues != null && _savedValues.TryGetValue(index, out string result)) { return result; }
-                if (IsNull[index]) { return null; }
+                if (IsNull == null || IsNull[index]) { return null; }
 
                 ArraySlice<byte> bytes = Values[index];
                 item = new CacheItem<string>(index, (bytes.Count == 0 ? string.Empty : Encoding.UTF8.GetString(bytes.Array, bytes.Index, bytes.Count)));
@@ -62,6 +61,7 @@ namespace BSOA.Column
                 _cache = default;
 
                 // Always set IsNull; IsNull tracks Count cheaply
+                Init();
                 IsNull[index] = (value == null);
 
                 int length = value?.Length ?? 0;
@@ -82,10 +82,21 @@ namespace BSOA.Column
             }
         }
 
+        private void Init()
+        {
+            if (IsNull == null)
+            {
+                IsNull = new BooleanColumn(true);
+                Values = new ArraySliceColumn<byte>();
+            }
+        }
+
         private void PushSavedValues()
         {
             if (_savedValues?.Count > 0)
             {
+                Init();
+
                 // Find combined UTF-8 length of pending values
                 int totalLength = 0;
                 foreach (KeyValuePair<int, string> pair in _savedValues)
@@ -113,7 +124,7 @@ namespace BSOA.Column
         public void ForEach(Action<ArraySlice<byte>> action)
         {
             PushSavedValues();
-            Values.ForEach(action);
+            Values?.ForEach(action);
         }
 
         public override void Clear()
@@ -121,43 +132,46 @@ namespace BSOA.Column
             _cache = default;
             _savedValues = null;
 
-            IsNull.Clear();
-            Values.Clear();
+            IsNull = null;
+            Values = null;
         }
 
         public override void RemoveFromEnd(int count)
         {
             PushSavedValues();
-            IsNull.RemoveFromEnd(count);
-            Values.RemoveFromEnd(count);
+            IsNull?.RemoveFromEnd(count);
+            Values?.RemoveFromEnd(count);
         }
 
         public void Trim()
         {
             PushSavedValues();
-            Values.Trim();
+            Values?.Trim();
         }
 
         private static Dictionary<string, Setter<StringColumn>> setters = new Dictionary<string, Setter<StringColumn>>()
         {
-            [Names.IsNull] = (r, me) => me.IsNull.Read(r),
-            [Names.Values] = (r, me) => me.Values.Read(r)
+            [Names.IsNull] = (r, me) => { me.Init(); me.IsNull.Read(r); },
+            [Names.Values] = (r, me) => { me.Init(); me.Values.Read(r); }
         };
 
         public void Read(ITreeReader reader)
         {
             reader.ReadObject(this, setters);
 
-            if (IsNull.Count == 0 && Values.Count > 0)
+            if (IsNull != null)
             {
-                // Only wrote values means all values are non-null
-                IsNull[Values.Count - 1] = false;
-                IsNull.SetAll(false);
-            }
-            else if (IsNull.Count > 0 && Values.Count == 0)
-            {
-                // Only wrote nulls means all values are null
-                Values[IsNull.Count - 1] = ArraySlice<byte>.Empty;
+                if (IsNull.Count == 0 && Values.Count > 0)
+                {
+                    // Only wrote values means all values are non-null
+                    IsNull[Values.Count - 1] = false;
+                    IsNull.SetAll(false);
+                }
+                else if (IsNull.Count > 0 && Values.Count == 0)
+                {
+                    // Only wrote nulls means all values are null
+                    Values[IsNull.Count - 1] = ArraySlice<byte>.Empty;
+                }
             }
         }
 
