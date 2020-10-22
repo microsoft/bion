@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using BSOA.Extensions;
-
 using System.Linq;
+
+using BSOA.Extensions;
 
 using Xunit;
 

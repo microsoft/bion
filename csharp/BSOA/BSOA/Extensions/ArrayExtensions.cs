@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using BSOA.Model;
-
 using System;
 using System.Collections.Generic;
+
+using BSOA.Model;
 
 namespace BSOA.Extensions
 {

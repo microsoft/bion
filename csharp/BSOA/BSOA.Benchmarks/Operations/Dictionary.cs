@@ -1,14 +1,14 @@
-﻿using BenchmarkDotNet.Attributes;
-
-using BSOA.Column;
-using BSOA.Model;
-
-// Uncomment line for model to test (they're signature identical)
-using BSOA.Benchmarks.Model;
-//using BSOA.Benchmarks.NonBsoaModel;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System.Collections.Generic;
 using System.Linq;
+
+using BenchmarkDotNet.Attributes;
+
+using BSOA.Benchmarks.Model;
+using BSOA.Column;
+using BSOA.Model;
 
 
 namespace BSOA.Benchmarks

@@ -1,6 +1,9 @@
-﻿using BSOA.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System.Collections.Generic;
+
+using BSOA.Json;
 
 namespace BSOA.Demo.Model.Classic
 {

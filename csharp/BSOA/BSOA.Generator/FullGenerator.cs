@@ -1,10 +1,13 @@
-﻿using BSOA.Generator.Schema;
-using BSOA.Json;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+
+using BSOA.Generator.Schema;
+using BSOA.Json;
 
 namespace BSOA.Generator
 {

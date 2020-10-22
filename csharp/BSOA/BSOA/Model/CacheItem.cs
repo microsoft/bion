@@ -1,4 +1,7 @@
-﻿namespace BSOA.Model
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace BSOA.Model
 {
     /// <summary>
     ///  CacheItem enables simple lockless caching of the last retrieved row in columns.

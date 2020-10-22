@@ -1,8 +1,11 @@
-﻿using BenchmarkDotNet.Running;
-
-using RoughBench;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
+
+using BenchmarkDotNet.Running;
+
+using RoughBench;
 
 namespace BSOA.Benchmarks
 {
