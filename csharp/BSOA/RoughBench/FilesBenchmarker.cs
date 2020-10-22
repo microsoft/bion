@@ -77,9 +77,13 @@ namespace RoughBench
             {
                 return Directory.EnumerateFiles(inputPath).ToList();
             }
-            else
+            else if (File.Exists(inputPath))
             {
                 return new string[] { inputPath };
+            }
+            else
+            {
+                return Array.Empty<string>();
             }
         }
     }
