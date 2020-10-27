@@ -15,8 +15,8 @@ namespace BSOA.Model
     /// </summary>
     public class Database : ITreeSerializable
     {
-        internal string RootTableName { get; }
-        internal Dictionary<string, ITable> Tables { get; }
+        public string RootTableName { get; }
+        public Dictionary<string, ITable> Tables { get; }
 
         public Database(string rootTableName)
         {
@@ -62,6 +62,16 @@ namespace BSOA.Model
             }
         }
 
+        /// <summary>
+        ///  Garbage Collect the tables in this database, removing any
+        ///  unreachable rows.
+        /// </summary>
+        public void Collect()
+        {
+            DatabaseCollector collector = new DatabaseCollector(this);
+            collector.Collect();
+        }
+
         public void Read(ITreeReader reader)
         {
             Clear();
@@ -72,6 +82,9 @@ namespace BSOA.Model
 
         public void Write(ITreeWriter writer)
         {
+            // Garbage Collect before writing
+            Collect();
+
             // Write non-empty tables only
             writer.WriteStartObject();
 

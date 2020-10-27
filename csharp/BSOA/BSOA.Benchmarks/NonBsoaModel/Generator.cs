@@ -51,7 +51,7 @@ namespace BSOA.Benchmarks.NonBsoaModel
                 // result.Guid = null;
                 result.IsActive = (i % 3 == 0);
                 result.BaselineState = (i % 10 == 4 ? BaselineState.New : BaselineState.Unchanged);
-                result.StartLine = r.Next(1000);
+                result.StartLine = r.Next(100000);
                 result.Message = Messages[r.Next(Messages.Length)];
 
                 // Add properties; more properties will show Dictionary performance more clearly. Real CloudMine data has 11 properties.
