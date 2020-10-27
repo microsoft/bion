@@ -12,6 +12,7 @@ namespace BSOA.Benchmarks.NonBsoaModel
     {
         public string Guid { get; set; }
         public string RuleId { get; set; }
+        public Rule Rule { get; set; }
         public bool IsActive { get; set; }
         public string Message { get; set; }
         public int StartLine { get; set; }

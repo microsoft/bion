@@ -43,8 +43,12 @@ namespace BSOA.Benchmarks.NonBsoaModel
             for (int i = 0; i < resultCount; ++i)
             {
                 Result result = new Result();
+                Rule rule = run.Rules[r.Next(ruleCount - 2)];
+
+                result.RuleId = rule.Id;
+                result.Rule = rule;
+
                 // result.Guid = null;
-                result.RuleId = $"SCAN{r.Next(ruleCount - 2):D4}";
                 result.IsActive = (i % 3 == 0);
                 result.BaselineState = (i % 10 == 4 ? BaselineState.New : BaselineState.Unchanged);
                 result.StartLine = r.Next(1000);
