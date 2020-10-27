@@ -9,7 +9,7 @@ using BSOA.Collections;
 using BSOA.IO;
 using BSOA.Model;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     /// <summary>
     ///  BSOA GENERATED Root Entity for 'Run'

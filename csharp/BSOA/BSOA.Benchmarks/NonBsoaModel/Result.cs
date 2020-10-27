@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 
+using BaselineState = BSOA.Test.Model.Log.BaselineState;
+
 namespace BSOA.Benchmarks.NonBsoaModel
 {
     public class Result

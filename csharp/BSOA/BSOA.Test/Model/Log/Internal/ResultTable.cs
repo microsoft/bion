@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using BSOA.Column;
 using BSOA.Model;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     /// <summary>
     ///  BSOA GENERATED Table for 'Result'
@@ -17,6 +17,7 @@ namespace BSOA.Benchmarks.Model
         internal RunDatabase Database;
 
         internal IColumn<string> RuleId;
+        internal RefColumn Rule;
         internal IColumn<string> Guid;
         internal IColumn<bool> IsActive;
         internal IColumn<string> Message;
@@ -31,6 +32,7 @@ namespace BSOA.Benchmarks.Model
             Database = database;
 
             RuleId = AddColumn(nameof(RuleId), database.BuildColumn<string>(nameof(Result), nameof(RuleId), default));
+            Rule = AddColumn(nameof(Rule), new RefColumn(nameof(RunDatabase.Rule)));
             Guid = AddColumn(nameof(Guid), database.BuildColumn<string>(nameof(Result), nameof(Guid), default));
             IsActive = AddColumn(nameof(IsActive), database.BuildColumn<bool>(nameof(Result), nameof(IsActive), default));
             Message = AddColumn(nameof(Message), database.BuildColumn<string>(nameof(Result), nameof(Message), default));

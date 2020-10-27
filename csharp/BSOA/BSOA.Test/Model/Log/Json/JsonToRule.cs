@@ -9,7 +9,7 @@ using BSOA.Json.Converters;
 
 using Newtonsoft.Json;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     [JsonConverter(typeof(JsonToRule))]
     public partial class Rule
@@ -21,7 +21,8 @@ namespace BSOA.Benchmarks.Model
         {
             ["id"] = (reader, root, me) => me.Id = JsonToString.Read(reader, root),
             ["guid"] = (reader, root, me) => me.Guid = JsonToString.Read(reader, root),
-            ["helpUri"] = (reader, root, me) => me.HelpUri = JsonToUri.Read(reader, root)
+            ["helpUri"] = (reader, root, me) => me.HelpUri = JsonToUri.Read(reader, root),
+            ["relatedRules"] = (reader, root, me) => me.RelatedRules = JsonToIList<Rule>.Read(reader, root, null, JsonToRule.Read)
         };
 
         public static Rule Read(JsonReader reader, Run root = null)
@@ -54,6 +55,7 @@ namespace BSOA.Benchmarks.Model
                 JsonToString.Write(writer, "id", item.Id, default);
                 JsonToString.Write(writer, "guid", item.Guid, default);
                 JsonToUri.Write(writer, "helpUri", item.HelpUri, default);
+                JsonToIList<Rule>.Write(writer, "relatedRules", item.RelatedRules, JsonToRule.Write);
                 writer.WriteEndObject();
             }
         }

@@ -8,7 +8,7 @@ using System.Linq;
 using BSOA.Collections;
 using BSOA.Model;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     /// <summary>
     ///  BSOA GENERATED Entity for 'Rule'
@@ -65,6 +65,21 @@ namespace BSOA.Benchmarks.Model
             set => _table.HelpUri[_index] = value;
         }
 
+        private TypedList<Rule> _relatedRules;
+        public IList<Rule> RelatedRules
+        {
+            get
+            {
+                if (_relatedRules == null) { _relatedRules = TypedList<Rule>.Get(_table.Database.Rule, _table.RelatedRules, _index); }
+                return _relatedRules;
+            }
+            set
+            {
+                TypedList<Rule>.Set(_table.Database.Rule, _table.RelatedRules, _index, value);
+                _relatedRules = null;
+            }
+        }
+
         #region IEquatable<Rule>
         public bool Equals(Rule other)
         {
@@ -73,6 +88,7 @@ namespace BSOA.Benchmarks.Model
             if (!object.Equals(this.Id, other.Id)) { return false; }
             if (!object.Equals(this.Guid, other.Guid)) { return false; }
             if (!object.Equals(this.HelpUri, other.HelpUri)) { return false; }
+            if (!object.Equals(this.RelatedRules, other.RelatedRules)) { return false; }
 
             return true;
         }
@@ -98,6 +114,11 @@ namespace BSOA.Benchmarks.Model
                 if (HelpUri != default(Uri))
                 {
                     result = (result * 31) + HelpUri.GetHashCode();
+                }
+
+                if (RelatedRules != default(IList<Rule>))
+                {
+                    result = (result * 31) + RelatedRules.GetHashCode();
                 }
             }
 
@@ -139,6 +160,7 @@ namespace BSOA.Benchmarks.Model
             Id = other.Id;
             Guid = other.Guid;
             HelpUri = other.HelpUri;
+            RelatedRules = other.RelatedRules?.Select((item) => Rule.Copy(_table.Database, item)).ToList();
         }
 
         internal static Rule Copy(RunDatabase database, Rule other)

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace BSOA.Benchmarks
+namespace BSOA.Test.Model.Log
 {
     public enum BaselineState
     {

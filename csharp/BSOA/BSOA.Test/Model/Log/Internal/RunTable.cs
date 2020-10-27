@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using BSOA.Column;
 using BSOA.Model;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     /// <summary>
     ///  BSOA GENERATED Table for 'Run'

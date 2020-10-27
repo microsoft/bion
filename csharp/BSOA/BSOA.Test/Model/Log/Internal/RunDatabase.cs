@@ -5,7 +5,7 @@ using System;
 
 using BSOA.Model;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     /// <summary>
     ///  BSOA GENERATED Database for 'Run'

@@ -8,7 +8,7 @@ using System.Linq;
 using BSOA.Collections;
 using BSOA.Model;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     /// <summary>
     ///  BSOA GENERATED Entity for 'Result'
@@ -51,6 +51,12 @@ namespace BSOA.Benchmarks.Model
         {
             get => _table.RuleId[_index];
             set => _table.RuleId[_index] = value;
+        }
+
+        public Rule Rule
+        {
+            get => _table.Database.Rule.Get(_table.Rule[_index]);
+            set => _table.Rule[_index] = _table.Database.Rule.LocalIndex(value);
         }
 
         public string Guid
@@ -107,6 +113,7 @@ namespace BSOA.Benchmarks.Model
             if (other == null) { return false; }
 
             if (!object.Equals(this.RuleId, other.RuleId)) { return false; }
+            if (!object.Equals(this.Rule, other.Rule)) { return false; }
             if (!object.Equals(this.Guid, other.Guid)) { return false; }
             if (!object.Equals(this.IsActive, other.IsActive)) { return false; }
             if (!object.Equals(this.Message, other.Message)) { return false; }
@@ -130,6 +137,11 @@ namespace BSOA.Benchmarks.Model
                 if (RuleId != default(string))
                 {
                     result = (result * 31) + RuleId.GetHashCode();
+                }
+
+                if (Rule != default(Rule))
+                {
+                    result = (result * 31) + Rule.GetHashCode();
                 }
 
                 if (Guid != default(string))
@@ -209,6 +221,7 @@ namespace BSOA.Benchmarks.Model
         public void CopyFrom(Result other)
         {
             RuleId = other.RuleId;
+            Rule = Rule.Copy(_table.Database, other.Rule);
             Guid = other.Guid;
             IsActive = other.IsActive;
             Message = other.Message;
