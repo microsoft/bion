@@ -15,7 +15,7 @@ namespace BSOA.Test.Model.V2
         internal PersonTable Person { get; }
         internal CommunityTable Community { get; }
 
-        public PersonDatabase()
+        public PersonDatabase() : base("Community")
         {
             _lastCreated = new WeakReference<PersonDatabase>(this);
 

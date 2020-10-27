@@ -22,7 +22,8 @@ namespace BSOA.Model
     public abstract class Table<T> : LimitedList<T>, ITable<T> where T : IRow<T>
     {
         private int _count;
-        protected Dictionary<string, IColumn> Columns { get; private set; }
+        internal Dictionary<string, IColumn> Columns { get; private set; }
+        Dictionary<string, IColumn> ITable.Columns => Columns;
 
         protected Table()
         {
@@ -73,8 +74,6 @@ namespace BSOA.Model
                 return result.Index;
             }
         }
-
-
 
         /// <summary>
         ///  Add a new item to the end of this table.

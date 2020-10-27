@@ -16,7 +16,7 @@ namespace BSOA.Benchmarks.Model
         internal RuleTable Rule { get; }
         internal RunTable Run { get; }
 
-        public RunDatabase()
+        public RunDatabase() : base("Run")
         {
             _lastCreated = new WeakReference<RunDatabase>(this);
 

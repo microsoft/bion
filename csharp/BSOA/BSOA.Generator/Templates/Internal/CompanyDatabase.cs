@@ -20,7 +20,7 @@ namespace BSOA.Generator.Templates
         //   </TableMember>
         // </TableMemberList>
 
-        public CompanyDatabase()
+        public CompanyDatabase() : base("Company")
         {
             _lastCreated = new WeakReference<CompanyDatabase>(this);
 

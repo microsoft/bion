@@ -16,7 +16,7 @@ namespace BSOA.Demo.Model.BSOA
         internal FolderTable Folder { get; }
         internal FileSystemTable FileSystem { get; }
 
-        public FileSystemDatabase()
+        public FileSystemDatabase() : base("FileSystem")
         {
             _lastCreated = new WeakReference<FileSystemDatabase>(this);
 

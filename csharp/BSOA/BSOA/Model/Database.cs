@@ -15,10 +15,12 @@ namespace BSOA.Model
     /// </summary>
     public class Database : ITreeSerializable
     {
-        protected Dictionary<string, ITable> Tables { get; private set; }
+        internal string RootTableName { get; }
+        internal Dictionary<string, ITable> Tables { get; }
 
-        public Database()
+        public Database(string rootTableName)
         {
+            RootTableName = rootTableName;
             Tables = new Dictionary<string, ITable>();
         }
 
