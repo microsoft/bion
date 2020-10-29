@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -15,8 +16,8 @@ namespace BSOA.Test.Model.Log
     /// </summary>
     public partial class Result : IRow<Result>, IEquatable<Result>
     {
-        private readonly ResultTable _table;
-        private readonly int _index;
+        private ResultTable _table;
+        private int _index;
 
         public Result() : this(RunDatabase.Current.Result)
         { }
@@ -217,6 +218,12 @@ namespace BSOA.Test.Model.Log
         #region IRow
         ITable IRow<Result>.Table => _table;
         int IRow<Result>.Index => _index;
+
+        void IRow<Result>.Remap(ITable table, int index)
+        {
+            _table = (ResultTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Result other)
         {

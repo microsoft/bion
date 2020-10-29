@@ -16,8 +16,8 @@ namespace BSOA.Test.Model.Log
     /// </summary>
     public partial class Run : IRow<Run>, IEquatable<Run>
     {
-        private readonly RunTable _table;
-        private readonly int _index;
+        private RunTable _table;
+        private int _index;
 
         internal RunDatabase Database => _table.Database;
         public IDatabase DB => _table.Database;
@@ -135,6 +135,12 @@ namespace BSOA.Test.Model.Log
         #region IRow
         ITable IRow<Run>.Table => _table;
         int IRow<Run>.Index => _index;
+
+        void IRow<Run>.Remap(ITable table, int index)
+        {
+            _table = (RunTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Run other)
         {

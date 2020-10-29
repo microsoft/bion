@@ -16,8 +16,8 @@ namespace BSOA.Generator.Templates
     /// </summary>
     public partial class Company : IRow<Company>, IEquatable<Company>
     {
-        private readonly CompanyTable _table;
-        private readonly int _index;
+        private CompanyTable _table;
+        private int _index;
 
         internal CompanyDatabase Database => _table.Database;
         public IDatabase DB => _table.Database;
@@ -169,6 +169,12 @@ namespace BSOA.Generator.Templates
         #region IRow
         ITable IRow<Company>.Table => _table;
         int IRow<Company>.Index => _index;
+
+        void IRow<Company>.Remap(ITable table, int index)
+        {
+            _table = (CompanyTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Company other)
         {

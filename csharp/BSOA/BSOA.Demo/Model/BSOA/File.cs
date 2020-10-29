@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -15,8 +16,8 @@ namespace BSOA.Demo.Model.BSOA
     /// </summary>
     public partial class File : IRow<File>, IEquatable<File>
     {
-        private readonly FileTable _table;
-        private readonly int _index;
+        private FileTable _table;
+        private int _index;
 
         public File() : this(FileSystemDatabase.Current.File)
         { }
@@ -169,6 +170,12 @@ namespace BSOA.Demo.Model.BSOA
         #region IRow
         ITable IRow<File>.Table => _table;
         int IRow<File>.Index => _index;
+
+        void IRow<File>.Remap(ITable table, int index)
+        {
+            _table = (FileTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(File other)
         {

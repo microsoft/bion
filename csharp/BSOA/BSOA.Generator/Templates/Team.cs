@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -15,8 +16,8 @@ namespace BSOA.Generator.Templates
     /// </summary>
     public partial class Team : IRow<Team>, IEquatable<Team>
     {
-        private readonly TeamTable _table;
-        private readonly int _index;
+        private TeamTable _table;
+        private int _index;
 
         public Team() : this(CompanyDatabase.Current.Team)
         { }
@@ -173,6 +174,12 @@ namespace BSOA.Generator.Templates
         #region IRow
         ITable IRow<Team>.Table => _table;
         int IRow<Team>.Index => _index;
+
+        void IRow<Team>.Remap(ITable table, int index)
+        {
+            _table = (TeamTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Team other)
         {

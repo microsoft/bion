@@ -16,8 +16,8 @@ namespace BSOA.Demo.Model.BSOA
     /// </summary>
     public partial class FileSystem : IRow<FileSystem>, IEquatable<FileSystem>
     {
-        private readonly FileSystemTable _table;
-        private readonly int _index;
+        private FileSystemTable _table;
+        private int _index;
 
         internal FileSystemDatabase Database => _table.Database;
         public IDatabase DB => _table.Database;
@@ -135,6 +135,12 @@ namespace BSOA.Demo.Model.BSOA
         #region IRow
         ITable IRow<FileSystem>.Table => _table;
         int IRow<FileSystem>.Index => _index;
+
+        void IRow<FileSystem>.Remap(ITable table, int index)
+        {
+            _table = (FileSystemTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(FileSystem other)
         {

@@ -13,6 +13,10 @@ namespace BSOA.Model
         ITable Table { get; }
         int Index { get; }
 
+        // Copy all values from another instance of yourself (to make a cross-DB copy when needed)
         void CopyFrom(T other);
+
+        // Remap this instance to another Table and Index (updating object after GC moves it, when required)
+        void Remap(ITable table, int index);
     }
 }

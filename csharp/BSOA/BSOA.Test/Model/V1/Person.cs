@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -15,8 +16,8 @@ namespace BSOA.Test.Model.V1
     /// </summary>
     public partial class Person : IRow<Person>, IEquatable<Person>
     {
-        private readonly PersonTable _table;
-        private readonly int _index;
+        private PersonTable _table;
+        private int _index;
 
         public Person() : this(PersonDatabase.Current.Person)
         { }
@@ -121,6 +122,12 @@ namespace BSOA.Test.Model.V1
         #region IRow
         ITable IRow<Person>.Table => _table;
         int IRow<Person>.Index => _index;
+
+        void IRow<Person>.Remap(ITable table, int index)
+        {
+            _table = (PersonTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Person other)
         {

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -15,8 +16,8 @@ namespace BSOA.Demo.Model.BSOA
     /// </summary>
     public partial class Folder : IRow<Folder>, IEquatable<Folder>
     {
-        private readonly FolderTable _table;
-        private readonly int _index;
+        private FolderTable _table;
+        private int _index;
 
         public Folder() : this(FileSystemDatabase.Current.Folder)
         { }
@@ -121,6 +122,12 @@ namespace BSOA.Demo.Model.BSOA
         #region IRow
         ITable IRow<Folder>.Table => _table;
         int IRow<Folder>.Index => _index;
+
+        void IRow<Folder>.Remap(ITable table, int index)
+        {
+            _table = (FolderTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Folder other)
         {

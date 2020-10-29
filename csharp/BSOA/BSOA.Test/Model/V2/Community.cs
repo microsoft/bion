@@ -16,8 +16,8 @@ namespace BSOA.Test.Model.V2
     /// </summary>
     public partial class Community : IRow<Community>, IEquatable<Community>
     {
-        private readonly CommunityTable _table;
-        private readonly int _index;
+        private CommunityTable _table;
+        private int _index;
 
         internal PersonDatabase Database => _table.Database;
         public IDatabase DB => _table.Database;
@@ -114,6 +114,12 @@ namespace BSOA.Test.Model.V2
         #region IRow
         ITable IRow<Community>.Table => _table;
         int IRow<Community>.Index => _index;
+
+        void IRow<Community>.Remap(ITable table, int index)
+        {
+            _table = (CommunityTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Community other)
         {
