@@ -6,6 +6,17 @@ using System.Collections.Generic;
 
 namespace BSOA
 {
+    /// <summary>
+    ///  DatabaseCollector is responsible for garbage collection in BSOA database tables.
+    ///  When BSOA object model objects are created, the data for them is really stored in a new row in an internal table.
+    ///  The .NET garbage collector cleans up the object, but BSOA must clean up unused rows.
+    ///  
+    ///  This collector must:
+    ///  - Remove all rows not reachable from the root, so they aren't serialized out.
+    ///  - Update all Ref and RefList columns so that they still point to the same logical row.
+    ///  - Update all OM instances in memory so that they still point to the same logical row.
+    ///  - Copy data for OM instances which aren't reachable to a temporary database, so the OM object looks the same.
+    /// </summary>
     internal class DatabaseCollector
     {
         private Dictionary<string, TableCollector> _tableCollectors;

@@ -5,7 +5,6 @@ using BSOA.Test.Model.Log;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Security;
 
 using Xunit;
 
@@ -16,39 +15,141 @@ namespace BSOA.Test
         private const int RuleCount = 10;
         private const int ResultCount = 100;
 
-        [Fact]
-        public void GarbageCollector_NoDeletion()
+        // Return Rule IDs in the Run.Rules collection (in found order)
+        // Used to verify Collect() hasn't altered the Run.Rules collection, even if underlying rows were swapped around.
+        private string RunRules(Run run)
         {
-            Run run = Generator.Build(RuleCount, ResultCount);
-            List<int> startLines = run.Results.Select((r) => r.StartLine).ToList();
+            return string.Join(", ", run.Rules.Select((r) => r.Id));
+        }
 
-            // Verify all created objects are found in Tables
+        // Return Rule IDs present in the underlying BSOA Rules Table (all reachable rules, in *sorted* order)
+        // Used to verify Collect() has removed and kept all reachable rows.
+        private string TableRules(Run run)
+        {
             RunDatabase db = (RunDatabase)run.DB;
-            Assert.Equal(RuleCount, db.Tables["Rule"].Count);
-            Assert.Equal(ResultCount, db.Tables["Result"].Count);
+            IEnumerable<Rule> tableRules = db.Rule;
+            return string.Join(", ", tableRules.Select((r) => r.Id).OrderBy((id) => id));
+        }
 
-            // Round-trip and verify collect doesn't remove anything
+        private void CollectAndVerify(Run run, string expectedRunRules, string expectedTableRules)
+        {
+            // Run rules should be correct before and after collection
+            Assert.Equal(expectedRunRules, RunRules(run));
+
+            // Force BSOA Collection and verify collections
+            run.Database.Collect();
+            Assert.Equal(expectedRunRules, RunRules(run));
+            Assert.Equal(expectedTableRules, TableRules(run));
+
+            // Roundtrip and verify collections
             RoundTrip(run);
-            Assert.Equal(RuleCount, db.Tables["Rule"].Count);
-            Assert.Equal(ResultCount, db.Tables["Result"].Count);
+            Assert.Equal(expectedRunRules, RunRules(run));
+            Assert.Equal(expectedTableRules, TableRules(run));
+        }
 
-            // Remove rules (leaving some at the beginning and end)
-            int remainingResultCount = 90;
-            run.Results = run.Results.Skip(5).Take(remainingResultCount).ToList();
-            startLines = startLines.Skip(5).Take(remainingResultCount).ToList();
+        [Fact]
+        public void GarbageCollector_Basics()
+        {
+            Run run = new Run() { Rules = new List<Rule>(), Results = new List<Result>() };
+            IList<Rule> rules = run.Rules;
 
-            // Collection is updated, but Table still has previously created items
-            Assert.Equal(remainingResultCount, run.Results.Count);
-            Assert.Equal(ResultCount, db.Tables["Result"].Count);
+            Result result = new Result(run);
+            run.Results.Add(result);
 
-            // Round-trip and verify unreferenced items collected
-            RoundTrip(run);
-            db = TreeSerializer.RoundTrip<RunDatabase>(db, TreeFormat.Binary);
-            Assert.Equal(RuleCount, db.Tables["Rule"].Count);
-            Assert.Equal(remainingResultCount, db.Tables["Result"].Count);
+            for (int i = 0; i < 5; ++i)
+            {
+                rules.Add(new Rule(run) { Id = i.ToString() });
+            }
 
-            // Verify that remapping worked properly (Results in list still point to the right underlying values)
-            Assert.Equal(startLines, run.Results.Select((r) => r.StartLine));
+            // Verify all rules present in Run and Table
+            Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
+            Assert.Equal("0, 1, 2, 3, 4", TableRules(run));
+
+            // Verify nothing removed by Garbage Collection (all Rules directly reachable from root)            
+            run.Database.Collect();
+            Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
+            Assert.Equal("0, 1, 2, 3, 4", TableRules(run));
+            
+            // Add a new Rule without adding to a collection
+            new Rule(run) { Id = "5" };
+
+            // Verify new Rule in Table only
+            Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
+            Assert.Equal("0, 1, 2, 3, 4, 5", TableRules(run));
+
+            // Verify unreachable instance removed by Garbage Collection
+            run.Database.Collect();
+            Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
+            Assert.Equal("0, 1, 2, 3, 4", TableRules(run));
+
+            // Add a new Rule; confirm ID from old Rule wasn't "left behind" on collected instance
+            Rule six = new Rule();
+            Assert.Null(six.Id);
+
+            // Make Rule reachable only from another Rule
+            six.Id = "6";
+            rules[0].RelatedRules = new List<Rule>() { six };
+
+            // Verify indirectly reachable instance kept
+            run.Database.Collect();
+            Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
+            Assert.Equal("0, 1, 2, 3, 4, 6", TableRules(run));
+
+            // Add another link to the new Rule
+            rules[1].RelatedRules = new List<Rule>() { six };
+
+            // Remove the original rule (so the new one is reachable via '1' but not '0' anymore)
+            rules.RemoveAt(0);
+
+            // Verify removed Rule collected and new rule still kept (reachable via '1')
+            run.Database.Collect();
+            Assert.Equal("1, 2, 3, 4", RunRules(run));
+            Assert.Equal("1, 2, 3, 4, 6", TableRules(run));
+
+            // TODO: GC should update object instance automatically
+            six = run.Database.Rule.Where((r) => r.Id == "6").First();
+
+            // Verify object model instance is pointing to correct data (Collect will have swapped it, so OM object index must be changed)
+            Assert.Equal("6", six.Id);
+
+            // Make a Rule reachable from a different table only
+            result.Rule = six;
+            rules.RemoveAt(0);
+
+            // Verify removed Rule collected and new rule still kept (reachable via Result)
+            run.Database.Collect();
+            Assert.Equal("2, 3, 4", RunRules(run));
+            Assert.Equal("2, 3, 4, 6", TableRules(run));
+
+            // TODO: GC should fix object instance index
+            six = run.Database.Rule.Where((r) => r.Id == "6").First();
+
+            // Verify Result and OM instance are still pointing to the right data (index of '6' will have been updated again)
+            Assert.Equal("6", result.Rule.Id);
+            Assert.Equal("6", six.Id);
+
+            // Make Rule unreachable from Result; verify now unreachable Rule removed
+            result.Rule = null;
+            run.Database.Collect();
+            Assert.Equal("2, 3, 4", RunRules(run));
+            Assert.Equal("2, 3, 4", TableRules(run));
+
+            // Verify OM object moved to temporary database with data intact
+            // TODO: GC not copying unreachable but still used object references yet
+            //Assert.Equal("6", six.Id);
+
+            // Make a Rule self-referential; verify Collect doesn't hang
+            run.Rules[0].RelatedRules = new List<Rule>() { run.Rules[0] };
+            run.Database.Collect();
+            Assert.Equal("2, 3, 4", RunRules(run));
+            Assert.Equal("2, 3, 4", TableRules(run));
+
+            // Remove self-referencing row; verify removed
+            run.Rules.RemoveAt(0);
+            run.Database.Collect();
+            Assert.Equal("3, 4", RunRules(run));
+            Assert.Equal("3, 4", TableRules(run));
+
         }
 
         private void RoundTrip(Run run)
@@ -70,20 +171,5 @@ namespace BSOA.Test
                 }
             }
         }
-
-        // TODO:
-        //  - Verify RemoveFromEnd happening (ensure new instances don't initialize with values from old ones)
-        //  - Need Ref AND RefList from one table to another. (Result.Rule?)
-        //    - Instances reachable only indirectly are kept. (Rule on Result, not in root collection)
-        //    - Instances cut off from root are removed.
-        //    - Instances with one path to root cut but another left are still kept.
-        //  - Cycle in references, self-references (verify no hang)
-        //  - Remap optimization? (Avoid swap and remap when
-        //  - Performance (GC with nothing to do, and GC with work)
-        //  - Hold OM instances; verify removed from Table and put into a new DB
-
-        // Do I want a separate object model for GC tests, or no?
-        // When should Trim be happening?
-        // What is performance impact here?
     }
 }
