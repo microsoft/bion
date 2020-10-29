@@ -10,6 +10,7 @@ namespace BSOA.Model
 
     public interface ITable : IColumn
     {
+        // ITable exposes Columns to hook up Garbage Collection (GC builds a map of IRefColumns to find reachable items and update indices)
         Dictionary<string, IColumn> Columns { get; }
     }
 }

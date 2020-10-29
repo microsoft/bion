@@ -20,7 +20,7 @@ namespace BSOA.Test.Model.V1
         private readonly int _index;
 
         internal PersonDatabase Database => _table.Database;
-        public ITreeSerializable DB => _table.Database;
+        public IDatabase DB => _table.Database;
 
         public Community() : this(new PersonDatabase().Community)
         { }

@@ -20,7 +20,7 @@ namespace BSOA.Test.Model.Log
         private readonly int _index;
 
         internal RunDatabase Database => _table.Database;
-        public ITreeSerializable DB => _table.Database;
+        public IDatabase DB => _table.Database;
 
         public Run() : this(new RunDatabase().Run)
         { }

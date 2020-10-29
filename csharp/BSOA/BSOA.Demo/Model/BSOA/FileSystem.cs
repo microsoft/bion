@@ -20,7 +20,7 @@ namespace BSOA.Demo.Model.BSOA
         private readonly int _index;
 
         internal FileSystemDatabase Database => _table.Database;
-        public ITreeSerializable DB => _table.Database;
+        public IDatabase DB => _table.Database;
 
         public FileSystem() : this(new FileSystemDatabase().FileSystem)
         { }

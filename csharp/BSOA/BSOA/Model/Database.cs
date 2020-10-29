@@ -13,7 +13,7 @@ namespace BSOA.Model
     ///  BSOA Database is the container class for an overall set of tables.
     ///  Projects using BSOA will have the 'root' type inherit from Database.
     /// </summary>
-    public class Database : ITreeSerializable
+    public class Database : IDatabase
     {
         public string RootTableName { get; }
         public Dictionary<string, ITable> Tables { get; }
@@ -66,10 +66,10 @@ namespace BSOA.Model
         ///  Garbage Collect the tables in this database, removing any
         ///  unreachable rows.
         /// </summary>
-        public void Collect()
+        public bool Collect()
         {
             DatabaseCollector collector = new DatabaseCollector(this);
-            collector.Collect();
+            return collector.Collect();
         }
 
         public void Read(ITreeReader reader)

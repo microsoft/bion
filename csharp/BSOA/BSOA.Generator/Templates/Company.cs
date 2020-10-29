@@ -20,7 +20,7 @@ namespace BSOA.Generator.Templates
         private readonly int _index;
 
         internal CompanyDatabase Database => _table.Database;
-        public ITreeSerializable DB => _table.Database;
+        public IDatabase DB => _table.Database;
 
         public Company() : this(new CompanyDatabase().Company)
         { }
