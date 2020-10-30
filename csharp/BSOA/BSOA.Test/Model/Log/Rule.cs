@@ -153,10 +153,10 @@ namespace BSOA.Test.Model.Log
         #endregion
 
         #region IRow
-        ITable IRow<Rule>.Table => _table;
-        int IRow<Rule>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        void IRow<Rule>.Remap(ITable table, int index)
+        void IRow.Remap(ITable table, int index)
         {
             _table = (RuleTable)table;
             _index = index;

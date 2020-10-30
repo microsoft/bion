@@ -167,10 +167,10 @@ namespace BSOA.Generator.Templates
         #endregion
 
         #region IRow
-        ITable IRow<Company>.Table => _table;
-        int IRow<Company>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        void IRow<Company>.Remap(ITable table, int index)
+        void IRow.Remap(ITable table, int index)
         {
             _table = (CompanyTable)table;
             _index = index;

@@ -216,10 +216,10 @@ namespace BSOA.Test.Model.Log
         #endregion
 
         #region IRow
-        ITable IRow<Result>.Table => _table;
-        int IRow<Result>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        void IRow<Result>.Remap(ITable table, int index)
+        void IRow.Remap(ITable table, int index)
         {
             _table = (ResultTable)table;
             _index = index;

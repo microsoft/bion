@@ -133,10 +133,10 @@ namespace BSOA.Demo.Model.BSOA
         #endregion
 
         #region IRow
-        ITable IRow<FileSystem>.Table => _table;
-        int IRow<FileSystem>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        void IRow<FileSystem>.Remap(ITable table, int index)
+        void IRow.Remap(ITable table, int index)
         {
             _table = (FileSystemTable)table;
             _index = index;

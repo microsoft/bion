@@ -133,10 +133,10 @@ namespace BSOA.Test.Model.Log
         #endregion
 
         #region IRow
-        ITable IRow<Run>.Table => _table;
-        int IRow<Run>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        void IRow<Run>.Remap(ITable table, int index)
+        void IRow.Remap(ITable table, int index)
         {
             _table = (RunTable)table;
             _index = index;

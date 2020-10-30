@@ -120,10 +120,10 @@ namespace BSOA.Demo.Model.BSOA
         #endregion
 
         #region IRow
-        ITable IRow<Folder>.Table => _table;
-        int IRow<Folder>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        void IRow<Folder>.Remap(ITable table, int index)
+        void IRow.Remap(ITable table, int index)
         {
             _table = (FolderTable)table;
             _index = index;

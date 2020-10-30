@@ -3,6 +3,8 @@ using BSOA.Model;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace BSOA
 {
@@ -52,6 +54,11 @@ namespace BSOA
 
         public bool Collect()
         {
+            foreach (TableCollector collector in _tableCollectors.Values)
+            {
+                collector.PrepareToCollect();
+            }
+
             // Walk reachable rows (add root, which will recursively add everything reachable)
             _tableCollectors[_rootTableName].AddRow(0);
 
@@ -75,27 +82,30 @@ namespace BSOA
         void AddRow(int index);
     }
 
-    internal class TableCollector : ICollector
+    public class TableCollector : ICollector
     {
+        // Table this Collector is assigned to (so it can Swap and Remove to clean unused rows)
         private ITable _table;
 
+        // List of columns from this table to other tables (to walk reachable graph)
         private List<ICollector> _refsFromTable;
+
+        // List of columns from other tables to this table (to remap indices of Swapped rows)
         private List<IRefColumn> _refsToTable;
 
+        // During collection, tracking rows in the table reachable from the root object
         private bool[] _isRowReachable;
 
         public TableCollector(ITable table)
         {
             _table = table;
-
-            _refsFromTable = new List<ICollector>();
-            _refsToTable = new List<IRefColumn>();
-
-            _isRowReachable = new bool[_table.Count];
         }
 
         public void AddRefColumn(IRefColumn column, TableCollector target)
         {
+            if (_refsFromTable == null) { _refsFromTable = new List<ICollector>(); }
+            if (target._refsToTable == null) { target._refsToTable = new List<IRefColumn>(); }
+
             // Add column to 'RefsTo' in the target (for remapping indices)
             target._refsToTable.Add(column);
 
@@ -104,7 +114,7 @@ namespace BSOA
             {
                 _refsFromTable.Add(new RefColumnCollector((RefColumn)column, target));
             }
-            else if(column is RefListColumn)
+            else if (column is RefListColumn)
             {
                 _refsFromTable.Add(new RefListColumnCollector((RefListColumn)column, target));
             }
@@ -114,15 +124,23 @@ namespace BSOA
             }
         }
 
+        public void PrepareToCollect()
+        {
+            _isRowReachable = new bool[_table.Count];
+        }
+
         public void AddRow(int index)
         {
             if (_isRowReachable[index] == false)
             {
                 _isRowReachable[index] = true;
 
-                foreach (ICollector collector in _refsFromTable)
+                if (_refsFromTable != null)
                 {
-                    collector.AddRow(index);
+                    foreach (ICollector collector in _refsFromTable)
+                    {
+                        collector.AddRow(index);
+                    }
                 }
             }
         }
@@ -136,13 +154,15 @@ namespace BSOA
 
             // If there are unused values, ...
             List<int> unusedValues = new List<int>();
-            for(int i = 0; i < _isRowReachable.Length; ++i)
+            for (int i = 0; i < _isRowReachable.Length; ++i)
             {
                 // PERF RISK: Need faster way to find unused values; pivot to BitVector and add vectorized mechanism?
-                if(!_isRowReachable[i]) { unusedValues.Add(i); }
+                if (!_isRowReachable[i]) { unusedValues.Add(i); }
             }
 
+            _isRowReachable = null;
             int[] remapped = unusedValues.ToArray();
+
             if (remapped.Length > 0)
             {
                 int remapFrom = (values.Count - remapped.Length);
@@ -153,6 +173,9 @@ namespace BSOA
                     values.Swap(remapFrom + i, remapped[i]);
                 }
 
+                // TODO: Update object model instances whose rows have been swapped
+                // TODO: Copy object model instances which were orphaned to a temporary database
+
                 // Remove the unused values that are now at the end of the array
                 values.RemoveFromEnd(remapped.Length);
 
@@ -160,13 +183,13 @@ namespace BSOA
                 values.Trim();
 
                 // Remap indices from all tables which point to this one to use the updated indices
-                foreach (INumberColumn<int> refToTable in _refsToTable)
+                if (_refsToTable != null)
                 {
-                    refToTable.ForEach((slice) => remapper.RemapAbove(slice, remapFrom, remapped));
+                    foreach (INumberColumn<int> refToTable in _refsToTable)
+                    {
+                        refToTable.ForEach((slice) => remapper.RemapAbove(slice, remapFrom, remapped));
+                    }
                 }
-
-                // TODO: Update object model instances whose rows have been swapped
-                // TODO: Copy object model instances which were orphaned to a temporary database
             }
 
             // Return whether anything was remapped

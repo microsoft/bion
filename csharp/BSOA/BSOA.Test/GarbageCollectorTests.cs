@@ -12,9 +12,6 @@ namespace BSOA.Test
 {
     public class GarbageCollectorTests
     {
-        private const int RuleCount = 10;
-        private const int ResultCount = 100;
-
         // Return Rule IDs in the Run.Rules collection (in found order)
         // Used to verify Collect() hasn't altered the Run.Rules collection, even if underlying rows were swapped around.
         private string RunRules(Run run)
@@ -29,22 +26,6 @@ namespace BSOA.Test
             RunDatabase db = (RunDatabase)run.DB;
             IEnumerable<Rule> tableRules = db.Rule;
             return string.Join(", ", tableRules.Select((r) => r.Id).OrderBy((id) => id));
-        }
-
-        private void CollectAndVerify(Run run, string expectedRunRules, string expectedTableRules)
-        {
-            // Run rules should be correct before and after collection
-            Assert.Equal(expectedRunRules, RunRules(run));
-
-            // Force BSOA Collection and verify collections
-            run.Database.Collect();
-            Assert.Equal(expectedRunRules, RunRules(run));
-            Assert.Equal(expectedTableRules, TableRules(run));
-
-            // Roundtrip and verify collections
-            RoundTrip(run);
-            Assert.Equal(expectedRunRules, RunRules(run));
-            Assert.Equal(expectedTableRules, TableRules(run));
         }
 
         [Fact]
@@ -66,7 +47,7 @@ namespace BSOA.Test
             Assert.Equal("0, 1, 2, 3, 4", TableRules(run));
 
             // Verify nothing removed by Garbage Collection (all Rules directly reachable from root)            
-            run.Database.Collect();
+            run.DB.Collect();
             Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
             Assert.Equal("0, 1, 2, 3, 4", TableRules(run));
             
@@ -78,7 +59,7 @@ namespace BSOA.Test
             Assert.Equal("0, 1, 2, 3, 4, 5", TableRules(run));
 
             // Verify unreachable instance removed by Garbage Collection
-            run.Database.Collect();
+            run.DB.Collect();
             Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
             Assert.Equal("0, 1, 2, 3, 4", TableRules(run));
 
@@ -91,7 +72,7 @@ namespace BSOA.Test
             rules[0].RelatedRules = new List<Rule>() { six };
 
             // Verify indirectly reachable instance kept
-            run.Database.Collect();
+            run.DB.Collect();
             Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
             Assert.Equal("0, 1, 2, 3, 4, 6", TableRules(run));
 
@@ -102,7 +83,7 @@ namespace BSOA.Test
             rules.RemoveAt(0);
 
             // Verify removed Rule collected and new rule still kept (reachable via '1')
-            run.Database.Collect();
+            run.DB.Collect();
             Assert.Equal("1, 2, 3, 4", RunRules(run));
             Assert.Equal("1, 2, 3, 4, 6", TableRules(run));
 
@@ -117,7 +98,7 @@ namespace BSOA.Test
             rules.RemoveAt(0);
 
             // Verify removed Rule collected and new rule still kept (reachable via Result)
-            run.Database.Collect();
+            run.DB.Collect();
             Assert.Equal("2, 3, 4", RunRules(run));
             Assert.Equal("2, 3, 4, 6", TableRules(run));
 
@@ -130,7 +111,7 @@ namespace BSOA.Test
 
             // Make Rule unreachable from Result; verify now unreachable Rule removed
             result.Rule = null;
-            run.Database.Collect();
+            run.DB.Collect();
             Assert.Equal("2, 3, 4", RunRules(run));
             Assert.Equal("2, 3, 4", TableRules(run));
 
@@ -140,13 +121,13 @@ namespace BSOA.Test
 
             // Make a Rule self-referential; verify Collect doesn't hang
             run.Rules[0].RelatedRules = new List<Rule>() { run.Rules[0] };
-            run.Database.Collect();
+            run.DB.Collect();
             Assert.Equal("2, 3, 4", RunRules(run));
             Assert.Equal("2, 3, 4", TableRules(run));
 
             // Remove self-referencing row; verify removed
             run.Rules.RemoveAt(0);
-            run.Database.Collect();
+            run.DB.Collect();
             Assert.Equal("3, 4", RunRules(run));
             Assert.Equal("3, 4", TableRules(run));
 

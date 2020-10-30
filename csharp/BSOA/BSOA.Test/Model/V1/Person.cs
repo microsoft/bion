@@ -120,10 +120,10 @@ namespace BSOA.Test.Model.V1
         #endregion
 
         #region IRow
-        ITable IRow<Person>.Table => _table;
-        int IRow<Person>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
 
-        void IRow<Person>.Remap(ITable table, int index)
+        void IRow.Remap(ITable table, int index)
         {
             _table = (PersonTable)table;
             _index = index;
