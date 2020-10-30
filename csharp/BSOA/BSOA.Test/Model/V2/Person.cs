@@ -50,14 +50,14 @@ namespace BSOA.Test.Model.V2
 
         public DateTime Birthdate
         {
-            get => _table.Birthdate[_index];
-            set => _table.Birthdate[_index] = value;
+            get => _table.Birthdate[_index, this];
+            set => _table.Birthdate[_index, this] = value;
         }
 
         public string Name
         {
-            get => _table.Name[_index];
-            set => _table.Name[_index] = value;
+            get => _table.Name[_index, this];
+            set => _table.Name[_index, this] = value;
         }
 
         #region IEquatable<Person>

@@ -50,62 +50,62 @@ namespace BSOA.Test.Model.Log
 
         public string RuleId
         {
-            get => _table.RuleId[_index];
-            set => _table.RuleId[_index] = value;
+            get => _table.RuleId[_index, this];
+            set => _table.RuleId[_index, this] = value;
         }
 
         public Rule Rule
         {
-            get => _table.Database.Rule.Get(_table.Rule[_index]);
-            set => _table.Rule[_index] = _table.Database.Rule.LocalIndex(value);
+            get => _table.Database.Rule.Get(_table.Rule[_index, this]);
+            set => _table.Rule[_index, this] = _table.Database.Rule.LocalIndex(value);
         }
 
         public string Guid
         {
-            get => _table.Guid[_index];
-            set => _table.Guid[_index] = value;
+            get => _table.Guid[_index, this];
+            set => _table.Guid[_index, this] = value;
         }
 
         public bool IsActive
         {
-            get => _table.IsActive[_index];
-            set => _table.IsActive[_index] = value;
+            get => _table.IsActive[_index, this];
+            set => _table.IsActive[_index, this] = value;
         }
 
         public string Message
         {
-            get => _table.Message[_index];
-            set => _table.Message[_index] = value;
+            get => _table.Message[_index, this];
+            set => _table.Message[_index, this] = value;
         }
 
         public int StartLine
         {
-            get => _table.StartLine[_index];
-            set => _table.StartLine[_index] = value;
+            get => _table.StartLine[_index, this];
+            set => _table.StartLine[_index, this] = value;
         }
 
         public DateTime WhenDetectedUtc
         {
-            get => _table.WhenDetectedUtc[_index];
-            set => _table.WhenDetectedUtc[_index] = value;
+            get => _table.WhenDetectedUtc[_index, this];
+            set => _table.WhenDetectedUtc[_index, this] = value;
         }
 
         public BaselineState BaselineState
         {
-            get => (BaselineState)_table.BaselineState[_index];
-            set => _table.BaselineState[_index] = (int)value;
+            get => (BaselineState)_table.BaselineState[_index, this];
+            set => _table.BaselineState[_index, this] = (int)value;
         }
 
         public IDictionary<String, String> Properties
         {
-            get => _table.Properties[_index];
-            set => _table.Properties[_index] = value;
+            get => _table.Properties[_index, this];
+            set => _table.Properties[_index, this] = value;
         }
 
         public IList<int> Tags
         {
-            get => _table.Tags[_index];
-            set => _table.Tags[_index] = value;
+            get => _table.Tags[_index, this];
+            set => _table.Tags[_index, this] = value;
         }
 
         #region IEquatable<Result>

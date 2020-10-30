@@ -50,14 +50,14 @@ namespace BSOA.Test.Model.V1
 
         public byte Age
         {
-            get => _table.Age[_index];
-            set => _table.Age[_index] = value;
+            get => _table.Age[_index, this];
+            set => _table.Age[_index, this] = value;
         }
 
         public string Name
         {
-            get => _table.Name[_index];
-            set => _table.Name[_index] = value;
+            get => _table.Name[_index, this];
+            set => _table.Name[_index, this] = value;
         }
 
         #region IEquatable<Person>

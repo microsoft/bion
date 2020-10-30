@@ -50,38 +50,38 @@ namespace BSOA.Demo.Model.BSOA
 
         public int ParentFolderIndex
         {
-            get => _table.ParentFolderIndex[_index];
-            set => _table.ParentFolderIndex[_index] = value;
+            get => _table.ParentFolderIndex[_index, this];
+            set => _table.ParentFolderIndex[_index, this] = value;
         }
 
         public string Name
         {
-            get => _table.Name[_index];
-            set => _table.Name[_index] = value;
+            get => _table.Name[_index, this];
+            set => _table.Name[_index, this] = value;
         }
 
         public DateTime LastModifiedUtc
         {
-            get => _table.LastModifiedUtc[_index];
-            set => _table.LastModifiedUtc[_index] = value;
+            get => _table.LastModifiedUtc[_index, this];
+            set => _table.LastModifiedUtc[_index, this] = value;
         }
 
         public DateTime CreatedUtc
         {
-            get => _table.CreatedUtc[_index];
-            set => _table.CreatedUtc[_index] = value;
+            get => _table.CreatedUtc[_index, this];
+            set => _table.CreatedUtc[_index, this] = value;
         }
 
         public System.IO.FileAttributes Attributes
         {
-            get => (System.IO.FileAttributes)_table.Attributes[_index];
-            set => _table.Attributes[_index] = (int)value;
+            get => (System.IO.FileAttributes)_table.Attributes[_index, this];
+            set => _table.Attributes[_index, this] = (int)value;
         }
 
         public long Length
         {
-            get => _table.Length[_index];
-            set => _table.Length[_index] = value;
+            get => _table.Length[_index, this];
+            set => _table.Length[_index, this] = value;
         }
 
         #region IEquatable<File>

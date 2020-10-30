@@ -50,20 +50,20 @@ namespace BSOA.Test.Model.Log
 
         public string Id
         {
-            get => _table.Id[_index];
-            set => _table.Id[_index] = value;
+            get => _table.Id[_index, this];
+            set => _table.Id[_index, this] = value;
         }
 
         public String Guid
         {
-            get => _table.Guid[_index];
-            set => _table.Guid[_index] = value;
+            get => _table.Guid[_index, this];
+            set => _table.Guid[_index, this] = value;
         }
 
         public Uri HelpUri
         {
-            get => _table.HelpUri[_index];
-            set => _table.HelpUri[_index] = value;
+            get => _table.HelpUri[_index, this];
+            set => _table.HelpUri[_index, this] = value;
         }
 
         private TypedList<Rule> _relatedRules;

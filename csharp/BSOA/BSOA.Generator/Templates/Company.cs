@@ -47,24 +47,24 @@ namespace BSOA.Generator.Templates
         //   <SimpleColumn>
         public long Id
         {
-            get => _table.Id[_index];
-            set => _table.Id[_index] = value;
+            get => _table.Id[_index, this];
+            set => _table.Id[_index, this] = value;
         }
 
         //   </SimpleColumn>
         //   <EnumColumn>
         public SecurityPolicy JoinPolicy
         {
-            get => (SecurityPolicy)_table.JoinPolicy[_index];
-            set => _table.JoinPolicy[_index] = (byte)value;
+            get => (SecurityPolicy)_table.JoinPolicy[_index, this];
+            set => _table.JoinPolicy[_index, this] = (byte)value;
         }
 
         //   </EnumColumn>
         //  <RefColumn>
         public Employee Owner
         {
-            get => _table.Database.Employee.Get(_table.Owner[_index]);
-            set => _table.Owner[_index] = _table.Database.Employee.LocalIndex(value);
+            get => _table.Database.Employee.Get(_table.Owner[_index, this]);
+            set => _table.Owner[_index, this] = _table.Database.Employee.LocalIndex(value);
         }
 
         //  </RefColumn>

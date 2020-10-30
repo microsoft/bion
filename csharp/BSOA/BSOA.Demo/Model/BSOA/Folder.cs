@@ -50,14 +50,14 @@ namespace BSOA.Demo.Model.BSOA
 
         public int ParentIndex
         {
-            get => _table.ParentIndex[_index];
-            set => _table.ParentIndex[_index] = value;
+            get => _table.ParentIndex[_index, this];
+            set => _table.ParentIndex[_index, this] = value;
         }
 
         public string Name
         {
-            get => _table.Name[_index];
-            set => _table.Name[_index] = value;
+            get => _table.Name[_index, this];
+            set => _table.Name[_index, this] = value;
         }
 
         #region IEquatable<Folder>

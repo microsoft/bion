@@ -21,12 +21,18 @@ namespace BSOA.Model
         public bool IsSynchronized => false;
         public object SyncRoot => null;
         public bool IsReadOnly => false;
-
+         
         // Descendants must implement these minimal members
         public abstract int Count { get; }
         public abstract T this[int index] { get; set; }
         public abstract void Clear();
         public abstract void RemoveFromEnd(int count);
+
+        public virtual T this[int index, IRow caller]
+        {
+            get => this[index];
+            set => this[index] = value;
+        }
 
         public virtual T Add()
         {
