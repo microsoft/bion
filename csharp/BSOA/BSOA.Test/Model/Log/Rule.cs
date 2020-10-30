@@ -66,19 +66,10 @@ namespace BSOA.Test.Model.Log
             set => _table.HelpUri[_index, this] = value;
         }
 
-        private TypedList<Rule> _relatedRules;
         public IList<Rule> RelatedRules
         {
-            get
-            {
-                if (_relatedRules == null) { _relatedRules = TypedList<Rule>.Get(_table.Database.Rule, _table.RelatedRules, _index); }
-                return _relatedRules;
-            }
-            set
-            {
-                TypedList<Rule>.Set(_table.Database.Rule, _table.RelatedRules, _index, value);
-                _relatedRules = null;
-            }
+            get => TypedList<Rule>.Get(_table.Database.Rule, _table.RelatedRules, _index);
+            set => TypedList<Rule>.Set(_table.Database.Rule, _table.RelatedRules, _index, value);
         }
 
         #region IEquatable<Rule>
