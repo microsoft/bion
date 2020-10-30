@@ -24,7 +24,7 @@ namespace BSOA.Demo
 
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                GC.Collect();
+                System.GC.Collect();
 
                 w.Restart();
                 method();
@@ -42,14 +42,14 @@ namespace BSOA.Demo
         {
             T result = default(T);
             double fileSizeMB = new FileInfo(path).Length / Megabyte;
-            double ramBeforeMB = GC.GetTotalMemory(true) / Megabyte;
+            double ramBeforeMB = System.GC.GetTotalMemory(true) / Megabyte;
 
             string description = $"Loading {Path.GetFileName(path)} [{fileSizeMB:n1} MB] with {AssemblyDescription<T>()}...";
 
             // Run and time the method
             TimeSpan averageRuntime = Time(description, iterations, () => result = loader(path));
 
-            double ramAfterMB = GC.GetTotalMemory(true) / Megabyte;
+            double ramAfterMB = System.GC.GetTotalMemory(true) / Megabyte;
             double loadMegabytesPerSecond = fileSizeMB / averageRuntime.TotalSeconds;
 
             ConsoleColor previous = Console.ForegroundColor;

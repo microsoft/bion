@@ -3,10 +3,8 @@ using BSOA.Model;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 
-namespace BSOA
+namespace BSOA.GC
 {
     /// <summary>
     ///  DatabaseCollector is responsible for garbage collection in BSOA database tables.
@@ -194,6 +192,31 @@ namespace BSOA
 
             // Return whether anything was remapped
             return remapped.Length > 0;
+        }
+
+        //private ITable BuildRevisedTable(ITable table, int remapFrom, int[] remapped)
+        //{
+        //    ITable current = new Table(table.Columns);
+            
+        //    RowUpdater updater = new RowUpdater(current, null);
+        //    for (int i = 0; i < remapped.Length; ++i)
+        //    {
+        //        updater.AddMapping(remapFrom + i, remapped[i], movedToTemp: false);
+        //        updater.AddMapping(remapped[i], remapFrom + i, movedToTemp: false); // true
+        //    }
+
+        //    foreach (var column in table.Columns)
+        //    {
+        //        table.Columns[column.Key] = Wrap(column.Value, null, updater);
+        //    }
+
+        //    table.ResyncColumns();
+        //}
+
+        private static IColumn Wrap(IColumn inner, IColumn temp, RowUpdater updater)
+        {
+            Type innerType = inner.Type;
+            return (IColumn)(typeof(UpdatingColumn<>).MakeGenericType(innerType).GetConstructor(new[] { typeof(IColumn), typeof(IColumn), typeof(RowUpdater) }).Invoke(new object[] { inner, temp, updater }));
         }
     }
 

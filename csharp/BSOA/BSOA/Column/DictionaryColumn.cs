@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using BSOA.Collections;
+using BSOA.GC;
 using BSOA.IO;
 using BSOA.Model;
 

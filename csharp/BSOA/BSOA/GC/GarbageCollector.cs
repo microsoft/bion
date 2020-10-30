@@ -7,7 +7,7 @@ using System.Linq;
 using BSOA.Collections;
 using BSOA.Model;
 
-namespace BSOA
+namespace BSOA.GC
 {
     public class GarbageCollector
     {
