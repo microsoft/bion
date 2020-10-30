@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using BSOA.Column;
+using BSOA.Collections;
 using BSOA.Model;
 
 namespace BSOA.Demo.Model.BSOA
@@ -16,15 +17,19 @@ namespace BSOA.Demo.Model.BSOA
     {
         internal FileSystemDatabase Database;
 
-        internal RefListColumn Folders;
-        internal RefListColumn Files;
+        internal IColumn<NumberList<int>> Folders;
+        internal IColumn<NumberList<int>> Files;
 
-        internal FileSystemTable(FileSystemDatabase database) : base()
+        internal FileSystemTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
-            Database = database;
+            Database = (FileSystemDatabase)database;
+            GetOrBuildColumns();
+        }
 
-            Folders = AddColumn(nameof(Folders), new RefListColumn(nameof(FileSystemDatabase.Folder)));
-            Files = AddColumn(nameof(Files), new RefListColumn(nameof(FileSystemDatabase.File)));
+        public override void GetOrBuildColumns()
+        {
+            Folders = GetOrBuild(nameof(Folders), () => new RefListColumn(nameof(FileSystemDatabase.Folder)));
+            Files = GetOrBuild(nameof(Files), () => new RefListColumn(nameof(FileSystemDatabase.File)));
         }
 
         public override FileSystem Get(int index)

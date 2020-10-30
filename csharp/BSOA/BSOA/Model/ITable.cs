@@ -12,5 +12,8 @@ namespace BSOA.Model
     {
         // ITable exposes Columns to hook up Garbage Collection (GC builds a map of IRefColumns to find reachable items and update indices)
         Dictionary<string, IColumn> Columns { get; }
+
+        // Copy an item to this Table and return the new index for it
+        int LocalIndex(IRow value);
     }
 }

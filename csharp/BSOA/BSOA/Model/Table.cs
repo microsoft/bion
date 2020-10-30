@@ -22,15 +22,18 @@ namespace BSOA.Model
     public abstract class Table<T> : LimitedList<T>, ITable<T> where T : IRow<T>
     {
         private int _count;
-        internal Dictionary<string, IColumn> Columns { get; private set; }
-        Dictionary<string, IColumn> ITable.Columns => Columns;
+        public Dictionary<string, IColumn> Columns { get; }
 
-        protected Table()
+        protected Table(IDatabase database, Dictionary<string, IColumn> columns = null)
         {
-            Columns = new Dictionary<string, IColumn>();
+            Columns = columns ?? new Dictionary<string, IColumn>();
         }
 
+        // Construct an object model instance for the given index, or null.
         public abstract T Get(int index);
+
+        // Set column properties to columns from Columns Dictionary.
+        public abstract void GetOrBuildColumns();
 
         public override int Count => _count;
 
@@ -75,6 +78,11 @@ namespace BSOA.Model
             }
         }
 
+        public int LocalIndex(IRow value)
+        {
+            return LocalIndex((T)value);
+        }
+
         /// <summary>
         ///  Add a new item to the end of this table.
         /// </summary>
@@ -94,22 +102,18 @@ namespace BSOA.Model
             }
         }
 
-        /// <summary>
-        ///  Add a Column to the table set.
-        /// </summary>
-        /// <remarks>
-        ///  Typed tables should add columns to determine types, define default values, and similar.
-        ///  Typed tables should have hardcoded properties per column for fastest use by the item types.
-        ///  Columns must be provided to the table for it to facilitate serialization of them.
-        /// </remarks>
-        /// <typeparam name="U">Type of Column being added</typeparam>
-        /// <param name="name">Name of column</param>
-        /// <param name="column">IColumn instance for column</param>
-        /// <returns>Column instance, for easy assignment to hardcoded properties</returns>
-        protected U AddColumn<U>(string name, U column) where U : IColumn
+        protected U GetOrBuild<U>(string name, Func<U> builder) where U : IColumn
         {
-            Columns[name] = column;
-            return column;
+            if (Columns.TryGetValue(name, out IColumn column))
+            {
+                return (U)column;
+            }
+            else
+            {
+                U newColumn = builder();
+                Columns[name] = newColumn;
+                return newColumn;
+            }
         }
 
         public override void Swap(int index1, int index2)
