@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 using BSOA.Column;
@@ -33,7 +34,13 @@ namespace BSOA.Model
         public abstract T Get(int index);
 
         // Set column properties to columns from Columns Dictionary.
-        public abstract void GetOrBuildColumns();
+        public virtual void GetOrBuildColumns()
+        {
+            if (Columns.Count > 0)
+            {
+                _count = Columns.Values.Max((col) => col.Count);
+            }
+        }
 
         public override int Count => _count;
 

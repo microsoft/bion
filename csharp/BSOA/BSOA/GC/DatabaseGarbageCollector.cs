@@ -3,6 +3,7 @@ using BSOA.Model;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BSOA.GC
 {
@@ -19,18 +20,27 @@ namespace BSOA.GC
     /// </summary>
     internal class DatabaseCollector
     {
+        public IDatabase Database { get; }
+        
+        private Func<IDatabase> _tempBuilder;
+        private IDatabase _tempDatabase;
+        public IDatabase TempDatabase => _tempDatabase ??= _tempBuilder();
+
         private Dictionary<string, TableCollector> _tableCollectors;
         private string _rootTableName;
 
-        public DatabaseCollector(Database database)
+        public DatabaseCollector(IDatabase database)
         {
+            Database = database;
+            _tempBuilder = () => (IDatabase)database.GetType().GetConstructor(new Type[0]).Invoke(new object[0]);
+
             _tableCollectors = new Dictionary<string, TableCollector>();
             _rootTableName = database.RootTableName;
 
             // 1. Build a Collector for each Table
             foreach (var table in database.Tables)
             {
-                _tableCollectors[table.Key] = new TableCollector(table.Value);
+                _tableCollectors[table.Key] = new TableCollector(this, table.Value, table.Key);
             }
 
             // 2. Hook up ref columns between the source and target table collectors
@@ -80,10 +90,13 @@ namespace BSOA.GC
         void AddRow(int index);
     }
 
-    public class TableCollector : ICollector
+    internal class TableCollector : ICollector
     {
+        private DatabaseCollector _databaseCollector;
+
         // Table this Collector is assigned to (so it can Swap and Remove to clean unused rows)
         private ITable _table;
+        private string _tableName;
 
         // List of columns from this table to other tables (to walk reachable graph)
         private List<ICollector> _refsFromTable;
@@ -94,9 +107,11 @@ namespace BSOA.GC
         // During collection, tracking rows in the table reachable from the root object
         private bool[] _isRowReachable;
 
-        public TableCollector(ITable table)
+        public TableCollector(DatabaseCollector databaseCollector, ITable table, string tableName)
         {
+            _databaseCollector = databaseCollector;
             _table = table;
+            _tableName = tableName;
         }
 
         public void AddRefColumn(IRefColumn column, TableCollector target)
@@ -165,17 +180,19 @@ namespace BSOA.GC
             {
                 int remapFrom = (values.Count - remapped.Length);
 
+                Revise(_databaseCollector.Database, _table, remapFrom, remapped);
+
                 // Swap the *values* to the end of the values array
                 for (int i = 0; i < remapped.Length; ++i)
                 {
                     values.Swap(remapFrom + i, remapped[i]);
                 }
 
-                // TODO: Update object model instances whose rows have been swapped
-                // TODO: Copy object model instances which were orphaned to a temporary database
-
                 // Remove the unused values that are now at the end of the array
                 values.RemoveFromEnd(remapped.Length);
+
+                // Ensure count of 'latest' table is *also* updated to be correct
+                _databaseCollector.Database.Tables[_tableName].RemoveFromEnd(remapped.Length);
 
                 // Trim values afterward to clean up any newly unused space
                 values.Trim();
@@ -194,26 +211,49 @@ namespace BSOA.GC
             return remapped.Length > 0;
         }
 
-        //private ITable BuildRevisedTable(ITable table, int remapFrom, int[] remapped)
-        //{
-        //    ITable current = new Table(table.Columns);
-            
-        //    RowUpdater updater = new RowUpdater(current, null);
-        //    for (int i = 0; i < remapped.Length; ++i)
-        //    {
-        //        updater.AddMapping(remapFrom + i, remapped[i], movedToTemp: false);
-        //        updater.AddMapping(remapped[i], remapFrom + i, movedToTemp: false); // true
-        //    }
+        public void Revise(IDatabase database, ITable current, int remapFrom, int[] remapped)
+        {
+            // ISSUE: Removed rows will be cloned multiple times; once for the row in the table, and again as each reference is recursively cloned.
 
-        //    foreach (var column in table.Columns)
-        //    {
-        //        table.Columns[column.Key] = Wrap(column.Value, null, updater);
-        //    }
+            // Construct a new Table tied to the existing database and *unchanged* columns
+            Dictionary<string, IColumn> latestColumns = new Dictionary<string, IColumn>(current.Columns);
+            ITable latest = (ITable)(current.GetType().GetConstructor(new[] { typeof(IDatabase), typeof(Dictionary<string, IColumn>) }).Invoke(new object[] { database, latestColumns }));
 
-        //    table.ResyncColumns();
-        //}
+            // Replace Table instance in Database with new one
+            database.Tables[_tableName] = latest;
+            database.GetOrBuildTables();
 
-        private static IColumn Wrap(IColumn inner, IColumn temp, RowUpdater updater)
+            // Get the temporary copy of this table
+            ITable temp = _databaseCollector.TempDatabase.Tables[_tableName];
+
+            // Build a RowUpdater to redirect object model instances to the temp or latest table copies
+            RowUpdater updater = new RowUpdater(latest, temp);
+
+            // For each removed item...
+            for (int i = 0; i < remapped.Length; ++i)
+            {
+                // Copy the item to the temp table
+                int tempTableIndex = temp.Count;
+                temp.CopyItem(tempTableIndex, current, remapped[i]);
+
+                // Tell the updater that the item-to-remove is in the temp table
+                updater.AddMapping(remapped[i], tempTableIndex, movedToTemp: true);
+
+                // Tell the updater that the item swapped in for the removed item was swapped
+                updater.AddMapping(remapFrom + i, remapped[i], movedToTemp: false);
+            }
+
+            // Wrap each column on the current table with an UpdatingColumn
+            List<string> columnNames = current.Columns.Keys.ToList();
+            foreach (string columnName in columnNames)
+            {
+                current.Columns[columnName] = WrapColumn(current.Columns[columnName], temp.Columns[columnName], updater);
+            }
+
+            current.GetOrBuildColumns();
+        }
+
+        private static IColumn WrapColumn(IColumn inner, IColumn temp, RowUpdater updater)
         {
             Type innerType = inner.Type;
             return (IColumn)(typeof(UpdatingColumn<>).MakeGenericType(innerType).GetConstructor(new[] { typeof(IColumn), typeof(IColumn), typeof(RowUpdater) }).Invoke(new object[] { inner, temp, updater }));

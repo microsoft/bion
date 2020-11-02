@@ -20,7 +20,7 @@ namespace BSOA.Demo.Model.BSOA
         internal IColumn<NumberList<int>> Folders;
         internal IColumn<NumberList<int>> Files;
 
-        internal FileSystemTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
+        public FileSystemTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
             Database = (FileSystemDatabase)database;
             GetOrBuildColumns();
@@ -28,8 +28,10 @@ namespace BSOA.Demo.Model.BSOA
 
         public override void GetOrBuildColumns()
         {
-            Folders = GetOrBuild(nameof(Folders), () => new RefListColumn(nameof(FileSystemDatabase.Folder)));
-            Files = GetOrBuild(nameof(Files), () => new RefListColumn(nameof(FileSystemDatabase.File)));
+            base.GetOrBuildColumns();
+
+            Folders = GetOrBuild(nameof(Folders), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(FileSystemDatabase.Folder)));
+            Files = GetOrBuild(nameof(Files), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(FileSystemDatabase.File)));
         }
 
         public override FileSystem Get(int index)

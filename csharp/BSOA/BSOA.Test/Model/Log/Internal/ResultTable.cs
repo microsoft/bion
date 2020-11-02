@@ -28,7 +28,7 @@ namespace BSOA.Test.Model.Log
         internal IColumn<IDictionary<String, String>> Properties;
         internal IColumn<IList<int>> Tags;
 
-        internal ResultTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
+        public ResultTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
             Database = (RunDatabase)database;
             GetOrBuildColumns();
@@ -36,8 +36,10 @@ namespace BSOA.Test.Model.Log
 
         public override void GetOrBuildColumns()
         {
+            base.GetOrBuildColumns();
+
             RuleId = GetOrBuild(nameof(RuleId), () => Database.BuildColumn<string>(nameof(Result), nameof(RuleId), default));
-            Rule = GetOrBuild(nameof(Rule), () => new RefColumn(nameof(RunDatabase.Rule)));
+            Rule = GetOrBuild(nameof(Rule), () => (IColumn<int>)new RefColumn(nameof(RunDatabase.Rule)));
             Guid = GetOrBuild(nameof(Guid), () => Database.BuildColumn<string>(nameof(Result), nameof(Guid), default));
             IsActive = GetOrBuild(nameof(IsActive), () => Database.BuildColumn<bool>(nameof(Result), nameof(IsActive), default));
             Message = GetOrBuild(nameof(Message), () => Database.BuildColumn<string>(nameof(Result), nameof(Message), default));

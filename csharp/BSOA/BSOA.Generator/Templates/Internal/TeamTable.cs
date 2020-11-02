@@ -32,7 +32,7 @@ namespace BSOA.Generator.Templates
         // </RefListColumnMember>
         // </ColumnMemberList>
 
-        internal TeamTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
+        public TeamTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
             Database = (CompanyDatabase)database;
             GetOrBuildColumns();
@@ -40,6 +40,8 @@ namespace BSOA.Generator.Templates
 
         public override void GetOrBuildColumns()
         {
+            base.GetOrBuildColumns();
+
             // <ColumnConstructorList>
 
             // <SimpleColumnConstructor>
@@ -51,11 +53,11 @@ namespace BSOA.Generator.Templates
             // </EnumColumnConstructor>
 
             // <RefColumnConstructor>
-            Owner = GetOrBuild(nameof(Owner), () => new RefColumn(nameof(CompanyDatabase.Employee)));
+            Owner = GetOrBuild(nameof(Owner), () => (IColumn<int>)new RefColumn(nameof(CompanyDatabase.Employee)));
             // </RefColumnConstructor>
 
             // <RefListColumnConstructor>
-            Members = GetOrBuild(nameof(Members), () => new RefListColumn(nameof(CompanyDatabase.Employee)));
+            Members = GetOrBuild(nameof(Members), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(CompanyDatabase.Employee)));
             // </RefListColumnConstructor>
 
             // </ColumnConstructorList>

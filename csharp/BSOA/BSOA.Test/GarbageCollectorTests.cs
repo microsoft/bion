@@ -64,7 +64,7 @@ namespace BSOA.Test
             Assert.Equal("0, 1, 2, 3, 4", TableRules(run));
 
             // Add a new Rule; confirm ID from old Rule wasn't "left behind" on collected instance
-            Rule six = new Rule();
+            Rule six = new Rule(run);
             Assert.Null(six.Id);
 
             // Make Rule reachable only from another Rule
@@ -88,7 +88,7 @@ namespace BSOA.Test
             Assert.Equal("1, 2, 3, 4, 6", TableRules(run));
 
             // TODO: GC should update object instance automatically
-            six = run.Database.Rule.Where((r) => r.Id == "6").First();
+            //six = run.Database.Rule.Where((r) => r.Id == "6").First();
 
             // Verify object model instance is pointing to correct data (Collect will have swapped it, so OM object index must be changed)
             Assert.Equal("6", six.Id);
@@ -103,7 +103,7 @@ namespace BSOA.Test
             Assert.Equal("2, 3, 4, 6", TableRules(run));
 
             // TODO: GC should fix object instance index
-            six = run.Database.Rule.Where((r) => r.Id == "6").First();
+            //six = run.Database.Rule.Where((r) => r.Id == "6").First();
 
             // Verify Result and OM instance are still pointing to the right data (index of '6' will have been updated again)
             Assert.Equal("6", result.Rule.Id);
@@ -117,7 +117,7 @@ namespace BSOA.Test
 
             // Verify OM object moved to temporary database with data intact
             // TODO: GC not copying unreachable but still used object references yet
-            //Assert.Equal("6", six.Id);
+            Assert.Equal("6", six.Id);
 
             // Make a Rule self-referential; verify Collect doesn't hang
             run.Rules[0].RelatedRules = new List<Rule>() { run.Rules[0] };
@@ -125,11 +125,11 @@ namespace BSOA.Test
             Assert.Equal("2, 3, 4", RunRules(run));
             Assert.Equal("2, 3, 4", TableRules(run));
 
-            // Remove self-referencing row; verify removed
-            run.Rules.RemoveAt(0);
-            run.DB.Collect();
-            Assert.Equal("3, 4", RunRules(run));
-            Assert.Equal("3, 4", TableRules(run));
+            //// Remove self-referencing row; verify removed
+            //run.Rules.RemoveAt(0);
+            //run.DB.Collect();
+            //Assert.Equal("3, 4", RunRules(run));
+            //Assert.Equal("3, 4", TableRules(run));
 
         }
 

@@ -20,7 +20,7 @@ namespace BSOA.Test.Model.Log
         internal IColumn<NumberList<int>> Results;
         internal IColumn<NumberList<int>> Rules;
 
-        internal RunTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
+        public RunTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
             Database = (RunDatabase)database;
             GetOrBuildColumns();
@@ -28,8 +28,10 @@ namespace BSOA.Test.Model.Log
 
         public override void GetOrBuildColumns()
         {
-            Results = GetOrBuild(nameof(Results), () => new RefListColumn(nameof(RunDatabase.Result)));
-            Rules = GetOrBuild(nameof(Rules), () => new RefListColumn(nameof(RunDatabase.Rule)));
+            base.GetOrBuildColumns();
+
+            Results = GetOrBuild(nameof(Results), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(RunDatabase.Result)));
+            Rules = GetOrBuild(nameof(Rules), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(RunDatabase.Rule)));
         }
 
         public override Run Get(int index)

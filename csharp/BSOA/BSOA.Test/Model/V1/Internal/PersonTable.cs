@@ -20,7 +20,7 @@ namespace BSOA.Test.Model.V1
         internal IColumn<byte> Age;
         internal IColumn<string> Name;
 
-        internal PersonTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
+        public PersonTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
             Database = (PersonDatabase)database;
             GetOrBuildColumns();
@@ -28,6 +28,8 @@ namespace BSOA.Test.Model.V1
 
         public override void GetOrBuildColumns()
         {
+            base.GetOrBuildColumns();
+
             Age = GetOrBuild(nameof(Age), () => Database.BuildColumn<byte>(nameof(Person), nameof(Age), default));
             Name = GetOrBuild(nameof(Name), () => Database.BuildColumn<string>(nameof(Person), nameof(Name), default));
         }

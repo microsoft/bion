@@ -68,8 +68,8 @@ namespace BSOA.Test.Model.Log
 
         public IList<Rule> RelatedRules
         {
-            get => TypedList<Rule>.Get(_table.Database.Rule, _table.RelatedRules, _index);
-            set => TypedList<Rule>.Set(_table.Database.Rule, _table.RelatedRules, _index, value);
+            get => TypedList<Rule>.Get(_table.Database.Rule, _table.RelatedRules, _index, this);
+            set => TypedList<Rule>.Set(_table.Database.Rule, _table.RelatedRules, _index, value, this);
         }
 
         #region IEquatable<Rule>

@@ -71,8 +71,8 @@ namespace BSOA.Generator.Templates
         //  <RefListColumn>
         public IList<Employee> Members
         {
-            get => TypedList<Employee>.Get(_table.Database.Employee, _table.Members, _index);
-            set => TypedList<Employee>.Set(_table.Database.Employee, _table.Members, _index, value);
+            get => TypedList<Employee>.Get(_table.Database.Employee, _table.Members, _index, this);
+            set => TypedList<Employee>.Set(_table.Database.Employee, _table.Members, _index, value, this);
         }
 
         //  </RefListColumn>

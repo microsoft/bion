@@ -20,7 +20,7 @@ namespace BSOA.Demo.Model.BSOA
         internal IColumn<int> ParentIndex;
         internal IColumn<string> Name;
 
-        internal FolderTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
+        public FolderTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
             Database = (FileSystemDatabase)database;
             GetOrBuildColumns();
@@ -28,6 +28,8 @@ namespace BSOA.Demo.Model.BSOA
 
         public override void GetOrBuildColumns()
         {
+            base.GetOrBuildColumns();
+
             ParentIndex = GetOrBuild(nameof(ParentIndex), () => Database.BuildColumn<int>(nameof(Folder), nameof(ParentIndex), default));
             Name = GetOrBuild(nameof(Name), () => Database.BuildColumn<string>(nameof(Folder), nameof(Name), default));
         }

@@ -22,7 +22,7 @@ namespace BSOA.Test.Model.Log
         internal IColumn<Uri> HelpUri;
         internal IColumn<NumberList<int>> RelatedRules;
 
-        internal RuleTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
+        public RuleTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
             Database = (RunDatabase)database;
             GetOrBuildColumns();
@@ -30,10 +30,12 @@ namespace BSOA.Test.Model.Log
 
         public override void GetOrBuildColumns()
         {
+            base.GetOrBuildColumns();
+
             Id = GetOrBuild(nameof(Id), () => Database.BuildColumn<string>(nameof(Rule), nameof(Id), default));
             Guid = GetOrBuild(nameof(Guid), () => Database.BuildColumn<String>(nameof(Rule), nameof(Guid), default));
             HelpUri = GetOrBuild(nameof(HelpUri), () => Database.BuildColumn<Uri>(nameof(Rule), nameof(HelpUri), default));
-            RelatedRules = GetOrBuild(nameof(RelatedRules), () => new RefListColumn(nameof(RunDatabase.Rule)));
+            RelatedRules = GetOrBuild(nameof(RelatedRules), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(RunDatabase.Rule)));
         }
 
         public override Rule Get(int index)

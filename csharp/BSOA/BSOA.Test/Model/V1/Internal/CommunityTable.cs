@@ -19,7 +19,7 @@ namespace BSOA.Test.Model.V1
 
         internal IColumn<NumberList<int>> People;
 
-        internal CommunityTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
+        public CommunityTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
             Database = (PersonDatabase)database;
             GetOrBuildColumns();
@@ -27,7 +27,9 @@ namespace BSOA.Test.Model.V1
 
         public override void GetOrBuildColumns()
         {
-            People = GetOrBuild(nameof(People), () => new RefListColumn(nameof(PersonDatabase.Person)));
+            base.GetOrBuildColumns();
+
+            People = GetOrBuild(nameof(People), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(PersonDatabase.Person)));
         }
 
         public override Community Get(int index)

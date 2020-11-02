@@ -29,21 +29,21 @@ namespace BSOA.Collections
             _toIndex = toIndex;
         }
 
-        public static TypedList<TItem> Get(Table<TItem> table, IColumn<NumberList<int>> column, int index)
+        public static TypedList<TItem> Get(Table<TItem> table, IColumn<NumberList<int>> column, int index, IRow item)
         {
-            NumberList<int> indices = column[index];
+            NumberList<int> indices = column[index, item];
             return (indices == null ? null : new TypedList<TItem>(indices, (i) => table.Get(i), (v) => table.LocalIndex(v)));
         }
 
-        public static void Set(Table<TItem> table, IColumn<NumberList<int>> column, int index, ICollection<TItem> toValue)
+        public static void Set(Table<TItem> table, IColumn<NumberList<int>> column, int index, ICollection<TItem> toValue, IRow item)
         {
             if (toValue == null)
             {
-                column[index] = null;
+                column[index, item] = null;
             }
             else if (toValue.Count == 0)
             {
-                column[index] = NumberList<int>.Empty;
+                column[index, item] = NumberList<int>.Empty;
             }
             else
             {
@@ -54,13 +54,13 @@ namespace BSOA.Collections
                     indices[i++] = table.LocalIndex(value);
                 }
 
-                NumberList<int> current = column[index];
+                NumberList<int> current = column[index, item];
 
                 // Setting to empty coerces list creation in correct column
                 if (current == null)
                 {
-                    column[index] = NumberList<int>.Empty;
-                    current = column[index];
+                    column[index, item] = NumberList<int>.Empty;
+                    current = column[index, item];
                 }
 
                 current.SetTo(new ArraySlice<int>(indices));

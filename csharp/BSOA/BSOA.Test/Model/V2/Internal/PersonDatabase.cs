@@ -12,15 +12,19 @@ namespace BSOA.Test.Model.V2
     /// </summary>
     internal partial class PersonDatabase : Database
     {
-        internal PersonTable Person { get; }
-        internal CommunityTable Community { get; }
+        internal PersonTable Person;
+        internal CommunityTable Community;
 
         public PersonDatabase() : base("Community")
         {
             _lastCreated = new WeakReference<PersonDatabase>(this);
+            GetOrBuildTables();
+        }
 
-            Person = AddTable(nameof(Person), new PersonTable(this));
-            Community = AddTable(nameof(Community), new CommunityTable(this));
+        public override void GetOrBuildTables()
+        {
+            Person = GetOrBuild(nameof(Person), () => new PersonTable(this));
+            Community = GetOrBuild(nameof(Community), () => new CommunityTable(this));
         }
 
         [ThreadStatic]

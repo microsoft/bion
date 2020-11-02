@@ -24,7 +24,7 @@ namespace BSOA.Demo.Model.BSOA
         internal IColumn<int> Attributes;
         internal IColumn<long> Length;
 
-        internal FileTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
+        public FileTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
             Database = (FileSystemDatabase)database;
             GetOrBuildColumns();
@@ -32,6 +32,8 @@ namespace BSOA.Demo.Model.BSOA
 
         public override void GetOrBuildColumns()
         {
+            base.GetOrBuildColumns();
+
             ParentFolderIndex = GetOrBuild(nameof(ParentFolderIndex), () => Database.BuildColumn<int>(nameof(File), nameof(ParentFolderIndex), default));
             Name = GetOrBuild(nameof(Name), () => Database.BuildColumn<string>(nameof(File), nameof(Name), default));
             LastModifiedUtc = GetOrBuild(nameof(LastModifiedUtc), () => Database.BuildColumn<DateTime>(nameof(File), nameof(LastModifiedUtc), default));

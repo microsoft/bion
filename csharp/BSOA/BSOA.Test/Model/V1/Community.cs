@@ -45,8 +45,8 @@ namespace BSOA.Test.Model.V1
 
         public IList<Person> People
         {
-            get => TypedList<Person>.Get(_table.Database.Person, _table.People, _index);
-            set => TypedList<Person>.Set(_table.Database.Person, _table.People, _index, value);
+            get => TypedList<Person>.Get(_table.Database.Person, _table.People, _index, this);
+            set => TypedList<Person>.Set(_table.Database.Person, _table.People, _index, value, this);
         }
 
         #region IEquatable<Community>
