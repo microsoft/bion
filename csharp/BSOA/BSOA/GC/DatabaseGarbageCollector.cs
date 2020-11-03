@@ -111,10 +111,10 @@ namespace BSOA.GC
         // The set of rows which were unreachable from the root (and must be removed before write)
         private int[] _unreachableRows;
 
-        // The set of rows to copy to the Temp instance (unreachable rows and the subgraph under them)
+        // Keep the temp table (to which unreachables are copied) and mappings from current row index to temp row index and back
+        private ITable _tempTable;
         private List<int> _tempIndexToRowIndex;
         private int[] _rowIndexToTempIndex;
-        private ITable _tempTable;
 
         public TableCollector(DatabaseCollector databaseCollector, ITable table, string tableName)
         {
@@ -190,6 +190,7 @@ namespace BSOA.GC
             if (_unreachableRows == null) { return; }
 
             // Traverse all unreachable rows recusively, finding everything they reference.
+            // This will include all unreachable rows, but also anything reachable but also referenced by something unreachable.
             foreach (int rowIndex in _unreachableRows)
             {
                 AddRow(rowIndex);
@@ -200,7 +201,7 @@ namespace BSOA.GC
         {
             if (_unreachableRows == null) { return; }
 
-            // Assign new row indices to every item in the unreachable graph.
+            // Assign a new temp row index to every row in the unreachable graph.
             _tempIndexToRowIndex = new List<int>();
             _rowIndexToTempIndex = new int[_addedRows.Length];
 
@@ -240,7 +241,7 @@ namespace BSOA.GC
                 }
             }
 
-            // Fix all ref columns in the temp table to use the temp-copy indices
+            // Update every Ref and RefList in the temp copy to refer to the re-assigned temp indices from the referenced table
             foreach (var refCollector in _refsFromTable)
             {
                 IRefColumn temp = (IRefColumn)_tempTable.Columns[refCollector.ColumnName];

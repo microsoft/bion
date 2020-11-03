@@ -94,6 +94,20 @@ namespace BSOA.Model
             return LocalIndex((T)value);
         }
 
+        protected U GetOrBuild<U>(string name, Func<U> builder) where U : IColumn
+        {
+            if (Columns.TryGetValue(name, out IColumn column))
+            {
+                return (U)column;
+            }
+            else
+            {
+                U newColumn = builder();
+                Columns[name] = newColumn;
+                return newColumn;
+            }
+        }
+
         /// <summary>
         ///  Add a new item to the end of this table.
         /// </summary>
@@ -110,20 +124,6 @@ namespace BSOA.Model
             if (!object.ReferenceEquals(item.Table, this) || item.Index != Count - 1)
             {
                 Add().CopyFrom(item);
-            }
-        }
-
-        protected U GetOrBuild<U>(string name, Func<U> builder) where U : IColumn
-        {
-            if (Columns.TryGetValue(name, out IColumn column))
-            {
-                return (U)column;
-            }
-            else
-            {
-                U newColumn = builder();
-                Columns[name] = newColumn;
-                return newColumn;
             }
         }
 
