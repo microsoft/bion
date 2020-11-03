@@ -15,8 +15,9 @@ namespace BSOA.GC
     ///  This collector must:
     ///  - Remove all rows not reachable from the root, so they aren't serialized out.
     ///  - Update all Ref and RefList columns so that they still point to the same logical row.
-    ///  - Update all OM instances in memory so that they still point to the same logical row.
-    ///  - Copy data for OM instances which aren't reachable to a temporary database, so the OM object looks the same.
+    ///
+    ///  - Copy data for OM instances which aren't reachable to a temporary database, so any orphaned OM objects still work.
+    ///  - Update any OM instances in memory to point to the same logical data.
     /// </summary>
     internal class DatabaseCollector
     {

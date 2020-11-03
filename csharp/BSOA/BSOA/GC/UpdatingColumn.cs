@@ -6,9 +6,10 @@ using System;
 namespace BSOA.GC
 {
     /// <summary>
-    ///  UpdatingColumn handles updating BSOA object model instances when a BSOA Garbage Collection
-    ///  had to move them. When the object model calls a column getter or setter, this column updates
-    ///  the object model instance to point to an updated row index on the real current Table.
+    ///  UpdatingColumn implements a "trap" for BSOA object model objects, updating them to point to
+    ///  an updated table and row index when any column property is get or set. This is done because
+    ///  keeping a list of all object model instances in memory is too expensive. Updating them
+    ///  "just in time" avoids slowing down other scenarios to support Garbage Collection.
     /// </summary>
     /// <typeparam name="T">Column value type</typeparam>
     internal class UpdatingColumn<T> : WrappingColumn<T, T>
