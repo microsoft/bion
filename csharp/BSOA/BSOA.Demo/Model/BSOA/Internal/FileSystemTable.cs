@@ -28,8 +28,6 @@ namespace BSOA.Demo.Model.BSOA
 
         public override void GetOrBuildColumns()
         {
-            base.GetOrBuildColumns();
-
             Folders = GetOrBuild(nameof(Folders), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(FileSystemDatabase.Folder)));
             Files = GetOrBuild(nameof(Files), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(FileSystemDatabase.File)));
         }

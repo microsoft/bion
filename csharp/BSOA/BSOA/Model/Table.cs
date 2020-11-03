@@ -28,19 +28,18 @@ namespace BSOA.Model
         protected Table(IDatabase database, Dictionary<string, IColumn> columns = null)
         {
             Columns = columns ?? new Dictionary<string, IColumn>();
+
+            if (columns != null)
+            {
+                _count = columns.Values.Max((col) => col.Count);
+            }
         }
 
         // Construct an object model instance for the given index, or null.
         public abstract T Get(int index);
 
         // Set column properties to columns from Columns Dictionary.
-        public virtual void GetOrBuildColumns()
-        {
-            if (Columns.Count > 0)
-            {
-                _count = Columns.Values.Max((col) => col.Count);
-            }
-        }
+        public abstract void GetOrBuildColumns();
 
         public override int Count => _count;
 
@@ -58,6 +57,11 @@ namespace BSOA.Model
                 if (index >= Count) { _count = index + 1; }
                 Get(index).CopyFrom(value);
             }
+        }
+
+        public void SetCount(int count)
+        {
+            _count = count;
         }
 
         /// <summary>

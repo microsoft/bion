@@ -36,8 +36,6 @@ namespace BSOA.Test.Model.Log
 
         public override void GetOrBuildColumns()
         {
-            base.GetOrBuildColumns();
-
             RuleId = GetOrBuild(nameof(RuleId), () => Database.BuildColumn<string>(nameof(Result), nameof(RuleId), default));
             Rule = GetOrBuild(nameof(Rule), () => (IColumn<int>)new RefColumn(nameof(RunDatabase.Rule)));
             Guid = GetOrBuild(nameof(Guid), () => Database.BuildColumn<string>(nameof(Result), nameof(Guid), default));

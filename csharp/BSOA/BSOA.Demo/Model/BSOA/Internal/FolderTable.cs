@@ -28,8 +28,6 @@ namespace BSOA.Demo.Model.BSOA
 
         public override void GetOrBuildColumns()
         {
-            base.GetOrBuildColumns();
-
             ParentIndex = GetOrBuild(nameof(ParentIndex), () => Database.BuildColumn<int>(nameof(Folder), nameof(ParentIndex), default));
             Name = GetOrBuild(nameof(Name), () => Database.BuildColumn<string>(nameof(Folder), nameof(Name), default));
         }

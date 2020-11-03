@@ -28,8 +28,6 @@ namespace BSOA.Test.Model.V2
 
         public override void GetOrBuildColumns()
         {
-            base.GetOrBuildColumns();
-
             Birthdate = GetOrBuild(nameof(Birthdate), () => Database.BuildColumn<DateTime>(nameof(Person), nameof(Birthdate), default));
             Name = GetOrBuild(nameof(Name), () => Database.BuildColumn<string>(nameof(Person), nameof(Name), default));
         }

@@ -32,8 +32,6 @@ namespace BSOA.Demo.Model.BSOA
 
         public override void GetOrBuildColumns()
         {
-            base.GetOrBuildColumns();
-
             ParentFolderIndex = GetOrBuild(nameof(ParentFolderIndex), () => Database.BuildColumn<int>(nameof(File), nameof(ParentFolderIndex), default));
             Name = GetOrBuild(nameof(Name), () => Database.BuildColumn<string>(nameof(File), nameof(Name), default));
             LastModifiedUtc = GetOrBuild(nameof(LastModifiedUtc), () => Database.BuildColumn<DateTime>(nameof(File), nameof(LastModifiedUtc), default));

@@ -28,8 +28,6 @@ namespace BSOA.Test.Model.Log
 
         public override void GetOrBuildColumns()
         {
-            base.GetOrBuildColumns();
-
             Results = GetOrBuild(nameof(Results), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(RunDatabase.Result)));
             Rules = GetOrBuild(nameof(Rules), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(RunDatabase.Rule)));
         }

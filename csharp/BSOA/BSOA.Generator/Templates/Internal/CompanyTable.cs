@@ -32,23 +32,18 @@ namespace BSOA.Generator.Templates
         public override void GetOrBuildColumns()
         {
             // <ColumnConstructorList>
-
             // <SimpleColumnConstructor>
             Id = GetOrBuild(nameof(Id), () => Database.BuildColumn<long>(nameof(Team), nameof(Id), 99));
             // </SimpleColumnConstructor>
-
             // <EnumColumnConstructor>
             JoinPolicy = GetOrBuild(nameof(JoinPolicy), () => Database.BuildColumn<byte>(nameof(Team), nameof(JoinPolicy), (byte)SecurityPolicy.Open));
             // </EnumColumnConstructor>
-
             // <RefColumnConstructor>
-            Owner = GetOrBuild(nameof(Owner), () => new RefColumn(nameof(CompanyDatabase.Employee)));
+            Owner = GetOrBuild(nameof(Owner), () => (IColumn<int>)new RefColumn(nameof(CompanyDatabase.Employee)));
             // </RefColumnConstructor>
-
             // <RefListColumnConstructor>
-            Members = GetOrBuild(nameof(Members), () => new RefListColumn(nameof(CompanyDatabase.Employee)));
+            Members = GetOrBuild(nameof(Members), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(CompanyDatabase.Employee)));
             // </RefListColumnConstructor>
-
             // </ColumnConstructorList>
         }
 

@@ -17,11 +17,16 @@ namespace BSOA.Generator.Templates
         internal CompanyDatabase Database;
         internal IColumn<string> Name;
 
-        internal EmployeeTable(CompanyDatabase database) : base()
+        internal EmployeeTable(IDatabase database) : base()
         {
-            Database = database;
+            Database = (CompanyDatabase)database;
+            Database = (CompanyDatabase)database;
+            GetOrBuildColumns();
+        }
 
-            Name = AddColumn(nameof(Name), database.BuildColumn<string>(nameof(Employee), nameof(Name)));
+        public override void GetOrBuildColumns()
+        {
+            Name = GetOrBuild(nameof(Name)), () => Database.BuildColumn<string>(nameof(Employee), nameof(Name)));
         }
 
         public override Employee Get(int index)

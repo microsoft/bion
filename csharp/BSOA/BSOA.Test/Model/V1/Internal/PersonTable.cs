@@ -28,8 +28,6 @@ namespace BSOA.Test.Model.V1
 
         public override void GetOrBuildColumns()
         {
-            base.GetOrBuildColumns();
-
             Age = GetOrBuild(nameof(Age), () => Database.BuildColumn<byte>(nameof(Person), nameof(Age), default));
             Name = GetOrBuild(nameof(Name), () => Database.BuildColumn<string>(nameof(Person), nameof(Name), default));
         }

@@ -18,5 +18,8 @@ namespace BSOA.Model
 
         // Copy an item to this Table and return the new index for it
         int LocalIndex(IRow value);
+
+        // Fix count on a table after GC-related shenanigans. :/
+        void SetCount(int count);
     }
 }

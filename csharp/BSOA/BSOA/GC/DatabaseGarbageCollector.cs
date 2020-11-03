@@ -1,4 +1,6 @@
-﻿using BSOA.Column;
+﻿using BSOA.Collections;
+using BSOA.Column;
+using BSOA.Extensions;
 using BSOA.Model;
 
 using System;
@@ -21,23 +23,22 @@ namespace BSOA.GC
     /// </summary>
     internal class DatabaseCollector
     {
+        public bool MaintainObjectModel { get; }
         public IDatabase Database { get; }
 
-        private Func<IDatabase> _tempBuilder;
-        private IDatabase _tempDatabase;
-        public IDatabase TempDatabase => _tempDatabase ??= _tempBuilder();
-
         private Dictionary<string, TableCollector> _tableCollectors;
-        private string _rootTableName;
+
+        // Create a Temp Database (just in time) if needed, to copy unreachable items to
+        private IDatabase _tempDatabase;
+        public IDatabase TempDatabase => _tempDatabase ??= ConstructorBuilder.GetConstructor<Func<IDatabase>>(Database.GetType())();
 
         public DatabaseCollector(IDatabase database)
         {
+            MaintainObjectModel = true;
             Database = database;
-            _tempBuilder = ConstructorBuilder.GetConstructor<Func<IDatabase>>(database.GetType());
-            _tableCollectors = new Dictionary<string, TableCollector>();
-            _rootTableName = database.RootTableName;
 
             // 1. Build a Collector for each Table
+            _tableCollectors = new Dictionary<string, TableCollector>();
             foreach (var table in database.Tables)
             {
                 _tableCollectors[table.Key] = new TableCollector(this, table.Value, table.Key);
@@ -49,12 +50,12 @@ namespace BSOA.GC
                 string tableName = table.Key;
                 TableCollector sourceCollector = _tableCollectors[tableName];
 
-                foreach (var column in table.Value.Columns.Values)
+                foreach (var column in table.Value.Columns)
                 {
-                    IRefColumn refColumn = column as IRefColumn;
+                    IRefColumn refColumn = column.Value as IRefColumn;
                     if (refColumn != null)
                     {
-                        sourceCollector.AddRefColumn(refColumn, _tableCollectors[refColumn.ReferencedTableName]);
+                        sourceCollector.AddRefColumn(column.Key, refColumn, _tableCollectors[refColumn.ReferencedTableName]);
                     }
                 }
             }
@@ -62,35 +63,35 @@ namespace BSOA.GC
 
         public bool Collect()
         {
-            foreach (TableCollector collector in _tableCollectors.Values)
+            // Walk reachable rows (add root, which will recursively add everything reachable)
+            _tableCollectors.Values.ForEach((collector) => collector.ResetAddedRows());
+            _tableCollectors[Database.RootTableName].AddRow(0);
+            _tableCollectors.Values.ForEach((collector) => collector.IdentifyUnreachableRows());
+
+            // Walk *unreachable* rows, assign temp DB indices to each row-to-remove, and copy the rows to Temp DB
+            if (MaintainObjectModel)
             {
-                collector.PrepareToCollect();
+                _tableCollectors.Values.ForEach((collector) => collector.ResetAddedRows());
+                _tableCollectors.Values.ForEach((collector) => collector.WalkUnreachableGraph());
+                _tableCollectors.Values.ForEach((collector) => collector.BuildRowToTempRowMap());
+                _tableCollectors.Values.ForEach((collector) => collector.CopyUnreachableGraphToTemp());
             }
 
-            // Walk reachable rows (add root, which will recursively add everything reachable)
-            _tableCollectors[_rootTableName].AddRow(0);
-
-            // Identify and clean up any unused rows from each table
+            // Swap and Remove to clean up all unreachable rows from 'main' database
             bool dataRemoved = false;
-            foreach (TableCollector collector in _tableCollectors.Values)
+            _tableCollectors.Values.ForEach((collector) => dataRemoved |= collector.RemoveUnreachableRows());
+
+            // Set Table instances as "traps" to update object model instances whose rows have been swapped or moved to Temp DB
+            if (MaintainObjectModel)
             {
-                dataRemoved |= collector.Collect();
+                _tableCollectors.Values.ForEach((collector) => collector.SetObjectModelUpdateTrap());
             }
 
             return dataRemoved;
         }
     }
 
-    /// <summary>
-    ///  GarbageCollection is built on ICollectors, which 'mark' rows which are
-    ///  reachable from the database root.
-    /// </summary>
-    internal interface ICollector
-    {
-        void AddRow(int index);
-    }
-
-    internal class TableCollector : ICollector
+    internal class TableCollector
     {
         private DatabaseCollector _databaseCollector;
 
@@ -104,8 +105,16 @@ namespace BSOA.GC
         // List of columns from other tables to this table (to remap indices of Swapped rows)
         private List<IRefColumn> _refsToTable;
 
-        // During collection, tracking rows in the table reachable from the root object
-        private bool[] _isRowReachable;
+        // Added rows tracks rows reachable from the root (first walk) and everything to copy to temp (second walk)
+        private bool[] _addedRows;
+
+        // The set of rows which were unreachable from the root (and must be removed before write)
+        private int[] _unreachableRows;
+
+        // The set of rows to copy to the Temp instance (unreachable rows and the subgraph under them)
+        private List<int> _tempIndexToRowIndex;
+        private int[] _rowIndexToTempIndex;
+        private ITable _tempTable;
 
         public TableCollector(DatabaseCollector databaseCollector, ITable table, string tableName)
         {
@@ -114,7 +123,7 @@ namespace BSOA.GC
             _tableName = tableName;
         }
 
-        public void AddRefColumn(IRefColumn column, TableCollector target)
+        public void AddRefColumn(string columnName, IRefColumn column, TableCollector target)
         {
             if (_refsFromTable == null) { _refsFromTable = new List<ICollector>(); }
             if (target._refsToTable == null) { target._refsToTable = new List<IRefColumn>(); }
@@ -125,28 +134,28 @@ namespace BSOA.GC
             // Add column to 'RefsFrom' in the source (for walking reachable indices)
             if (column is RefColumn)
             {
-                _refsFromTable.Add(new RefColumnCollector((RefColumn)column, target));
+                _refsFromTable.Add(new RefColumnCollector(columnName, (RefColumn)column, target));
             }
             else if (column is RefListColumn)
             {
-                _refsFromTable.Add(new RefListColumnCollector((RefListColumn)column, target));
+                _refsFromTable.Add(new RefListColumnCollector(columnName, (RefListColumn)column, target));
             }
             else
             {
-                throw new NotImplementedException($"IRefColumn of type {column.GetType().Name} not supported in TableCollector.Add()");
+                throw new NotImplementedException($"IRefColumn '{columnName}' of type {column.GetType().Name} not supported in TableCollector.Add()");
             }
         }
 
-        public void PrepareToCollect()
+        public void ResetAddedRows()
         {
-            _isRowReachable = new bool[_table.Count];
+            _addedRows = new bool[_table.Count];
         }
 
         public void AddRow(int index)
         {
-            if (_isRowReachable[index] == false)
+            if (_addedRows[index] == false)
             {
-                _isRowReachable[index] = true;
+                _addedRows[index] = true;
 
                 if (_refsFromTable != null)
                 {
@@ -158,74 +167,153 @@ namespace BSOA.GC
             }
         }
 
-        public bool Collect()
+        public void IdentifyUnreachableRows()
         {
-            IColumn values = _table;
-            IRemapper<int> remapper = IntRemapper.Instance;
+            // Build an array of all row indices which were unreachable from the root.
+            // These rows will be removed from the database.
 
-            // TODO: Deduplicate with GarbageCollector.Collect().
-
-            // If there are unused values, ...
-            List<int> unusedValues = new List<int>();
-            for (int i = 0; i < _isRowReachable.Length; ++i)
+            List<int> unreachableRows = new List<int>();
+            for (int i = 0; i < _addedRows.Length; ++i)
             {
                 // PERF RISK: Need faster way to find unused values; pivot to BitVector and add vectorized mechanism?
-                if (!_isRowReachable[i]) { unusedValues.Add(i); }
+                if (!_addedRows[i]) { unreachableRows.Add(i); }
             }
 
-            _isRowReachable = null;
-            int[] remapped = unusedValues.ToArray();
-
-            if (remapped.Length > 0)
+            if (unreachableRows.Count > 0)
             {
-                int remapFrom = (values.Count - remapped.Length);
-
-                Revise(_table, remapFrom, remapped);
-
-                // Swap the *values* to the end of the values array
-                for (int i = 0; i < remapped.Length; ++i)
-                {
-                    values.Swap(remapFrom + i, remapped[i]);
-                }
-
-                // Remove the unused values that are now at the end of the array
-                values.RemoveFromEnd(remapped.Length);
-
-                // Ensure count of 'latest' table is *also* updated to be correct
-                _databaseCollector.Database.Tables[_tableName].RemoveFromEnd(remapped.Length);
-
-                // Trim values afterward to clean up any newly unused space
-                values.Trim();
-
-                // Remap indices from all tables which point to this one to use the updated indices
-                if (_refsToTable != null)
-                {
-                    foreach (INumberColumn<int> refToTable in _refsToTable)
-                    {
-                        refToTable.ForEach((slice) => remapper.RemapAbove(slice, remapFrom, remapped));
-                    }
-                }
+                _unreachableRows = unreachableRows.ToArray();
             }
-
-            // Return whether anything was remapped
-            return remapped.Length > 0;
         }
 
-        public void Revise(ITable current, int remapFrom, int[] remapped)
+        public void WalkUnreachableGraph()
         {
-            // ISSUE: Removed rows will be cloned multiple times; once for the row in the table, and again as each reference is recursively cloned.
+            if (_unreachableRows == null) { return; }
 
-            // Construct a new Table tied to the existing database and *unchanged* columns
+            // Traverse all unreachable rows recusively, finding everything they reference.
+            foreach (int rowIndex in _unreachableRows)
+            {
+                AddRow(rowIndex);
+            }
+        }
+
+        public void BuildRowToTempRowMap()
+        {
+            if (_unreachableRows == null) { return; }
+
+            // Assign new row indices to every item in the unreachable graph.
+            _tempIndexToRowIndex = new List<int>();
+            _rowIndexToTempIndex = new int[_addedRows.Length];
+
+            int tempCount = 0;
+            for (int i = 0; i < _addedRows.Length; ++i)
+            {
+                int tempIndex = -1;
+
+                if (_addedRows[i])
+                {
+                    tempIndex = tempCount;
+                    tempCount++;
+
+                    _tempIndexToRowIndex.Add(i);
+                }
+
+                _rowIndexToTempIndex[i] = tempIndex;
+            }
+        }
+
+        public void CopyUnreachableGraphToTemp()
+        {
+            if (_unreachableRows == null) { return; }
+            
+            _tempTable = _databaseCollector.TempDatabase.Tables[_tableName];
+
+            // Copy every row in the unreachable graph to the temp table *non-recursively*
+            foreach (string columnName in _table.Columns.Keys)
+            {
+                IColumn source = _table.Columns[columnName];
+                IColumn temp = _tempTable.Columns[columnName];
+
+                for (int tempIndex = 0; tempIndex < _tempIndexToRowIndex.Count; ++tempIndex)
+                {
+                    int sourceIndex = _tempIndexToRowIndex[tempIndex];
+                    temp.CopyItem(tempIndex, source, sourceIndex);
+                }
+            }
+
+            // Fix all ref columns in the temp table to use the temp-copy indices
+            foreach (var refCollector in _refsFromTable)
+            {
+                IRefColumn temp = (IRefColumn)_tempTable.Columns[refCollector.ColumnName];
+                temp.ForEach(refCollector.Collector.FixReferences);
+            }
+
+            // Ensure temp table count correct
+            _tempTable.SetCount(_tempIndexToRowIndex.Count);
+        }
+
+        private void FixReferences(ArraySlice<int> slice)
+        {
+            int[] array = slice.Array;
+            int end = slice.Index + slice.Count;
+            for (int i = slice.Index; i < end; ++i)
+            {
+                array[i] = _rowIndexToTempIndex[array[i]];
+            }
+        }
+
+        public bool RemoveUnreachableRows()
+        {
+            if (_unreachableRows == null) { return false; }
+
+            // TODO: Deduplicate with GarbageCollector.Collect()
+            IColumn current = _table;
+            IRemapper<int> remapper = IntRemapper.Instance;
+
+            int remapFrom = (current.Count - _unreachableRows.Length);
+
+            // Swap the *values* to the end of the values array
+            for (int i = 0; i < _unreachableRows.Length; ++i)
+            {
+                current.Swap(remapFrom + i, _unreachableRows[i]);
+            }
+
+            // Remove the unused values that are now at the end of the array
+            current.RemoveFromEnd(_unreachableRows.Length);
+
+            // Trim values afterward to clean up any newly unused space
+            current.Trim();
+
+            // Remap indices from all tables which point to this one to use the updated indices
+            if (_refsToTable != null)
+            {
+                foreach (INumberColumn<int> refToTable in _refsToTable)
+                {
+                    refToTable.ForEach((slice) => remapper.RemapAbove(slice, remapFrom, _unreachableRows));
+                }
+            }
+
+            return true;
+        }
+
+        public void SetObjectModelUpdateTrap()
+        {
+            if (_unreachableRows == null) { return; }
+
             IDatabase database = _databaseCollector.Database;
-            Dictionary<string, IColumn> latestColumns = new Dictionary<string, IColumn>(current.Columns);
-            Func<IDatabase, Dictionary<string, IColumn>, ITable> tableBuilder = ConstructorBuilder.GetConstructor<Func<IDatabase, Dictionary<string, IColumn>, ITable>>(current.GetType());
-            ITable latest = tableBuilder(database, latestColumns);
 
-            // Replace Table instance in Database with new one
+            ITable current = _table;
+            int remapFrom = _table.Count;
+            int[] remapped = _unreachableRows;
+
+            // Construct a new 'latest' Table with the real, updated columns
+            Func<IDatabase, Dictionary<string, IColumn>, ITable> tableBuilder = ConstructorBuilder.GetConstructor<Func<IDatabase, Dictionary<string, IColumn>, ITable>>(current.GetType());
+            ITable latest = tableBuilder(database, new Dictionary<string, IColumn>(current.Columns));
+
+            // Update the database to see the 'latest' table
             database.Tables[_tableName] = latest;
             database.GetOrBuildTables();
 
-            // Get the temporary copy of this table
+            // Find the 'temp' copy of this table which unreachable rows were copied to
             ITable temp = _databaseCollector.TempDatabase.Tables[_tableName];
 
             // Build a RowUpdater to redirect object model instances to the temp or latest table copies
@@ -234,24 +322,25 @@ namespace BSOA.GC
             // For each removed item...
             for (int i = 0; i < remapped.Length; ++i)
             {
-                // Copy the item to the temp table
-                int tempTableIndex = temp.Count;
-                temp.CopyItem(tempTableIndex, current, remapped[i]);
+                int removedRowIndex = remapped[i];
+                int swappedRowIndex = remapFrom + i;
+                int removedRowTempTableIndex = _rowIndexToTempIndex[remapped[i]];
 
                 // Tell the updater that the item-to-remove is in the temp table
-                updater.AddMapping(remapped[i], tempTableIndex, movedToTemp: true);
+                updater.AddMapping(removedRowIndex, removedRowTempTableIndex, movedToTemp: true);
 
                 // Tell the updater that the item swapped in for the removed item was swapped
-                updater.AddMapping(remapFrom + i, remapped[i], movedToTemp: false);
+                updater.AddMapping(swappedRowIndex, removedRowIndex, movedToTemp: false);
             }
 
-            // Wrap each column on the current table with an UpdatingColumn
+            // Wrap each column on the current table with a trapped UpdatingColumn
             List<string> columnNames = current.Columns.Keys.ToList();
             foreach (string columnName in columnNames)
             {
                 current.Columns[columnName] = WrapColumn(current.Columns[columnName], temp.Columns[columnName], updater);
             }
 
+            // Update the current table reference columns with the trapped copies
             current.GetOrBuildColumns();
         }
 
@@ -262,13 +351,26 @@ namespace BSOA.GC
         }
     }
 
+    /// <summary>
+    ///  GarbageCollection is built on ICollectors, which 'mark' rows which are
+    ///  reachable from the database root.
+    /// </summary>
+    internal interface ICollector
+    {
+        string ColumnName { get; }
+        TableCollector Collector { get; }
+        void AddRow(int index);
+    }
+
     internal struct RefColumnCollector : ICollector
     {
+        public string ColumnName { get; }
         public RefColumn Column { get; }
         public TableCollector Collector { get; }
 
-        public RefColumnCollector(RefColumn column, TableCollector collector)
+        public RefColumnCollector(string columnName, RefColumn column, TableCollector collector)
         {
+            ColumnName = columnName;
             Column = column;
             Collector = collector;
         }
@@ -285,11 +387,13 @@ namespace BSOA.GC
 
     internal struct RefListColumnCollector : ICollector
     {
+        public string ColumnName { get; }
         public RefListColumn Column { get; }
         public TableCollector Collector { get; }
 
-        public RefListColumnCollector(RefListColumn column, TableCollector collector)
+        public RefListColumnCollector(string columnName, RefListColumn column, TableCollector collector)
         {
+            ColumnName = columnName;
             Column = column;
             Collector = collector;
         }

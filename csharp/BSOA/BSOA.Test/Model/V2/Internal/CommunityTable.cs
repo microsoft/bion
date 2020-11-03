@@ -27,8 +27,6 @@ namespace BSOA.Test.Model.V2
 
         public override void GetOrBuildColumns()
         {
-            base.GetOrBuildColumns();
-
             People = GetOrBuild(nameof(People), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(PersonDatabase.Person)));
         }
 
