@@ -34,7 +34,15 @@ namespace BSOA.GC
             get
             {
                 _updater.Update(caller, out bool movedToTemp);
-                return (movedToTemp ? _temp[caller.Index] : Inner[caller.Index]);
+
+                if (movedToTemp)
+                {
+                    return _temp[caller.Index];
+                }
+                else
+                {
+                    return Inner[caller.Index];
+                }
             }
 
             set

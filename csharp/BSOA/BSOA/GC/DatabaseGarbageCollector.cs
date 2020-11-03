@@ -21,7 +21,7 @@ namespace BSOA.GC
     internal class DatabaseCollector
     {
         public IDatabase Database { get; }
-        
+
         private Func<IDatabase> _tempBuilder;
         private IDatabase _tempDatabase;
         public IDatabase TempDatabase => _tempDatabase ??= _tempBuilder();
@@ -32,7 +32,7 @@ namespace BSOA.GC
         public DatabaseCollector(IDatabase database)
         {
             Database = database;
-            _tempBuilder = () => (IDatabase)database.GetType().GetConstructor(new Type[0]).Invoke(new object[0]);
+            _tempBuilder = () => (IDatabase)Activator.CreateInstance(database.GetType());
 
             _tableCollectors = new Dictionary<string, TableCollector>();
             _rootTableName = database.RootTableName;
@@ -180,7 +180,7 @@ namespace BSOA.GC
             {
                 int remapFrom = (values.Count - remapped.Length);
 
-                Revise(_databaseCollector.Database, _table, remapFrom, remapped);
+                Revise(_table, remapFrom, remapped);
 
                 // Swap the *values* to the end of the values array
                 for (int i = 0; i < remapped.Length; ++i)
@@ -211,13 +211,14 @@ namespace BSOA.GC
             return remapped.Length > 0;
         }
 
-        public void Revise(IDatabase database, ITable current, int remapFrom, int[] remapped)
+        public void Revise(ITable current, int remapFrom, int[] remapped)
         {
             // ISSUE: Removed rows will be cloned multiple times; once for the row in the table, and again as each reference is recursively cloned.
 
             // Construct a new Table tied to the existing database and *unchanged* columns
+            IDatabase database = _databaseCollector.Database;
             Dictionary<string, IColumn> latestColumns = new Dictionary<string, IColumn>(current.Columns);
-            ITable latest = (ITable)(current.GetType().GetConstructor(new[] { typeof(IDatabase), typeof(Dictionary<string, IColumn>) }).Invoke(new object[] { database, latestColumns }));
+            ITable latest = (ITable)Activator.CreateInstance(current.GetType(), database, latestColumns);
 
             // Replace Table instance in Database with new one
             database.Tables[_tableName] = latest;
