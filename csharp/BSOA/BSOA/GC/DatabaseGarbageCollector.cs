@@ -32,8 +32,7 @@ namespace BSOA.GC
         public DatabaseCollector(IDatabase database)
         {
             Database = database;
-            _tempBuilder = () => (IDatabase)Activator.CreateInstance(database.GetType());
-
+            _tempBuilder = ConstructorBuilder.GetConstructor<Func<IDatabase>>(database.GetType());
             _tableCollectors = new Dictionary<string, TableCollector>();
             _rootTableName = database.RootTableName;
 
@@ -218,7 +217,8 @@ namespace BSOA.GC
             // Construct a new Table tied to the existing database and *unchanged* columns
             IDatabase database = _databaseCollector.Database;
             Dictionary<string, IColumn> latestColumns = new Dictionary<string, IColumn>(current.Columns);
-            ITable latest = (ITable)Activator.CreateInstance(current.GetType(), database, latestColumns);
+            Func<IDatabase, Dictionary<string, IColumn>, ITable> tableBuilder = ConstructorBuilder.GetConstructor<Func<IDatabase, Dictionary<string, IColumn>, ITable>>(current.GetType());
+            ITable latest = tableBuilder(database, latestColumns);
 
             // Replace Table instance in Database with new one
             database.Tables[_tableName] = latest;
@@ -256,8 +256,8 @@ namespace BSOA.GC
 
         private static IColumn WrapColumn(IColumn inner, IColumn temp, RowUpdater updater)
         {
-            Type innerType = inner.Type;
-            return (IColumn)(typeof(UpdatingColumn<>).MakeGenericType(innerType).GetConstructor(new[] { typeof(IColumn), typeof(IColumn), typeof(RowUpdater) }).Invoke(new object[] { inner, temp, updater }));
+            var ctor = ConstructorBuilder.GetConstructor<Func<IColumn, IColumn, RowUpdater, IColumn>>(typeof(UpdatingColumn<>).MakeGenericType(inner.Type));
+            return ctor(inner, temp, updater);
         }
     }
 
