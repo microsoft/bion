@@ -15,11 +15,11 @@ namespace BSOA.GC
     ///  The .NET garbage collector cleans up the object, but BSOA must clean up unused rows.
     ///  
     ///  This collector must:
-    ///  - Remove all rows not reachable from the root, so they aren't serialized out.
-    ///  - Update all Ref and RefList columns so that they still point to the same logical row.
+    ///  - Remove all rows not reachable from the root, so they aren't serialized out with the database.
+    ///  - Update all Ref and RefList columns for swapped rows so that they still point to the same data.
     ///
-    ///  - Copy data for OM instances which aren't reachable to a temporary database, so any orphaned OM objects still work.
-    ///  - Update any OM instances in memory to point to the same logical data.
+    ///  - Copy data for rows which aren't reachable to a temporary database, so orphaned OM objects will still know their data.
+    ///  - Update OM instances in memory to refer to the right row (maybe same row, maybe swapped row, maybe row now in temp table).
     /// </summary>
     internal class DatabaseCollector
     {
@@ -63,12 +63,12 @@ namespace BSOA.GC
 
         public bool Collect()
         {
-            // Walk reachable rows (add root, which will recursively add everything reachable)
+            // 3. Walk reachable rows (add root, which will recursively add everything reachable)
             _tableCollectors.Values.ForEach((collector) => collector.ResetAddedRows());
             _tableCollectors[Database.RootTableName].AddRow(0);
             _tableCollectors.Values.ForEach((collector) => collector.IdentifyUnreachableRows());
 
-            // Walk *unreachable* rows, assign temp DB indices to each row-to-remove, and copy the rows to Temp DB
+            // 4. Walk *unreachable* rows, assign temp DB row indices to each row-to-remove, and copy the rows to Temp DB
             if (MaintainObjectModel)
             {
                 _tableCollectors.Values.ForEach((collector) => collector.ResetAddedRows());
@@ -77,11 +77,11 @@ namespace BSOA.GC
                 _tableCollectors.Values.ForEach((collector) => collector.CopyUnreachableGraphToTemp());
             }
 
-            // Swap and Remove to clean up all unreachable rows from 'main' database
+            // 5. Swap and Remove to clean up all unreachable rows from 'main' database
             bool dataRemoved = false;
             _tableCollectors.Values.ForEach((collector) => dataRemoved |= collector.RemoveUnreachableRows());
 
-            // Set Table instances as "traps" to update object model instances whose rows have been swapped or moved to Temp DB
+            // 6. Turn existing table instances into "traps" to update object model instances to the (now current) table and row.
             if (MaintainObjectModel)
             {
                 _tableCollectors.Values.ForEach((collector) => collector.SetObjectModelUpdateTrap());
@@ -241,7 +241,7 @@ namespace BSOA.GC
                 }
             }
 
-            // Update every Ref and RefList in the temp copy to refer to the re-assigned temp indices from the referenced table
+            // Update every Ref and RefList in the temp copy of this table to use the re-assigned temp indices from each referenced table
             foreach (var refCollector in _refsFromTable)
             {
                 IRefColumn temp = (IRefColumn)_tempTable.Columns[refCollector.ColumnName];
@@ -301,7 +301,6 @@ namespace BSOA.GC
             if (_unreachableRows == null) { return; }
 
             IDatabase database = _databaseCollector.Database;
-
             ITable current = _table;
             int remapFrom = _table.Count;
             int[] remapped = _unreachableRows;
@@ -353,8 +352,8 @@ namespace BSOA.GC
     }
 
     /// <summary>
-    ///  GarbageCollection is built on ICollectors, which 'mark' rows which are
-    ///  reachable from the database root.
+    ///  Garbage Collection is built on ICollectors, which track the references from table to table.
+    ///  These allow recursively walking a graph of objects to identify reachable or unreachable rows.
     /// </summary>
     internal interface ICollector
     {
