@@ -1,8 +1,11 @@
 ﻿using BSOA.IO;
+using BSOA.Model;
 using BSOA.Test.Components;
 using BSOA.Test.Model.Log;
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -54,7 +57,7 @@ namespace BSOA.Test
             run.DB.Collect();
             Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
             Assert.Equal("0, 1, 2, 3, 4", TableRules(run));
-            
+
             // Add a new Rule without adding to a collection
             new Rule(run) { Id = "5" };
 
@@ -137,6 +140,15 @@ namespace BSOA.Test
             Assert.Equal("3, 4", RunRules(run));
             Assert.Equal("3, 4", TableRules(run));
             Assert.Equal("3", run.Rules[0].Id);
+
+            // Verify UpdatingColumns throw if row index only indexers used
+            if (!Debugger.IsAttached)
+            {
+                ITable resultTempTable = ((IRow)result).Table;
+                IColumn<string> innerColumn = (IColumn<string>)resultTempTable.Columns["Guid"];
+                Assert.Throws<InvalidOperationException>(() => innerColumn[0]);
+                Assert.Throws<InvalidOperationException>(() => innerColumn[0] = "Nice");
+            }
 
             // TODO: Ref setter on item moved to temp doesn't work, because .Database accessed before a column access can trap instance.
             Assert.Null(result.Rule.Guid);

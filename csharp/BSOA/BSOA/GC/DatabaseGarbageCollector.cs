@@ -142,7 +142,7 @@ namespace BSOA.GC
             }
             else
             {
-                throw new NotImplementedException($"IRefColumn '{columnName}' of type {column.GetType().Name} not supported in TableCollector.Add()");
+                throw new NotImplementedException();
             }
         }
 
