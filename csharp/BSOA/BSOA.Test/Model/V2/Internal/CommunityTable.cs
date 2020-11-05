@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using BSOA.Column;
+using BSOA.Collections;
 using BSOA.Model;
 
 namespace BSOA.Test.Model.V2
@@ -16,13 +17,17 @@ namespace BSOA.Test.Model.V2
     {
         internal PersonDatabase Database;
 
-        internal RefListColumn People;
+        internal IColumn<NumberList<int>> People;
 
-        internal CommunityTable(PersonDatabase database) : base()
+        public CommunityTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
-            Database = database;
+            Database = (PersonDatabase)database;
+            GetOrBuildColumns();
+        }
 
-            People = AddColumn(nameof(People), new RefListColumn(nameof(PersonDatabase.Person)));
+        public override void GetOrBuildColumns()
+        {
+            People = GetOrBuild(nameof(People), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(PersonDatabase.Person)));
         }
 
         public override Community Get(int index)

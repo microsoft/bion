@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using BSOA.Column;
+using BSOA.Collections;
 using BSOA.Model;
 
 namespace BSOA.Test.Model.V2
@@ -19,12 +20,16 @@ namespace BSOA.Test.Model.V2
         internal IColumn<DateTime> Birthdate;
         internal IColumn<string> Name;
 
-        internal PersonTable(PersonDatabase database) : base()
+        public PersonTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
-            Database = database;
+            Database = (PersonDatabase)database;
+            GetOrBuildColumns();
+        }
 
-            Birthdate = AddColumn(nameof(Birthdate), database.BuildColumn<DateTime>(nameof(Person), nameof(Birthdate), default));
-            Name = AddColumn(nameof(Name), database.BuildColumn<string>(nameof(Person), nameof(Name), default));
+        public override void GetOrBuildColumns()
+        {
+            Birthdate = GetOrBuild(nameof(Birthdate), () => Database.BuildColumn<DateTime>(nameof(Person), nameof(Birthdate), default));
+            Name = GetOrBuild(nameof(Name), () => Database.BuildColumn<string>(nameof(Person), nameof(Name), default));
         }
 
         public override Person Get(int index)

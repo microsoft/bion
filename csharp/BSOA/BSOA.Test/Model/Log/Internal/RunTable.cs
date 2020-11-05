@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using BSOA.Column;
+using BSOA.Collections;
 using BSOA.Model;
 
 namespace BSOA.Test.Model.Log
@@ -16,15 +17,19 @@ namespace BSOA.Test.Model.Log
     {
         internal RunDatabase Database;
 
-        internal RefListColumn Results;
-        internal RefListColumn Rules;
+        internal IColumn<NumberList<int>> Results;
+        internal IColumn<NumberList<int>> Rules;
 
-        internal RunTable(RunDatabase database) : base()
+        public RunTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
-            Database = database;
+            Database = (RunDatabase)database;
+            GetOrBuildColumns();
+        }
 
-            Results = AddColumn(nameof(Results), new RefListColumn(nameof(RunDatabase.Result)));
-            Rules = AddColumn(nameof(Rules), new RefListColumn(nameof(RunDatabase.Rule)));
+        public override void GetOrBuildColumns()
+        {
+            Results = GetOrBuild(nameof(Results), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(RunDatabase.Result)));
+            Rules = GetOrBuild(nameof(Rules), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(RunDatabase.Rule)));
         }
 
         public override Run Get(int index)

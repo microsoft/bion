@@ -1,8 +1,11 @@
 ﻿using BSOA.IO;
+using BSOA.Model;
 using BSOA.Test.Components;
 using BSOA.Test.Model.Log;
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -34,13 +37,17 @@ namespace BSOA.Test
             Run run = new Run() { Rules = new List<Rule>(), Results = new List<Result>() };
             IList<Rule> rules = run.Rules;
 
-            Result result = new Result(run);
-            run.Results.Add(result);
+            for (int i = 0; i < 5; ++i)
+            {
+                run.Results.Add(new Result(run) { StartLine = i });
+            }
 
             for (int i = 0; i < 5; ++i)
             {
                 rules.Add(new Rule(run) { Id = i.ToString() });
             }
+
+            Result result = run.Results[0];
 
             // Verify all rules present in Run and Table
             Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
@@ -50,7 +57,7 @@ namespace BSOA.Test
             run.DB.Collect();
             Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
             Assert.Equal("0, 1, 2, 3, 4", TableRules(run));
-            
+
             // Add a new Rule without adding to a collection
             new Rule(run) { Id = "5" };
 
@@ -64,7 +71,7 @@ namespace BSOA.Test
             Assert.Equal("0, 1, 2, 3, 4", TableRules(run));
 
             // Add a new Rule; confirm ID from old Rule wasn't "left behind" on collected instance
-            Rule six = new Rule();
+            Rule six = new Rule(run);
             Assert.Null(six.Id);
 
             // Make Rule reachable only from another Rule
@@ -87,9 +94,6 @@ namespace BSOA.Test
             Assert.Equal("1, 2, 3, 4", RunRules(run));
             Assert.Equal("1, 2, 3, 4, 6", TableRules(run));
 
-            // TODO: GC should update object instance automatically
-            six = run.Database.Rule.Where((r) => r.Id == "6").First();
-
             // Verify object model instance is pointing to correct data (Collect will have swapped it, so OM object index must be changed)
             Assert.Equal("6", six.Id);
 
@@ -102,9 +106,6 @@ namespace BSOA.Test
             Assert.Equal("2, 3, 4", RunRules(run));
             Assert.Equal("2, 3, 4, 6", TableRules(run));
 
-            // TODO: GC should fix object instance index
-            six = run.Database.Rule.Where((r) => r.Id == "6").First();
-
             // Verify Result and OM instance are still pointing to the right data (index of '6' will have been updated again)
             Assert.Equal("6", result.Rule.Id);
             Assert.Equal("6", six.Id);
@@ -116,21 +117,38 @@ namespace BSOA.Test
             Assert.Equal("2, 3, 4", TableRules(run));
 
             // Verify OM object moved to temporary database with data intact
-            // TODO: GC not copying unreachable but still used object references yet
-            //Assert.Equal("6", six.Id);
+            Assert.Equal("6", six.Id);
 
-            // Make a Rule self-referential; verify Collect doesn't hang
+            // Make a Rule self-referential; verify Collect doesn't hang (walking reachable graph)
             run.Rules[0].RelatedRules = new List<Rule>() { run.Rules[0] };
             run.DB.Collect();
             Assert.Equal("2, 3, 4", RunRules(run));
             Assert.Equal("2, 3, 4", TableRules(run));
 
-            // Remove self-referencing row; verify removed
+            // Remove self-referencing row; verify removed and Collect doesn't hang (copying unreachable graph)
             run.Rules.RemoveAt(0);
             run.DB.Collect();
             Assert.Equal("3, 4", RunRules(run));
             Assert.Equal("3, 4", TableRules(run));
 
+            // Make a rule needed by both reachable (Run.Rules) and unreachable objects (Result).
+            result.Rule = run.Rules[0];
+            run.Results.RemoveAt(0);
+            run.DB.Collect();
+
+            // Verify one copy of Rule kept in main DB
+            Assert.Equal("3, 4", RunRules(run));
+            Assert.Equal("3, 4", TableRules(run));
+            Assert.Equal("3", run.Rules[0].Id);
+
+            // Verify Rule copied; one copy left in main DB and one referenced by Result now in temp
+            result.Rule.Guid = "New";
+            Assert.Equal("New", result.Rule.Guid);
+            Assert.Null(run.Rules[0].Guid);
+
+            // Verify moved Result still has correct data
+            Assert.Equal(0, result.StartLine);
+            Assert.Equal("3", result.Rule.Id);
         }
 
         private void RoundTrip(Run run)

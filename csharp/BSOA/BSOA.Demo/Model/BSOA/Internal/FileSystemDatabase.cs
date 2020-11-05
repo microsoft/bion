@@ -12,17 +12,21 @@ namespace BSOA.Demo.Model.BSOA
     /// </summary>
     internal partial class FileSystemDatabase : Database
     {
-        internal FileTable File { get; }
-        internal FolderTable Folder { get; }
-        internal FileSystemTable FileSystem { get; }
+        internal FileTable File;
+        internal FolderTable Folder;
+        internal FileSystemTable FileSystem;
 
         public FileSystemDatabase() : base("FileSystem")
         {
             _lastCreated = new WeakReference<FileSystemDatabase>(this);
+            GetOrBuildTables();
+        }
 
-            File = AddTable(nameof(File), new FileTable(this));
-            Folder = AddTable(nameof(Folder), new FolderTable(this));
-            FileSystem = AddTable(nameof(FileSystem), new FileSystemTable(this));
+        public override void GetOrBuildTables()
+        {
+            File = GetOrBuild(nameof(File), () => new FileTable(this));
+            Folder = GetOrBuild(nameof(Folder), () => new FolderTable(this));
+            FileSystem = GetOrBuild(nameof(FileSystem), () => new FileSystemTable(this));
         }
 
         [ThreadStatic]

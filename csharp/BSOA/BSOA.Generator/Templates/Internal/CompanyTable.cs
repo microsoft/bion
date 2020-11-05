@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using BSOA.Column;
+using BSOA.Collections;
 using BSOA.Model;
 
 namespace BSOA.Generator.Templates
@@ -18,19 +19,32 @@ namespace BSOA.Generator.Templates
 
         internal IColumn<long> Id;
         internal IColumn<byte> JoinPolicy;
-        internal RefColumn Owner;
-        internal RefListColumn Members;
-        internal RefListColumn Teams;
+        internal IColumn<int> Owner;
+        internal IColumn<NumberList<int>> Members;
+        internal IColumn<NumberList<int>> Teams;
 
-        internal CompanyTable(CompanyDatabase database) : base()
+        internal CompanyTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
-            Database = database;
+            Database = (CompanyDatabase)database;
+            GetOrBuildColumns();
+        }
 
-            Id = AddColumn(nameof(Id), database.BuildColumn<long>(nameof(Company), nameof(Id), 99));
-            JoinPolicy = AddColumn(nameof(JoinPolicy), database.BuildColumn<byte>(nameof(Company), nameof(JoinPolicy), (byte)SecurityPolicy.Open));
-            Owner = AddColumn(nameof(Owner), new RefColumn(nameof(CompanyDatabase.Employee)));
-            Members = AddColumn(nameof(Members), new RefListColumn(nameof(CompanyDatabase.Employee)));
-            Teams = AddColumn(nameof(Teams), new RefListColumn(nameof(CompanyDatabase.Team)));
+        public override void GetOrBuildColumns()
+        {
+            // <ColumnConstructorList>
+            // <SimpleColumnConstructor>
+            Id = GetOrBuild(nameof(Id), () => Database.BuildColumn<long>(nameof(Team), nameof(Id), 99));
+            // </SimpleColumnConstructor>
+            // <EnumColumnConstructor>
+            JoinPolicy = GetOrBuild(nameof(JoinPolicy), () => Database.BuildColumn<byte>(nameof(Team), nameof(JoinPolicy), (byte)SecurityPolicy.Open));
+            // </EnumColumnConstructor>
+            // <RefColumnConstructor>
+            Owner = GetOrBuild(nameof(Owner), () => (IColumn<int>)new RefColumn(nameof(CompanyDatabase.Employee)));
+            // </RefColumnConstructor>
+            // <RefListColumnConstructor>
+            Members = GetOrBuild(nameof(Members), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(CompanyDatabase.Employee)));
+            // </RefListColumnConstructor>
+            // </ColumnConstructorList>
         }
 
         public override Company Get(int index)

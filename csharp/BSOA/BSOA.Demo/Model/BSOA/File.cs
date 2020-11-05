@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -50,38 +49,38 @@ namespace BSOA.Demo.Model.BSOA
 
         public int ParentFolderIndex
         {
-            get => _table.ParentFolderIndex[_index];
-            set => _table.ParentFolderIndex[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.ParentFolderIndex[_index]; }
+            set { _table.EnsureCurrent(this); _table.ParentFolderIndex[_index] = value; }
         }
 
         public string Name
         {
-            get => _table.Name[_index];
-            set => _table.Name[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Name[_index]; }
+            set { _table.EnsureCurrent(this); _table.Name[_index] = value; }
         }
 
         public DateTime LastModifiedUtc
         {
-            get => _table.LastModifiedUtc[_index];
-            set => _table.LastModifiedUtc[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.LastModifiedUtc[_index]; }
+            set { _table.EnsureCurrent(this); _table.LastModifiedUtc[_index] = value; }
         }
 
         public DateTime CreatedUtc
         {
-            get => _table.CreatedUtc[_index];
-            set => _table.CreatedUtc[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.CreatedUtc[_index]; }
+            set { _table.EnsureCurrent(this); _table.CreatedUtc[_index] = value; }
         }
 
         public System.IO.FileAttributes Attributes
         {
-            get => (System.IO.FileAttributes)_table.Attributes[_index];
-            set => _table.Attributes[_index] = (int)value;
+            get { _table.EnsureCurrent(this); return (System.IO.FileAttributes)_table.Attributes[_index]; }
+            set { _table.EnsureCurrent(this); _table.Attributes[_index] = (int)value; }
         }
 
         public long Length
         {
-            get => _table.Length[_index];
-            set => _table.Length[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Length[_index]; }
+            set { _table.EnsureCurrent(this); _table.Length[_index] = value; }
         }
 
         #region IEquatable<File>

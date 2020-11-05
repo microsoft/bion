@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using BSOA.Column;
+using BSOA.Collections;
 using BSOA.Model;
 
 namespace BSOA.Test.Model.Log
@@ -19,16 +20,20 @@ namespace BSOA.Test.Model.Log
         internal IColumn<string> Id;
         internal IColumn<String> Guid;
         internal IColumn<Uri> HelpUri;
-        internal RefListColumn RelatedRules;
+        internal IColumn<NumberList<int>> RelatedRules;
 
-        internal RuleTable(RunDatabase database) : base()
+        public RuleTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
-            Database = database;
+            Database = (RunDatabase)database;
+            GetOrBuildColumns();
+        }
 
-            Id = AddColumn(nameof(Id), database.BuildColumn<string>(nameof(Rule), nameof(Id), default));
-            Guid = AddColumn(nameof(Guid), database.BuildColumn<String>(nameof(Rule), nameof(Guid), default));
-            HelpUri = AddColumn(nameof(HelpUri), database.BuildColumn<Uri>(nameof(Rule), nameof(HelpUri), default));
-            RelatedRules = AddColumn(nameof(RelatedRules), new RefListColumn(nameof(RunDatabase.Rule)));
+        public override void GetOrBuildColumns()
+        {
+            Id = GetOrBuild(nameof(Id), () => Database.BuildColumn<string>(nameof(Rule), nameof(Id), default));
+            Guid = GetOrBuild(nameof(Guid), () => Database.BuildColumn<String>(nameof(Rule), nameof(Guid), default));
+            HelpUri = GetOrBuild(nameof(HelpUri), () => Database.BuildColumn<Uri>(nameof(Rule), nameof(HelpUri), default));
+            RelatedRules = GetOrBuild(nameof(RelatedRules), () => (IColumn<NumberList<int>>)new RefListColumn(nameof(RunDatabase.Rule)));
         }
 
         public override Rule Get(int index)

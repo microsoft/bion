@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using BSOA.Column;
+using BSOA.GC;
 using BSOA.IO;
 
 namespace BSOA.Model
@@ -13,7 +14,7 @@ namespace BSOA.Model
     ///  BSOA Database is the container class for an overall set of tables.
     ///  Projects using BSOA will have the 'root' type inherit from Database.
     /// </summary>
-    public class Database : IDatabase
+    public abstract class Database : IDatabase
     {
         public string RootTableName { get; }
         public Dictionary<string, ITable> Tables { get; }
@@ -24,10 +25,20 @@ namespace BSOA.Model
             Tables = new Dictionary<string, ITable>();
         }
 
-        protected U AddTable<U>(string name, U table) where U : ITable
+        public abstract void GetOrBuildTables();
+
+        protected U GetOrBuild<U>(string name, Func<U> builder) where U : ITable
         {
-            Tables[name] = table;
-            return table;
+            if (Tables.TryGetValue(name, out ITable table))
+            {
+                return (U)table;
+            }
+            else
+            {
+                U newTable = builder();
+                Tables[name] = newTable;
+                return newTable;
+            }
         }
 
         public IColumn<T> BuildColumn<T>(string tableName, string columnName, T defaultValue = default)

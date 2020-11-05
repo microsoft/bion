@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 using BSOA.Column;
+using BSOA.GC;
 using BSOA.IO;
 
 namespace BSOA.Model
@@ -22,15 +24,24 @@ namespace BSOA.Model
     public abstract class Table<T> : LimitedList<T>, ITable<T> where T : IRow<T>
     {
         private int _count;
-        internal Dictionary<string, IColumn> Columns { get; private set; }
-        Dictionary<string, IColumn> ITable.Columns => Columns;
+        public Dictionary<string, IColumn> Columns { get; }
+        public RowUpdater Updater { get; set; }
 
-        protected Table()
+        protected Table(IDatabase database, Dictionary<string, IColumn> columns = null)
         {
-            Columns = new Dictionary<string, IColumn>();
+            Columns = columns ?? new Dictionary<string, IColumn>();
+
+            if (columns != null)
+            {
+                _count = columns.Values.Max((col) => col.Count);
+            }
         }
 
+        // Construct an object model instance for the given index, or null.
         public abstract T Get(int index);
+
+        // Set named column fields on table from current Columns Dictionary values; build missing columns.
+        public abstract void GetOrBuildColumns();
 
         public override int Count => _count;
 
@@ -48,6 +59,16 @@ namespace BSOA.Model
                 if (index >= Count) { _count = index + 1; }
                 Get(index).CopyFrom(value);
             }
+        }
+
+        public void SetCount(int count)
+        {
+            _count = count;
+        }
+
+        public void EnsureCurrent(IRow row)
+        {
+            Updater?.Update(row, out bool unused);
         }
 
         /// <summary>
@@ -75,6 +96,20 @@ namespace BSOA.Model
             }
         }
 
+        protected U GetOrBuild<U>(string name, Func<U> builder) where U : IColumn
+        {
+            if (Columns.TryGetValue(name, out IColumn column))
+            {
+                return (U)column;
+            }
+            else
+            {
+                U newColumn = builder();
+                Columns[name] = newColumn;
+                return newColumn;
+            }
+        }
+
         /// <summary>
         ///  Add a new item to the end of this table.
         /// </summary>
@@ -92,24 +127,6 @@ namespace BSOA.Model
             {
                 Add().CopyFrom(item);
             }
-        }
-
-        /// <summary>
-        ///  Add a Column to the table set.
-        /// </summary>
-        /// <remarks>
-        ///  Typed tables should add columns to determine types, define default values, and similar.
-        ///  Typed tables should have hardcoded properties per column for fastest use by the item types.
-        ///  Columns must be provided to the table for it to facilitate serialization of them.
-        /// </remarks>
-        /// <typeparam name="U">Type of Column being added</typeparam>
-        /// <param name="name">Name of column</param>
-        /// <param name="column">IColumn instance for column</param>
-        /// <returns>Column instance, for easy assignment to hardcoded properties</returns>
-        protected U AddColumn<U>(string name, U column) where U : IColumn
-        {
-            Columns[name] = column;
-            return column;
         }
 
         public override void Swap(int index1, int index2)

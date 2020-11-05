@@ -43,19 +43,10 @@ namespace BSOA.Test.Model.V1
 
         partial void Init();
 
-        private TypedList<Person> _people;
         public IList<Person> People
         {
-            get
-            {
-                if (_people == null) { _people = TypedList<Person>.Get(_table.Database.Person, _table.People, _index); }
-                return _people;
-            }
-            set
-            {
-                TypedList<Person>.Set(_table.Database.Person, _table.People, _index, value);
-                _people = null;
-            }
+            get { _table.EnsureCurrent(this); return TypedList<Person>.Get(_table.Database.Person, _table.People, _index); }
+            set { _table.EnsureCurrent(this); TypedList<Person>.Set(_table.Database.Person, _table.People, _index, value); }
         }
 
         #region IEquatable<Community>

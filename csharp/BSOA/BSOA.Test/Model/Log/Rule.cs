@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -50,35 +49,26 @@ namespace BSOA.Test.Model.Log
 
         public string Id
         {
-            get => _table.Id[_index];
-            set => _table.Id[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Id[_index]; }
+            set { _table.EnsureCurrent(this); _table.Id[_index] = value; }
         }
 
         public String Guid
         {
-            get => _table.Guid[_index];
-            set => _table.Guid[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Guid[_index]; }
+            set { _table.EnsureCurrent(this); _table.Guid[_index] = value; }
         }
 
         public Uri HelpUri
         {
-            get => _table.HelpUri[_index];
-            set => _table.HelpUri[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.HelpUri[_index]; }
+            set { _table.EnsureCurrent(this); _table.HelpUri[_index] = value; }
         }
 
-        private TypedList<Rule> _relatedRules;
         public IList<Rule> RelatedRules
         {
-            get
-            {
-                if (_relatedRules == null) { _relatedRules = TypedList<Rule>.Get(_table.Database.Rule, _table.RelatedRules, _index); }
-                return _relatedRules;
-            }
-            set
-            {
-                TypedList<Rule>.Set(_table.Database.Rule, _table.RelatedRules, _index, value);
-                _relatedRules = null;
-            }
+            get { _table.EnsureCurrent(this); return TypedList<Rule>.Get(_table.Database.Rule, _table.RelatedRules, _index); }
+            set { _table.EnsureCurrent(this); TypedList<Rule>.Set(_table.Database.Rule, _table.RelatedRules, _index, value); }
         }
 
         #region IEquatable<Rule>

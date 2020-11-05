@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -50,62 +49,62 @@ namespace BSOA.Test.Model.Log
 
         public string RuleId
         {
-            get => _table.RuleId[_index];
-            set => _table.RuleId[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.RuleId[_index]; }
+            set { _table.EnsureCurrent(this); _table.RuleId[_index] = value; }
         }
 
         public Rule Rule
         {
-            get => _table.Database.Rule.Get(_table.Rule[_index]);
-            set => _table.Rule[_index] = _table.Database.Rule.LocalIndex(value);
+            get { _table.EnsureCurrent(this); return _table.Database.Rule.Get(_table.Rule[_index]); }
+            set { _table.EnsureCurrent(this); _table.Rule[_index] = _table.Database.Rule.LocalIndex(value); }
         }
 
         public string Guid
         {
-            get => _table.Guid[_index];
-            set => _table.Guid[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Guid[_index]; }
+            set { _table.EnsureCurrent(this); _table.Guid[_index] = value; }
         }
 
         public bool IsActive
         {
-            get => _table.IsActive[_index];
-            set => _table.IsActive[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.IsActive[_index]; }
+            set { _table.EnsureCurrent(this); _table.IsActive[_index] = value; }
         }
 
         public string Message
         {
-            get => _table.Message[_index];
-            set => _table.Message[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Message[_index]; }
+            set { _table.EnsureCurrent(this); _table.Message[_index] = value; }
         }
 
         public int StartLine
         {
-            get => _table.StartLine[_index];
-            set => _table.StartLine[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.StartLine[_index]; }
+            set { _table.EnsureCurrent(this); _table.StartLine[_index] = value; }
         }
 
         public DateTime WhenDetectedUtc
         {
-            get => _table.WhenDetectedUtc[_index];
-            set => _table.WhenDetectedUtc[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.WhenDetectedUtc[_index]; }
+            set { _table.EnsureCurrent(this); _table.WhenDetectedUtc[_index] = value; }
         }
 
         public BaselineState BaselineState
         {
-            get => (BaselineState)_table.BaselineState[_index];
-            set => _table.BaselineState[_index] = (int)value;
+            get { _table.EnsureCurrent(this); return (BaselineState)_table.BaselineState[_index]; }
+            set { _table.EnsureCurrent(this); _table.BaselineState[_index] = (int)value; }
         }
 
         public IDictionary<String, String> Properties
         {
-            get => _table.Properties[_index];
-            set => _table.Properties[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Properties[_index]; }
+            set { _table.EnsureCurrent(this); _table.Properties[_index] = value; }
         }
 
         public IList<int> Tags
         {
-            get => _table.Tags[_index];
-            set => _table.Tags[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Tags[_index]; }
+            set { _table.EnsureCurrent(this); _table.Tags[_index] = value; }
         }
 
         #region IEquatable<Result>
