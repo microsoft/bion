@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 
 using BSOA.Column;
+using BSOA.GC;
 using BSOA.IO;
 
 namespace BSOA.Model
@@ -24,6 +25,7 @@ namespace BSOA.Model
     {
         private int _count;
         public Dictionary<string, IColumn> Columns { get; }
+        public RowUpdater Updater { get; set; }
 
         protected Table(IDatabase database, Dictionary<string, IColumn> columns = null)
         {
@@ -62,6 +64,11 @@ namespace BSOA.Model
         public void SetCount(int count)
         {
             _count = count;
+        }
+
+        public void EnsureCurrent(IRow row)
+        {
+            Updater?.Update(row, out bool unused);
         }
 
         /// <summary>

@@ -5,7 +5,6 @@ using BSOA.Model;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BSOA.GC
 {
@@ -334,21 +333,7 @@ namespace BSOA.GC
                 updater.AddMapping(swappedRowIndex, removedRowIndex, movedToTemp: false);
             }
 
-            // Wrap each column on the current table with a trapped UpdatingColumn
-            List<string> columnNames = current.Columns.Keys.ToList();
-            foreach (string columnName in columnNames)
-            {
-                current.Columns[columnName] = WrapColumn(current.Columns[columnName], temp.Columns[columnName], updater);
-            }
-
-            // Update the current table reference columns with the trapped copies
-            current.GetOrBuildColumns();
-        }
-
-        private static IColumn WrapColumn(IColumn inner, IColumn temp, RowUpdater updater)
-        {
-            var ctor = ConstructorBuilder.GetConstructor<Func<IColumn, IColumn, RowUpdater, IColumn>>(typeof(UpdatingColumn<>).MakeGenericType(inner.Type));
-            return ctor(inner, temp, updater);
+            current.Updater = updater;
         }
     }
 

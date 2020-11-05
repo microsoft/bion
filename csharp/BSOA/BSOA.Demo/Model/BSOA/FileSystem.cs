@@ -45,14 +45,14 @@ namespace BSOA.Demo.Model.BSOA
 
         public IList<Folder> Folders
         {
-            get => TypedList<Folder>.Get(_table.Database.Folder, _table.Folders, _index, this);
-            set => TypedList<Folder>.Set(_table.Database.Folder, _table.Folders, _index, value, this);
+            get { _table.EnsureCurrent(this); return TypedList<Folder>.Get(_table.Database.Folder, _table.Folders, _index); }
+            set { _table.EnsureCurrent(this); TypedList<Folder>.Set(_table.Database.Folder, _table.Folders, _index, value); }
         }
 
         public IList<File> Files
         {
-            get => TypedList<File>.Get(_table.Database.File, _table.Files, _index, this);
-            set => TypedList<File>.Set(_table.Database.File, _table.Files, _index, value, this);
+            get { _table.EnsureCurrent(this); return TypedList<File>.Get(_table.Database.File, _table.Files, _index); }
+            set { _table.EnsureCurrent(this); TypedList<File>.Set(_table.Database.File, _table.Files, _index, value); }
         }
 
         #region IEquatable<FileSystem>

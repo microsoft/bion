@@ -24,9 +24,6 @@ namespace BSOA.Model
         // Support getter and setter
         new T this[int index] { get; set; }
 
-        // Getter and Setter with 'trap' for Garbage Collection
-        T this[int index, IRow caller] { get; set; }
-
         // Add IndexOf to find items; nicer implementation of Contains(T item);
         int IndexOf(T item);
     }

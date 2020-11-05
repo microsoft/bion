@@ -11,7 +11,7 @@ namespace BSOA.GC
     ///  has all columns wrapped with UpdatingColumns, which update the object model
     ///  instances when they try to call to get or set data.
     /// </summary>
-    internal class RowUpdater
+    public class RowUpdater
     {
         private ITable Current { get; }
         private ITable Temp { get; }

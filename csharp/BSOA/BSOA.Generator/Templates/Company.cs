@@ -47,35 +47,35 @@ namespace BSOA.Generator.Templates
         //   <SimpleColumn>
         public long Id
         {
-            get => _table.Id[_index, this];
-            set => _table.Id[_index, this] = value;
+            get { _table.EnsureCurrent(this); return _table.Id[_index]; }
+            set { _table.EnsureCurrent(this); _table.Id[_index] = value; }
         }
 
         //   </SimpleColumn>
         //   <EnumColumn>
         public SecurityPolicy JoinPolicy
         {
-            get => (SecurityPolicy)_table.JoinPolicy[_index, this];
-            set => _table.JoinPolicy[_index, this] = (byte)value;
+            get { _table.EnsureCurrent(this); return (SecurityPolicy)_table.JoinPolicy[_index]; }
+            set { _table.EnsureCurrent(this); _table.JoinPolicy[_index] = (byte)value; }
         }
 
         //   </EnumColumn>
-        //  <RefColumn>
+        //   <RefColumn>
         public Employee Owner
         {
-            get => _table.Database.Employee.Get(_table.Owner[_index, this]);
-            set => _table.Owner[_index, this] = _table.Database.Employee.LocalIndex(value);
+            get { _table.EnsureCurrent(this); return _table.Database.Employee.Get(_table.Owner[_index]); }
+            set { _table.EnsureCurrent(this); _table.Owner[_index] = _table.Database.Employee.LocalIndex(value); }
         }
 
-        //  </RefColumn>
-        //  <RefListColumn>
+        //   </RefColumn>
+        //   <RefListColumn>
         public IList<Employee> Members
         {
-            get => TypedList<Employee>.Get(_table.Database.Employee, _table.Members, _index, this);
-            set => TypedList<Employee>.Set(_table.Database.Employee, _table.Members, _index, value, this);
+            get { _table.EnsureCurrent(this); return TypedList<Employee>.Get(_table.Database.Employee, _table.Members, _index); }
+            set { _table.EnsureCurrent(this); TypedList<Employee>.Set(_table.Database.Employee, _table.Members, _index, value); }
         }
 
-        //  </RefListColumn>
+        //   </RefListColumn>
         // </ColumnList>
 
         #region IEquatable<Company>

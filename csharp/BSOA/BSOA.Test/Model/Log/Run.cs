@@ -45,14 +45,14 @@ namespace BSOA.Test.Model.Log
 
         public IList<Result> Results
         {
-            get => TypedList<Result>.Get(_table.Database.Result, _table.Results, _index, this);
-            set => TypedList<Result>.Set(_table.Database.Result, _table.Results, _index, value, this);
+            get { _table.EnsureCurrent(this); return TypedList<Result>.Get(_table.Database.Result, _table.Results, _index); }
+            set { _table.EnsureCurrent(this); TypedList<Result>.Set(_table.Database.Result, _table.Results, _index, value); }
         }
 
         public IList<Rule> Rules
         {
-            get => TypedList<Rule>.Get(_table.Database.Rule, _table.Rules, _index, this);
-            set => TypedList<Rule>.Set(_table.Database.Rule, _table.Rules, _index, value, this);
+            get { _table.EnsureCurrent(this); return TypedList<Rule>.Get(_table.Database.Rule, _table.Rules, _index); }
+            set { _table.EnsureCurrent(this); TypedList<Rule>.Set(_table.Database.Rule, _table.Rules, _index, value); }
         }
 
         #region IEquatable<Run>

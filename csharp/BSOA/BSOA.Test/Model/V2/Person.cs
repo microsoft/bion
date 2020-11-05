@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 
 using BSOA.Collections;
 using BSOA.Model;
@@ -50,14 +49,14 @@ namespace BSOA.Test.Model.V2
 
         public DateTime Birthdate
         {
-            get => _table.Birthdate[_index, this];
-            set => _table.Birthdate[_index, this] = value;
+            get { _table.EnsureCurrent(this); return _table.Birthdate[_index]; }
+            set { _table.EnsureCurrent(this); _table.Birthdate[_index] = value; }
         }
 
         public string Name
         {
-            get => _table.Name[_index, this];
-            set => _table.Name[_index, this] = value;
+            get { _table.EnsureCurrent(this); return _table.Name[_index]; }
+            set { _table.EnsureCurrent(this); _table.Name[_index] = value; }
         }
 
         #region IEquatable<Person>

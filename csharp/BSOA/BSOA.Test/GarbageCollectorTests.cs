@@ -141,18 +141,6 @@ namespace BSOA.Test
             Assert.Equal("3, 4", TableRules(run));
             Assert.Equal("3", run.Rules[0].Id);
 
-            // Verify UpdatingColumns throw if row index only indexers used
-            if (!Debugger.IsAttached)
-            {
-                ITable resultTempTable = ((IRow)result).Table;
-                IColumn<string> innerColumn = (IColumn<string>)resultTempTable.Columns["Guid"];
-                Assert.Throws<InvalidOperationException>(() => innerColumn[0]);
-                Assert.Throws<InvalidOperationException>(() => innerColumn[0] = "Nice");
-            }
-
-            // TODO: Ref setter on item moved to temp doesn't work, because .Database accessed before a column access can trap instance.
-            Assert.Null(result.Rule.Guid);
-
             // Verify Rule copied; one copy left in main DB and one referenced by Result now in temp
             result.Rule.Guid = "New";
             Assert.Equal("New", result.Rule.Guid);

@@ -28,12 +28,6 @@ namespace BSOA.Model
         public abstract void Clear();
         public abstract void RemoveFromEnd(int count);
 
-        public virtual T this[int index, IRow caller]
-        {
-            get => this[index];
-            set => this[index] = value;
-        }
-
         public virtual T Add()
         {
             return this[Count];
