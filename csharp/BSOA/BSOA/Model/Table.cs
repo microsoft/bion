@@ -40,7 +40,7 @@ namespace BSOA.Model
         // Construct an object model instance for the given index, or null.
         public abstract T Get(int index);
 
-        // Set column properties to columns from Columns Dictionary.
+        // Set named column fields on table from current Columns Dictionary values; build missing columns.
         public abstract void GetOrBuildColumns();
 
         public override int Count => _count;
