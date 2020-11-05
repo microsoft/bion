@@ -34,13 +34,17 @@ namespace BSOA.Test
             Run run = new Run() { Rules = new List<Rule>(), Results = new List<Result>() };
             IList<Rule> rules = run.Rules;
 
-            Result result = new Result(run);
-            run.Results.Add(result);
+            for (int i = 0; i < 5; ++i)
+            {
+                run.Results.Add(new Result(run) { StartLine = i });
+            }
 
             for (int i = 0; i < 5; ++i)
             {
                 rules.Add(new Rule(run) { Id = i.ToString() });
             }
+
+            Result result = run.Results[0];
 
             // Verify all rules present in Run and Table
             Assert.Equal("0, 1, 2, 3, 4", RunRules(run));
@@ -123,6 +127,28 @@ namespace BSOA.Test
             run.DB.Collect();
             Assert.Equal("3, 4", RunRules(run));
             Assert.Equal("3, 4", TableRules(run));
+
+            // Make a rule needed by both reachable (Run.Rules) and unreachable objects (Result).
+            result.Rule = run.Rules[0];
+            run.Results.RemoveAt(0);
+            run.DB.Collect();
+
+            // Verify one copy of Rule kept in main DB
+            Assert.Equal("3, 4", RunRules(run));
+            Assert.Equal("3, 4", TableRules(run));
+            Assert.Equal("3", run.Rules[0].Id);
+
+            // TODO: Ref setter on item moved to temp doesn't work, because .Database accessed before a column access can trap instance.
+            Assert.Null(result.Rule.Guid);
+
+            // Verify Rule copied; one copy left in main DB and one referenced by Result now in temp
+            result.Rule.Guid = "New";
+            Assert.Equal("New", result.Rule.Guid);
+            Assert.Null(run.Rules[0].Guid);
+
+            // Verify moved Result still has correct data
+            Assert.Equal(0, result.StartLine);
+            Assert.Equal("3", result.Rule.Id);
         }
 
         private void RoundTrip(Run run)

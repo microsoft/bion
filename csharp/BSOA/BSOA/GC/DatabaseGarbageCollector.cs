@@ -199,8 +199,6 @@ namespace BSOA.GC
 
         public void BuildRowToTempRowMap()
         {
-            if (_unreachableRows == null) { return; }
-
             // Assign a new temp row index to every row in the unreachable graph.
             _tempIndexToRowIndex = new List<int>();
             _rowIndexToTempIndex = new int[_addedRows.Length];
@@ -224,7 +222,7 @@ namespace BSOA.GC
 
         public void CopyUnreachableGraphToTemp()
         {
-            if (_unreachableRows == null) { return; }
+            if (_tempIndexToRowIndex == null || _tempIndexToRowIndex.Count == 0) { return; }
             
             _tempTable = _databaseCollector.TempDatabase.Tables[_tableName];
 
@@ -242,10 +240,13 @@ namespace BSOA.GC
             }
 
             // Update every Ref and RefList in the temp copy of this table to use the re-assigned temp indices from each referenced table
-            foreach (var refCollector in _refsFromTable)
+            if (_refsFromTable != null)
             {
-                IRefColumn temp = (IRefColumn)_tempTable.Columns[refCollector.ColumnName];
-                temp.ForEach(refCollector.Collector.FixReferences);
+                foreach (var refCollector in _refsFromTable)
+                {
+                    IRefColumn temp = (IRefColumn)_tempTable.Columns[refCollector.ColumnName];
+                    temp.ForEach(refCollector.Collector.FixReferences);
+                }
             }
 
             // Ensure temp table count correct

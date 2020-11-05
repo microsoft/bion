@@ -89,11 +89,6 @@ namespace BSOA.Model
             }
         }
 
-        public int LocalIndex(IRow value)
-        {
-            return LocalIndex((T)value);
-        }
-
         protected U GetOrBuild<U>(string name, Func<U> builder) where U : IColumn
         {
             if (Columns.TryGetValue(name, out IColumn column))

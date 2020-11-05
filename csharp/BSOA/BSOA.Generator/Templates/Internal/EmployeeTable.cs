@@ -20,7 +20,6 @@ namespace BSOA.Generator.Templates
         internal EmployeeTable(IDatabase database) : base()
         {
             Database = (CompanyDatabase)database;
-            Database = (CompanyDatabase)database;
             GetOrBuildColumns();
         }
 

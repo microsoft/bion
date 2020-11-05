@@ -16,9 +16,6 @@ namespace BSOA.Model
         // Set named column fields on table from current Columns Dictionary values.
         void GetOrBuildColumns();
 
-        // Copy an item to this Table and return the new index for it
-        int LocalIndex(IRow value);
-
         // Fix count on a table after GC-related shenanigans. :/
         void SetCount(int count);
     }
