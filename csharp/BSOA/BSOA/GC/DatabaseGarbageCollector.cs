@@ -75,28 +75,24 @@ namespace BSOA.GC
                 return false;
             }
 
-            _tableCollectors.Values.ForEach((collector) => collector.IdentifyUnreachableRows());
+            _tableCollectors.Values.ForEach((collector) => collector.SaveReachableRows());
 
             // 4. Walk *unreachable* rows, assign temp DB row indices to each row-to-remove, and copy the rows to Temp DB
             if (MaintainObjectModel)
             {
                 _tableCollectors.Values.ForEach((collector) => collector.ResetAddedRows());
                 _tableCollectors.Values.ForEach((collector) => collector.WalkUnreachableGraph());
+                _tableCollectors.Values.ForEach((collector) => collector.SaveUnreachableRows());
+
                 _tableCollectors.Values.ForEach((collector) => collector.BuildRowToTempRowMap());
                 _tableCollectors.Values.ForEach((collector) => collector.CopyUnreachableGraphToTemp());
             }
 
-            // 5. Swap and Remove to clean up all unreachable rows from 'main' database
-            bool dataRemoved = false;
-            _tableCollectors.Values.ForEach((collector) => dataRemoved |= collector.RemoveUnreachableRows());
-
+            // 5. Swap and Remove to clean up all non-reachable rows from 'main' database
             // 6. Turn existing table instances into "traps" to update object model instances to the (now current) table and row.
-            if (MaintainObjectModel)
-            {
-                _tableCollectors.Values.ForEach((collector) => collector.SetObjectModelUpdateTrap());
-            }
+            _tableCollectors.Values.ForEach((collector) => collector.RemoveNonReachableRows());
 
-            return dataRemoved;
+            return true;
         }
     }
 
@@ -107,6 +103,7 @@ namespace BSOA.GC
         // Table this Collector is assigned to (so it can Swap and Remove to clean unused rows)
         private ITable _table;
         private string _tableName;
+        private int _initialCount;
 
         // List of columns from this table to other tables (to walk reachable graph)
         private List<ICollector> _refsFromTable;
@@ -114,15 +111,21 @@ namespace BSOA.GC
         // List of columns from other tables to this table (to remap indices of Swapped rows)
         private List<IRefColumn> _refsToTable;
 
-        // Added rows tracks rows reachable from the root (first walk) and everything to copy to temp (second walk)
+        // Tracks rows included in the current recursive walk
         private bool[] _addedRows;
+        private int _addedCount;
 
-        // The set of rows which were unreachable from the root (and must be removed before write)
-        private int[] _unreachableRows;
+        // Tracks rows which are reachable from the root element
+        private bool[] _reachableRows;
+        private int _reachableCount;
+
+        // Tracks all rows referenced by any unreachable row (may overlap with reachable rows)
+        private bool[] _unreachableRows;
+        private int _unreachableCount;
 
         // Keep the temp table (to which unreachables are copied) and mappings from current row index to temp row index and back
         private ITable _tempTable;
-        private List<int> _tempIndexToRowIndex;
+        private int[] _tempIndexToRowIndex;
         private int[] _rowIndexToTempIndex;
 
         public TableCollector(DatabaseCollector databaseCollector, ITable table, string tableName)
@@ -130,6 +133,8 @@ namespace BSOA.GC
             _databaseCollector = databaseCollector;
             _table = table;
             _tableName = tableName;
+
+            _initialCount = table.Count;
         }
 
         public void AddRefColumn(string columnName, IRefColumn column, TableCollector target)
@@ -157,7 +162,8 @@ namespace BSOA.GC
 
         public void ResetAddedRows()
         {
-            _addedRows = new bool[_table.Count];
+            _addedRows = new bool[_initialCount];
+            _addedCount = 0;
         }
 
         public long AddRow(int index)
@@ -167,6 +173,7 @@ namespace BSOA.GC
             if (_addedRows[index] == false)
             {
                 _addedRows[index] = true;
+                _addedCount++;
                 sum++;
 
                 if (_refsFromTable != null)
@@ -181,53 +188,59 @@ namespace BSOA.GC
             return sum;
         }
 
-        public void IdentifyUnreachableRows()
+        public void SaveReachableRows()
         {
-            // Build an array of all row indices which were unreachable from the root.
-            // These rows will be removed from the database.
+            _reachableRows = _addedRows;
+            _reachableCount = _addedCount;
 
-            List<int> unreachableRows = new List<int>();
-            for (int i = 0; i < _addedRows.Length; ++i)
-            {
-                // PERF RISK: Need faster way to find unused values; pivot to BitVector and add vectorized mechanism?
-                if (!_addedRows[i]) { unreachableRows.Add(i); }
-            }
-
-            if (unreachableRows.Count > 0)
-            {
-                _unreachableRows = unreachableRows.ToArray();
-            }
+            _addedRows = null;
+            _addedCount = 0;
         }
 
-        public void WalkUnreachableGraph()
+        public long WalkUnreachableGraph()
         {
-            if (_unreachableRows == null) { return; }
+            if (_reachableCount == _initialCount) { return 0; }
 
             // Traverse all unreachable rows recusively, finding everything they reference.
             // This will include all unreachable rows, but also anything reachable but also referenced by something unreachable.
-            foreach (int rowIndex in _unreachableRows)
+            long sum = 0;
+            for (int i = 0; i < _reachableRows.Length; ++i)
             {
-                AddRow(rowIndex);
+                if (_reachableRows[i] == false)
+                {
+                    sum += AddRow(i);
+                }
             }
+
+            return sum;
+        }
+
+        public void SaveUnreachableRows()
+        {
+            _unreachableRows = _addedRows;
+            _unreachableCount = _addedCount;
+
+            _addedRows = null;
+            _addedCount = 0;
         }
 
         public void BuildRowToTempRowMap()
         {
             // Assign a new temp row index to every row in the unreachable graph.
-            _tempIndexToRowIndex = new List<int>();
-            _rowIndexToTempIndex = new int[_addedRows.Length];
+            _tempIndexToRowIndex = new int[_unreachableCount];
+            _rowIndexToTempIndex = new int[_unreachableRows.Length];
 
             int tempCount = 0;
-            for (int i = 0; i < _addedRows.Length; ++i)
+            for (int i = 0; i < _unreachableRows.Length; ++i)
             {
                 int tempIndex = -1;
 
-                if (_addedRows[i])
+                if (_unreachableRows[i])
                 {
                     tempIndex = tempCount;
                     tempCount++;
 
-                    _tempIndexToRowIndex.Add(i);
+                    _tempIndexToRowIndex[tempIndex] = i;
                 }
 
                 _rowIndexToTempIndex[i] = tempIndex;
@@ -236,7 +249,7 @@ namespace BSOA.GC
 
         public void CopyUnreachableGraphToTemp()
         {
-            if (_tempIndexToRowIndex == null || _tempIndexToRowIndex.Count == 0) { return; }
+            if (_unreachableCount == 0) { return; }
 
             _tempTable = _databaseCollector.TempDatabase.Tables[_tableName];
 
@@ -246,7 +259,7 @@ namespace BSOA.GC
                 IColumn source = _table.Columns[columnName];
                 IColumn temp = _tempTable.Columns[columnName];
 
-                for (int tempIndex = 0; tempIndex < _tempIndexToRowIndex.Count; ++tempIndex)
+                for (int tempIndex = 0; tempIndex < _tempIndexToRowIndex.Length; ++tempIndex)
                 {
                     int sourceIndex = _tempIndexToRowIndex[tempIndex];
                     temp.CopyItem(tempIndex, source, sourceIndex);
@@ -259,100 +272,52 @@ namespace BSOA.GC
                 foreach (var refCollector in _refsFromTable)
                 {
                     IRefColumn temp = (IRefColumn)_tempTable.Columns[refCollector.ColumnName];
-                    temp.ForEach(refCollector.Collector.FixReferences);
+                    temp.ForEach((slice) => Remapper2.Swap(slice, _rowIndexToTempIndex));
                 }
             }
 
             // Ensure temp table count correct
-            _tempTable.SetCount(_tempIndexToRowIndex.Count);
+            _tempTable.SetCount(_tempIndexToRowIndex.Length);
         }
 
-        private void FixReferences(ArraySlice<int> slice)
+        public bool RemoveNonReachableRows()
         {
-            int[] array = slice.Array;
-            int end = slice.Index + slice.Count;
-            for (int i = slice.Index; i < end; ++i)
+            if (_reachableCount == _initialCount) { return false; }
+
+            if (!_databaseCollector.MaintainObjectModel)
             {
-                int index = array[i];
-                if (index >= 0)
-                {
-                    array[i] = _rowIndexToTempIndex[index];
-                }
+                // Clean up all non-reachable rows
+                Remapper2.Collect(_reachableRows, _table, _refsToTable);
             }
-        }
+            else
+            { 
+                IDatabase database = _databaseCollector.Database;
 
-        public bool RemoveUnreachableRows()
-        {
-            if (_unreachableRows == null) { return false; }
+                // Construct a new 'latest' Table with the same columns
+                Func<IDatabase, Dictionary<string, IColumn>, ITable> tableBuilder = ConstructorBuilder.GetConstructor<Func<IDatabase, Dictionary<string, IColumn>, ITable>>(_table.GetType());
+                ITable latest = tableBuilder(database, new Dictionary<string, IColumn>(_table.Columns));
 
-            // TODO: Deduplicate with GarbageCollector.Collect()
-            IColumn current = _table;
-            IRemapper<int> remapper = IntRemapper.Instance;
+                // Update the database to refer to the 'latest' table (in new object model instances returned)
+                database.Tables[_tableName] = latest;
+                database.GetOrBuildTables();
 
-            int remapFrom = (current.Count - _unreachableRows.Length);
+                // Find the 'temp' copy of this table which unreachable rows were copied to
+                ITable temp = _databaseCollector.TempDatabase.Tables[_tableName];
 
-            // Swap the *values* to the end of the values array
-            for (int i = 0; i < _unreachableRows.Length; ++i)
-            {
-                current.Swap(remapFrom + i, _unreachableRows[i]);
-            }
+                // Build a RowUpdater to redirect object model instances to the temp or latest table copies
+                RowUpdater updater = new RowUpdater(latest, temp);
 
-            // Remove the unused values that are now at the end of the array
-            current.RemoveFromEnd(_unreachableRows.Length);
+                // Clean up all non-reachable rows, and fill out the updater with where to redirect them
+                Remapper2.Collect(_reachableRows, _table, _refsToTable, updater, _rowIndexToTempIndex);
 
-            // Trim values afterward to clean up any newly unused space
-            current.Trim();
+                // Tell the existing table instance to redirect object model objects to the new latest or temp tables
+                _table.Updater = updater;
 
-            // Remap indices from all tables which point to this one to use the updated indices
-            if (_refsToTable != null)
-            {
-                foreach (INumberColumn<int> refToTable in _refsToTable)
-                {
-                    refToTable.ForEach((slice) => remapper.RemapAbove(slice, remapFrom, _unreachableRows));
-                }
+                // Tell the latest table about the new row count (Collect removes happened after it was created)
+                latest.SetCount(_table.Count);
             }
 
             return true;
-        }
-
-        public void SetObjectModelUpdateTrap()
-        {
-            if (_unreachableRows == null) { return; }
-
-            IDatabase database = _databaseCollector.Database;
-            ITable current = _table;
-            int remapFrom = _table.Count;
-            int[] remapped = _unreachableRows;
-
-            // Construct a new 'latest' Table with the real, updated columns
-            Func<IDatabase, Dictionary<string, IColumn>, ITable> tableBuilder = ConstructorBuilder.GetConstructor<Func<IDatabase, Dictionary<string, IColumn>, ITable>>(current.GetType());
-            ITable latest = tableBuilder(database, new Dictionary<string, IColumn>(current.Columns));
-
-            // Update the database to see the 'latest' table
-            database.Tables[_tableName] = latest;
-            database.GetOrBuildTables();
-
-            // Find the 'temp' copy of this table which unreachable rows were copied to
-            ITable temp = _databaseCollector.TempDatabase.Tables[_tableName];
-
-            // Build a RowUpdater to redirect object model instances to the temp or latest table copies
-            RowUpdater updater = new RowUpdater(latest, temp);
-
-            // For each removed item...
-            for (int i = 0; i < remapped.Length; ++i)
-            {
-                int removedRowIndex = remapped[i];
-                int swappedRowIndex = remapFrom + i;
-                int removedRowTempTableIndex = _rowIndexToTempIndex[remapped[i]];
-
-                // Tell the updater that the item-to-remove is in the temp table
-                updater.AddMapping(removedRowIndex, removedRowTempTableIndex, movedToTemp: true);
-
-                // Tell the updater that the item swapped in for the removed item was swapped
-                updater.AddMapping(swappedRowIndex, removedRowIndex, movedToTemp: false);
-            }
-
-            current.Updater = updater;
         }
     }
 
@@ -411,10 +376,109 @@ namespace BSOA.GC
 
             foreach (int targetIndex in Column.Values[index])
             {
-                sum += Collector.AddRow(targetIndex);
+                if (targetIndex >= 0)
+                {
+                    sum += Collector.AddRow(targetIndex);
+                }
             }
 
             return sum;
         }
     }
+
+    internal class Remapper2
+    {
+        // Empty?
+        // Single?
+
+        // Redo algorithm to take a sorted array of rows to remove or keep? (BitVector as-is likely more efficient)
+        // Need to keep lists for RowUpdater. 
+        // Swap in for RemoveUnreachable and see how this works out.
+        // Redesign other GarbageCollector to be able to share logic.
+
+        public static void Collect(bool[] keepRow, IColumn column, IEnumerable<INumberColumn<int>> fixColumns, RowUpdater updater = null, int[] rowIndexToTempIndex = null)
+        {
+            int[] remap = null;
+
+            int smallestToRemove = 0;
+            int biggestToKeep = column.Count - 1;
+            int removeCount = 0;
+
+            while (smallestToRemove < biggestToKeep)
+            {
+                // Find the next last row which needs to be kept
+                while (smallestToRemove <= biggestToKeep && keepRow[biggestToKeep] == false)
+                {
+                    // While rows already at the end are being removed, tell the updater where in the temp table they've gone
+                    updater?.AddMapping(biggestToKeep, rowIndexToTempIndex[biggestToKeep], movedToTemp: true);
+
+                    biggestToKeep--;
+                    removeCount++;
+                }
+
+                // Find the next earliest row which needs to be removed
+                while (smallestToRemove < biggestToKeep && keepRow[smallestToRemove] == true)
+                {
+                    smallestToRemove++;
+                }
+
+                if (smallestToRemove >= biggestToKeep) { break; }
+                removeCount++;
+
+                // Swap these (the lowest index row left to remove with the highest index row left to keep)
+                column.Swap(smallestToRemove, biggestToKeep);
+
+                // Tell the updater about the kept row (moved from biggestToKeep to smallestToRemove)
+                updater?.AddMapping(biggestToKeep, smallestToRemove, movedToTemp: false);
+
+                // Tell the updater about the removed row (originally at smallestToRemove, now in temp
+                updater?.AddMapping(smallestToRemove, rowIndexToTempIndex[smallestToRemove], movedToTemp: true);
+
+                // Keep array mapping every row to new index
+                if (remap == null)
+                {
+                    remap = new int[column.Count];
+
+                    for (int i = 0; i < remap.Length; ++i)
+                    {
+                        remap[i] = i;
+                    }
+                }
+
+                remap[biggestToKeep] = smallestToRemove;
+                remap[smallestToRemove] = biggestToKeep;
+
+                smallestToRemove++;
+                biggestToKeep--;
+            }
+
+            // Remove the newly swapped rows
+            if (removeCount > 0)
+            {
+                column.RemoveFromEnd(removeCount);
+            }
+
+            // Remap columns referring to the cleaned set
+            if (remap != null)
+            {
+                fixColumns.ForEach((column) => column.ForEach((slice) => Swap(slice, remap)));
+            }
+        }
+
+        public static void Swap(ArraySlice<int> values, int[] replacements)
+        {
+            int[] array = values.Array;
+            int end = values.Index + values.Count;
+
+            for (int i = values.Index; i < end; ++i)
+            {
+                int value = array[i];
+                if (value >= 0 && value < replacements.Length)
+                {
+                    array[i] = replacements[value];
+                }
+            }
+        }
+    }
+
 }

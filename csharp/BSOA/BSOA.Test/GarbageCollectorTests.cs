@@ -151,6 +151,30 @@ namespace BSOA.Test
             Assert.Equal("3", result.Rule.Id);
         }
 
+        [Fact]
+        public void GarbageCollector_SwapBug()
+        {
+            Run run = new Run() { Rules = new List<Rule>(), Results = new List<Result>() };
+            IList<Rule> rules = run.Rules;
+
+            for (int i = 0; i < 7; ++i)
+            {
+                rules.Add(new Rule(run) { Id = i.ToString() });
+            }
+
+            // Verify all rules present in Run and Table
+            Assert.Equal("0, 1, 2, 3, 4, 5, 6", RunRules(run));
+            Assert.Equal("0, 1, 2, 3, 4, 5, 6", TableRules(run));
+
+            // Remove all but second to last rule
+            run.Rules = new List<Rule>() { rules[5] };
+
+            // Verify nothing removed by Garbage Collection (all Rules directly reachable from root)            
+            run.DB.Collect();
+            Assert.Equal("5", RunRules(run));
+            Assert.Equal("5", TableRules(run));
+        }
+
         private void RoundTrip(Run run)
         {
             // RoundTrip a single Database instance so that the root object from it is still valid (same Table instance, same index).
