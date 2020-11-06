@@ -5,6 +5,7 @@ using BSOA.Model;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BSOA.GC
 {
@@ -62,9 +63,18 @@ namespace BSOA.GC
 
         public bool Collect()
         {
+            long tableRowTotal = Database.Tables.Values.Sum((table) => table.Count);
+
             // 3. Walk reachable rows (add root, which will recursively add everything reachable)
             _tableCollectors.Values.ForEach((collector) => collector.ResetAddedRows());
-            _tableCollectors[Database.RootTableName].AddRow(0);
+            long reachableTotal = _tableCollectors[Database.RootTableName].AddRow(0);
+
+            // If nothing or everything is reachable, no splitting is needed. Stop.
+            if (reachableTotal == 1 || reachableTotal == tableRowTotal)
+            {
+                return false;
+            }
+
             _tableCollectors.Values.ForEach((collector) => collector.IdentifyUnreachableRows());
 
             // 4. Walk *unreachable* rows, assign temp DB row indices to each row-to-remove, and copy the rows to Temp DB
@@ -150,20 +160,25 @@ namespace BSOA.GC
             _addedRows = new bool[_table.Count];
         }
 
-        public void AddRow(int index)
+        public long AddRow(int index)
         {
+            long sum = 0;
+
             if (_addedRows[index] == false)
             {
                 _addedRows[index] = true;
+                sum++;
 
                 if (_refsFromTable != null)
                 {
                     foreach (ICollector collector in _refsFromTable)
                     {
-                        collector.AddRow(index);
+                        sum += collector.AddRow(index);
                     }
                 }
             }
+
+            return sum;
         }
 
         public void IdentifyUnreachableRows()
@@ -222,7 +237,7 @@ namespace BSOA.GC
         public void CopyUnreachableGraphToTemp()
         {
             if (_tempIndexToRowIndex == null || _tempIndexToRowIndex.Count == 0) { return; }
-            
+
             _tempTable = _databaseCollector.TempDatabase.Tables[_tableName];
 
             // Copy every row in the unreachable graph to the temp table *non-recursively*
@@ -258,7 +273,11 @@ namespace BSOA.GC
             int end = slice.Index + slice.Count;
             for (int i = slice.Index; i < end; ++i)
             {
-                array[i] = _rowIndexToTempIndex[array[i]];
+                int index = array[i];
+                if (index >= 0)
+                {
+                    array[i] = _rowIndexToTempIndex[index];
+                }
             }
         }
 
@@ -345,7 +364,7 @@ namespace BSOA.GC
     {
         string ColumnName { get; }
         TableCollector Collector { get; }
-        void AddRow(int index);
+        long AddRow(int index);
     }
 
     internal struct RefColumnCollector : ICollector
@@ -361,13 +380,15 @@ namespace BSOA.GC
             Collector = collector;
         }
 
-        public void AddRow(int index)
+        public long AddRow(int index)
         {
             int targetIndex = Column[index];
             if (targetIndex >= 0)
             {
-                Collector.AddRow(targetIndex);
+                return Collector.AddRow(targetIndex);
             }
+
+            return 0;
         }
     }
 
@@ -384,12 +405,16 @@ namespace BSOA.GC
             Collector = collector;
         }
 
-        public void AddRow(int index)
+        public long AddRow(int index)
         {
+            long sum = 0;
+
             foreach (int targetIndex in Column.Values[index])
             {
-                Collector.AddRow(targetIndex);
+                sum += Collector.AddRow(targetIndex);
             }
+
+            return sum;
         }
     }
 }
