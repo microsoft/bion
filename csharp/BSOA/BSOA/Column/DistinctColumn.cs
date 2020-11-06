@@ -160,7 +160,7 @@ namespace BSOA.Column
                 BitVector rowsToKeep = new BitVector(false, DistinctCount);
                 rowsToKeep.Add(0);
 
-                bool wasRemapped = GarbageCollector.Collect(_indices, _values, rowsToKeep);
+                bool wasRemapped = GarbageCollector.FindUnusedAndCollect(_values, _indices, rowsToKeep);
                 if (wasRemapped)
                 {
                     RebuildDistinctDictionary();

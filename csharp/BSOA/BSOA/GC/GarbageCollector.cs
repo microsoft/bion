@@ -12,12 +12,12 @@ namespace BSOA.GC
 {
     public class GarbageCollector
     {
-        public static bool Collect<T>(INumberColumn<T> indices, IColumn values) where T : unmanaged, IEquatable<T>
+        public static bool FindUnusedAndCollect<T>(IColumn values, INumberColumn<T> indices) where T : unmanaged, IEquatable<T>
         {
-            return Collect(indices, values, new BitVector(false, values.Count));
+            return FindUnusedAndCollect(values, indices, new BitVector(false, values.Count));
         }
 
-        public static bool Collect<T>(INumberColumn<T> indices, IColumn values, BitVector rowsToKeep) where T : unmanaged, IEquatable<T>
+        public static bool FindUnusedAndCollect<T>(IColumn values, INumberColumn<T> indices, BitVector rowsToKeep) where T : unmanaged, IEquatable<T>
         {
             IRemapper<T> remapper = RemapperFactory.Build<T>();
 

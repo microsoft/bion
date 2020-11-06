@@ -81,7 +81,7 @@ namespace BSOA.Column
             _indices.Trim();
 
             // Find any unused values and remove them
-            GarbageCollector.Collect(_indicesInner, _values);
+            GarbageCollector.FindUnusedAndCollect(_values, _indicesInner);
 
             // Trim values afterward to clean up any newly unused space
             _values.Trim();

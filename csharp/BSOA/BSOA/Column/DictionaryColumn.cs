@@ -101,8 +101,8 @@ namespace BSOA.Column
             _pairs.Trim();
 
             // Remove any keys and values which are no longer referenced
-            GarbageCollector.Collect(_pairsInner, _keys);
-            GarbageCollector.Collect(_pairsInner, _values);
+            GarbageCollector.FindUnusedAndCollect(_keys, _pairsInner);
+            GarbageCollector.FindUnusedAndCollect(_values, _pairsInner);
 
             _keys.Trim();
             _values.Trim();
