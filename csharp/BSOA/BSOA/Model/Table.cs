@@ -68,7 +68,7 @@ namespace BSOA.Model
 
         public void EnsureCurrent(IRow row)
         {
-            Updater?.Update(row, out bool unused);
+            Updater?.Update(row);
         }
 
         /// <summary>

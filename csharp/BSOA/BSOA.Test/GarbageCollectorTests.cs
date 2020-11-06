@@ -1,13 +1,12 @@
-﻿using BSOA.IO;
+﻿using BSOA.Column;
+using BSOA.GC;
 using BSOA.Model;
-using BSOA.Test.Components;
 using BSOA.Test.Model.Log;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Text;
 
 using Xunit;
 
@@ -47,6 +46,7 @@ namespace BSOA.Test
                 rules.Add(new Rule(run) { Id = i.ToString() });
             }
 
+            Rule two = run.Rules[2];
             Result result = run.Results[0];
 
             // Verify all rules present in Run and Table
@@ -131,6 +131,9 @@ namespace BSOA.Test
             Assert.Equal("3, 4", RunRules(run));
             Assert.Equal("3, 4", TableRules(run));
 
+            // Verify an old object model instance (swapped, then later moved to temp) is fully updated
+            Assert.Equal("2", two.Id);
+
             // Make a rule needed by both reachable (Run.Rules) and unreachable objects (Result).
             result.Rule = run.Rules[0];
             run.Results.RemoveAt(0);
@@ -152,47 +155,141 @@ namespace BSOA.Test
         }
 
         [Fact]
-        public void GarbageCollector_SwapBug()
+        public void GarbageCollector_RandomVariations()
         {
-            Run run = new Run() { Rules = new List<Rule>(), Results = new List<Result>() };
-            IList<Rule> rules = run.Rules;
+            // Test keeping everything
+            Test(new bool[] { true, true, true, true, true });
 
-            for (int i = 0; i < 7; ++i)
+            // Test keeping nothing
+            Test(new bool[] { false, false, false, false, false });
+
+            // Test keeping a single row only
+            for (int keepIndex = 0; keepIndex < 5; ++keepIndex)
             {
-                rules.Add(new Rule(run) { Id = i.ToString() });
+                Test(Enumerable.Range(0, 5).Select((i) => (i == keepIndex)).ToArray());
             }
 
-            // Verify all rules present in Run and Table
-            Assert.Equal("0, 1, 2, 3, 4, 5, 6", RunRules(run));
-            Assert.Equal("0, 1, 2, 3, 4, 5, 6", TableRules(run));
+            // Test removing a single row only
+            for (int removeIndex = 0; removeIndex < 5; ++removeIndex)
+            {
+                Test(Enumerable.Range(0, 5).Select((i) => (i != removeIndex)).ToArray());
+            }
 
-            // Remove all but second to last rule
-            run.Rules = new List<Rule>() { rules[5] };
-
-            // Verify nothing removed by Garbage Collection (all Rules directly reachable from root)            
-            run.DB.Collect();
-            Assert.Equal("5", RunRules(run));
-            Assert.Equal("5", TableRules(run));
+            // Try repeatable randomized scenarios; tricky to get Collect
+            // to swap a given row only once, correctly count removed rows, and
+            // track every remapping.
+            Random r = new Random(5);
+            for (int i = 0; i < 100; ++i)
+            {
+                Test(RandomRowsToKeep(r, 10));
+            }
         }
 
-        private void RoundTrip(Run run)
+        private bool[] RandomRowsToKeep(Random r, int count)
         {
-            // RoundTrip a single Database instance so that the root object from it is still valid (same Table instance, same index).
+            bool[] rowsToKeep = new bool[count];
 
-            using (MemoryStream stream = new MemoryStream())
+            // Randomly choose rows to remove
+            int leftToRemove = r.Next(count);
+            for (int i = 0; i < count; ++i)
             {
-                using (BinaryTreeWriter writer = new BinaryTreeWriter(stream, new TreeSerializationSettings(leaveStreamOpen: true)))
-                {
-                    run.DB.Write(writer);
-                }
+                bool keep = r.NextDouble() < (double)(leftToRemove / (count - i));
+                rowsToKeep[i] = keep;
+                if (!keep) { leftToRemove--; }
+            }
 
-                stream.Seek(0, SeekOrigin.Begin);
+            return rowsToKeep;
+        }
 
-                using (BinaryTreeReader reader = new BinaryTreeReader(stream))
+        private void Test(bool[] rowsToKeep)
+        {
+            int count = rowsToKeep.Length;
+
+            // Build an identity column
+            NumberColumn<int> column = new NumberColumn<int>(-1);
+            for (int i = 0; i < rowsToKeep.Length; ++i)
+            {
+                column[i] = i;
+            }
+
+            // Build a RowUpdater and fake mapping to temp to check those results
+            TableStub table = new TableStub();
+            RowUpdater updater = new RowUpdater(table, table);
+            int[] rowsToTemp = Enumerable.Range(10, count).ToArray();
+
+            // Request Garbage Collection
+            GarbageCollector.Collect<int>(column, null, rowsToKeep, updater, rowsToTemp);
+
+            // Verify correct values were kept
+            StringBuilder expected = new StringBuilder();
+            int expectedCount = 0;
+
+            for (int i = 0; i < count; ++i)
+            {
+                if (rowsToKeep[i])
                 {
-                    run.DB.Read(reader);
+                    expectedCount++;
+
+                    if (expected.Length > 0) { expected.Append(", "); }
+                    expected.Append(i);
                 }
             }
+
+            Assert.Equal(expectedCount, column.Count);
+            Assert.Equal(expected.ToString(), String.Join(", ", column.OrderBy((i) => i)));
+
+            // Verify rows removed are reported in the correct indices in temp or swapped in original column
+            RowStub stub = new RowStub(table, 0);
+
+            for (int i = 0; i < count; ++i)
+            {
+                stub.Index = i;
+                updater.Update(stub);
+
+                if (!rowsToKeep[i])
+                {
+                    Assert.Equal(10 + i, stub.Index);
+                }
+                else
+                {
+                    Assert.Equal(i, column[stub.Index]);
+                }
+            }
+        }
+
+        private class TableStub : Table<RowStub>
+        {
+            public TableStub() : base(null)
+            { }
+
+            public override RowStub Get(int index)
+            {
+                return (index == -1 ? null : new RowStub(this, index));
+            }
+
+            public override void GetOrBuildColumns()
+            { }
+        }
+
+        private class RowStub : IRow<RowStub>
+        {
+            public ITable Table { get; set; }
+            public int Index { get; set; }
+
+            public RowStub(ITable table, int index)
+            {
+                this.Table = table;
+                this.Index = index;
+            }
+
+            public void Remap(ITable table, int index)
+            {
+                Table = table;
+                Index = index;
+            }
+
+            public void CopyFrom(RowStub other)
+            { }
         }
     }
 }

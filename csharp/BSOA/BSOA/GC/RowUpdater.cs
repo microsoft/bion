@@ -13,13 +13,13 @@ namespace BSOA.GC
     /// </summary>
     public class RowUpdater
     {
-        private ITable Current { get; }
+        private ITable Latest { get; }
         private ITable Temp { get; }
         private Dictionary<int, Mapping> Mappings { get; }
 
-        public RowUpdater(ITable current, ITable temp)
+        public RowUpdater(ITable latest, ITable temp)
         {
-            Current = current;
+            Latest = latest;
             Temp = temp;
             Mappings = new Dictionary<int, Mapping>();
         }
@@ -29,26 +29,26 @@ namespace BSOA.GC
             Mappings[oldIndex] = new Mapping(newIndex, movedToTemp);
         }
 
-        public void Update(IRow caller, out bool movedToTemp)
+        public void Update(IRow caller)
         {
             if (!Mappings.TryGetValue(caller.Index, out Mapping mapping))
             {
                 // Row was not swapped or removed - current table, same index
-                movedToTemp = false;
-                caller.Remap(Current, caller.Index);
+                caller.Remap(Latest, caller.Index);
             }
             else if (mapping.MovedToTemp)
             {
                 // Row was removed - temp table at new index
-                movedToTemp = true;
                 caller.Remap(Temp, mapping.NewIndex);
             }
             else
             {
                 // Row was swapped but kept - current table, new index
-                movedToTemp = false;
-                caller.Remap(Current, mapping.NewIndex);
+                caller.Remap(Latest, mapping.NewIndex);
             }
+
+            // Call EnsureCurrent again with updated table; once up-to-date, table will have no RowUpdater.
+            caller.Table.EnsureCurrent(caller);
         }
 
         private struct Mapping

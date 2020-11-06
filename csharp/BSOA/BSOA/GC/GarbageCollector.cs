@@ -38,7 +38,7 @@ namespace BSOA.GC
             int biggestToKeep = column.Count - 1;
             int removeCount = 0;
 
-            while (smallestToRemove < biggestToKeep)
+            while (smallestToRemove <= biggestToKeep)
             {
                 // Walk backward, finding the first row to keep
                 while (smallestToRemove <= biggestToKeep && rowsToKeep[biggestToKeep] == false)
