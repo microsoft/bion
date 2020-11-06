@@ -272,7 +272,7 @@ namespace BSOA.GC
                 foreach (var refCollector in _refsFromTable)
                 {
                     IRefColumn temp = (IRefColumn)_tempTable.Columns[refCollector.ColumnName];
-                    temp.ForEach((slice) => Remapper2.Swap(slice, _rowIndexToTempIndex));
+                    temp.ForEach((slice) => IntRemapper.Instance.Remap(slice, _rowIndexToTempIndex));
                 }
             }
 
@@ -287,7 +287,7 @@ namespace BSOA.GC
             if (!_databaseCollector.MaintainObjectModel)
             {
                 // Clean up all non-reachable rows
-                Remapper2.Collect(_reachableRows, _table, _refsToTable);
+                GarbageCollector.Collect(_table, _refsToTable, _reachableRows);
             }
             else
             { 
@@ -308,7 +308,7 @@ namespace BSOA.GC
                 RowUpdater updater = new RowUpdater(latest, temp);
 
                 // Clean up all non-reachable rows, and fill out the updater with where to redirect them
-                Remapper2.Collect(_reachableRows, _table, _refsToTable, updater, _rowIndexToTempIndex);
+                GarbageCollector.Collect(_table, _refsToTable, _reachableRows, updater, _rowIndexToTempIndex);
 
                 // Tell the existing table instance to redirect object model objects to the new latest or temp tables
                 _table.Updater = updater;
@@ -385,100 +385,4 @@ namespace BSOA.GC
             return sum;
         }
     }
-
-    internal class Remapper2
-    {
-        // Empty?
-        // Single?
-
-        // Redo algorithm to take a sorted array of rows to remove or keep? (BitVector as-is likely more efficient)
-        // Need to keep lists for RowUpdater. 
-        // Swap in for RemoveUnreachable and see how this works out.
-        // Redesign other GarbageCollector to be able to share logic.
-
-        public static void Collect(bool[] keepRow, IColumn column, IEnumerable<INumberColumn<int>> fixColumns, RowUpdater updater = null, int[] rowIndexToTempIndex = null)
-        {
-            int[] remap = null;
-
-            int smallestToRemove = 0;
-            int biggestToKeep = column.Count - 1;
-            int removeCount = 0;
-
-            while (smallestToRemove < biggestToKeep)
-            {
-                // Find the next last row which needs to be kept
-                while (smallestToRemove <= biggestToKeep && keepRow[biggestToKeep] == false)
-                {
-                    // While rows already at the end are being removed, tell the updater where in the temp table they've gone
-                    updater?.AddMapping(biggestToKeep, rowIndexToTempIndex[biggestToKeep], movedToTemp: true);
-
-                    biggestToKeep--;
-                    removeCount++;
-                }
-
-                // Find the next earliest row which needs to be removed
-                while (smallestToRemove < biggestToKeep && keepRow[smallestToRemove] == true)
-                {
-                    smallestToRemove++;
-                }
-
-                if (smallestToRemove >= biggestToKeep) { break; }
-                removeCount++;
-
-                // Swap these (the lowest index row left to remove with the highest index row left to keep)
-                column.Swap(smallestToRemove, biggestToKeep);
-
-                // Tell the updater about the kept row (moved from biggestToKeep to smallestToRemove)
-                updater?.AddMapping(biggestToKeep, smallestToRemove, movedToTemp: false);
-
-                // Tell the updater about the removed row (originally at smallestToRemove, now in temp
-                updater?.AddMapping(smallestToRemove, rowIndexToTempIndex[smallestToRemove], movedToTemp: true);
-
-                // Keep array mapping every row to new index
-                if (remap == null)
-                {
-                    remap = new int[column.Count];
-
-                    for (int i = 0; i < remap.Length; ++i)
-                    {
-                        remap[i] = i;
-                    }
-                }
-
-                remap[biggestToKeep] = smallestToRemove;
-                remap[smallestToRemove] = biggestToKeep;
-
-                smallestToRemove++;
-                biggestToKeep--;
-            }
-
-            // Remove the newly swapped rows
-            if (removeCount > 0)
-            {
-                column.RemoveFromEnd(removeCount);
-            }
-
-            // Remap columns referring to the cleaned set
-            if (remap != null)
-            {
-                fixColumns.ForEach((column) => column.ForEach((slice) => Swap(slice, remap)));
-            }
-        }
-
-        public static void Swap(ArraySlice<int> values, int[] replacements)
-        {
-            int[] array = values.Array;
-            int end = values.Index + values.Count;
-
-            for (int i = values.Index; i < end; ++i)
-            {
-                int value = array[i];
-                if (value >= 0 && value < replacements.Length)
-                {
-                    array[i] = replacements[value];
-                }
-            }
-        }
-    }
-
 }

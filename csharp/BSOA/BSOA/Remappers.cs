@@ -15,10 +15,10 @@ namespace BSOA
     public interface IRemapper<T> where T : unmanaged, IEquatable<T>
     {
         // Remove all values found in slice from vector (to find remaining unused values)
-        void RemoveValues(ArraySlice<T> slice, BitVector vector);
+        void AddValues(ArraySlice<T> slice, BitVector vector);
 
-        // Replace all values >= 'remapFrom' with the swapped values in replaceWith.
-        void RemapAbove(ArraySlice<T> slice, int remapFrom, int[] replaceWith);
+        // Replace all values in slice with replacements in array
+        void Remap(ArraySlice<T> slice, int[] replacements);
     }
 
     public static class RemapperFactory
@@ -38,7 +38,7 @@ namespace BSOA
         private IntRemapper()
         { }
 
-        public void RemoveValues(ArraySlice<int> values, BitVector vector)
+        public void AddValues(ArraySlice<int> values, BitVector vector)
         {
             if (vector.Count == 0) { return; }
 
@@ -47,20 +47,21 @@ namespace BSOA
 
             for (int i = values.Index; i < end; ++i)
             {
-                vector[array[i]] = false;
+                vector[array[i]] = true;
             }
         }
 
-        public void RemapAbove(ArraySlice<int> values, int remapFrom, int[] replaceWith)
+        public void Remap(ArraySlice<int> values, int[] replacements)
         {
             int[] array = values.Array;
             int end = values.Index + values.Count;
 
             for (int i = values.Index; i < end; ++i)
             {
-                if (array[i] >= remapFrom)
+                int value = array[i];
+                if (value >= 0 && value < replacements.Length)
                 {
-                    array[i] = replaceWith[(array[i] - remapFrom)];
+                    array[i] = replacements[value];
                 }
             }
         }
@@ -73,27 +74,28 @@ namespace BSOA
         private ByteRemapper()
         { }
 
-        public void RemoveValues(ArraySlice<byte> values, BitVector vector)
+        public void AddValues(ArraySlice<byte> values, BitVector vector)
         {
             byte[] array = values.Array;
             int end = values.Index + values.Count;
 
             for (int i = values.Index; i < end; ++i)
             {
-                vector[array[i]] = false;
+                vector[array[i]] = true;
             }
         }
 
-        public void RemapAbove(ArraySlice<byte> values, int remapFrom, int[] replaceWith)
+        public void Remap(ArraySlice<byte> values, int[] replacements)
         {
             byte[] array = values.Array;
             int end = values.Index + values.Count;
 
             for (int i = values.Index; i < end; ++i)
             {
-                if (array[i] >= remapFrom)
+                int value = array[i];
+                if (value >= 0 && value < replacements.Length)
                 {
-                    array[i] = (byte)replaceWith[(array[i] - remapFrom)];
+                    array[i] = (byte)replacements[value];
                 }
             }
         }

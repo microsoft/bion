@@ -156,11 +156,11 @@ namespace BSOA.Column
                 if (_requiresTrim == false) { return; }
                 _requiresTrim = false;
 
-                // Remove unused values *except the default*, which must stay as '0' so new rows in indices have the default value
-                BitVector unusedValues = new BitVector(true, DistinctCount);
-                unusedValues.Remove(0);
+                // Pre-mark the default value used so it can't be removed
+                BitVector rowsToKeep = new BitVector(false, DistinctCount);
+                rowsToKeep.Add(0);
 
-                bool wasRemapped = GarbageCollector.Collect<byte, T>(_indices, _values, unusedValues);
+                bool wasRemapped = GarbageCollector.Collect(_indices, _values, rowsToKeep);
                 if (wasRemapped)
                 {
                     RebuildDistinctDictionary();

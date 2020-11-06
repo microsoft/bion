@@ -2,21 +2,22 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 using BSOA.Collections;
+using BSOA.Extensions;
 using BSOA.Model;
 
 namespace BSOA.GC
 {
     public class GarbageCollector
     {
-        public static bool Collect<T, U>(INumberColumn<T> indices, IColumn<U> values) where T : unmanaged, IEquatable<T>
+        public static bool Collect<T>(INumberColumn<T> indices, IColumn values) where T : unmanaged, IEquatable<T>
         {
-            return Collect(indices, values, new BitVector(true, values.Count));
+            return Collect(indices, values, new BitVector(false, values.Count));
         }
 
-        public static bool Collect<T, U>(INumberColumn<T> indices, IColumn<U> values, BitVector unusedValues) where T : unmanaged, IEquatable<T>
+        public static bool Collect<T>(INumberColumn<T> indices, IColumn values, BitVector rowsToKeep) where T : unmanaged, IEquatable<T>
         {
             IRemapper<T> remapper = RemapperFactory.Build<T>();
 
@@ -24,32 +25,84 @@ namespace BSOA.GC
             indices.Trim();
 
             // Find all value indices which are no longer referenced by any row
-            indices.ForEach((slice) => remapper.RemoveValues(slice, unusedValues));
+            indices.ForEach((slice) => remapper.AddValues(slice, rowsToKeep));
 
-            // If there are unused values, ...
-            int[] remapped = unusedValues.ToArray();
-            if (remapped.Length > 0)
+            return Collect(values, new[] { indices }, rowsToKeep);
+        }
+
+        public static bool Collect<T>(IColumn column, IEnumerable<INumberColumn<T>> refsToColumn, IReadOnlyList<bool> rowsToKeep, RowUpdater updater = null, int[] rowIndexToTempIndex = null) where T : unmanaged, IEquatable<T>
+        {
+            int[] replacements = null;
+
+            int smallestToRemove = 0;
+            int biggestToKeep = column.Count - 1;
+            int removeCount = 0;
+
+            while (smallestToRemove < biggestToKeep)
             {
-                int remapFrom = (values.Count - remapped.Length);
-
-                // Swap the *values* to the end of the values array
-                for (int i = 0; i < remapped.Length; ++i)
+                // Walk backward, finding the first row to keep
+                while (smallestToRemove <= biggestToKeep && rowsToKeep[biggestToKeep] == false)
                 {
-                    values.Swap(remapFrom + i, remapped[i]);
+                    // While rows already at the end are being removed, tell the updater where in the temp table they've gone
+                    updater?.AddMapping(biggestToKeep, rowIndexToTempIndex[biggestToKeep], movedToTemp: true);
+
+                    biggestToKeep--;
+                    removeCount++;
                 }
 
-                // Swap indices using those values to use the new ones
-                indices.ForEach((slice) => remapper.RemapAbove(slice, remapFrom, remapped));
+                // Walk forward, finding the first row to be removed
+                while (smallestToRemove < biggestToKeep && rowsToKeep[smallestToRemove] == true)
+                {
+                    smallestToRemove++;
+                }
 
-                // Remove the unused values that are now at the end of the array
-                values.RemoveFromEnd(remapped.Length);
+                if (smallestToRemove >= biggestToKeep) { break; }
+                removeCount++;
+
+                // Swap these (the first row to remove with the last row to keep)
+                column.Swap(smallestToRemove, biggestToKeep);
+
+                // Tell the updater about the kept row (moved from biggestToKeep to smallestToRemove)
+                updater?.AddMapping(biggestToKeep, smallestToRemove, movedToTemp: false);
+
+                // Tell the updater about the removed row (originally at smallestToRemove, now in temp
+                updater?.AddMapping(smallestToRemove, rowIndexToTempIndex[smallestToRemove], movedToTemp: true);
+
+                // Set up a map array identifying the new row index for each previous row index
+                if (refsToColumn != null)
+                {
+                    if (replacements == null)
+                    {
+                        replacements = new int[column.Count];
+
+                        for (int i = 0; i < replacements.Length; ++i)
+                        {
+                            replacements[i] = i;
+                        }
+                    }
+
+                    replacements[biggestToKeep] = smallestToRemove;
+                    replacements[smallestToRemove] = biggestToKeep;
+                }
+
+                smallestToRemove++;
+                biggestToKeep--;
             }
 
-            // Trim values afterward to clean up any newly unused space
-            values.Trim();
+            // Remove the rows (now swapped to the end) to be removed
+            if (removeCount > 0)
+            {
+                column.RemoveFromEnd(removeCount);
+            }
 
-            // Return whether anything was remapped
-            return remapped.Length > 0;
+            // Update columns to refer to the updated indices
+            if (refsToColumn != null && replacements != null)
+            {
+                IRemapper<T> remapper = RemapperFactory.Build<T>();
+                refsToColumn.ForEach((column) => column.ForEach((slice) => remapper.Remap(slice, replacements)));
+            }
+
+            return (removeCount > 0);
         }
     }
 }

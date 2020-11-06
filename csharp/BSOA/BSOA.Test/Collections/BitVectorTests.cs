@@ -83,7 +83,6 @@ namespace BSOA.Test.Collections
             // Clear
             vector.Clear();
             Assert.Empty(vector);
-            Assert.Equal(0, vector.Count);
             Assert.Equal(0, vector.Capacity);
 
             // UnionWith
@@ -93,7 +92,6 @@ namespace BSOA.Test.Collections
             // ExceptWith
             vector.ExceptWith(expected);
             Assert.Empty(vector);
-            Assert.Equal(0, vector.Count);
 
             // SetAll
             vector.Clear();
@@ -105,7 +103,7 @@ namespace BSOA.Test.Collections
             Assert.True(vector[vector.Capacity - 1]);
 
             vector.SetAll(false);
-            Assert.Equal(0, vector.Count);
+            Assert.Empty(vector);
             Assert.False(vector[vector.Capacity]);
 
             // SetAll (exact multiple of 32)
@@ -118,7 +116,7 @@ namespace BSOA.Test.Collections
             Assert.True(vector[vector.Capacity - 1]);
 
             vector.SetAll(false);
-            Assert.Equal(0, vector.Count);
+            Assert.Empty(vector);
             Assert.False(vector[vector.Capacity]);
             Assert.False(vector[vector.Capacity - 1]);
         }
@@ -155,7 +153,7 @@ namespace BSOA.Test.Collections
             Assert.True(vector[vector.Capacity]);
 
             vector.SetAll(false);
-            Assert.Equal(0, vector.Count);
+            Assert.True(0 == vector.Count);
             Assert.True(vector[vector.Capacity]);
 
             // SetAll, length exact multiple of 32.
