@@ -6,20 +6,20 @@ using System.Collections.Generic;
 namespace BSOA.GC
 {
     /// <summary>
-    ///  RowUpdater tracks rows in a Garbage Collection updated table which
-    ///  were swapped or which moved to a temporary table. The original table instance
-    ///  has all columns wrapped with UpdatingColumns, which update the object model
-    ///  instances when they try to call to get or set data.
+    ///  RowUpdater tracks rows in a Garbage-Collection-updated table.
+    ///  Rows may have been swapped to new indices or copied to a temporary
+    ///  table. RowUpdator updates object model instances to point to
+    ///  the updated index in the updated table.
     /// </summary>
     public class RowUpdater
     {
-        private ITable Latest { get; }
+        private ITable Successor { get; }
         private ITable Temp { get; }
         private Dictionary<int, Mapping> Mappings { get; }
 
-        public RowUpdater(ITable latest, ITable temp)
+        public RowUpdater(ITable successor, ITable temp)
         {
-            Latest = latest;
+            Successor = successor;
             Temp = temp;
             Mappings = new Dictionary<int, Mapping>();
         }
@@ -34,7 +34,7 @@ namespace BSOA.GC
             if (!Mappings.TryGetValue(caller.Index, out Mapping mapping))
             {
                 // Row was not swapped or removed - current table, same index
-                caller.Remap(Latest, caller.Index);
+                caller.Remap(Successor, caller.Index);
             }
             else if (mapping.MovedToTemp)
             {
@@ -44,7 +44,7 @@ namespace BSOA.GC
             else
             {
                 // Row was swapped but kept - current table, new index
-                caller.Remap(Latest, mapping.NewIndex);
+                caller.Remap(Successor, mapping.NewIndex);
             }
 
             // Call EnsureCurrent again with updated table; once up-to-date, table will have no RowUpdater.

@@ -293,28 +293,28 @@ namespace BSOA.GC
             { 
                 IDatabase database = _databaseCollector.Database;
 
-                // Construct a new 'latest' Table with the same columns
+                // Construct 'successor' Table with the same columns
                 Func<IDatabase, Dictionary<string, IColumn>, ITable> tableBuilder = ConstructorBuilder.GetConstructor<Func<IDatabase, Dictionary<string, IColumn>, ITable>>(_table.GetType());
-                ITable latest = tableBuilder(database, new Dictionary<string, IColumn>(_table.Columns));
+                ITable successor = tableBuilder(database, new Dictionary<string, IColumn>(_table.Columns));
 
-                // Update the database to refer to the 'latest' table (in new object model instances returned)
-                database.Tables[_tableName] = latest;
+                // Update the database to refer to the successor table (in new object model instances returned)
+                database.Tables[_tableName] = successor;
                 database.GetOrBuildTables();
 
                 // Find the 'temp' copy of this table which unreachable rows were copied to
                 ITable temp = _databaseCollector.TempDatabase.Tables[_tableName];
 
-                // Build a RowUpdater to redirect object model instances to the temp or latest table copies
-                RowUpdater updater = new RowUpdater(latest, temp);
+                // Build a RowUpdater to redirect object model instances to the successor or temp tables
+                RowUpdater updater = new RowUpdater(successor, temp);
 
                 // Clean up all non-reachable rows, and fill out the updater with where to redirect them
                 GarbageCollector.Collect(_table, _refsToTable, _reachableRows, updater, _rowIndexToTempIndex);
 
-                // Tell the existing table instance to redirect object model objects to the new latest or temp tables
+                // Tell the previous table to redirect object model objects
                 _table.Updater = updater;
 
-                // Tell the latest table about the new row count (Collect removes happened after it was created)
-                latest.SetCount(_table.Count);
+                // Tell the successor table about the new row count (Collect removes happened after it was created)
+                successor.SetCount(_table.Count);
             }
 
             return true;
