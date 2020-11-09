@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using BSOA.Collections;
+using BSOA.GC;
 using BSOA.Model;
 
 using System;
@@ -19,6 +20,23 @@ namespace BSOA.Column
         public RefListColumn(string referencedTableName, bool nullByDefault = true) : base(new NumberListColumn<int>(), nullByDefault)
         {
             ReferencedTableName = referencedTableName;
+        }
+
+        public long Traverse(int index, IGraphTraverser referencedTableCollector)
+        {
+            NumberList<int> references = this[index];
+            if (references == null) { return 0; }
+            
+            long sum = 0;
+            foreach (int targetIndex in references)
+            {
+                if (targetIndex >= 0)
+                {
+                    sum += referencedTableCollector.Traverse(targetIndex);
+                }
+            }
+
+            return sum;
         }
 
         public void ForEach(Action<ArraySlice<int>> action)

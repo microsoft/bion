@@ -1,6 +1,4 @@
-﻿using BSOA.Collections;
-using BSOA.Column;
-using BSOA.Extensions;
+﻿using BSOA.Extensions;
 using BSOA.Model;
 
 using System;
@@ -67,7 +65,7 @@ namespace BSOA.GC
 
             // 3. Walk reachable rows (add root, which will recursively add everything reachable)
             _tableCollectors.Values.ForEach((collector) => collector.ResetAddedRows());
-            long reachableTotal = _tableCollectors[Database.RootTableName].AddRow(0);
+            long reachableTotal = _tableCollectors[Database.RootTableName].Traverse(0);
 
             // If nothing or everything is reachable, no splitting is needed. Stop.
             if (reachableTotal == 1 || reachableTotal == tableRowTotal)
@@ -96,7 +94,7 @@ namespace BSOA.GC
         }
     }
 
-    internal class TableCollector
+    internal class TableCollector : IGraphTraverser
     {
         private DatabaseCollector _databaseCollector;
 
@@ -106,10 +104,10 @@ namespace BSOA.GC
         private int _initialCount;
 
         // List of columns from this table to other tables (to walk reachable graph)
-        private List<ICollector> _refsFromTable;
+        private List<ColumnCollector> _refsFromTable;
 
         // List of columns from other tables to this table (to remap indices of Swapped rows)
-        private List<IRefColumn> _refsToTable;
+        private List<ColumnCollector> _refsToTable;
 
         // Tracks rows included in the current recursive walk
         private bool[] _addedRows;
@@ -139,25 +137,16 @@ namespace BSOA.GC
 
         public void AddRefColumn(string columnName, IRefColumn column, TableCollector target)
         {
-            if (_refsFromTable == null) { _refsFromTable = new List<ICollector>(); }
-            if (target._refsToTable == null) { target._refsToTable = new List<IRefColumn>(); }
+            if (_refsFromTable == null) { _refsFromTable = new List<ColumnCollector>(); }
+            if (target._refsToTable == null) { target._refsToTable = new List<ColumnCollector>(); }
+
+            ColumnCollector collector = new ColumnCollector(columnName, column, target);
 
             // Add column to 'RefsTo' in the target (for remapping indices)
-            target._refsToTable.Add(column);
+            target._refsToTable.Add(collector);
 
             // Add column to 'RefsFrom' in the source (for walking reachable indices)
-            if (column is RefColumn)
-            {
-                _refsFromTable.Add(new RefColumnCollector(columnName, (RefColumn)column, target));
-            }
-            else if (column is RefListColumn)
-            {
-                _refsFromTable.Add(new RefListColumnCollector(columnName, (RefListColumn)column, target));
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+            _refsFromTable.Add(collector);
         }
 
         public void ResetAddedRows()
@@ -166,7 +155,7 @@ namespace BSOA.GC
             _addedCount = 0;
         }
 
-        public long AddRow(int index)
+        public long Traverse(int index)
         {
             long sum = 0;
 
@@ -178,9 +167,9 @@ namespace BSOA.GC
 
                 if (_refsFromTable != null)
                 {
-                    foreach (ICollector collector in _refsFromTable)
+                    foreach (IGraphTraverser collector in _refsFromTable)
                     {
-                        sum += collector.AddRow(index);
+                        sum += collector.Traverse(index);
                     }
                 }
             }
@@ -208,7 +197,7 @@ namespace BSOA.GC
             {
                 if (_reachableRows[i] == false)
                 {
-                    sum += AddRow(i);
+                    sum += Traverse(i);
                 }
             }
 
@@ -266,13 +255,14 @@ namespace BSOA.GC
                 }
             }
 
-            // Update every Ref and RefList in the temp copy of this table to use the re-assigned temp indices from each referenced table
+            // Update every Ref and RefList in the temp copy of *this* table to use the re-assigned temp indices from the corresponding referenced temp table
             if (_refsFromTable != null)
             {
                 foreach (var refCollector in _refsFromTable)
                 {
-                    IRefColumn temp = (IRefColumn)_tempTable.Columns[refCollector.ColumnName];
-                    temp.ForEach((slice) => IntRemapper.Instance.Remap(slice, _rowIndexToTempIndex));
+                    IRefColumn tempTableColumn = (IRefColumn)_tempTable.Columns[refCollector.ColumnName];
+                    TableCollector referencedTableCollector = refCollector.ReferencedTableCollector;
+                    tempTableColumn.ForEach((slice) => IntRemapper.Instance.Remap(slice, referencedTableCollector._rowIndexToTempIndex));
                 }
             }
 
@@ -287,10 +277,10 @@ namespace BSOA.GC
             if (!_databaseCollector.MaintainObjectModel)
             {
                 // Clean up all non-reachable rows
-                GarbageCollector.Collect(_table, _refsToTable, _reachableRows);
+                GarbageCollector.Collect(_table, _refsToTable.Select((c) => c.Column), _reachableRows);
             }
             else
-            { 
+            {
                 IDatabase database = _databaseCollector.Database;
 
                 // Construct 'successor' Table with the same columns
@@ -308,7 +298,7 @@ namespace BSOA.GC
                 RowUpdater updater = new RowUpdater(successor, temp);
 
                 // Clean up all non-reachable rows, and fill out the updater with where to redirect them
-                GarbageCollector.Collect(_table, _refsToTable, _reachableRows, updater, _rowIndexToTempIndex);
+                GarbageCollector.Collect(_table, _refsToTable.Select((c) => c.Column), _reachableRows, updater, _rowIndexToTempIndex);
 
                 // Tell the previous table to redirect object model objects
                 _table.Updater = updater;
@@ -322,67 +312,26 @@ namespace BSOA.GC
     }
 
     /// <summary>
-    ///  Garbage Collection is built on ICollectors, which track the references from table to table.
-    ///  These allow recursively walking a graph of objects to identify reachable or unreachable rows.
+    ///  ColumnCollector adapts an IRefColumn into an IGraphTraverser by also
+    ///  maintaining a reference to the collector from the referenced table,
+    ///  so that traversals cross tables.
     /// </summary>
-    internal interface ICollector
-    {
-        string ColumnName { get; }
-        TableCollector Collector { get; }
-        long AddRow(int index);
-    }
-
-    internal struct RefColumnCollector : ICollector
+    internal struct ColumnCollector : IGraphTraverser
     {
         public string ColumnName { get; }
-        public RefColumn Column { get; }
-        public TableCollector Collector { get; }
+        public IRefColumn Column { get; }
+        public TableCollector ReferencedTableCollector { get; }
 
-        public RefColumnCollector(string columnName, RefColumn column, TableCollector collector)
+        public ColumnCollector(string columnName, IRefColumn column, TableCollector referencedTableCollector)
         {
             ColumnName = columnName;
             Column = column;
-            Collector = collector;
+            ReferencedTableCollector = referencedTableCollector;
         }
 
-        public long AddRow(int index)
+        public long Traverse(int index)
         {
-            int targetIndex = Column[index];
-            if (targetIndex >= 0)
-            {
-                return Collector.AddRow(targetIndex);
-            }
-
-            return 0;
-        }
-    }
-
-    internal struct RefListColumnCollector : ICollector
-    {
-        public string ColumnName { get; }
-        public RefListColumn Column { get; }
-        public TableCollector Collector { get; }
-
-        public RefListColumnCollector(string columnName, RefListColumn column, TableCollector collector)
-        {
-            ColumnName = columnName;
-            Column = column;
-            Collector = collector;
-        }
-
-        public long AddRow(int index)
-        {
-            long sum = 0;
-
-            foreach (int targetIndex in Column.Values[index])
-            {
-                if (targetIndex >= 0)
-                {
-                    sum += Collector.AddRow(targetIndex);
-                }
-            }
-
-            return sum;
+            return Column.Traverse(index, ReferencedTableCollector);
         }
     }
 }
