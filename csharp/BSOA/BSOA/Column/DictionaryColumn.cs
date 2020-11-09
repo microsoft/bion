@@ -139,4 +139,68 @@ namespace BSOA.Column
             }
         }
     }
+
+    /// <summary>
+    ///  RefDictionaryColumn is used when either the Keys or Values of a DictionaryColumn
+    ///  are typed references to another table. RefDictionaryColumn must be used in these
+    ///  cases so that the Garbage Collector can correctly traverse dictionary entries to
+    ///  find referenced rows and can see the inner RefColumn indices to update them when
+    ///  rows have been swapped or moved.
+    /// </summary>
+    /// <typeparam name="TKey">Type of Dictionary Keys</typeparam>
+    /// <typeparam name="TValue">Type of Dictionary Values</typeparam>
+    public class RefDictionaryColumn<TKey, TValue> : DictionaryColumn<TKey, TValue>, IRefColumn where TKey : IComparable<TKey>
+    {
+        private readonly IRefColumn _refColumn;
+        public string ReferencedTableName => _refColumn.ReferencedTableName;
+
+        public RefDictionaryColumn(IColumn<TKey> keys, IColumn<TValue> values, IRefColumn refColumn, Nullability nullability = Nullability.DefaultToNull) : base(keys, values, nullability)
+        {
+            _refColumn = refColumn;
+        }
+
+        public long Traverse(int index, IGraphTraverser referencedTableCollector)
+        {
+            NumberList<int> pairs = _pairs[index];
+            if (pairs == null) { return 0; }
+
+            // Get the inner row indices used in the Keys and Values columns to store the values for the row[index] Dictionary
+            long sum = 0;
+            foreach (int innerRowIndex in pairs)
+            {
+                // Traverse references in the ref column for each inner row in the outer Dictionary
+                sum += _refColumn.Traverse(innerRowIndex, referencedTableCollector);
+            }
+
+            return sum;
+        }
+
+        public void ForEach(Action<ArraySlice<int>> action)
+        {
+            _refColumn.ForEach(action);
+        }
+    }
+
+    // To make a Dictionary with typed keys or values, make a WrappingColumn like this
+    // to convert integers to typed values, then override BuildColumn to create the
+    // DictionaryColumn using it.
+    // 
+    // NOTE: Cache the database, not the table, to correctly handle table successors
+    // Garbage Collection creates.
+    
+    //internal class ArtifactLocationColumn : WrappingColumn<ArtifactLocation, int>
+    //{
+    //    private readonly SarifLogDatabase _database;
+
+    //    public ArtifactLocationColumn(SarifLogDatabase database, RefColumn inner) : base(inner)
+    //    {
+    //        _database = database;
+    //    }
+
+    //    public override ArtifactLocation this[int index]
+    //    {
+    //        get => new ArtifactLocation(_database.ArtifactLocation, Inner[index]);
+    //        set => Inner[index] = _database.ArtifactLocation.LocalIndex(value);
+    //    }
+    //}
 }
