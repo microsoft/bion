@@ -14,6 +14,7 @@ namespace BSOA.GC
     {
         public static bool FindUnusedAndCollect<T>(IColumn values, INumberColumn<T> indices) where T : unmanaged, IEquatable<T>
         {
+            if (values.Count == 0) { return false; }
             return FindUnusedAndCollect(values, indices, new BitVector(false, values.Count));
         }
 

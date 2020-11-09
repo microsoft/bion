@@ -98,14 +98,16 @@ namespace BSOA.Column
 
         public void Trim()
         {
+            if (Count == 0) { return; }
             _pairs.Trim();
 
-            // Remove any keys and values which are no longer referenced
-            GarbageCollector.FindUnusedAndCollect(_keys, _pairsInner);
-            GarbageCollector.FindUnusedAndCollect(_values, _pairsInner);
+            // Find Key/Value pairs no longer in any Dictionaries
+            BitVector rowsToKeep = new BitVector(false, _keys.Count);
+            _pairsInner.ForEach((slice) => IntRemapper.Instance.AddValues(slice, rowsToKeep));
 
-            _keys.Trim();
-            _values.Trim();
+            // Remove those from Keys and Values
+            GarbageCollector.Collect<int>(_keys, null, rowsToKeep);
+            GarbageCollector.Collect<int>(_values, new [] { _pairsInner }, rowsToKeep);
         }
 
         public void Write(ITreeWriter writer)

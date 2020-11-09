@@ -40,8 +40,6 @@ namespace BSOA
 
         public void AddValues(ArraySlice<int> values, BitVector vector)
         {
-            if (vector.Count == 0) { return; }
-
             int[] array = values.Array;
             int end = values.Index + values.Count;
 
