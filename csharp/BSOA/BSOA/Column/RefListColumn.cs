@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
+
 using BSOA.Collections;
 using BSOA.GC;
 using BSOA.Model;
-
-using System;
 
 namespace BSOA.Column
 {

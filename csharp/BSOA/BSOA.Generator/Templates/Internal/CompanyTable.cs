@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 
-using BSOA.Column;
 using BSOA.Collections;
+using BSOA.Column;
 using BSOA.Model;
 
 namespace BSOA.Generator.Templates

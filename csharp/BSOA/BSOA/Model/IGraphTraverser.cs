@@ -1,4 +1,7 @@
-﻿namespace BSOA.Model
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+namespace BSOA.Model
 {
     /// <summary>
     ///  To enable Garbage Collection, we must be able to traverse references from one table

@@ -1,4 +1,7 @@
-﻿using BSOA.GC;
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using BSOA.GC;
 
 namespace BSOA.Model
 {
