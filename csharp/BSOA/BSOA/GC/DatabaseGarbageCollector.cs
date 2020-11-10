@@ -31,7 +31,7 @@ namespace BSOA.GC
 
         // Create a Temp Database (just in time) if needed, to copy unreachable items to
         private IDatabase _tempDatabase;
-        public IDatabase TempDatabase => _tempDatabase ??= ConstructorBuilder.GetConstructor<Func<IDatabase>>(Database.GetType())();
+        public IDatabase TempDatabase => _tempDatabase ??= (IDatabase)Activator.CreateInstance(Database.GetType());
 
         public DatabaseCollector(IDatabase database)
         {
@@ -64,6 +64,9 @@ namespace BSOA.GC
 
         public bool Collect()
         {
+            // Collect is done in phases across all TableCollectors, so that each phase can depend
+            // on outputs from previous phases in all tables, not just the current table.
+
             long tableRowTotal = Database.Tables.Values.Sum((table) => table.Count);
 
             // 3. Walk reachable rows (add root, which will recursively add everything reachable)
@@ -287,8 +290,7 @@ namespace BSOA.GC
                 IDatabase database = _databaseCollector.Database;
 
                 // Construct 'successor' Table with the same columns
-                Func<IDatabase, Dictionary<string, IColumn>, ITable> tableBuilder = ConstructorBuilder.GetConstructor<Func<IDatabase, Dictionary<string, IColumn>, ITable>>(_table.GetType());
-                ITable successor = tableBuilder(database, new Dictionary<string, IColumn>(_table.Columns));
+                ITable successor = (ITable)Activator.CreateInstance(_table.GetType(), database, _table.Columns);
 
                 // Update the database to refer to the successor table (in new object model instances returned)
                 database.Tables[_tableName] = successor;

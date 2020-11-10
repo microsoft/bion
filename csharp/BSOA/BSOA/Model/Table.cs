@@ -117,7 +117,7 @@ namespace BSOA.Model
         public override T Add()
         {
             int newIndex = Interlocked.Increment(ref _count) - 1;
-            if ((newIndex % ArraySliceChapter<byte>.ChapterRowCount) == 0) { Trim(); }
+            if ((newIndex % ArraySliceChapter<byte>.ChapterRowCount) == (ArraySliceChapter<byte>.ChapterRowCount - 1)) { Trim(); }
             return Get(newIndex);
         }
 
