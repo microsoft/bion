@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 
+using BSOA.Collections;
 using BSOA.Column;
 using BSOA.Model;
 
@@ -23,16 +24,20 @@ namespace BSOA.Demo.Model.BSOA
         internal IColumn<int> Attributes;
         internal IColumn<long> Length;
 
-        internal FileTable(FileSystemDatabase database) : base()
+        public FileTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
-            Database = database;
+            Database = (FileSystemDatabase)database;
+            GetOrBuildColumns();
+        }
 
-            ParentFolderIndex = AddColumn(nameof(ParentFolderIndex), database.BuildColumn<int>(nameof(File), nameof(ParentFolderIndex), default));
-            Name = AddColumn(nameof(Name), database.BuildColumn<string>(nameof(File), nameof(Name), default));
-            LastModifiedUtc = AddColumn(nameof(LastModifiedUtc), database.BuildColumn<DateTime>(nameof(File), nameof(LastModifiedUtc), default));
-            CreatedUtc = AddColumn(nameof(CreatedUtc), database.BuildColumn<DateTime>(nameof(File), nameof(CreatedUtc), default));
-            Attributes = AddColumn(nameof(Attributes), database.BuildColumn<int>(nameof(File), nameof(Attributes), (int)default));
-            Length = AddColumn(nameof(Length), database.BuildColumn<long>(nameof(File), nameof(Length), default));
+        public override void GetOrBuildColumns()
+        {
+            ParentFolderIndex = GetOrBuild(nameof(ParentFolderIndex), () => Database.BuildColumn<int>(nameof(File), nameof(ParentFolderIndex), default));
+            Name = GetOrBuild(nameof(Name), () => Database.BuildColumn<string>(nameof(File), nameof(Name), default));
+            LastModifiedUtc = GetOrBuild(nameof(LastModifiedUtc), () => Database.BuildColumn<DateTime>(nameof(File), nameof(LastModifiedUtc), default));
+            CreatedUtc = GetOrBuild(nameof(CreatedUtc), () => Database.BuildColumn<DateTime>(nameof(File), nameof(CreatedUtc), default));
+            Attributes = GetOrBuild(nameof(Attributes), () => Database.BuildColumn<int>(nameof(File), nameof(Attributes), (int)default));
+            Length = GetOrBuild(nameof(Length), () => Database.BuildColumn<long>(nameof(File), nameof(Length), default));
         }
 
         public override File Get(int index)

@@ -8,15 +8,15 @@ using System.Linq;
 using BSOA.Collections;
 using BSOA.Model;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     /// <summary>
     ///  BSOA GENERATED Entity for 'Rule'
     /// </summary>
     public partial class Rule : IRow<Rule>, IEquatable<Rule>
     {
-        private readonly RuleTable _table;
-        private readonly int _index;
+        private RuleTable _table;
+        private int _index;
 
         public Rule() : this(RunDatabase.Current.Rule)
         { }
@@ -49,20 +49,26 @@ namespace BSOA.Benchmarks.Model
 
         public string Id
         {
-            get => _table.Id[_index];
-            set => _table.Id[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Id[_index]; }
+            set { _table.EnsureCurrent(this); _table.Id[_index] = value; }
         }
 
         public String Guid
         {
-            get => _table.Guid[_index];
-            set => _table.Guid[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Guid[_index]; }
+            set { _table.EnsureCurrent(this); _table.Guid[_index] = value; }
         }
 
         public Uri HelpUri
         {
-            get => _table.HelpUri[_index];
-            set => _table.HelpUri[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.HelpUri[_index]; }
+            set { _table.EnsureCurrent(this); _table.HelpUri[_index] = value; }
+        }
+
+        public IList<Rule> RelatedRules
+        {
+            get { _table.EnsureCurrent(this); return TypedList<Rule>.Get(_table.Database.Rule, _table.RelatedRules, _index); }
+            set { _table.EnsureCurrent(this); TypedList<Rule>.Set(_table.Database.Rule, _table.RelatedRules, _index, value); }
         }
 
         #region IEquatable<Rule>
@@ -73,6 +79,7 @@ namespace BSOA.Benchmarks.Model
             if (!object.Equals(this.Id, other.Id)) { return false; }
             if (!object.Equals(this.Guid, other.Guid)) { return false; }
             if (!object.Equals(this.HelpUri, other.HelpUri)) { return false; }
+            if (!object.Equals(this.RelatedRules, other.RelatedRules)) { return false; }
 
             return true;
         }
@@ -98,6 +105,11 @@ namespace BSOA.Benchmarks.Model
                 if (HelpUri != default(Uri))
                 {
                     result = (result * 31) + HelpUri.GetHashCode();
+                }
+
+                if (RelatedRules != default(IList<Rule>))
+                {
+                    result = (result * 31) + RelatedRules.GetHashCode();
                 }
             }
 
@@ -131,14 +143,21 @@ namespace BSOA.Benchmarks.Model
         #endregion
 
         #region IRow
-        ITable IRow<Rule>.Table => _table;
-        int IRow<Rule>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
+
+        void IRow.Remap(ITable table, int index)
+        {
+            _table = (RuleTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Rule other)
         {
             Id = other.Id;
             Guid = other.Guid;
             HelpUri = other.HelpUri;
+            RelatedRules = other.RelatedRules?.Select((item) => Rule.Copy(_table.Database, item)).ToList();
         }
 
         internal static Rule Copy(RunDatabase database, Rule other)

@@ -21,7 +21,7 @@ namespace BSOA.Model
         public bool IsSynchronized => false;
         public object SyncRoot => null;
         public bool IsReadOnly => false;
-
+         
         // Descendants must implement these minimal members
         public abstract int Count { get; }
         public abstract T this[int index] { get; set; }

@@ -9,7 +9,7 @@ using BSOA.Json.Converters;
 
 using Newtonsoft.Json;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     [JsonConverter(typeof(JsonToResult))]
     public partial class Result
@@ -20,6 +20,7 @@ namespace BSOA.Benchmarks.Model
         private static Dictionary<string, Action<JsonReader, Run, Result>> setters = new Dictionary<string, Action<JsonReader, Run, Result>>()
         {
             ["ruleId"] = (reader, root, me) => me.RuleId = JsonToString.Read(reader, root),
+            ["rule"] = (reader, root, me) => me.Rule = JsonToRule.Read(reader, root),
             ["guid"] = (reader, root, me) => me.Guid = JsonToString.Read(reader, root),
             ["isActive"] = (reader, root, me) => me.IsActive = JsonToBool.Read(reader, root),
             ["message"] = (reader, root, me) => me.Message = JsonToString.Read(reader, root),
@@ -58,6 +59,7 @@ namespace BSOA.Benchmarks.Model
             {
                 writer.WriteStartObject();
                 JsonToString.Write(writer, "ruleId", item.RuleId, default);
+                JsonToRule.Write(writer, "rule", item.Rule);
                 JsonToString.Write(writer, "guid", item.Guid, default);
                 JsonToBool.Write(writer, "isActive", item.IsActive, default);
                 JsonToString.Write(writer, "message", item.Message, default);

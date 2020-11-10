@@ -1,6 +1,6 @@
 {
   "name": "RunDatabase",
-  "namespace": "BSOA.Benchmarks.Model",
+  "namespace": "BSOA.Test.Model.Log",
   "rootTableName": "Run",
   "tables": [
     {
@@ -9,6 +9,12 @@
         {
           "name": "RuleId",
           "type": "string"
+        },
+        {
+          "category": "Ref",
+          "name": "Rule",
+          "type": "Rule",
+          "referencedTableName": "Rule"
         },
         {
           "name": "Guid",
@@ -61,7 +67,13 @@
         {
           "name": "HelpUri",
           "type": "Uri"
-        }
+        },
+        {
+          "category": "RefList",
+          "name": "RelatedRules",
+          "type": "IList<Rule>",
+          "referencedTableName": "Rule"
+        },
       ]
     },
     {

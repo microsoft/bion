@@ -14,7 +14,7 @@ namespace BSOA.Collections
     ///  BitVector provides set operations, tracking whether each item is included with a bit in an int[].
     ///  BitVector is an extremely compact way to represent a set from [0, Count).
     /// </summary>
-    public class BitVector : IEnumerable<int>, ITreeSerializable
+    public class BitVector : IReadOnlyList<bool>, IEnumerable<int>, ITreeSerializable
     {
         private const uint FirstBit = 0x1U << 31;
         private uint[] _array;
@@ -119,6 +119,11 @@ namespace BSOA.Collections
         IEnumerator IEnumerable.GetEnumerator()
         {
             return new BitVectorEnumerator(this);
+        }
+
+        IEnumerator<bool> IEnumerable<bool>.GetEnumerator()
+        {
+            return new ListEnumerator<bool>(this);
         }
 
         public bool Add(int item)

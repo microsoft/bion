@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 
 using BSOA.Collections;
+using BSOA.GC;
 using BSOA.IO;
 using BSOA.Model;
 
@@ -80,7 +81,7 @@ namespace BSOA.Column
             _indices.Trim();
 
             // Find any unused values and remove them
-            GarbageCollector.Collect<int, T>(_indicesInner, _values);
+            GarbageCollector.FindUnusedAndCollect(_values, _indicesInner);
 
             // Trim values afterward to clean up any newly unused space
             _values.Trim();

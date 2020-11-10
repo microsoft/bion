@@ -6,10 +6,9 @@ using System.Linq;
 
 using BenchmarkDotNet.Attributes;
 
-using BSOA.Benchmarks.Model;
 using BSOA.Column;
 using BSOA.Model;
-
+using BSOA.Test.Model.Log;
 
 namespace BSOA.Benchmarks
 {

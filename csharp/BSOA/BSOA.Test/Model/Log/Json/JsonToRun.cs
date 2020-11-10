@@ -9,7 +9,7 @@ using BSOA.Json.Converters;
 
 using Newtonsoft.Json;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     [JsonConverter(typeof(JsonToRun))]
     public partial class Run

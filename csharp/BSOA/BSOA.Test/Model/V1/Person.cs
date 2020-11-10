@@ -15,8 +15,8 @@ namespace BSOA.Test.Model.V1
     /// </summary>
     public partial class Person : IRow<Person>, IEquatable<Person>
     {
-        private readonly PersonTable _table;
-        private readonly int _index;
+        private PersonTable _table;
+        private int _index;
 
         public Person() : this(PersonDatabase.Current.Person)
         { }
@@ -49,14 +49,14 @@ namespace BSOA.Test.Model.V1
 
         public byte Age
         {
-            get => _table.Age[_index];
-            set => _table.Age[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Age[_index]; }
+            set { _table.EnsureCurrent(this); _table.Age[_index] = value; }
         }
 
         public string Name
         {
-            get => _table.Name[_index];
-            set => _table.Name[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Name[_index]; }
+            set { _table.EnsureCurrent(this); _table.Name[_index] = value; }
         }
 
         #region IEquatable<Person>
@@ -119,8 +119,14 @@ namespace BSOA.Test.Model.V1
         #endregion
 
         #region IRow
-        ITable IRow<Person>.Table => _table;
-        int IRow<Person>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
+
+        void IRow.Remap(ITable table, int index)
+        {
+            _table = (PersonTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Person other)
         {

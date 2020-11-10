@@ -8,15 +8,15 @@ using System.Linq;
 using BSOA.Collections;
 using BSOA.Model;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     /// <summary>
     ///  BSOA GENERATED Entity for 'Result'
     /// </summary>
     public partial class Result : IRow<Result>, IEquatable<Result>
     {
-        private readonly ResultTable _table;
-        private readonly int _index;
+        private ResultTable _table;
+        private int _index;
 
         public Result() : this(RunDatabase.Current.Result)
         { }
@@ -49,56 +49,62 @@ namespace BSOA.Benchmarks.Model
 
         public string RuleId
         {
-            get => _table.RuleId[_index];
-            set => _table.RuleId[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.RuleId[_index]; }
+            set { _table.EnsureCurrent(this); _table.RuleId[_index] = value; }
+        }
+
+        public Rule Rule
+        {
+            get { _table.EnsureCurrent(this); return _table.Database.Rule.Get(_table.Rule[_index]); }
+            set { _table.EnsureCurrent(this); _table.Rule[_index] = _table.Database.Rule.LocalIndex(value); }
         }
 
         public string Guid
         {
-            get => _table.Guid[_index];
-            set => _table.Guid[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Guid[_index]; }
+            set { _table.EnsureCurrent(this); _table.Guid[_index] = value; }
         }
 
         public bool IsActive
         {
-            get => _table.IsActive[_index];
-            set => _table.IsActive[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.IsActive[_index]; }
+            set { _table.EnsureCurrent(this); _table.IsActive[_index] = value; }
         }
 
         public string Message
         {
-            get => _table.Message[_index];
-            set => _table.Message[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Message[_index]; }
+            set { _table.EnsureCurrent(this); _table.Message[_index] = value; }
         }
 
         public int StartLine
         {
-            get => _table.StartLine[_index];
-            set => _table.StartLine[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.StartLine[_index]; }
+            set { _table.EnsureCurrent(this); _table.StartLine[_index] = value; }
         }
 
         public DateTime WhenDetectedUtc
         {
-            get => _table.WhenDetectedUtc[_index];
-            set => _table.WhenDetectedUtc[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.WhenDetectedUtc[_index]; }
+            set { _table.EnsureCurrent(this); _table.WhenDetectedUtc[_index] = value; }
         }
 
         public BaselineState BaselineState
         {
-            get => (BaselineState)_table.BaselineState[_index];
-            set => _table.BaselineState[_index] = (int)value;
+            get { _table.EnsureCurrent(this); return (BaselineState)_table.BaselineState[_index]; }
+            set { _table.EnsureCurrent(this); _table.BaselineState[_index] = (int)value; }
         }
 
         public IDictionary<String, String> Properties
         {
-            get => _table.Properties[_index];
-            set => _table.Properties[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Properties[_index]; }
+            set { _table.EnsureCurrent(this); _table.Properties[_index] = value; }
         }
 
         public IList<int> Tags
         {
-            get => _table.Tags[_index];
-            set => _table.Tags[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Tags[_index]; }
+            set { _table.EnsureCurrent(this); _table.Tags[_index] = value; }
         }
 
         #region IEquatable<Result>
@@ -107,6 +113,7 @@ namespace BSOA.Benchmarks.Model
             if (other == null) { return false; }
 
             if (!object.Equals(this.RuleId, other.RuleId)) { return false; }
+            if (!object.Equals(this.Rule, other.Rule)) { return false; }
             if (!object.Equals(this.Guid, other.Guid)) { return false; }
             if (!object.Equals(this.IsActive, other.IsActive)) { return false; }
             if (!object.Equals(this.Message, other.Message)) { return false; }
@@ -130,6 +137,11 @@ namespace BSOA.Benchmarks.Model
                 if (RuleId != default(string))
                 {
                     result = (result * 31) + RuleId.GetHashCode();
+                }
+
+                if (Rule != default(Rule))
+                {
+                    result = (result * 31) + Rule.GetHashCode();
                 }
 
                 if (Guid != default(string))
@@ -203,12 +215,19 @@ namespace BSOA.Benchmarks.Model
         #endregion
 
         #region IRow
-        ITable IRow<Result>.Table => _table;
-        int IRow<Result>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
+
+        void IRow.Remap(ITable table, int index)
+        {
+            _table = (ResultTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Result other)
         {
             RuleId = other.RuleId;
+            Rule = Rule.Copy(_table.Database, other.Rule);
             Guid = other.Guid;
             IsActive = other.IsActive;
             Message = other.Message;

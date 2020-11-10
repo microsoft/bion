@@ -39,7 +39,7 @@ namespace BSOA.Column
                 case Nullability.NullsDisallowed:
                     return values;
                 default:
-                    throw new NotImplementedException($"NullableColumn.Wrap not implemented for Nullability {nullability}.");
+                    throw new NotImplementedException();
             }
         }
 

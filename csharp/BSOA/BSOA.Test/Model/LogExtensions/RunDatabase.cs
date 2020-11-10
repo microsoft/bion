@@ -6,7 +6,7 @@ using System;
 using BSOA.Column;
 using BSOA.Model;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 { 
     internal partial class RunDatabase
     {

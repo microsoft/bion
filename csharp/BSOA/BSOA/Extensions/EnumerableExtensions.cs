@@ -20,5 +20,16 @@ namespace BSOA.Extensions
                 array[next++] = item;
             }
         }
+
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+        {
+            if (source != null)
+            {
+                foreach (T item in source)
+                {
+                    action(item);
+                }
+            }
+        }
     }
 }

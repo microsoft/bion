@@ -15,8 +15,8 @@ namespace BSOA.Demo.Model.BSOA
     /// </summary>
     public partial class File : IRow<File>, IEquatable<File>
     {
-        private readonly FileTable _table;
-        private readonly int _index;
+        private FileTable _table;
+        private int _index;
 
         public File() : this(FileSystemDatabase.Current.File)
         { }
@@ -49,38 +49,38 @@ namespace BSOA.Demo.Model.BSOA
 
         public int ParentFolderIndex
         {
-            get => _table.ParentFolderIndex[_index];
-            set => _table.ParentFolderIndex[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.ParentFolderIndex[_index]; }
+            set { _table.EnsureCurrent(this); _table.ParentFolderIndex[_index] = value; }
         }
 
         public string Name
         {
-            get => _table.Name[_index];
-            set => _table.Name[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Name[_index]; }
+            set { _table.EnsureCurrent(this); _table.Name[_index] = value; }
         }
 
         public DateTime LastModifiedUtc
         {
-            get => _table.LastModifiedUtc[_index];
-            set => _table.LastModifiedUtc[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.LastModifiedUtc[_index]; }
+            set { _table.EnsureCurrent(this); _table.LastModifiedUtc[_index] = value; }
         }
 
         public DateTime CreatedUtc
         {
-            get => _table.CreatedUtc[_index];
-            set => _table.CreatedUtc[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.CreatedUtc[_index]; }
+            set { _table.EnsureCurrent(this); _table.CreatedUtc[_index] = value; }
         }
 
         public System.IO.FileAttributes Attributes
         {
-            get => (System.IO.FileAttributes)_table.Attributes[_index];
-            set => _table.Attributes[_index] = (int)value;
+            get { _table.EnsureCurrent(this); return (System.IO.FileAttributes)_table.Attributes[_index]; }
+            set { _table.EnsureCurrent(this); _table.Attributes[_index] = (int)value; }
         }
 
         public long Length
         {
-            get => _table.Length[_index];
-            set => _table.Length[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Length[_index]; }
+            set { _table.EnsureCurrent(this); _table.Length[_index] = value; }
         }
 
         #region IEquatable<File>
@@ -167,8 +167,14 @@ namespace BSOA.Demo.Model.BSOA
         #endregion
 
         #region IRow
-        ITable IRow<File>.Table => _table;
-        int IRow<File>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
+
+        void IRow.Remap(ITable table, int index)
+        {
+            _table = (FileTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(File other)
         {
