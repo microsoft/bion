@@ -6,7 +6,7 @@ pool:
 
 steps:
 - task: PowerShell@2
-    displayName: Build and Test
-    inputs:
-      targetType: filePath
-      filePath: ./scripts/BuildAndTest.ps1
+  displayName: Build and Test
+  inputs:
+    targetType: filePath
+    filePath: ./scripts/BuildAndTest.ps1
