@@ -35,6 +35,9 @@ $ErrorActionPreference = "Stop"
 $InformationPreference = "Continue"
 
 $ScriptName = $([io.Path]::GetFileNameWithoutExtension($PSCommandPath))
+
+Import-Module -Force $PSScriptRoot\NuGetUtilities.psm1
+
 $projects = Get-ChildItem -Include *.sln -Recurse
 
 foreach ($project in $projects) {
@@ -48,7 +51,7 @@ foreach ($project in $projects) {
 
     if (-not $NoBuild) {
         Write-Information "Building $project..."
-        dotnet build $project.FullName --no-restore --configuration Release
+        dotnet build $project.FullName --no-restore --configuration $Configuration
         if ($LASTEXITCODE -ne 0) {
             Exit-WithFailureMessage $ScriptName "Build of $solutionFilePath failed."
         }
@@ -56,7 +59,7 @@ foreach ($project in $projects) {
 
     if (-not $NoTest) {
         Write-Information "Testing $project..."
-        dotnet test $project.FullName --no-build --configuration Release
+        dotnet test $project.FullName --no-build --configuration $Configuration
         if ($LASTEXITCODE -ne 0) {
             Exit-WithFailureMessage $ScriptName "Build of $solutionFilePath failed."
         }        
