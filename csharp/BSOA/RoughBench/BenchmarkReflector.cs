@@ -17,7 +17,7 @@ namespace RoughBench.Attributes
 
 namespace RoughBench
 {
-    internal static class BenchmarkReflector
+    public static class BenchmarkReflector
     {
         /// <summary>
         ///  Reflection magic to get public methods with the [Benchmark] attribute
@@ -28,9 +28,26 @@ namespace RoughBench
         ///  closest related craziness.
         /// </remarks>
         /// <typeparam name="WithSignature">Action or Func with desired parameters and return type</typeparam>
-        /// <param name="fromType">Type to search for matching methods</param>
+        /// <param name="instance">Instance of type on which to call; optional</param>
         /// <returns>Dictionary with method names and Action or Func to invoke for each matching method</returns>
-        internal static Dictionary<string, WithSignature> BenchmarkMethods<WithSignature>(Type fromType)
+        public static Dictionary<string, WithSignature> BenchmarkMethods<WithSignature>(object instance)
+        {
+            return BenchmarkMethods<WithSignature>(instance.GetType(), instance);
+        }
+
+        /// <summary>
+        ///  Reflection magic to get public methods with the [Benchmark] attribute
+        ///  matching the desired signature.
+        /// </summary>
+        /// <remarks>
+        ///  See https://github.com/microsoft/elfie-arriba/blob/master/XForm/XForm/Core/NativeAccelerator.cs for the
+        ///  closest related craziness.
+        /// </remarks>
+        /// <typeparam name="WithSignature">Action or Func with desired parameters and return type</typeparam>
+        /// <param name="fromType">Type to search for matching methods</param>
+        /// <param name="instance">Instance of type on which to call; optional</param>
+        /// <returns>Dictionary with method names and Action or Func to invoke for each matching method</returns>
+        public static Dictionary<string, WithSignature> BenchmarkMethods<WithSignature>(Type fromType, object instance = null)
         {
             Dictionary<string, WithSignature> methods = new Dictionary<string, WithSignature>();
 
@@ -39,9 +56,6 @@ namespace RoughBench
             MethodInfo withSignatureInfo = delegateOrFuncType.GetMethod("Invoke");
             Type returnType = withSignatureInfo.ReturnType;
             List<Type> arguments = new List<Type>(withSignatureInfo.GetParameters().Select((pi) => pi.ParameterType));
-
-            // Create an instance of the desired class (triggering any initialization)
-            object instance = null;
 
             // Find all public methods with 'Benchmark' attribute and correct signature
             foreach (MethodInfo method in fromType.GetMethods())
@@ -53,6 +67,7 @@ namespace RoughBench
 
                 if (!method.IsStatic && instance == null)
                 {
+                    // Create an instance of the desired class (triggering any initialization)
                     instance = fromType.GetConstructor(new Type[0]).Invoke(null);
                 }
 
