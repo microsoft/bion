@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using BSOA.Column;
+using BSOA.GC;
 using BSOA.IO;
 
 namespace BSOA.Model
@@ -13,19 +14,31 @@ namespace BSOA.Model
     ///  BSOA Database is the container class for an overall set of tables.
     ///  Projects using BSOA will have the 'root' type inherit from Database.
     /// </summary>
-    public class Database : ITreeSerializable
+    public abstract class Database : IDatabase
     {
-        protected Dictionary<string, ITable> Tables { get; private set; }
+        public string RootTableName { get; }
+        public Dictionary<string, ITable> Tables { get; }
 
-        public Database()
+        public Database(string rootTableName)
         {
+            RootTableName = rootTableName;
             Tables = new Dictionary<string, ITable>();
         }
 
-        protected U AddTable<U>(string name, U table) where U : ITable
+        public abstract void GetOrBuildTables();
+
+        protected U GetOrBuild<U>(string name, Func<U> builder) where U : ITable
         {
-            Tables[name] = table;
-            return table;
+            if (Tables.TryGetValue(name, out ITable table))
+            {
+                return (U)table;
+            }
+            else
+            {
+                U newTable = builder();
+                Tables[name] = newTable;
+                return newTable;
+            }
         }
 
         public IColumn<T> BuildColumn<T>(string tableName, string columnName, T defaultValue = default)
@@ -60,6 +73,16 @@ namespace BSOA.Model
             }
         }
 
+        /// <summary>
+        ///  Garbage Collect the tables in this database, removing any
+        ///  unreachable rows.
+        /// </summary>
+        public bool Collect()
+        {
+            DatabaseCollector collector = new DatabaseCollector(this);
+            return collector.Collect();
+        }
+
         public void Read(ITreeReader reader)
         {
             Clear();
@@ -70,6 +93,9 @@ namespace BSOA.Model
 
         public void Write(ITreeWriter writer)
         {
+            // Garbage Collect before writing
+            Collect();
+
             // Write non-empty tables only
             writer.WriteStartObject();
 

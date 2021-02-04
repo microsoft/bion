@@ -16,11 +16,11 @@ namespace BSOA.Demo.Model.BSOA
     /// </summary>
     public partial class FileSystem : IRow<FileSystem>, IEquatable<FileSystem>
     {
-        private readonly FileSystemTable _table;
-        private readonly int _index;
+        private FileSystemTable _table;
+        private int _index;
 
         internal FileSystemDatabase Database => _table.Database;
-        public ITreeSerializable DB => _table.Database;
+        public IDatabase DB => _table.Database;
 
         public FileSystem() : this(new FileSystemDatabase().FileSystem)
         { }
@@ -43,34 +43,16 @@ namespace BSOA.Demo.Model.BSOA
 
         partial void Init();
 
-        private TypedList<Folder> _folders;
         public IList<Folder> Folders
         {
-            get
-            {
-                if (_folders == null) { _folders = TypedList<Folder>.Get(_table.Database.Folder, _table.Folders, _index); }
-                return _folders;
-            }
-            set
-            {
-                TypedList<Folder>.Set(_table.Database.Folder, _table.Folders, _index, value);
-                _folders = null;
-            }
+            get { _table.EnsureCurrent(this); return TypedList<Folder>.Get(_table.Database.Folder, _table.Folders, _index); }
+            set { _table.EnsureCurrent(this); TypedList<Folder>.Set(_table.Database.Folder, _table.Folders, _index, value); }
         }
 
-        private TypedList<File> _files;
         public IList<File> Files
         {
-            get
-            {
-                if (_files == null) { _files = TypedList<File>.Get(_table.Database.File, _table.Files, _index); }
-                return _files;
-            }
-            set
-            {
-                TypedList<File>.Set(_table.Database.File, _table.Files, _index, value);
-                _files = null;
-            }
+            get { _table.EnsureCurrent(this); return TypedList<File>.Get(_table.Database.File, _table.Files, _index); }
+            set { _table.EnsureCurrent(this); TypedList<File>.Set(_table.Database.File, _table.Files, _index, value); }
         }
 
         #region IEquatable<FileSystem>
@@ -133,8 +115,14 @@ namespace BSOA.Demo.Model.BSOA
         #endregion
 
         #region IRow
-        ITable IRow<FileSystem>.Table => _table;
-        int IRow<FileSystem>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
+
+        void IRow.Remap(ITable table, int index)
+        {
+            _table = (FileSystemTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(FileSystem other)
         {

@@ -94,11 +94,34 @@ namespace BSOA.Test
             IDictionary<int, int> dictionary = column[0];
 
             dictionary[5] = 5;
+            dictionary[8] = 8;
             dictionary[10] = 10;
 
             Assert.Equal(10, dictionary[10]);
             Assert.Equal(5, dictionary[5]);
             Assert.False(dictionary.ContainsKey(6));
+
+            // Trigger column collection with all values still used; verify everything kept
+            column.Trim();
+            Assert.Equal(10, dictionary[10]);
+            Assert.Equal(5, dictionary[5]);
+            Assert.False(dictionary.ContainsKey(6));
+
+            // Replace a value
+            dictionary[10] = 11;
+            Assert.Equal(11, dictionary[10]);
+
+            // Remove a key
+            dictionary.Remove(5);
+            Assert.True(dictionary.ContainsKey(10));
+            Assert.False(dictionary.ContainsKey(5));
+
+            // Trigger unused key/value pair collection
+            column.Trim();
+
+            // Verify remaining key still present and with correct value
+            Assert.Equal(11, dictionary[10]);
+            Assert.Equal(8, dictionary[8]);
         }
     }
 }

@@ -5,24 +5,28 @@ using System;
 
 using BSOA.Model;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     /// <summary>
     ///  BSOA GENERATED Database for 'Run'
     /// </summary>
     internal partial class RunDatabase : Database
     {
-        internal ResultTable Result { get; }
-        internal RuleTable Rule { get; }
-        internal RunTable Run { get; }
+        internal ResultTable Result;
+        internal RuleTable Rule;
+        internal RunTable Run;
 
-        public RunDatabase()
+        public RunDatabase() : base("Run")
         {
             _lastCreated = new WeakReference<RunDatabase>(this);
+            GetOrBuildTables();
+        }
 
-            Result = AddTable(nameof(Result), new ResultTable(this));
-            Rule = AddTable(nameof(Rule), new RuleTable(this));
-            Run = AddTable(nameof(Run), new RunTable(this));
+        public override void GetOrBuildTables()
+        {
+            Result = GetOrBuild(nameof(Result), () => new ResultTable(this));
+            Rule = GetOrBuild(nameof(Rule), () => new RuleTable(this));
+            Run = GetOrBuild(nameof(Run), () => new RunTable(this));
         }
 
         [ThreadStatic]

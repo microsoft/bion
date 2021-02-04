@@ -4,12 +4,15 @@
 using System;
 using System.Collections.Generic;
 
+using BaselineState = BSOA.Test.Model.Log.BaselineState;
+
 namespace BSOA.Benchmarks.NonBsoaModel
 {
     public class Result
     {
         public string Guid { get; set; }
         public string RuleId { get; set; }
+        public Rule Rule { get; set; }
         public bool IsActive { get; set; }
         public string Message { get; set; }
         public int StartLine { get; set; }

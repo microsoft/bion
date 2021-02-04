@@ -15,8 +15,8 @@ namespace BSOA.Demo.Model.BSOA
     /// </summary>
     public partial class Folder : IRow<Folder>, IEquatable<Folder>
     {
-        private readonly FolderTable _table;
-        private readonly int _index;
+        private FolderTable _table;
+        private int _index;
 
         public Folder() : this(FileSystemDatabase.Current.Folder)
         { }
@@ -49,14 +49,14 @@ namespace BSOA.Demo.Model.BSOA
 
         public int ParentIndex
         {
-            get => _table.ParentIndex[_index];
-            set => _table.ParentIndex[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.ParentIndex[_index]; }
+            set { _table.EnsureCurrent(this); _table.ParentIndex[_index] = value; }
         }
 
         public string Name
         {
-            get => _table.Name[_index];
-            set => _table.Name[_index] = value;
+            get { _table.EnsureCurrent(this); return _table.Name[_index]; }
+            set { _table.EnsureCurrent(this); _table.Name[_index] = value; }
         }
 
         #region IEquatable<Folder>
@@ -119,8 +119,14 @@ namespace BSOA.Demo.Model.BSOA
         #endregion
 
         #region IRow
-        ITable IRow<Folder>.Table => _table;
-        int IRow<Folder>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
+
+        void IRow.Remap(ITable table, int index)
+        {
+            _table = (FolderTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Folder other)
         {

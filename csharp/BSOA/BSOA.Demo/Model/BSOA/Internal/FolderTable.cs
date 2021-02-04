@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 
+using BSOA.Collections;
 using BSOA.Column;
 using BSOA.Model;
 
@@ -19,12 +20,16 @@ namespace BSOA.Demo.Model.BSOA
         internal IColumn<int> ParentIndex;
         internal IColumn<string> Name;
 
-        internal FolderTable(FileSystemDatabase database) : base()
+        public FolderTable(IDatabase database, Dictionary<string, IColumn> columns = null) : base(database, columns)
         {
-            Database = database;
+            Database = (FileSystemDatabase)database;
+            GetOrBuildColumns();
+        }
 
-            ParentIndex = AddColumn(nameof(ParentIndex), database.BuildColumn<int>(nameof(Folder), nameof(ParentIndex), default));
-            Name = AddColumn(nameof(Name), database.BuildColumn<string>(nameof(Folder), nameof(Name), default));
+        public override void GetOrBuildColumns()
+        {
+            ParentIndex = GetOrBuild(nameof(ParentIndex), () => Database.BuildColumn<int>(nameof(Folder), nameof(ParentIndex), default));
+            Name = GetOrBuild(nameof(Name), () => Database.BuildColumn<string>(nameof(Folder), nameof(Name), default));
         }
 
         public override Folder Get(int index)

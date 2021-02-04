@@ -9,18 +9,18 @@ using BSOA.Collections;
 using BSOA.IO;
 using BSOA.Model;
 
-namespace BSOA.Benchmarks.Model
+namespace BSOA.Test.Model.Log
 {
     /// <summary>
     ///  BSOA GENERATED Root Entity for 'Run'
     /// </summary>
     public partial class Run : IRow<Run>, IEquatable<Run>
     {
-        private readonly RunTable _table;
-        private readonly int _index;
+        private RunTable _table;
+        private int _index;
 
         internal RunDatabase Database => _table.Database;
-        public ITreeSerializable DB => _table.Database;
+        public IDatabase DB => _table.Database;
 
         public Run() : this(new RunDatabase().Run)
         { }
@@ -43,34 +43,16 @@ namespace BSOA.Benchmarks.Model
 
         partial void Init();
 
-        private TypedList<Result> _results;
         public IList<Result> Results
         {
-            get
-            {
-                if (_results == null) { _results = TypedList<Result>.Get(_table.Database.Result, _table.Results, _index); }
-                return _results;
-            }
-            set
-            {
-                TypedList<Result>.Set(_table.Database.Result, _table.Results, _index, value);
-                _results = null;
-            }
+            get { _table.EnsureCurrent(this); return TypedList<Result>.Get(_table.Database.Result, _table.Results, _index); }
+            set { _table.EnsureCurrent(this); TypedList<Result>.Set(_table.Database.Result, _table.Results, _index, value); }
         }
 
-        private TypedList<Rule> _rules;
         public IList<Rule> Rules
         {
-            get
-            {
-                if (_rules == null) { _rules = TypedList<Rule>.Get(_table.Database.Rule, _table.Rules, _index); }
-                return _rules;
-            }
-            set
-            {
-                TypedList<Rule>.Set(_table.Database.Rule, _table.Rules, _index, value);
-                _rules = null;
-            }
+            get { _table.EnsureCurrent(this); return TypedList<Rule>.Get(_table.Database.Rule, _table.Rules, _index); }
+            set { _table.EnsureCurrent(this); TypedList<Rule>.Set(_table.Database.Rule, _table.Rules, _index, value); }
         }
 
         #region IEquatable<Run>
@@ -133,8 +115,14 @@ namespace BSOA.Benchmarks.Model
         #endregion
 
         #region IRow
-        ITable IRow<Run>.Table => _table;
-        int IRow<Run>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
+
+        void IRow.Remap(ITable table, int index)
+        {
+            _table = (RunTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Run other)
         {

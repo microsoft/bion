@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>BSOA.Json adds JSON serialization support for BSOA object models, in addition to the default binary format. This provides an easy interchange format for consumers which can't read the binary format.</Description>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

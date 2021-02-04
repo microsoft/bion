@@ -16,11 +16,11 @@ namespace BSOA.Test.Model.V1
     /// </summary>
     public partial class Community : IRow<Community>, IEquatable<Community>
     {
-        private readonly CommunityTable _table;
-        private readonly int _index;
+        private CommunityTable _table;
+        private int _index;
 
         internal PersonDatabase Database => _table.Database;
-        public ITreeSerializable DB => _table.Database;
+        public IDatabase DB => _table.Database;
 
         public Community() : this(new PersonDatabase().Community)
         { }
@@ -43,19 +43,10 @@ namespace BSOA.Test.Model.V1
 
         partial void Init();
 
-        private TypedList<Person> _people;
         public IList<Person> People
         {
-            get
-            {
-                if (_people == null) { _people = TypedList<Person>.Get(_table.Database.Person, _table.People, _index); }
-                return _people;
-            }
-            set
-            {
-                TypedList<Person>.Set(_table.Database.Person, _table.People, _index, value);
-                _people = null;
-            }
+            get { _table.EnsureCurrent(this); return TypedList<Person>.Get(_table.Database.Person, _table.People, _index); }
+            set { _table.EnsureCurrent(this); TypedList<Person>.Set(_table.Database.Person, _table.People, _index, value); }
         }
 
         #region IEquatable<Community>
@@ -112,8 +103,14 @@ namespace BSOA.Test.Model.V1
         #endregion
 
         #region IRow
-        ITable IRow<Community>.Table => _table;
-        int IRow<Community>.Index => _index;
+        ITable IRow.Table => _table;
+        int IRow.Index => _index;
+
+        void IRow.Remap(ITable table, int index)
+        {
+            _table = (CommunityTable)table;
+            _index = index;
+        }
 
         public void CopyFrom(Community other)
         {

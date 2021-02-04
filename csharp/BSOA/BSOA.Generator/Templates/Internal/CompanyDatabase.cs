@@ -13,22 +13,26 @@ namespace BSOA.Generator.Templates
     internal partial class CompanyDatabase : Database
     {
         // <TableMemberList>
-        internal CompanyTable Company { get; }
-        internal EmployeeTable Employee { get; }
+        internal CompanyTable Company;
+        internal EmployeeTable Employee;
         //   <TableMember>
-        internal TeamTable Team { get; }
+        internal TeamTable Team;
         //   </TableMember>
         // </TableMemberList>
 
-        public CompanyDatabase()
+        public CompanyDatabase() : base("Company")
         {
             _lastCreated = new WeakReference<CompanyDatabase>(this);
+            GetOrBuildTables();
+        }
 
+        public override void GetOrBuildTables()
+        {
             // <TableConstructorList>
-            Company = AddTable(nameof(Company), new CompanyTable(this));
-            Employee = AddTable(nameof(Employee), new EmployeeTable(this));
+            Company = GetOrBuild(nameof(Company), () => new CompanyTable(this));
+            Employee = GetOrBuild(nameof(Employee), () => new EmployeeTable(this));
             //   <TableConstructor>
-            Team = AddTable(nameof(Team), new TeamTable(this));
+            Team = GetOrBuild(nameof(Team), () => new TeamTable(this));
             //   </TableConstructor>
             // </TableConstructorList>
         }

@@ -58,7 +58,8 @@ namespace BSOA.Test.Model
 
             // Verify Database.Clear works
             community.DB.Clear();
-            Assert.Empty(community.People);
+            var people = community.People;
+            Assert.True(people == null || people.Count == 0);
         }
 
         [Fact]

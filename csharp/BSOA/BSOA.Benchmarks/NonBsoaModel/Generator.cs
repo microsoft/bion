@@ -4,14 +4,13 @@
 using System;
 using System.Collections.Generic;
 
+using BaselineState = BSOA.Test.Model.Log.BaselineState;
+
 namespace BSOA.Benchmarks.NonBsoaModel
 {
     public class Generator
     {
-        // NOTE: Copy these from BSOA 'Generator' class to get identical measurements
-
-        private const int RuleCount = 20;
-        private const int ResultCount = 1000;
+        // NOTE: Copy these from BSOA.Test.Model.LogExtensions.Generator class to get identical measurements
 
         private static readonly string[] Messages = new string[]
         {
@@ -22,7 +21,7 @@ namespace BSOA.Benchmarks.NonBsoaModel
 
         private static readonly string[] Commits = new string[] { "105adc4", "105adc4", "f56a516", "f3181ce", "2579f8d", "3b22a90", "cd18eb6" };
 
-        private Run Build()
+        public static Run Build(int ruleCount, int resultCount)
         {
             DateTime when = DateTime.UtcNow;
             Random r = new Random();
@@ -31,7 +30,7 @@ namespace BSOA.Benchmarks.NonBsoaModel
             run.Rules = new List<Rule>();
             run.Results = new List<Result>();
 
-            for (int i = 0; i < RuleCount; ++i)
+            for (int i = 0; i < ruleCount; ++i)
             {
                 Rule rule = new Rule();
                 rule.Id = $"SCAN{i:D4}";
@@ -41,14 +40,18 @@ namespace BSOA.Benchmarks.NonBsoaModel
                 run.Rules.Add(rule);
             }
 
-            for (int i = 0; i < ResultCount; ++i)
+            for (int i = 0; i < resultCount; ++i)
             {
                 Result result = new Result();
+                Rule rule = run.Rules[r.Next(ruleCount - 2)];
+
+                result.RuleId = rule.Id;
+                result.Rule = rule;
+
                 // result.Guid = null;
-                result.RuleId = $"SCAN{r.Next(RuleCount - 2):D4}";
                 result.IsActive = (i % 3 == 0);
                 result.BaselineState = (i % 10 == 4 ? BaselineState.New : BaselineState.Unchanged);
-                result.StartLine = r.Next(1000);
+                result.StartLine = r.Next(100000);
                 result.Message = Messages[r.Next(Messages.Length)];
 
                 // Add properties; more properties will show Dictionary performance more clearly. Real CloudMine data has 11 properties.
@@ -83,7 +86,7 @@ namespace BSOA.Benchmarks.NonBsoaModel
 
         public static Run CreateOrLoad()
         {
-            return new Generator().Build();
+            return Build(20, 1000);
         }
     }
 }
