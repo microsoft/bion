@@ -507,7 +507,7 @@ namespace Bion.Vector
             private int[] _currentPage;
             private int _currentPageCount;
             private int _index;
-            
+
             internal Enumerator(IntBlockReader reader)
             {
                 _reader = reader;
@@ -517,7 +517,7 @@ namespace Bion.Vector
 
                 Current = 0;
                 _index = -1;
-                
+
                 Reset();
             }
 
@@ -596,7 +596,7 @@ namespace Bion.Vector
             int shuffleIndex = 0;
             int multiplyIndex = 0;
 
-            // For Each bit length... 
+            // For Each bit length...
             for (int bitLength = 0; bitLength <= 32; ++bitLength)
             {
                 int bitOffset = 0;
@@ -677,8 +677,8 @@ namespace Bion.Vector
                     Vector128<int> vector2 = Unsafe.ReadUnaligned<Vector128<int>>(&bufferPtr[index + bytes1]);
 
                     // Shuffle to get the right bytes in each integer
-                    vector1 = Sse.StaticCast<sbyte, int>(Ssse3.Shuffle(Sse.StaticCast<int, sbyte>(vector1), shuffle1));
-                    vector2 = Sse.StaticCast<sbyte, int>(Ssse3.Shuffle(Sse.StaticCast<int, sbyte>(vector2), shuffle2));
+                    vector1 = (Ssse3.Shuffle(vector1.AsSByte(), shuffle1).AsInt32());
+                    vector2 = (Ssse3.Shuffle(vector2.AsSByte(), shuffle2).AsInt32());
 
                     // Multiply to shift each int so the desired bits are at the top
                     vector1 = Sse41.MultiplyLow(vector1, multiply1);
