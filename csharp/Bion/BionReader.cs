@@ -31,6 +31,7 @@ namespace Bion
 
         // Lookups: Marker to Depth, Length, TokenType
         private static sbyte[] DepthLookup = Enumerable.Repeat((sbyte)0, 256).ToArray();
+
         private static sbyte[] LengthLookup = Enumerable.Repeat((sbyte)0, 256).ToArray();
         private static BionToken[] TokenLookup = Enumerable.Repeat(BionToken.None, 256).ToArray();
 
@@ -156,7 +157,7 @@ namespace Bion
         public void Skip()
         {
             // If this container is indexed, skip by seeking
-            if(_containerIndex != null)
+            if (_containerIndex != null)
             {
                 ContainerEntry entry = _containerIndex.NearestIndexedContainer(BytesRead);
 
@@ -186,7 +187,7 @@ namespace Bion
             int depth = _currentDepth;
 
             // Find the closing container for the container we're in
-            int innerDepth = 1;
+            uint innerDepth = 1;
             while (!_reader.EndOfStream)
             {
                 _reader.EnsureSpace(16 * 1024);
@@ -211,13 +212,13 @@ namespace Bion
             int targetDepth = _currentDepth - 1;
             long end = _reader.BytesRead;
 
-            while(end > 0)
+            while (end > 0)
             {
                 // Look for a StartObject or StartArray
-                for(int i = _reader.Index; i >= 0; --i)
+                for (int i = _reader.Index; i >= 0; --i)
                 {
                     _currentDepth -= DepthLookup[_reader.Buffer[i]];
-                    if(_currentDepth == targetDepth)
+                    if (_currentDepth == targetDepth)
                     {
                         _reader.Index = i;
                         return true;
@@ -280,7 +281,6 @@ namespace Bion
             }
             else
             {
-
                 return *(double*)&value;
             }
         }
@@ -288,7 +288,7 @@ namespace Bion
         public string CurrentString()
         {
             if (TokenType == BionToken.Null) { return null; }
-            if (TokenType != BionToken.PropertyName && TokenType != BionToken.String) { throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a string type."); } 
+            if (TokenType != BionToken.PropertyName && TokenType != BionToken.String) { throw new BionSyntaxException($"@{BytesRead}: TokenType {TokenType} isn't a string type."); }
 
             if (_currentDecodedString == null)
             {

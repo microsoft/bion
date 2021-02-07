@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -15,5 +15,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Map\Map.csproj" />
   </ItemGroup>
-
 </Project>

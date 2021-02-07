@@ -13,5 +13,4 @@
     <ProjectReference Include="..\Bion.Json\Bion.Json.csproj" />
     <ProjectReference Include="..\Bion\Bion.csproj" />
   </ItemGroup>
-
 </Project>

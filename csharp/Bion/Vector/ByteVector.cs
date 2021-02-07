@@ -52,7 +52,7 @@ namespace Bion.Vector
 
                     // Convert to a bit vector
                     uint matchBits = unchecked((uint)Avx2.MoveMask(matchV));
-                    if(matchBits != 0)
+                    if (matchBits != 0)
                     {
                         return i + (int)TrailingZeroCount(matchBits);
                     }
@@ -119,7 +119,7 @@ namespace Bion.Vector
             }
         }
 
-        public static int Skip(byte[] content, int index, int endIndex, ref int depth)
+        public static int Skip(byte[] content, int index, int endIndex, ref uint depth)
         {
             if (endIndex - index > 128 && Avx2.IsSupported)
             {
@@ -131,7 +131,7 @@ namespace Bion.Vector
             }
         }
 
-        private static int SkipCs(byte[] content, int index, int endIndex, ref int depth)
+        private static int SkipCs(byte[] content, int index, int endIndex, ref uint depth)
         {
             int i;
             for (i = index; i < endIndex; ++i)
@@ -141,7 +141,7 @@ namespace Bion.Vector
                 {
                     // Depth +1 for 0xFF, 0xFE, -1 for 0xFD, 0xFC.
                     // Second to last bit is one for open, zero for close.
-                    depth += (value & 0x2) - 1;
+                    depth += (uint)(value & 0x2) - 1;
                     if (depth == 0) { break; }
                 }
             }
@@ -149,7 +149,7 @@ namespace Bion.Vector
             return i;
         }
 
-        private static int SkipAvx(byte[] content, int index, int endIndex, ref int depth)
+        private static int SkipAvx(byte[] content, int index, int endIndex, ref uint depth)
         {
             // Load a vector to convert unsigned to signed value order (only signed compare supported)
             Vector256<sbyte> toSignedV = SetAllTo(128);
@@ -182,10 +182,10 @@ namespace Bion.Vector
                     uint endBits = (startOrEndBits & ~startBits);
 
                     // Count start and ends found
-                    int startCount = Popcnt.PopCount(startBits);
-                    int endCount = Popcnt.PopCount(endBits);
+                    uint startCount = Popcnt.PopCount(startBits);
+                    uint endCount = Popcnt.PopCount(endBits);
 
-                    if(depth - endCount <= 0)
+                    if (depth - endCount <= 0)
                     {
                         // If there are enough end containers here to reach the root, we have to check the order
                         int inner = SkipCs(content, i, i + 32, ref depth);
@@ -218,6 +218,7 @@ namespace Bion.Vector
         }
 
         private const uint DeBruijnSequence = 0x077CB531U;
+
         private static readonly int[] DeBruijnTrailingZeroCount =
         {
             0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,

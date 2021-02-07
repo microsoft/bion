@@ -25,7 +25,7 @@ namespace Bion.Test.Vector
             Assert.AreEqual(-1, ByteVector.IndexOf(0, sample, 1, sample.Length));           // Index respected
             Assert.AreEqual(1, ByteVector.IndexOf(1, sample, 1, sample.Length));            // Index respected
             Assert.AreEqual(248, ByteVector.IndexOf(248, sample, 0, sample.Length - 1));    // Index respected
-            Assert.AreEqual(-1, ByteVector.IndexOf(249, sample, 0, sample.Length -1));      // Index respected
+            Assert.AreEqual(-1, ByteVector.IndexOf(249, sample, 0, sample.Length - 1));      // Index respected
         }
 
         [TestMethod]
@@ -58,7 +58,7 @@ namespace Bion.Test.Vector
             sample[250] = (byte)BionToken.EndObject;
             sample[251] = (byte)BionToken.EndArray;
 
-            int depth;
+            uint depth;
 
             // Inside Object, find end
             depth = 1;
