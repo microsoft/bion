@@ -58,7 +58,7 @@ namespace RoughBench
             List<Type> arguments = new List<Type>(withSignatureInfo.GetParameters().Select((pi) => pi.ParameterType));
 
             // Find all public methods with 'Benchmark' attribute and correct signature
-            foreach (MethodInfo method in fromType.GetMethods())
+            foreach (MethodInfo method in fromType.GetMethods(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance))
             {
                 if (!method.IsPublic) { continue; }
                 if (!method.GetCustomAttributes().Where((a) => a.GetType().Name == "BenchmarkAttribute").Any()) { continue; }
