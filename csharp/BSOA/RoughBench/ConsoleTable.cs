@@ -3,12 +3,23 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 
 namespace RoughBench
 {
+    internal struct Point
+    {
+        public int X { get; set; }
+        public int Y { get; set; }
+
+        public Point(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+    }
+
     /// <summary>
     ///  ConsoleTable writes formatted tables in the console, supporting highlighting and right-aligned columns.
     ///  Output is Markdown compatible for easy copy and paste.
